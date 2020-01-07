@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import javax.persistence.EntityManager;
 
 
 @RestController
+@Transactional
 public class TeamsController {
 
     @Autowired
@@ -28,8 +30,8 @@ public class TeamsController {
                                              @RequestParam("teamTitle") String teamTitle) {
 
         Team team = new Team();
-        team.setTeamTitle("Boshtulke");
-        team.setTeamNumber("KOKOKO123");
+        team.setTeamTitle("Boshtulke: " + teamTitle);
+        team.setTeamNumber("KOKOKO123: " + teamNumber);
         entityManager.persist(team);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
