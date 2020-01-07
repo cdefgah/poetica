@@ -2,16 +2,14 @@ package com.cdefgah.poetica.controllers;
 
 import com.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.List;
 
 
 @RestController
@@ -19,25 +17,70 @@ import javax.persistence.EntityManager;
 public class TeamsController {
 
     @Autowired
-    ApplicationContext context;
-
-    @Autowired
     EntityManager entityManager;
 
     @RequestMapping(path = "/teams", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
-    public ResponseEntity<String> addNewTeam(@RequestParam("teamNumber") String teamNumber,
+    public ResponseEntity<Long> addNewTeam(@RequestParam("teamNumber") String teamNumber,
                                              @RequestParam("teamTitle") String teamTitle) {
-
         Team team = new Team();
-        team.setTeamTitle("Boshtulke: " + teamTitle);
-        team.setTeamNumber("KOKOKO123: " + teamNumber);
+        team.setTeamTitle(teamTitle);
+        team.setTeamNumber(teamNumber);
         entityManager.persist(team);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return new ResponseEntity<>(team.getId(), HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/teams", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Team> getTeamByNumber(@RequestParam("teamNumber") String teamNumber) {
-        return null;
+    @RequestMapping(path = "/teams/all", method = RequestMethod.GET, produces = "application/json")
+    public List<Team> getAllTeams() {
+        Query query = entityManager.createQuery("select team from Team team", Team.class);
+        return query.getResultList();
     }
+
+    @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Team> getTeamById(@PathVariable long teamId) {
+        Team team = entityManager.find(Team.class, teamId);
+        if (team != null) {
+            return new ResponseEntity<>(team, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(path = "/teams", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<Team> updateTeamTitle(@RequestParam("teamId") long teamId,
+                                                @RequestParam("newTeamTitle") String newTeamTitle) {
+
+        if (newTeamTitle == null || newTeamTitle.trim().length() == 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Team team = entityManager.find(Team.class, teamId);
+        if (team != null) {
+            team.setTeamTitle(newTeamTitle);
+            entityManager.persist(team);
+            return new ResponseEntity<>(team, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     *     @RequestMapping(path = "/teams", method = RequestMethod.PUT, produces = "application/json")
+     *     public ResponseEntity<Team> updateTeamNumber(@RequestParam("teamId") long teamId,
+     *                                                 @RequestParam("newTeamNumber") String newTeamNumber) {
+     *
+     *         if (newTeamNumber == null || newTeamNumber.trim().length() == 0) {
+     *             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+     *         }
+     *
+     *         Team team = entityManager.find(Team.class, teamId);
+     *         if (team != null) {
+     *             team.setTeamNumber(newTeamNumber);
+     *             entityManager.persist(team);
+     *             return new ResponseEntity<>(team, HttpStatus.OK);
+     *         } else {
+     *             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+     *         }
+     *     }
+     */
 }
