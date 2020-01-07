@@ -21,8 +21,8 @@ public class ExportController {
 
     private static String SERVER_LOCATION = "C:\\Temp\\";
 
-    @RequestMapping("/export/results")
-    public String index() {
+    @RequestMapping("/export/teams")
+    public String getTeams() {
         return "Abartulke Mabulke Tarampulke!";
     }
 
