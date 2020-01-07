@@ -21,16 +21,20 @@ public class TeamsController {
 
     @RequestMapping(path = "/teams", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
-    public ResponseEntity<Long> addNewTeam(@RequestParam("teamNumber") String teamNumber,
+    public ResponseEntity<Team> addNewTeam(@RequestParam("teamNumber") String teamNumber,
                                              @RequestParam("teamTitle") String teamTitle) {
+        if (!isTeamNumberUnique(teamNumber)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         Team team = new Team();
-        team.setTeamTitle(teamTitle);
-        team.setTeamNumber(teamNumber);
+        team.setTitle(teamTitle);
+        team.setNumber(teamNumber);
         entityManager.persist(team);
-        return new ResponseEntity<>(team.getId(), HttpStatus.CREATED);
+        return new ResponseEntity<>(team, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/teams/all", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(path = "/teams", method = RequestMethod.GET, produces = "application/json")
     public List<Team> getAllTeams() {
         Query query = entityManager.createQuery("select team from Team team", Team.class);
         return query.getResultList();
@@ -46,17 +50,33 @@ public class TeamsController {
         }
     }
 
-    @RequestMapping(path = "/teams", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<Team> updateTeamTitle(@RequestParam("teamId") long teamId,
-                                                @RequestParam("newTeamTitle") String newTeamTitle) {
+    @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<Team> updateTeam(@PathVariable long teamId,
+                                           @RequestParam("newTeamNumber") String newTeamNumber,
+                                           @RequestParam("newTeamTitle") String newTeamTitle) {
 
-        if (newTeamTitle == null || newTeamTitle.trim().length() == 0) {
+        // at least either newTeamNumber or newTeamTitle should be set
+        boolean updateNumber = !(newTeamNumber == null || newTeamNumber.isEmpty());
+        boolean updateTitle = !(newTeamTitle == null || newTeamTitle.isEmpty());
+
+        if (!updateNumber && !updateTitle) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         Team team = entityManager.find(Team.class, teamId);
         if (team != null) {
-            team.setTeamTitle(newTeamTitle);
+            if (updateNumber) {
+                if (isTeamNumberUnique(newTeamNumber)) {
+                    team.setNumber(newTeamNumber);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            if (updateTitle) {
+                team.setTitle(newTeamTitle);
+            }
+
             entityManager.persist(team);
             return new ResponseEntity<>(team, HttpStatus.OK);
         } else {
@@ -64,23 +84,15 @@ public class TeamsController {
         }
     }
 
-    /**
-     *     @RequestMapping(path = "/teams", method = RequestMethod.PUT, produces = "application/json")
-     *     public ResponseEntity<Team> updateTeamNumber(@RequestParam("teamId") long teamId,
-     *                                                 @RequestParam("newTeamNumber") String newTeamNumber) {
-     *
-     *         if (newTeamNumber == null || newTeamNumber.trim().length() == 0) {
-     *             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-     *         }
-     *
-     *         Team team = entityManager.find(Team.class, teamId);
-     *         if (team != null) {
-     *             team.setTeamNumber(newTeamNumber);
-     *             entityManager.persist(team);
-     *             return new ResponseEntity<>(team, HttpStatus.OK);
-     *         } else {
-     *             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-     *         }
-     *     }
-     */
+    @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
+    public ResponseEntity<Team> deleteTeam(@PathVariable long teamId) {
+        // TODO check existing answers, if there are existing answers don't delete
+        return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    private boolean isTeamNumberUnique(String teamNumber) {
+        Query query = entityManager.createQuery("from Team t where t.number=:teamNumber", Team.class);
+        query.setParameter("teamNumber", teamNumber);
+        return query.getResultList().isEmpty();
+    }
 }

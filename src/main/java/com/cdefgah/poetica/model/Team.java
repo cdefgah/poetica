@@ -10,11 +10,11 @@ public final class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "team_number", length = 32, nullable = false, unique = true)
-    private String teamNumber;
+    @Column(length = 32, nullable = false, unique = true)
+    private String number;
 
-    @Column(name = "team_title", length = 256, nullable = false)
-    private String teamTitle;
+    @Column(length = 256, nullable = false)
+    private String title;
 
     public Long getId() {
         return id;
@@ -24,19 +24,19 @@ public final class Team {
         this.id = id;
     }
 
-    public String getTeamNumber() {
-        return teamNumber;
+    public String getNumber() {
+        return number;
     }
 
-    public void setTeamNumber(String teamNumber) {
-        this.teamNumber = teamNumber;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public String getTeamTitle() {
-        return teamTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTeamTitle(String teamTitle) {
-        this.teamTitle = teamTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
