@@ -11,7 +11,7 @@ public final class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 32, nullable = false, unique = true)
+    @Column(length = 32, nullable = true)
     private String number;
 
     @Column(length = 256, nullable = false)

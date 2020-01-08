@@ -23,6 +23,10 @@ public final class Answer {
     @Column(length = 256, nullable = true)
     private String comment;
 
+    @Column(nullable = true)
+    @Enumerated(EnumType.STRING)
+    private Grade grade;
+
     public Long getId() {
         return id;
     }
@@ -61,6 +65,14 @@ public final class Answer {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Grade getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Grade grade) {
+        this.grade = grade;
     }
 
     @Override

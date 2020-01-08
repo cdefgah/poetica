@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @Transactional
-public class TeamsController {
+public class TeamsController extends AbstractController {
 
     @Autowired
     EntityManager entityManager;
@@ -24,7 +24,8 @@ public class TeamsController {
             produces = "application/json")
     public ResponseEntity<Team> addNewTeam(@RequestParam("teamNumber") String teamNumber,
                                              @RequestParam("teamTitle") String teamTitle) {
-        if (!isTeamNumberUnique(teamNumber)) {
+
+        if (isStringEmpty(teamNumber) || !isTeamNumberUnique(teamNumber) || isStringEmpty(teamTitle)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -36,9 +37,9 @@ public class TeamsController {
     }
 
     @RequestMapping(path = "/teams", method = RequestMethod.GET, produces = "application/json")
-    public List<Team> getAllTeams() {
+    public ResponseEntity<List<Team>> getAllTeams() {
         Query query = entityManager.createQuery("select team from Team team", Team.class);
-        return query.getResultList();
+        return new ResponseEntity<>(query.getResultList(), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.GET, produces = "application/json")
@@ -57,8 +58,8 @@ public class TeamsController {
                                            @RequestParam("newTeamTitle") String newTeamTitle) {
 
         // at least either newTeamNumber or newTeamTitle should be set
-        boolean updateNumber = !(newTeamNumber == null || newTeamNumber.isEmpty());
-        boolean updateTitle = !(newTeamTitle == null || newTeamTitle.isEmpty());
+        boolean updateNumber = !isStringEmpty(newTeamNumber);
+        boolean updateTitle = !isStringEmpty(newTeamTitle);
 
         if (!updateNumber && !updateTitle) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -99,7 +100,7 @@ public class TeamsController {
         query.setParameter("teamId", teamId);
         if (query.getResultList().isEmpty()) {
             // team removal is allowed, there are no answers from this team
-            Query deletionQuery = entityManager.createQuery("DELETE from Team t where t.id=:teamId");
+            Query deletionQuery = entityManager.createQuery("delete from Team t where t.id=:teamId");
             int deletedCount = deletionQuery.setParameter("teamId", teamId).executeUpdate();
             if (deletedCount == 1) {
                 return ResponseEntity.ok().build();
