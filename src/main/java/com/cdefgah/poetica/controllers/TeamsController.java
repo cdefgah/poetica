@@ -1,5 +1,6 @@
 package com.cdefgah.poetica.controllers;
 
+import com.cdefgah.poetica.model.Answer;
 import com.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -84,10 +85,33 @@ public class TeamsController {
         }
     }
 
+    /**
+     * Removes the team from the database. Usually it is not allowed/permitted operation, because all teams should
+     * be stored in the database, even those, who stopped participating in the game. Because of that I don't implement
+     * cascading removal of the all related information. It may be used to remove a team added by mistake, or something
+     * like this.
+     * @param teamId id of team that should be removed.
+     * @return
+     */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity<Team> deleteTeam(@PathVariable long teamId) {
-        // TODO check existing answers, if there are existing answers don't delete
-        return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<String> deleteTeam(@PathVariable long teamId) {
+        Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
+        query.setParameter("teamId", teamId);
+        if (query.getResultList().isEmpty()) {
+            // team removal is allowed, there are no answers from this team
+            Query deletionQuery = entityManager.createQuery("DELETE from Team t where t.id=:teamId");
+            int deletedCount = deletionQuery.setParameter("teamId", teamId).executeUpdate();
+            if (deletedCount == 1) {
+                return ResponseEntity.ok().build();
+            } else {
+                return new ResponseEntity<>("Unable to delete team with id: " + teamId,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            // team removal is not allowed, there are answers from this team exist in the database
+            return new ResponseEntity<>("Team removal is not allowed," +
+                            " because the database contains answers, created by this team.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private boolean isTeamNumberUnique(String teamNumber) {
