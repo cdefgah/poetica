@@ -30,8 +30,9 @@ public class TeamsController extends AbstractController {
 
     /**
      * Creates new team entity in the database.
+     *
      * @param teamNumber A unique number assigned to the team. Could be empty string and will be set later.
-     * @param teamTitle Unique team title.
+     * @param teamTitle  Unique team title.
      * @return Http.OK and Unique id (don't confuse it with the team number) of the created team entity.
      * In case of error returns Http.BAD_REQUEST with the error message.
      */
@@ -50,7 +51,7 @@ public class TeamsController extends AbstractController {
 
         if (getTeamByTitle(teamTitle).isPresent()) {
             return new ResponseEntity<>("teamTitle is not unique. " +
-                                "There's a team exists with the same title: " + teamTitle, HttpStatus.BAD_REQUEST);
+                    "There's a team exists with the same title: " + teamTitle, HttpStatus.BAD_REQUEST);
         }
 
         Team team = new Team();
@@ -62,6 +63,7 @@ public class TeamsController extends AbstractController {
 
     /**
      * Gets the list of all teams.
+     *
      * @return Http.OK and the list of teams in json format.
      */
     @RequestMapping(path = "/teams", method = RequestMethod.GET, produces = "application/json")
@@ -72,6 +74,7 @@ public class TeamsController extends AbstractController {
 
     /**
      * Gets team entity by its unique id.
+     *
      * @param teamId unique team id.
      * @return Http.OK and the team entity in json format. In case team was not found, returns Http.NOT_FOUND.
      */
@@ -85,18 +88,30 @@ public class TeamsController extends AbstractController {
         }
     }
 
+    @RequestMapping(path = "/teams/{teamTitle}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Team> getTeamById(@PathVariable String teamTitle) {
+        if (isStringEmpty(teamTitle)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Team> teamOptional = getTeamByTitle(teamTitle);
+        return teamOptional.map(team -> new ResponseEntity<>(team, HttpStatus.OK)).orElseGet(() ->
+                new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     /**
      * Updates a team entity with the provided information.
-     * @param teamId unique id of a team to be updated.
+     *
+     * @param teamId        unique id of a team to be updated.
      * @param newTeamNumber new team number.
-     * @param newTeamTitle new team title.
+     * @param newTeamTitle  new team title.
      * @return Http.OK if update was successful. Otherwise will return relevant http error code
      * and the error message.
      */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateTeam(@PathVariable long teamId,
-                                           @RequestParam("newTeamNumber") String newTeamNumber,
-                                           @RequestParam("newTeamTitle") String newTeamTitle) {
+                                             @RequestParam("newTeamNumber") String newTeamNumber,
+                                             @RequestParam("newTeamTitle") String newTeamTitle) {
 
         // at least either newTeamNumber or newTeamTitle should be set
         boolean updateNumber = !isStringEmpty(newTeamNumber);
@@ -135,8 +150,9 @@ public class TeamsController extends AbstractController {
      * be stored in the database, even those, who stopped participating in the game. Because of that I don't implement
      * cascading removal of the all related information. It may be used to remove a team added by mistake, or something
      * like this.
+     *
      * @param teamId id of team that should be removed.
-     * @return
+     * @return return Http.OK if operation succeed. Otherwise returns relevant http error code with the error message.
      */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<String> deleteTeam(@PathVariable long teamId) {
@@ -155,12 +171,13 @@ public class TeamsController extends AbstractController {
         } else {
             // team removal is not allowed, there are answers from this team exist in the database
             return new ResponseEntity<>("Team removal is not allowed," +
-                            " because the database contains answers, created by this team.", HttpStatus.BAD_REQUEST);
+                    " because the database contains answers, created by this team.", HttpStatus.BAD_REQUEST);
         }
     }
 
     /**
      * Checks whether teamNumber is unique (i.e not present in the database).
+     *
      * @param teamNumber teamNumber to be checked.
      * @return true, if there's no such teamNumber stored in the database, false otherwise.
      */
@@ -172,6 +189,7 @@ public class TeamsController extends AbstractController {
 
     /**
      * Gets team entity by its unique teamTitle.
+     *
      * @param teamTitle team title to be used.
      * @return team entity weapped by Optional type object if found, otherwise returns Optional.empty().
      */
