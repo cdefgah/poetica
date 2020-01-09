@@ -14,7 +14,7 @@ public final class Team {
     @Column(length = 32, nullable = true)
     private String number;
 
-    @Column(length = 256, nullable = false)
+    @Column(length = 256, nullable = false, unique=true)
     private String title;
 
     public Long getId() {

@@ -1,33 +1,33 @@
 package com.cdefgah.poetica.model;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 public enum Grade {
+    None("N"),
     NotAccepted("-"),
     Accepted("+"),
     Uncertain("?");
 
     private final String gradeSymbol;
 
+    private static final Map<String, Grade> stringToEnum = new HashMap<>();
+
+    static {
+        for (Grade grade : values())
+            stringToEnum.put(grade.toString(), grade);
+    }
+
     Grade(String gradeSymbol) {
         this.gradeSymbol = gradeSymbol;
     }
 
-    public String getGradeSymbol() {
-        return gradeSymbol;
-    }
-
-    public static Grade fromGradeSymbol(final String gradeSymbol) {
-        switch (gradeSymbol) {
-            case "-":
-                return NotAccepted;
-
-            case "+":
-                return Accepted;
-
-            case "?":
-                return Uncertain;
-
-            default:
-                throw new IllegalArgumentException("Unexpected grade symbol: " + gradeSymbol);
+    public static Optional<Grade> fromGradeSymbol(final String gradeSymbol) {
+        if (stringToEnum.containsKey(gradeSymbol)) {
+            return Optional.of(stringToEnum.get(gradeSymbol));
+        } else {
+            return Optional.empty();
         }
     }
 

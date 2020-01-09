@@ -16,6 +16,9 @@ import java.util.List;
 @Transactional
 public class QuestionsController extends AbstractController {
 
+    /**
+     * Entity manager that works with the underlying database.
+     */
     @Autowired
     EntityManager entityManager;
 

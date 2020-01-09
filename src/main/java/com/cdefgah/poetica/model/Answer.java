@@ -25,7 +25,7 @@ public final class Answer {
 
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
-    private Grade grade;
+    private Grade grade = Grade.None;
 
     public Long getId() {
         return id;
