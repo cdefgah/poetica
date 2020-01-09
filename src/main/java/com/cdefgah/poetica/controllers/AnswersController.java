@@ -58,7 +58,7 @@ public class AnswersController extends AbstractController {
 
         // checking for existing answer for the same question from the same team
         TypedQuery<Answer> query = entityManager.createQuery("from Answer a where a.questionId=:questionId " +
-                                                                                "and a.teamId=:teamId", Answer.class);
+                "and a.teamId=:teamId", Answer.class);
 
         query.setParameter("questionId", questionId);
         query.setParameter("teamId", teamId);
@@ -91,7 +91,7 @@ public class AnswersController extends AbstractController {
     public ResponseEntity<List<Answer>> getAnswersByQuestionId(@PathVariable long questionId) {
         TypedQuery<Answer> query =
                 entityManager.createQuery("select answer from Answer answer" +
-                                                                        " where answer.teamId=:teamId", Answer.class);
+                        " where answer.teamId=:teamId", Answer.class);
 
         query.setParameter("questionId", questionId);
         return new ResponseEntity<>(query.getResultList(), HttpStatus.OK);
@@ -111,6 +111,54 @@ public class AnswersController extends AbstractController {
         } else {
             return new ResponseEntity<>("Unable to delete answer with id: " + answerId,
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Updates the answer entity.
+     * @param answerId unique id of a question to be updated.
+     * @param newAnswerBody new answer body.
+     * @param gradeSymbol symbol of the grade.
+     * @return HTTP OK if the operation succeed, otherwise returns relevant http error code and error message.
+     */
+    @RequestMapping(path = "/answers/{answerId}", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<String> updateAnswer(@PathVariable long answerId,
+                                               @RequestParam("newAnswerBody") String newAnswerBody,
+                                               @RequestParam("grade") String gradeSymbol) {
+
+        boolean updateBody = !isStringEmpty(newAnswerBody);
+
+        Grade grade = Grade.None;
+        boolean updateGrade = false;
+        if (!isStringEmpty(gradeSymbol)) {
+            updateGrade = true;
+
+            Optional<Grade> gradeConversionResult = Grade.fromGradeSymbol(gradeSymbol);
+            if (gradeConversionResult.isPresent()) {
+                grade = gradeConversionResult.get();
+            } else {
+                return new ResponseEntity<>("Unexpected grade symbol: " + gradeSymbol, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (!updateBody && !updateGrade) {
+            return new ResponseEntity<>("Neither answer body nor grade values passed.", HttpStatus.BAD_REQUEST);
+        }
+
+        Answer answer = entityManager.find(Answer.class, answerId);
+        if (answer != null) {
+            if (updateBody) {
+                answer.setBody(newAnswerBody);
+            }
+
+            if (updateGrade) {
+                answer.setGrade(grade);
+            }
+
+            entityManager.persist(answer);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Answer not found by provided id: " + answerId, HttpStatus.NOT_FOUND);
         }
     }
 }

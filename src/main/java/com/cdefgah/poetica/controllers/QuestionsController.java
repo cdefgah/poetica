@@ -122,7 +122,8 @@ public class QuestionsController extends AbstractController {
                 if (isQuestionNumberUnique(newQuestionNumber, question.isOutOfCompetition())) {
                     question.setNumber(newQuestionNumber);
                 } else {
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Provided question number is not unique: " + newQuestionNumber,
+                            HttpStatus.BAD_REQUEST);
                 }
             }
 
@@ -133,7 +134,8 @@ public class QuestionsController extends AbstractController {
             entityManager.persist(question);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Question not found by provided id:  " + questionId,
+                    HttpStatus.NOT_FOUND);
         }
     }
 
