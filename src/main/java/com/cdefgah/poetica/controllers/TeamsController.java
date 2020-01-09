@@ -16,7 +16,7 @@ import java.util.Optional;
 
 
 /**
- * Handles team-related requests.
+ * Handles team-related REST requests.
  */
 @RestController
 @Transactional
@@ -33,8 +33,8 @@ public class TeamsController extends AbstractController {
      *
      * @param teamNumber A unique number assigned to the team. Could be empty string and will be set later.
      * @param teamTitle  Unique team title.
-     * @return Http.OK and Unique id (don't confuse it with the team number) of the created team entity.
-     * In case of error returns Http.BAD_REQUEST with the error message.
+     * @return HTTP CREATED and unique id (don't confuse it with the team number) of the created team entity.
+     * In case of error returns HTTP BAD_REQUEST with the error message.
      */
     @RequestMapping(path = "/teams", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
@@ -64,7 +64,7 @@ public class TeamsController extends AbstractController {
     /**
      * Gets the list of all teams.
      *
-     * @return Http.OK and the list of teams in json format.
+     * @return HTTP OK and the list of teams in json format.
      */
     @RequestMapping(path = "/teams", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Team>> getAllTeams() {
@@ -76,7 +76,7 @@ public class TeamsController extends AbstractController {
      * Gets team entity by its unique id.
      *
      * @param teamId unique team id.
-     * @return Http.OK and the team entity in json format. In case team was not found, returns Http.NOT_FOUND.
+     * @return HTTP OK and the team entity in json format. In case team was not found, returns HTTP NOT_FOUND.
      */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Team> getTeamById(@PathVariable long teamId) {
@@ -88,6 +88,12 @@ public class TeamsController extends AbstractController {
         }
     }
 
+    /**
+     * Gets team entity by its unique title.
+     * @param teamTitle team title to be used for searching.
+     * @return HTTP OK and the found entity in json format, otherwise returns the relevant http error code and
+     * error message.
+     */
     @RequestMapping(path = "/teams/{teamTitle}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Team> getTeamById(@PathVariable String teamTitle) {
         if (isStringEmpty(teamTitle)) {
@@ -105,7 +111,7 @@ public class TeamsController extends AbstractController {
      * @param teamId        unique id of a team to be updated.
      * @param newTeamNumber new team number.
      * @param newTeamTitle  new team title.
-     * @return Http.OK if update was successful. Otherwise will return relevant http error code
+     * @return HTTP OK if update was successful. Otherwise will return relevant http error code
      * and the error message.
      */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.PUT, produces = "application/json")
@@ -152,7 +158,7 @@ public class TeamsController extends AbstractController {
      * like this.
      *
      * @param teamId id of team that should be removed.
-     * @return return Http.OK if operation succeed. Otherwise returns relevant http error code with the error message.
+     * @return return HTTP OK if operation succeed. Otherwise returns relevant http error code with the error message.
      */
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<String> deleteTeam(@PathVariable long teamId) {
@@ -191,7 +197,7 @@ public class TeamsController extends AbstractController {
      * Gets team entity by its unique teamTitle.
      *
      * @param teamTitle team title to be used.
-     * @return team entity weapped by Optional type object if found, otherwise returns Optional.empty().
+     * @return team entity wrapped by Optional type object if found, otherwise returns Optional.empty().
      */
     private Optional<Team> getTeamByTitle(String teamTitle) {
         TypedQuery<Team> query = entityManager.createQuery("from Team t where t.title=:teamTitle", Team.class);
