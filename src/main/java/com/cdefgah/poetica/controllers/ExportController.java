@@ -40,4 +40,25 @@ public class ExportController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
+
+    @RequestMapping(path = "/reports/kokoi", method = RequestMethod.GET)
+    public ResponseEntity<Resource> getReportInKoi8R() throws IOException {
+
+        String payload = "Ента кои-восимь ыр кадироффка. Дыдынц. " +
+                "Жромотрульки тарампульки\nКекелушки мапатуршки!\n1234567890";
+
+        HttpHeaders header = new HttpHeaders();
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=myfile.txt");
+        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        header.add("Pragma", "no-cache");
+        header.add("Expires", "0");
+
+        ByteArrayResource resource = new ByteArrayResource(payload.getBytes(Charset.forName("KOI8_R")));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
 }
