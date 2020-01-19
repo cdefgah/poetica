@@ -1,1 +1,25 @@
-<p>App works</p>
+<mat-toolbar color="primary">
+  <span>Poetica</span>
+  <span class="fill-remaining-space"></span>
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="menu"
+    aria-label="Example icon-button with a menu"
+  >
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>
+      Вопросы
+    </button>
+    <button mat-menu-item>
+      Команды
+    </button>
+    <button mat-menu-item>
+      Ответы
+    </button>
+    <button mat-menu-item>
+      Отчёты
+    </button>
+  </mat-menu>
+</mat-toolbar>
