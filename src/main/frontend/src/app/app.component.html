@@ -1,21 +1,23 @@
 <mat-toolbar color="primary">
-  <span>Poetica</span>
-  <span class="fill-remaining-space"></span>
   <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Main menu">
-    <mat-icon>more_vert</mat-icon>
+    <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item>
-      Вопросы
+    <button mat-menu-item (click)="toggleQuestionsScreen()">
+      Задания
     </button>
-    <button mat-menu-item>
+    <button mat-menu-item (click)="toggleTeamsScreen()">
       Команды
     </button>
-    <button mat-menu-item>
+    <button mat-menu-item (click)="toggleAnswersScreen()">
       Ответы
     </button>
-    <button mat-menu-item>
+    <button mat-menu-item (click)="toggleReportsScreen()">
       Отчёты
     </button>
   </mat-menu>
+  <span class="fill-remaining-space"></span>
+  <span>Poetica</span>
 </mat-toolbar>
+
+<app-general-questions-list></app-general-questions-list>
