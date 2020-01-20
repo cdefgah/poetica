@@ -1,5 +1,13 @@
 import { Component } from "@angular/core";
 
+enum AppWindowState {
+  Questions,
+  Teams,
+  Answers,
+  Reports,
+  About
+}
+
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
@@ -8,11 +16,38 @@ import { Component } from "@angular/core";
 export class AppComponent {
   title = "Poetica";
 
-  toggleQuestionsScreen() {}
+  // Store a reference to the enum for further use in html template
+  appWindowState = AppWindowState;
 
-  toggleTeamsScreen() {}
+  public windowState: AppWindowState = AppWindowState.Questions;
 
-  toggleAnswersScreen() {}
+  toggleQuestionsScreen() {
+    if (this.windowState != AppWindowState.Questions) {
+      this.windowState = AppWindowState.Questions;
+    }
+  }
 
-  toggleReportsScreen() {}
+  toggleTeamsScreen() {
+    if (this.windowState != AppWindowState.Teams) {
+      this.windowState = AppWindowState.Teams;
+    }
+  }
+
+  toggleAnswersScreen() {
+    if (this.windowState != AppWindowState.Answers) {
+      this.windowState = AppWindowState.Answers;
+    }
+  }
+
+  toggleReportsScreen() {
+    if (this.windowState != AppWindowState.Reports) {
+      this.windowState = AppWindowState.Reports;
+    }
+  }
+
+  toggleAboutScreen() {
+    if (this.windowState != AppWindowState.About) {
+      this.windowState = AppWindowState.About;
+    }
+  }
 }

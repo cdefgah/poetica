@@ -3,3 +3,9 @@
        Every toolbar row uses a flexbox row layout. */
   flex: 1 1 auto;
 }
+
+sup {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+}
