@@ -9,4 +9,9 @@ export class AnswersListComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  ImportAnswersWizard() {
+    // use Angular Material Stepper for wizard creation
+    // https://material.angular.io/components/stepper/overview
+  }
 }
