@@ -25,9 +25,9 @@
 </mat-toolbar>
 
 <div [ngSwitch]="windowState">
-  <app-general-questions-list
+  <app-questions-list
     *ngSwitchCase="appWindowState.Questions"
-  ></app-general-questions-list>
+  ></app-questions-list>
 
   <app-teams-list *ngSwitchCase="appWindowState.Teams"> </app-teams-list>
   <app-answers-list *ngSwitchCase="appWindowState.Answers"></app-answers-list>

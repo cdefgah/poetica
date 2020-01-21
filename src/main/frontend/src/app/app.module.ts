@@ -12,20 +12,20 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatDividerModule } from "@angular/material/divider";
 
-import { CreditedQuestionsListComponent } from "./credited-questions-list/credited-questions-list.component";
-import { NotCreditedQuestionsListComponent } from "./not-credited-questions-list/not-credited-questions-list.component";
-import { GeneralQuestionsListComponent } from "./general-questions-list/general-questions-list.component";
-import { TeamsListComponent } from "./teams-list/teams-list.component";
-import { AnswersListComponent } from "./answers-list/answers-list.component";
-import { ReportsComponent } from "./reports/reports.component";
-import { AboutComponent } from './about/about.component';
+import { QuestionsListComponent } from "./components/questions-list/questions-list.component";
+import { CreditedQuestionsListComponent } from "./components/questions-list/credited-questions-list/credited-questions-list.component";
+import { NotCreditedQuestionsListComponent } from "./components/questions-list/not-credited-questions-list/not-credited-questions-list.component";
+import { TeamsListComponent } from "./components/teams-list/teams-list.component";
+import { AnswersListComponent } from "./components/answers-list/answers-list.component";
+import { ReportsComponent } from "./components/reports/reports.component";
+import { AboutComponent } from "./components/about/about.component";
 
 @NgModule({
   declarations: [
     AppComponent,
+    QuestionsListComponent,
     CreditedQuestionsListComponent,
     NotCreditedQuestionsListComponent,
-    GeneralQuestionsListComponent,
     TeamsListComponent,
     AnswersListComponent,
     ReportsComponent,
