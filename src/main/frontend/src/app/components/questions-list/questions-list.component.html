@@ -1,10 +1,12 @@
-<h3>Задания</h3>
-<hr flex />
-<div class="button-row">
-  <button mat-raised-button>
+<mat-toolbar>
+  <span>Задания</span>
+
+  <span class="fill-remaining-space"></span>
+  <button mat-raised-button color="primary">
     Импортировать список заданий
   </button>
-</div>
+</mat-toolbar>
+
 <mat-tab-group>
   <mat-tab label="Зачётные задания">
     <app-credited-questions-list></app-credited-questions-list>
