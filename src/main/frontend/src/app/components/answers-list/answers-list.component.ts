@@ -11,7 +11,8 @@ export class AnswersListComponent implements OnInit {
   ngOnInit() {}
 
   ImportAnswersWizard() {
-    // use Angular Material Stepper for wizard creation
+    // use Angular Material Stepper for wizard creation (modal dialog for example)
     // https://material.angular.io/components/stepper/overview
+    // https://material.angular.io/components/dialog/examples
   }
 }
