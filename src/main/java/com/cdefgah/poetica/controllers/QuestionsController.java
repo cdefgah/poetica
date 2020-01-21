@@ -132,7 +132,7 @@ public class QuestionsController extends AbstractController {
             }
 
             entityManager.persist(question);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok().build();
         } else {
             return new ResponseEntity<>("Question not found by provided id:  " + questionId,
                     HttpStatus.NOT_FOUND);
@@ -153,7 +153,7 @@ public class QuestionsController extends AbstractController {
             Query deletionQuery = entityManager.createQuery("delete from Question q where q.id=:questionId");
             int deletedCount = deletionQuery.setParameter("questionId", questionId).executeUpdate();
             if (deletedCount == 1) {
-                return ResponseEntity.ok().build();
+                return ResponseEntity.noContent().build();
             } else {
                 return new ResponseEntity<>("Unable to delete question with id: " + questionId,
                         HttpStatus.INTERNAL_SERVER_ERROR);
