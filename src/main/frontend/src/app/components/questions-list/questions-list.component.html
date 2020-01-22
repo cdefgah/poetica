@@ -7,11 +7,12 @@
   </button>
 </mat-toolbar>
 
-<mat-tab-group>
-  <mat-tab label="Зачётные задания">
-    <app-credited-questions-list></app-credited-questions-list>
-  </mat-tab>
-  <mat-tab label="Внезачётные задания">
-    <app-not-credited-questions-list></app-not-credited-questions-list>
-  </mat-tab>
-</mat-tab-group>
+<mat-radio-group [(ngModel)]="selectedDisplayModeAlias">
+  <mat-radio-button
+    class="display-mode-radio-button"
+    *ngFor="let displayModeAlias of displayModeAliases; index as i"
+    [value]="displayModeAlias"
+  >
+    {{ displayModeTitles[i] }}
+  </mat-radio-button>
+</mat-radio-group>

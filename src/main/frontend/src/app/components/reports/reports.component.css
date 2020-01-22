@@ -1,0 +1,21 @@
+.encoding-selection-field {
+  margin-left: 1em;
+}
+
+.report-radio-group-label {
+  margin-left: 1em;
+}
+
+.reports-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1em;
+}
+
+.reports-radio-button {
+  margin: 0.5em;
+}
+
+.report-button {
+  margin-left: 1em;
+}

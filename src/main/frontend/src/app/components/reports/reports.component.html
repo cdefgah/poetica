@@ -1,12 +1,47 @@
-<h3>Отчёты</h3>
-<hr flex />
-<div class="report-buttons">
-  <button mat-raised-button color="primary">
-    Список команд, приславших ответы
+<mat-toolbar>
+  <span>Отчёты</span>
+</mat-toolbar>
+
+<p>
+  <mat-form-field class="encoding-selection-field">
+    <mat-label>Кодировка отчёта:</mat-label>
+    <mat-select [(value)]="selectedEncodingAlias">
+      <mat-option
+        *ngFor="let encodingAlias of encodingAliases; index as i"
+        [value]="encodingAlias"
+      >
+        {{ encodingTitles[i] }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</p>
+
+<p>
+  <label id="report-selection-label-field-id" class="report-radio-group-label"
+    >Выберите отчёт для выгрузки:</label
+  >
+  <mat-radio-group
+    aria-labelledby="report-selection-label-field-id"
+    class="reports-radio-group"
+    [(ngModel)]="selectedReportAlias"
+  >
+    <mat-radio-button
+      class="reports-radio-button"
+      *ngFor="let reportAlias of reportAliases; index as i"
+      [value]="reportAlias"
+    >
+      {{ reportTitles[i] }}
+    </mat-radio-button>
+  </mat-radio-group>
+</p>
+
+<p>
+  <button mat-raised-button color="primary" class="report-button">
+    Сформировать и выгрузить отчёт
   </button>
-  <mat-divider></mat-divider>
-  <button mat-raised-button color="primary">Промежуточный отчёт</button>
-  <mat-divider></mat-divider>
-  <button mat-raised-button color="primary">Окончательный отчёт</button>
-  <mat-divider></mat-divider>
-</div>
+</p>
+
+<p>
+  Ещё сделать диалог подтверждения, в некоторых диалогах выбирать формат отчёта
+  (полный, такой-сякой, сокращённый)
+</p>
