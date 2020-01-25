@@ -1,24 +1,58 @@
-package com.cdefgah.poetica.model;
+package com.github.cdefgah.poetica.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
+
+/**
+ * Класс вопроса (бескрылки).
+ */
 @Entity
 @Table(name = "Questions")
 public final class Question {
 
+    /**
+     * Уникальный внутренний идентификатор вопроса для связи таблиц между собой.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 4, nullable = false)
+    /**
+     * Если вопрос (бескрылка) зачётный, то хранит значение true. Иначе - false.
+     */
+    @Column(nullable = false)
+    private boolean isCredited = true;
+
+    /**
+     * Уникальный номер бескрылки, видим участниками состязания.
+     * Представляет собой трёхзначное целое положительное числое.
+     */
+    @Column(length = 3, nullable = false)
+    @Size(min = 1, max = 3)
     private String number;
 
+    /**
+     * Содержание вопроса (бескрылки).
+     */
     @Column(length = 1024, nullable = false)
     private String body;
 
-    @Column(nullable = false)
-    private boolean outOfCompetition = false;
+    /**
+     * Источник бескрылки.
+     */
+    @Column(length = 256, nullable = false)
+    private String source;
+
+    /**
+     * Комментарий к бескрылке от автора.
+     */
+    @Column(length = 1024, nullable = true)
+    private String comment;
+
+    public Question() {
+    }
 
     public Long getId() {
         return id;
@@ -26,6 +60,14 @@ public final class Question {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isCredited() {
+        return isCredited;
+    }
+
+    public void setCredited(boolean credited) {
+        isCredited = credited;
     }
 
     public String getNumber() {
@@ -44,12 +86,20 @@ public final class Question {
         this.body = body;
     }
 
-    public boolean isOutOfCompetition() {
-        return outOfCompetition;
+    public String getSource() {
+        return source;
     }
 
-    public void setOutOfCompetition(boolean outOfCompetition) {
-        this.outOfCompetition = outOfCompetition;
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

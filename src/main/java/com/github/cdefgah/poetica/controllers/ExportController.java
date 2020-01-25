@@ -1,4 +1,4 @@
-package com.cdefgah.poetica.controllers;
+package com.github.cdefgah.poetica.controllers;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;

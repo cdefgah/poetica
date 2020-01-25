@@ -1,4 +1,4 @@
-package com.cdefgah.poetica;
+package com.github.cdefgah.poetica;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

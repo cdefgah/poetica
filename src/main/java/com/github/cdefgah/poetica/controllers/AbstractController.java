@@ -1,4 +1,4 @@
-package com.cdefgah.poetica.controllers;
+package com.github.cdefgah.poetica.controllers;
 
 abstract class AbstractController {
     protected static boolean isStringEmpty(String string) {

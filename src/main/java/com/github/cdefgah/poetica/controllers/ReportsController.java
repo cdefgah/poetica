@@ -1,4 +1,4 @@
-package com.cdefgah.poetica.controllers;
+package com.github.cdefgah.poetica.controllers;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
