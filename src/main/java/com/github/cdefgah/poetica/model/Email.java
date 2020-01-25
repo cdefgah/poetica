@@ -30,11 +30,10 @@ public class Email {
     @Column(nullable = false)
     private long sentOn;
 
-    /**
-     * Тема письма.
-     */
-    @Column(length = 256, nullable = false)
-    @Size(max = 256)
+    private static final int maxSubjectLength = 256;
+
+    @Column(length = maxSubjectLength, nullable = false)
+    @Size(max = maxSubjectLength)
     private String subject;
 
     /**
