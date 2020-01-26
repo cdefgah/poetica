@@ -29,9 +29,8 @@ public final class Question {
      * Уникальный номер бескрылки, видим участниками состязания.
      * Представляет собой трёхзначное целое положительное числое.
      */
-    @Column(length = 3, nullable = false)
-    @Size(min = 1, max = 3)
-    private String number;
+    @Column(nullable = false)
+    private int number;
 
     /**
      * Содержание вопроса (бескрылки).
@@ -70,11 +69,11 @@ public final class Question {
         isCredited = credited;
     }
 
-    public String getNumber() {
+    public int getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(int number) {
         this.number = number;
     }
 
