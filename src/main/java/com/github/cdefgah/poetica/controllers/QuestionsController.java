@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Обрабатывает все запросы относительно непосредственной работы с вопросами (бескрылками).
@@ -26,6 +27,12 @@ public class QuestionsController extends AbstractController {
      */
     @Autowired
     EntityManager entityManager;
+
+
+    @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Map<String, Integer>> getModelConstraints() {
+        return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
+    }
 
     /**
      * Добавляет вопрос (бескрылку) в базу.

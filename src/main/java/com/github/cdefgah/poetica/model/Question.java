@@ -2,6 +2,9 @@ package com.github.cdefgah.poetica.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -11,6 +14,23 @@ import java.util.Objects;
 @Entity
 @Table(name = "Questions")
 public final class Question {
+
+    private static class ModelConstraints {
+        static final int MAX_BODY_LENGTH = 1024;
+        static final int MAX_SOURCE_LENGTH = 256;
+        static final int MAX_COMMENT_LENGTH = 1024;
+    }
+
+    private static final Map<String, Integer> modelConstraintsMap;
+
+    static
+    {
+        final Map<String, Integer> localConstraintsMap = new HashMap<>();
+        localConstraintsMap.put("MAX_BODY_LENGTH", ModelConstraints.MAX_BODY_LENGTH);
+        localConstraintsMap.put("MAX_SOURCE_LENGTH", ModelConstraints.MAX_SOURCE_LENGTH);
+        localConstraintsMap.put("MAX_COMMENT_LENGTH", ModelConstraints.MAX_COMMENT_LENGTH);
+        modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
+    }
 
     /**
      * Уникальный внутренний идентификатор вопроса для связи таблиц между собой.
@@ -35,22 +55,28 @@ public final class Question {
     /**
      * Содержание вопроса (бескрылки).
      */
-    @Column(length = 1024, nullable = false)
+    @Column(length = ModelConstraints.MAX_BODY_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_BODY_LENGTH)
     private String body;
 
     /**
      * Источник бескрылки.
      */
-    @Column(length = 256, nullable = false)
+    @Column(length = ModelConstraints.MAX_SOURCE_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_SOURCE_LENGTH)
     private String source;
 
     /**
      * Комментарий к бескрылке от автора.
      */
-    @Column(length = 1024, nullable = true)
+    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH, nullable = true)
     private String comment;
 
     public Question() {
+    }
+
+    public static Map<String, Integer> getModelConstraintsMap() {
+        return modelConstraintsMap;
     }
 
     public Long getId() {
