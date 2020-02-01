@@ -7,7 +7,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { FormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatRippleModule } from "@angular/material";
+import { MatRippleModule, MAT_DIALOG_DEFAULT_OPTIONS } from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatMenuModule } from "@angular/material/menu";
@@ -16,6 +16,7 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatSelectModule } from "@angular/material/select";
+import { MatDialogModule } from "@angular/material";
 
 import { QuestionsListComponent } from "./components/questions-list/questions-list.component";
 import { TeamsListComponent } from "./components/teams-list/teams-list.component";
@@ -48,12 +49,15 @@ import { QuestionDetailsComponent } from "./components/question-details/question
     MatTabsModule,
     MatDividerModule,
     MatRadioModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule
   ],
 
   entryComponents: [QuestionDetailsComponent],
 
-  providers: [],
+  providers: [
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
