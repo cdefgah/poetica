@@ -22,6 +22,7 @@ import { TeamsListComponent } from "./components/teams-list/teams-list.component
 import { AnswersListComponent } from "./components/answers-list/answers-list.component";
 import { ReportsComponent } from "./components/reports/reports.component";
 import { AboutComponent } from "./components/about/about.component";
+import { QuestionDetailsComponent } from './question-details/question-details.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { AboutComponent } from "./components/about/about.component";
     TeamsListComponent,
     AnswersListComponent,
     ReportsComponent,
-    AboutComponent
+    AboutComponent,
+    QuestionDetailsComponent
   ],
   imports: [
     FormsModule,
