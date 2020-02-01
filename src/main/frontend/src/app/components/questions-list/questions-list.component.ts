@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { MatDialog, MatDialogConfig } from "@angular/material";
+import { QuestionDetailsComponent } from "../question-details/question-details.component";
 
 @Component({
   selector: "app-questions-list",
@@ -19,7 +21,7 @@ export class QuestionsListComponent implements OnInit {
 
   modelConstaints: Map<string, number>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private dialog: MatDialog) {}
 
   ngOnInit() {}
 
@@ -37,5 +39,14 @@ export class QuestionsListComponent implements OnInit {
     console.log("===== CONSTRAINTS START =====");
     console.dir(this.modelConstaints);
     console.log("===== CONSTRAINTS END =====");
+  }
+
+  openDialog() {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    this.dialog.open(QuestionDetailsComponent, dialogConfig);
   }
 }
