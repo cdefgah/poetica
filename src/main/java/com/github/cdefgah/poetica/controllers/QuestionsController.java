@@ -36,9 +36,10 @@ public class QuestionsController extends AbstractController {
 
     /**
      * Добавляет вопрос (бескрылку) в базу.
-     * @param questionNumber уникальный номер вопроса (бескрылки).
+     * Номер вопроса присваивается автоматически.
+     * Признак зачётной/внезачётной бескрылки определяется согласно настройкам, в которых указано количество
+     * зачётных бескрылок. Все номера выше этого числа являются номерами внезачётных бескрылок.
      * @param questionBody содержимое вопроса (бескрылки).
-     * @param isCredited true, если вопрос (бескрылка) зачётный.
      * @param source источник вопроса (бескрылки).
      * @param comment комментарий к вопросу (бескрылке) от создателя этого вопроса.
      * @return Http CREATED вместе с идентификатором добавленного вопроса. Иначе - код http ошибки + сообщение.
@@ -46,20 +47,9 @@ public class QuestionsController extends AbstractController {
     @RequestMapping(path = "/questions", method = RequestMethod.POST,
             consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
-    public ResponseEntity<String> addNewQuestion(@RequestParam("questionNumber") int questionNumber,
-                                                 @RequestParam("questionBody") String questionBody,
-                                                 @RequestParam("isCredited") boolean isCredited,
+    public ResponseEntity<String> addNewQuestion(@RequestParam("questionBody") String questionBody,
                                                  @RequestParam("source") String source,
                                                  @RequestParam("comment") String comment) {
-        if (questionNumber <= 0) {
-            return new ResponseEntity<>("Номер вопроса должен быть положительным числом.",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        if (!isQuestionNumberUnique(questionNumber)) {
-            return new ResponseEntity<>("Номер вопроса должен быть уникальным: " + questionNumber,
-                    HttpStatus.BAD_REQUEST);
-        }
 
         if (isStringEmpty(questionBody)) {
             return new ResponseEntity<>("Содержание вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
@@ -72,7 +62,6 @@ public class QuestionsController extends AbstractController {
         Question question = new Question();
         question.setNumber(questionNumber);
         question.setBody(questionBody);
-        question.setCredited(isCredited);
         question.setSource(source);
         question.setComment(comment);
 
@@ -246,18 +235,5 @@ public class QuestionsController extends AbstractController {
                         "question where question.isCredited=:isCredited", Question.class);
         query.setParameter("isCredited", onlyCreditedQuestions);
         return query.getResultList();
-    }
-
-
-    /**
-     * Возвращает true, если номер вопроса уникальный и в базе нет вопроса с таким-же номером.
-     * @param questionNumber номер вопроса для проверки.
-     * @return true, если номер вопроса уникальный и в базе нет вопроса с таким-же номером.
-     */
-    private boolean isQuestionNumberUnique(int questionNumber) {
-        Query query = entityManager.createQuery("from Question q where q.number=:questionNumber",
-                Question.class);
-        query.setParameter("questionNumber", questionNumber);
-        return query.getResultList().isEmpty();
     }
 }

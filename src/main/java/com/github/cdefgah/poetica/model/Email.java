@@ -15,7 +15,7 @@ public class Email {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     /**
      * Если письмо отправлено в первом раунде (первый день) тура,

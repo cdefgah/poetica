@@ -37,13 +37,7 @@ public final class Question {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /**
-     * Если вопрос (бескрылка) зачётный, то хранит значение true. Иначе - false.
-     */
-    @Column(nullable = false)
-    private boolean isCredited = true;
+    private long id;
 
     /**
      * Уникальный номер бескрылки, видим участниками состязания.
@@ -69,7 +63,7 @@ public final class Question {
     /**
      * Комментарий к бескрылке от автора.
      */
-    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH, nullable = true)
+    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH)
     private String comment;
 
     public Question() {
@@ -87,13 +81,6 @@ public final class Question {
         this.id = id;
     }
 
-    public boolean isCredited() {
-        return isCredited;
-    }
-
-    public void setCredited(boolean credited) {
-        isCredited = credited;
-    }
 
     public int getNumber() {
         return number;
@@ -132,7 +119,7 @@ public final class Question {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Question question = (Question) o;
-        return id.equals(question.id);
+        return id == question.id;
     }
 
     @Override
