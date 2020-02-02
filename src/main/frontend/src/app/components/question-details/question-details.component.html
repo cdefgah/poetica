@@ -1,8 +1,47 @@
-<p>question-details works!</p>
+<p mat-dialog-title>{{ generateDialogTitle() }}</p>
+<mat-dialog-content>
+  <div style="display: flex; flex-direction: column">
+    <mat-form-field appearance="outline">
+      <mat-label>Содержание</mat-label>
+      <textarea
+        matInput
+        rows="6"
+        placeholder="Содержание"
+        [(ngModel)]="questionBody"
+      ></textarea>
+      <mat-hint class="validation-text" *ngIf="questionBodyIsIncorrect"
+        >Обязательное поле</mat-hint
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Источник</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        placeholder="Источник"
+        [(ngModel)]="questionSource"
+      ></textarea>
+      <mat-hint class="validation-text" *ngIf="questionSourceIsIncorrect"
+        >Обязательное поле</mat-hint
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Комментарий</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        placeholder="Комментарий"
+        [(ngModel)]="comments"
+      ></textarea>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
 
-<button mat-raised-button color="primary" (click)="acceptDialog()">
-  Сохранить
-</button>
-<button mat-raised-button color="primary" (click)="cancelDialog()">
-  Отменить
-</button>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="acceptDialog()">
+    Сохранить
+  </button>
+  <button mat-raised-button color="primary" (click)="cancelDialog()">
+    Отменить
+  </button>
+</mat-dialog-actions>

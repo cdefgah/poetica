@@ -17,6 +17,7 @@ import { MatDividerModule } from "@angular/material/divider";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatSelectModule } from "@angular/material/select";
 import { MatDialogModule } from "@angular/material";
+import { MatInputModule } from "@angular/material";
 
 import { QuestionsListComponent } from "./components/questions-list/questions-list.component";
 import { TeamsListComponent } from "./components/teams-list/teams-list.component";
@@ -50,7 +51,8 @@ import { QuestionDetailsComponent } from "./components/question-details/question
     MatDividerModule,
     MatRadioModule,
     MatSelectModule,
-    MatDialogModule
+    MatDialogModule,
+    MatInputModule
   ],
 
   entryComponents: [QuestionDetailsComponent],

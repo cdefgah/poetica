@@ -46,6 +46,7 @@ export class QuestionsListComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
+    dialogConfig.width = "400px";
 
     this.dialog.open(QuestionDetailsComponent, dialogConfig);
   }
