@@ -40,30 +40,40 @@ public class QuestionsController extends AbstractController {
      * Признак зачётной/внезачётной бескрылки определяется согласно настройкам, в которых указано количество
      * зачётных бескрылок. Все номера выше этого числа являются номерами внезачётных бескрылок.
      * @param questionBody содержимое вопроса (бескрылки).
-     * @param source источник вопроса (бескрылки).
-     * @param comment комментарий к вопросу (бескрылке) от создателя этого вопроса.
+     * @param questionSource источник вопроса (бескрылки).
+     * @param questionComment комментарий к вопросу (бескрылке) от создателя этого вопроса.
      * @return Http CREATED вместе с идентификатором добавленного вопроса. Иначе - код http ошибки + сообщение.
      */
     @RequestMapping(path = "/questions", method = RequestMethod.POST,
             consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
     public ResponseEntity<String> addNewQuestion(@RequestParam("questionBody") String questionBody,
-                                                 @RequestParam("source") String source,
-                                                 @RequestParam("comment") String comment) {
+                                                 @RequestParam("questionSource") String questionSource,
+                                                 @RequestParam("questionComment") String questionComment) {
 
         if (isStringEmpty(questionBody)) {
             return new ResponseEntity<>("Содержание вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
         }
 
-        if (isStringEmpty(source)) {
+        if (isStringEmpty(questionSource)) {
             return new ResponseEntity<>("Источник вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
+        }
+
+        TypedQuery<Question> questionNumberQuery =
+                entityManager.createQuery("select question from " +
+                        "Question question order by question.number desc", Question.class);
+
+        int questionNumber = 1;
+        List<Question> existingQuestions = questionNumberQuery.getResultList();
+        if (!existingQuestions.isEmpty()) {
+            questionNumber = existingQuestions.get(0).getNumber() + 1;
         }
 
         Question question = new Question();
         question.setNumber(questionNumber);
         question.setBody(questionBody);
-        question.setSource(source);
-        question.setComment(comment);
+        question.setSource(questionSource);
+        question.setComment(questionComment);
 
         entityManager.persist(question);
         return new ResponseEntity<>(String.valueOf(question.getId()), HttpStatus.CREATED);
