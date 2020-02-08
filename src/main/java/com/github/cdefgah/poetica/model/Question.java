@@ -80,8 +80,7 @@ public final class Question {
     public void setId(Long id) {
         this.id = id;
     }
-
-
+    
     public int getNumber() {
         return number;
     }
