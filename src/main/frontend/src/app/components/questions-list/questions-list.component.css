@@ -5,3 +5,8 @@
 table {
   width: 100%;
 }
+
+button {
+  margin: 1em 1em 1em 1em;
+  background: lightcyan;
+}
