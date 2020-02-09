@@ -7,7 +7,11 @@ import { AppRoutingModule } from "./app-routing.module";
 import { FormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatRippleModule, MAT_DIALOG_DEFAULT_OPTIONS } from "@angular/material";
+import {
+  MatRippleModule,
+  MAT_DIALOG_DEFAULT_OPTIONS,
+  MatTableModule
+} from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatMenuModule } from "@angular/material/menu";
@@ -52,7 +56,8 @@ import { QuestionDetailsComponent } from "./components/question-details/question
     MatRadioModule,
     MatSelectModule,
     MatDialogModule,
-    MatInputModule
+    MatInputModule,
+    MatTableModule
   ],
 
   entryComponents: [QuestionDetailsComponent],

@@ -17,9 +17,34 @@
   </mat-radio-button>
 </mat-radio-group>
 <hr />
-<button mat-raised-button color="accent" (click)="loadConstraints()">
-  Загрузить constraints (проверяй консоль)
-</button>
 <button mat-raised-button color="accent" (click)="openDialog()">
   Добавить задание
 </button>
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+  <!-- Question number column -->
+  <ng-container matColumnDef="number">
+    <th mat-header-cell *matHeaderCellDef>Номер</th>
+    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.number }}</td>
+  </ng-container>
+
+  <!-- Question body column -->
+  <ng-container matColumnDef="body">
+    <th mat-header-cell *matHeaderCellDef>Содержание</th>
+    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.body }}</td>
+  </ng-container>
+
+  <!-- Question source column -->
+  <ng-container matColumnDef="source">
+    <th mat-header-cell *matHeaderCellDef>Источник</th>
+    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.source }}</td>
+  </ng-container>
+
+  <!-- Question comment column -->
+  <ng-container matColumnDef="comment">
+    <th mat-header-cell *matHeaderCellDef>Комментарий</th>
+    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.comment }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

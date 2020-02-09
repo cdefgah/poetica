@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog, MatDialogConfig } from "@angular/material";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
+import { Question } from "src/app/model/Question";
 
 @Component({
   selector: "app-questions-list",
@@ -21,7 +22,14 @@ export class QuestionsListComponent implements OnInit {
 
   modelConstaints: Map<string, number>;
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {}
+  displayedColumns: string[] = ["number", "body", "source", "comment"];
+
+  dataSource: Question[];
+
+  constructor(private http: HttpClient, private dialog: MatDialog) {
+    this.loadConstraints();
+    this.loadQuestionsList();
+  }
 
   ngOnInit() {}
 
@@ -29,16 +37,14 @@ export class QuestionsListComponent implements OnInit {
     var url: string = "/questions/model-constraints";
     this.http
       .get(url)
-      .subscribe((data: Map<string, number>) =>
-        this.processLoadedConstaints(data)
-      );
+      .subscribe((data: Map<string, number>) => (this.modelConstaints = data));
   }
 
-  processLoadedConstaints(data: Map<string, number>) {
-    this.modelConstaints = data;
-    console.log("===== CONSTRAINTS START =====");
-    console.dir(this.modelConstaints);
-    console.log("===== CONSTRAINTS END =====");
+  loadQuestionsList() {
+    var url: string = "/questions/all";
+    this.http
+      .get(url)
+      .subscribe((data: Question[]) => (this.dataSource = data));
   }
 
   openDialog() {

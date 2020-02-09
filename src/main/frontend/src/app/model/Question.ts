@@ -1,1 +1,6 @@
-export class Question {}
+export class Question {
+  number: number;
+  body: string;
+  source: string;
+  comment: string;
+}
