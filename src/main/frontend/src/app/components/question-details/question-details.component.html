@@ -5,8 +5,9 @@
       <mat-label>Содержание</mat-label>
       <textarea
         matInput
-        rows="6"
+        rows="7"
         placeholder="Содержание"
+        maxlength="{{ maxBodyFieldSize }}"
         [(ngModel)]="questionBody"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionBodyIsIncorrect"
@@ -19,6 +20,7 @@
         matInput
         rows="3"
         placeholder="Источник"
+        maxlength="{{ maxSourceFieldSize }}"
         [(ngModel)]="questionSource"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionSourceIsIncorrect"
@@ -31,6 +33,7 @@
         matInput
         rows="3"
         placeholder="Комментарий"
+        maxlength="{{ maxCommentFieldSize }}"
         [(ngModel)]="questionComment"
       ></textarea>
     </mat-form-field>

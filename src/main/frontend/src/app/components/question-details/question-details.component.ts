@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, Output, EventEmitter } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
 
@@ -9,9 +9,14 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 })
 export class QuestionDetailsComponent implements OnInit {
   constructor(
+    @Inject(MAT_DIALOG_DATA) public modelConstraints: Map<string, number>,
     private http: HttpClient,
     public dialog: MatDialogRef<QuestionDetailsComponent>
   ) {}
+
+  maxBodyFieldSize: number = 0;
+  maxSourceFieldSize: number = 0;
+  maxCommentFieldSize: number = 0;
 
   questionNumber: string = "";
   questionBody: string = "";
@@ -23,7 +28,11 @@ export class QuestionDetailsComponent implements OnInit {
 
   serverResponse: any;
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.maxBodyFieldSize = this.modelConstraints.get("MAX_BODY_LENGTH");
+    this.maxSourceFieldSize = this.modelConstraints.get("MAX_SOURCE_LENGTH");
+    this.maxCommentFieldSize = this.modelConstraints.get("MAX_COMMENT_LENGTH");
+  }
 
   generateDialogTitle() {
     if (this.questionNumber.length == 0) {
@@ -48,7 +57,7 @@ export class QuestionDetailsComponent implements OnInit {
         console.log("==== SERVER RESPONSE END ===");
       });
 
-      this.dialog.close();
+      this.dialog.close(true);
 
       console.log("******************");
       console.log("ACCEPTED");
@@ -57,7 +66,7 @@ export class QuestionDetailsComponent implements OnInit {
   }
 
   cancelDialog() {
-    this.dialog.close();
+    this.dialog.close(false);
     console.log("******************");
     console.log("CANCELED");
     console.log("******************");

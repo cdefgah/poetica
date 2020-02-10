@@ -20,11 +20,13 @@ export class QuestionsListComponent implements OnInit {
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
 
-  modelConstaints: Map<string, number>;
-
   displayedColumns: string[] = ["number", "body", "source", "comment"];
 
+  modelConstraints: Map<string, number>;
+
   dataSource: Question[];
+
+  selectedRowIndex: number;
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
     this.loadConstraints();
@@ -37,7 +39,7 @@ export class QuestionsListComponent implements OnInit {
     var url: string = "/questions/model-constraints";
     this.http
       .get(url)
-      .subscribe((data: Map<string, number>) => (this.modelConstaints = data));
+      .subscribe((data: Map<string, number>) => (this.modelConstraints = data));
   }
 
   loadQuestionsList() {
@@ -52,8 +54,16 @@ export class QuestionsListComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "400px";
+    dialogConfig.width = "75%";
+    dialogConfig.data = this.modelConstraints;
 
-    this.dialog.open(QuestionDetailsComponent, dialogConfig);
+    var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // если диалог был принят (accepted)
+        // обновляем таблицу со списком вопросов
+        this.loadQuestionsList();
+      }
+    });
   }
 }

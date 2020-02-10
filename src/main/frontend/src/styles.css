@@ -22,3 +22,7 @@ body {
 .validation-text {
   color: red;
 }
+
+.mat-row:hover {
+  background-color: lightblue;
+}
