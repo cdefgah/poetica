@@ -7,7 +7,7 @@
         matInput
         rows="7"
         placeholder="Содержание"
-        maxlength="{{ maxBodyFieldSize }}"
+        maxlength="{{ modelConstraints['MAX_BODY_LENGTH'] }}"
         [(ngModel)]="questionBody"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionBodyIsIncorrect"
@@ -20,7 +20,7 @@
         matInput
         rows="3"
         placeholder="Источник"
-        maxlength="{{ maxSourceFieldSize }}"
+        maxlength="{{ modelConstraints['MAX_SOURCE_LENGTH'] }}"
         [(ngModel)]="questionSource"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionSourceIsIncorrect"
@@ -33,7 +33,7 @@
         matInput
         rows="3"
         placeholder="Комментарий"
-        maxlength="{{ maxCommentFieldSize }}"
+        maxlength="{{ modelConstraints['MAX_COMMENT_LENGTH'] }}"
         [(ngModel)]="questionComment"
       ></textarea>
     </mat-form-field>

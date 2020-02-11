@@ -17,7 +17,7 @@
   </mat-radio-button>
 </mat-radio-group>
 <hr />
-<button mat-raised-button (click)="openDialog()">
+<button mat-raised-button (click)="openNewQuestionDialog()">
   Добавить задание
 </button>
 <button mat-raised-button>
@@ -45,5 +45,9 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <tr
+    mat-row
+    *matRowDef="let row; columns: displayedColumns"
+    (click)="onRowClicked(row)"
+  ></tr>
 </table>

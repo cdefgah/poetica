@@ -49,13 +49,21 @@ export class QuestionsListComponent implements OnInit {
       .subscribe((data: Question[]) => (this.dataSource = data));
   }
 
-  openDialog() {
+  openNewQuestionDialog() {
+    this.openDetailsDialog(undefined);
+  }
+
+  openDetailsDialog(selectedRow: any) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.width = "75%";
-    dialogConfig.data = this.modelConstraints;
+
+    dialogConfig.data = {
+      selectedRow: selectedRow,
+      modelConstraints: this.modelConstraints
+    };
 
     var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
@@ -65,5 +73,9 @@ export class QuestionsListComponent implements OnInit {
         this.loadQuestionsList();
       }
     });
+  }
+
+  onRowClicked(row: any) {
+    this.openDetailsDialog(row);
   }
 }

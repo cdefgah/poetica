@@ -9,30 +9,41 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 })
 export class QuestionDetailsComponent implements OnInit {
   constructor(
-    @Inject(MAT_DIALOG_DATA) public modelConstraints: Map<string, number>,
+    @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private http: HttpClient,
     public dialog: MatDialogRef<QuestionDetailsComponent>
-  ) {}
+  ) {
+    this.modelConstraints = dialogData["modelConstraints"];
 
-  maxBodyFieldSize: number = 0;
-  maxSourceFieldSize: number = 0;
-  maxCommentFieldSize: number = 0;
+    var selectedRow = dialogData["selectedRow"];
+    if (selectedRow) {
+      console.log("=========== DLG SELECTED ROW =============");
+      console.dir(selectedRow);
+      console.log("=========== DLG SELECTED ROW =============");
+    } else {
+      console.log("*********** NO SELECTED ROW INFO ***************");
+      console.log("*********** NO SELECTED ROW INFO ***************");
+      console.log("*********** NO SELECTED ROW INFO ***************");
+    }
+  }
+
+  modelConstraints: Map<string, number>;
 
   questionNumber: string = "";
   questionBody: string = "";
   questionSource: string = "";
   questionComment: string = "";
 
+  // предварительно сохраняем комментарий,
+  // чтобы потом определить, был-ли он изменён.
+  oldQuestionComment: string = "";
+
   questionBodyIsIncorrect: boolean = false;
   questionSourceIsIncorrect: boolean = false;
 
   serverResponse: any;
 
-  ngOnInit() {
-    this.maxBodyFieldSize = this.modelConstraints.get("MAX_BODY_LENGTH");
-    this.maxSourceFieldSize = this.modelConstraints.get("MAX_SOURCE_LENGTH");
-    this.maxCommentFieldSize = this.modelConstraints.get("MAX_COMMENT_LENGTH");
-  }
+  ngOnInit() {}
 
   generateDialogTitle() {
     if (this.questionNumber.length == 0) {
@@ -52,24 +63,14 @@ export class QuestionDetailsComponent implements OnInit {
 
       this.http.post("/questions", payload).subscribe(data => {
         this.serverResponse = data;
-        console.log("==== SERVER RESPONSE START ===");
-        console.dir(data);
-        console.log("==== SERVER RESPONSE END ===");
       });
 
       this.dialog.close(true);
-
-      console.log("******************");
-      console.log("ACCEPTED");
-      console.log("******************");
     }
   }
 
   cancelDialog() {
     this.dialog.close(false);
-    console.log("******************");
-    console.log("CANCELED");
-    console.log("******************");
   }
 
   /**
