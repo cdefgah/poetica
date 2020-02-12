@@ -17,25 +17,30 @@ export class QuestionDetailsComponent implements OnInit {
 
     var selectedRow = dialogData["selectedRow"];
     if (selectedRow) {
-      console.log("=========== DLG SELECTED ROW =============");
-      console.dir(selectedRow);
-      console.log("=========== DLG SELECTED ROW =============");
-    } else {
-      console.log("*********** NO SELECTED ROW INFO ***************");
-      console.log("*********** NO SELECTED ROW INFO ***************");
-      console.log("*********** NO SELECTED ROW INFO ***************");
+      this.questionId = selectedRow["id"];
+      this.questionNumber = selectedRow["number"];
+      this.questionBody = selectedRow["body"];
+      this.questionSource = selectedRow["source"];
+      this.questionComment = selectedRow["comment"];
+
+      this.oldQuestionBody = this.questionBody;
+      this.oldQuestionSource = this.questionSource;
+      this.oldQuestionComment = this.questionComment;
     }
   }
 
   modelConstraints: Map<string, number>;
 
+  questionId: number = -1;
   questionNumber: string = "";
   questionBody: string = "";
   questionSource: string = "";
   questionComment: string = "";
 
-  // предварительно сохраняем комментарий,
-  // чтобы потом определить, был-ли он изменён.
+  // предварительно сохраняем прежние значения
+  // чтобы потом определить, что было изменено.
+  oldQuestionBody: string = "";
+  oldQuestionSource: string = "";
   oldQuestionComment: string = "";
 
   questionBodyIsIncorrect: boolean = false;
@@ -56,16 +61,57 @@ export class QuestionDetailsComponent implements OnInit {
   acceptDialog() {
     this.resetValidationFlags();
     if (this.validateFields()) {
-      const payload = new HttpParams()
-        .set("questionBody", this.questionBody)
-        .set("questionSource", this.questionSource)
-        .set("questionComment", this.questionComment);
+      if (this.questionNumber.length == 0) {
+        // добавляем новую запись
+        const payload = new HttpParams()
+          .set("questionBody", this.questionBody)
+          .set("questionSource", this.questionSource)
+          .set("questionComment", this.questionComment);
 
-      this.http.post("/questions", payload).subscribe(data => {
-        this.serverResponse = data;
-      });
+        this.http.post("/questions", payload).subscribe(data => {
+          this.serverResponse = data;
+          this.dialog.close(true);
+        });
+      } else {
+        // обновляем существующую запись
+        var newQuestionBody: string =
+          this.oldQuestionBody != this.questionBody ? this.questionBody : "";
 
-      this.dialog.close(true);
+        var newQuestionSource: string =
+          this.oldQuestionSource != this.questionSource
+            ? this.questionSource
+            : "";
+
+        var newQuestionComment: string =
+          this.oldQuestionComment != this.questionComment
+            ? this.questionComment
+            : "";
+
+        var updateComment: boolean =
+          this.oldQuestionComment != this.questionComment;
+
+        if (
+          newQuestionBody.length > 0 ||
+          newQuestionSource.length > 0 ||
+          updateComment
+        ) {
+          // данные изменились, обновляем их на сервере
+          var requestUrl = "/questions/" + this.questionId;
+          const payload = new HttpParams()
+            .set("newQuestionBody", newQuestionBody)
+            .set("newQuestionSource", newQuestionSource)
+            .set("updateComment", String(updateComment))
+            .set("newQuestionComment", newQuestionComment);
+
+          this.http.put(requestUrl, payload).subscribe(() => {
+            this.dialog.close(true);
+          });
+        } else {
+          // никаких изменений не было
+          // закрываем и не делаем лишнего запроса для обновления данных с сервера
+          this.dialog.close(false);
+        }
+      }
     }
   }
 

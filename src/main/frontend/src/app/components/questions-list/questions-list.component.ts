@@ -42,6 +42,14 @@ export class QuestionsListComponent implements OnInit {
       .subscribe((data: Map<string, number>) => (this.modelConstraints = data));
   }
 
+  removeActionIsAvailable() {
+    if (this.dataSource) {
+      return this.dataSource.length > 0;
+    } else {
+      return false;
+    }
+  }
+
   loadQuestionsList() {
     var url: string = "/questions/all";
     this.http

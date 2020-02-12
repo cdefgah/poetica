@@ -84,21 +84,21 @@ public class QuestionsController extends AbstractController {
      * Номер вопроса и признак 'зачётный/незачётный вопрос' обновлению не подлежат.
      * @param questionId уникальный идентификатор вопроса (бескрылки), который надо обновить.
      * @param newQuestionBody новое содержимое вопроса, если содержимое обновлять не надо, передаётся пустым.
-     * @param newSource новый источник вопроса, если источник обновлять не надо, передаётся пустым.
+     * @param newQuestionSource новый источник вопроса, если источник обновлять не надо, передаётся пустым.
      * @param updateComment true, если надо обновить комментарий. В противном случае параметр newComment во внимание
      *                      не принимается.
-     * @param newComment новый комментарий к вопросу, принимается во внимание только если updateComment равен true.
+     * @param newQuestionComment новый комментарий к вопросу, принимается во внимание только если updateComment равен true.
      * @return Http OK если всё в порядке, иначе http-код ошибки + сообщение.
      */
     @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateQuestion(@PathVariable long questionId,
                                                  @RequestParam("newQuestionBody") String newQuestionBody,
-                                                 @RequestParam("newSource") String newSource,
+                                                 @RequestParam("newQuestionSource") String newQuestionSource,
                                                  @RequestParam("updateComment") boolean updateComment,
-                                                 @RequestParam("newComment") String newComment) {
+                                                 @RequestParam("newQuestionComment") String newQuestionComment) {
 
         boolean updateBody = !isStringEmpty(newQuestionBody);
-        boolean updateSource = !isStringEmpty(newSource);
+        boolean updateSource = !isStringEmpty(newQuestionSource);
 
         if (!updateBody && !updateSource && !updateComment) {
             return new ResponseEntity<>("Судя по переданным параметрам, ни одно из разрешённых " +
@@ -118,11 +118,11 @@ public class QuestionsController extends AbstractController {
         }
 
         if (updateSource) {
-            question.setSource(newSource);
+            question.setSource(newQuestionSource);
         }
 
         if (updateComment) {
-            question.setComment(newComment);
+            question.setComment(newQuestionComment);
         }
 
         entityManager.persist(question);
