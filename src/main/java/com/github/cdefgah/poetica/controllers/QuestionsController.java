@@ -101,16 +101,17 @@ public class QuestionsController extends AbstractController {
         boolean updateSource = !isStringEmpty(newQuestionSource);
 
         if (!updateBody && !updateSource && !updateComment) {
-            return new ResponseEntity<>("Судя по переданным параметрам, ни одно из разрешённых " +
-                    "к обновлению свойств вопроса не обновляется.",
-                    HttpStatus.BAD_REQUEST);
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body("Судя по переданным параметрам, ни одно из разрешённых " +
+                    "к обновлению свойств вопроса не обновляется.");
         }
 
         Question question = entityManager.find(Question.class, questionId);
         if (question == null) {
-            return new ResponseEntity<>("Не удалось найти вопрос (бескрылку) " +
-                    "с указанным идентификатором:  " + questionId,
-                    HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                    body("Не удалось найти вопрос (бескрылку) " +
+                            "с указанным идентификатором:  " + questionId);
         }
 
         if (updateBody) {
@@ -138,7 +139,7 @@ public class QuestionsController extends AbstractController {
         TypedQuery<Question> query =
                 entityManager.createQuery("select question from Question question", Question.class);
 
-        return new ResponseEntity<>(query.getResultList(), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
 
     /**
@@ -147,7 +148,7 @@ public class QuestionsController extends AbstractController {
      */
     @RequestMapping(path = "/questions/credited", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Question>> getCreditedQuestions() {
-        return new ResponseEntity<>(getQuestionsList(true), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(getQuestionsList(true));
     }
 
     /**
@@ -156,7 +157,7 @@ public class QuestionsController extends AbstractController {
      */
     @RequestMapping(path = "/questions/not-credited", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Question>> getNotCreditedQuestions() {
-        return new ResponseEntity<>(getQuestionsList(false), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(getQuestionsList(false));
     }
 
     /**
@@ -168,7 +169,7 @@ public class QuestionsController extends AbstractController {
     public ResponseEntity<Question> getQuestionById(@PathVariable long questionId) {
         Question question = entityManager.find(Question.class, questionId);
         if (question != null) {
-            return new ResponseEntity<>(question, HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(question);
         } else {
             return ResponseEntity.notFound().build();
         }

@@ -1,6 +1,12 @@
 import { Component, OnInit, Inject, Output, EventEmitter } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogConfig,
+  MatDialog
+} from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
+import { MessageBoxComponent } from "../message-box/message-box.component";
 
 @Component({
   selector: "app-question-details",
@@ -11,7 +17,8 @@ export class QuestionDetailsComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private http: HttpClient,
-    public dialog: MatDialogRef<QuestionDetailsComponent>
+    public dialog: MatDialogRef<QuestionDetailsComponent>,
+    public otherDialog: MatDialog
   ) {
     this.modelConstraints = dialogData["modelConstraints"];
 
@@ -27,6 +34,25 @@ export class QuestionDetailsComponent implements OnInit {
       this.oldQuestionSource = this.questionSource;
       this.oldQuestionComment = this.questionComment;
     }
+  }
+
+  displayErrorMessage(error: any) {
+    var errorMessage: string =
+      error.error +
+      ". " +
+      "Код статуса: " +
+      error.status +
+      ". " +
+      "Сообщение сервера: '" +
+      error.message +
+      "'";
+
+    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+      errorMessage,
+      "Ошибка"
+    );
+
+    this.otherDialog.open(MessageBoxComponent, msgBoxConfig);
   }
 
   modelConstraints: Map<string, number>;
@@ -68,10 +94,13 @@ export class QuestionDetailsComponent implements OnInit {
           .set("questionSource", this.questionSource)
           .set("questionComment", this.questionComment);
 
-        this.http.post("/questions", payload).subscribe(data => {
-          this.serverResponse = data;
-          this.dialog.close(true);
-        });
+        this.http.post("/questions", payload).subscribe(
+          data => {
+            this.serverResponse = data;
+            this.dialog.close(true);
+          },
+          error => this.displayErrorMessage(error)
+        );
       } else {
         // обновляем существующую запись
         var newQuestionBody: string =
@@ -103,9 +132,12 @@ export class QuestionDetailsComponent implements OnInit {
             .set("updateComment", String(updateComment))
             .set("newQuestionComment", newQuestionComment);
 
-          this.http.put(requestUrl, payload).subscribe(() => {
-            this.dialog.close(true);
-          });
+          this.http.put(requestUrl, payload).subscribe(
+            () => {
+              this.dialog.close(true);
+            },
+            error => this.displayErrorMessage(error)
+          );
         } else {
           // никаких изменений не было
           // закрываем и не делаем лишнего запроса для обновления данных с сервера
