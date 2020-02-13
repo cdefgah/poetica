@@ -36,6 +36,7 @@ import { ConfigurationDialogComponent } from "./components/configuration-dialog/
 import { EmailsWithAnswersListComponent } from "./components/emails-with-answers-list/emails-with-answers-list.component";
 import { OneEmailWithAnswersComponent } from "./components/one-email-with-answers/one-email-with-answers.component";
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
+import { MessageBoxComponent } from "./components/message-box/message-box.component";
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { AnswerDetailsComponent } from "./components/answer-details/answer-detai
     ConfigurationDialogComponent,
     EmailsWithAnswersListComponent,
     OneEmailWithAnswersComponent,
-    AnswerDetailsComponent
+    AnswerDetailsComponent,
+    MessageBoxComponent
   ],
   imports: [
     FormsModule,
@@ -79,7 +81,8 @@ import { AnswerDetailsComponent } from "./components/answer-details/answer-detai
     ConfirmationDialogComponent,
     QuestionsListImporterComponent,
     ConfigurationDialogComponent,
-    AnswerDetailsComponent
+    AnswerDetailsComponent,
+    MessageBoxComponent
   ],
 
   providers: [

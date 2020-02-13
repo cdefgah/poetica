@@ -1,0 +1,9 @@
+<p mat-dialog-title>{{ getDialogTitle() }}</p>
+<mat-dialog-content>
+  <p>{{ getMessage() }}</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="acceptDialog()">
+    {{ getAcceptButtonTitle() }}
+  </button>
+</mat-dialog-actions>

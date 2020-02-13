@@ -58,10 +58,10 @@ export class QuestionsListComponent implements OnInit {
   }
 
   openNewQuestionDialog() {
-    this.openDetailsDialog(undefined);
+    this.openDetailsDialog();
   }
 
-  openDetailsDialog(selectedRow: any) {
+  openDetailsDialog(selectedRow?: any) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
