@@ -23,10 +23,10 @@ import java.util.Map;
 public class QuestionsController extends AbstractController {
 
     /**
-     * Менеджер сущностей для взаимоедйствия с базой данных.
+     * Менеджер сущностей для взаимодействия с базой данных.
      */
     @Autowired
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
 
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")

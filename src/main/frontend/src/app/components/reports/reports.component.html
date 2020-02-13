@@ -5,12 +5,12 @@
 <p>
   <mat-form-field class="encoding-selection-field">
     <mat-label>Кодировка отчёта:</mat-label>
-    <mat-select [(value)]="selectedEncodingAlias">
+    <mat-select [(value)]="selectedEncodingSystemName">
       <mat-option
-        *ngFor="let encodingAlias of encodingAliases; index as i"
-        [value]="encodingAlias"
+        *ngFor="let encodingSystemName of encodingSystemNames; index as i"
+        [value]="encodingSystemName"
       >
-        {{ encodingTitles[i] }}
+        {{ encodingHumanReadableTitles[i] }}
       </mat-option>
     </mat-select>
   </mat-form-field>

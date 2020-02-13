@@ -24,7 +24,7 @@ export class MessageBoxComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "75%";
+    dialogConfig.width = "50%";
 
     dialogConfig.data = new Map<string, string>();
 
