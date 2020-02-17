@@ -1,0 +1,12 @@
+table {
+  width: 100%;
+}
+
+.page-title {
+  padding: 1em 1em 1em 1em;
+}
+
+button {
+  margin: 1em 1em 1em 1em;
+  background: lightcyan;
+}
