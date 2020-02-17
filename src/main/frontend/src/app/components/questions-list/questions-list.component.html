@@ -12,6 +12,7 @@
     class="display-mode-radio-button"
     *ngFor="let displayModeAlias of displayModeAliases; index as i"
     [value]="displayModeAlias"
+    (change)="listDisplayModeChanged($event)"
   >
     {{ displayModeTitles[i] }}
   </mat-radio-button>

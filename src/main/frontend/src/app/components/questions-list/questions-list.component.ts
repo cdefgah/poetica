@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { MatDialog, MatDialogConfig } from "@angular/material";
+import { MatDialog, MatDialogConfig, MatRadioChange } from "@angular/material";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { Question } from "src/app/model/Question";
 import { MessageBoxComponent } from "../message-box/message-box.component";
@@ -85,17 +85,10 @@ export class QuestionsListComponent implements OnInit {
   }
 
   openDetailsDialog(selectedRow?: any) {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "75%";
-
-    dialogConfig.data = {
-      selectedRow: selectedRow,
-      modelConstraints: this.modelConstraints
-    };
-
+    const dialogConfig = QuestionDetailsComponent.getDialogConfigWithData(
+      this.modelConstraints,
+      selectedRow
+    );
     var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
@@ -124,5 +117,12 @@ export class QuestionsListComponent implements OnInit {
         console.log("***** Question removal ACCEPTED!!! ******");
       }
     });
+  }
+
+  listDisplayModeChanged(event: MatRadioChange) {
+    var actualRadioButtonValue = event.value;
+    console.log("****** RADIO START ********");
+    console.log(actualRadioButtonValue);
+    console.log("****** RADIO END ********");
   }
 }

@@ -2,12 +2,12 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
+import com.github.cdefgah.poetica.model.config.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -28,6 +28,8 @@ public class QuestionsController extends AbstractController {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private Configuration configuration;
 
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, Integer>> getModelConstraints() {
@@ -74,10 +76,13 @@ public class QuestionsController extends AbstractController {
         question.setBody(questionBody);
         question.setSource(questionSource);
         question.setComment(questionComment);
+        question.setCredited(questionNumber <= configuration.getCreditedQuestionsQty());
 
         entityManager.persist(question);
         return new ResponseEntity<>(String.valueOf(question.getId()), HttpStatus.CREATED);
     }
+
+
 
     /**
      * Обновляет содержимое вопроса (бескрылки).

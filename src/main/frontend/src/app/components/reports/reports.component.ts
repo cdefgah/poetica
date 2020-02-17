@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MessageBoxComponent } from "../message-box/message-box.component";
+import { ConfigurationValue } from "src/app/model/ConfigurationValue";
 
 @Component({
   selector: "app-reports",
@@ -13,6 +14,11 @@ export class ReportsComponent implements OnInit {
   encodingHumanReadableTitles: string[] = [];
 
   selectedEncodingSystemName: string;
+
+  /**
+   * Сделать map, где отчёту будет соответствовать action.
+   * дёргаем action из map по выбранному отчёту и просто его вызываем action.run();
+   */
 
   reportAliases: string[] = [
     "listOfAnsweredCommands",
@@ -52,8 +58,8 @@ export class ReportsComponent implements OnInit {
   initActualReportEncodingSystemName() {
     var url: string = "/configuration/actual-report-encoding-system-name";
     this.http.get(url).subscribe(
-      (data: CharsetSystemName) => {
-        this.selectedEncodingSystemName = data.name;
+      (data: ConfigurationValue) => {
+        this.selectedEncodingSystemName = data.value;
       },
       error => {
         this.displayErrorMessage(error);
@@ -84,8 +90,4 @@ export class ReportsComponent implements OnInit {
 class CharsetEncodingEntity {
   humanReadableTitle: string;
   systemName: string;
-}
-
-class CharsetSystemName {
-  name: string;
 }

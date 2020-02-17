@@ -1,4 +1,4 @@
-<p mat-dialog-title>{{ generateDialogTitle() }}</p>
+<p mat-dialog-title>{{ dialogTitle }}</p>
 <mat-dialog-content>
   <div style="display: flex; flex-direction: column">
     <mat-form-field appearance="outline">
@@ -8,7 +8,8 @@
         rows="7"
         placeholder="Содержание"
         maxlength="{{ modelConstraints['MAX_BODY_LENGTH'] }}"
-        [(ngModel)]="questionBody"
+        required
+        [(ngModel)]="question.body"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionBodyIsIncorrect"
         >Обязательное поле</mat-hint
@@ -21,7 +22,8 @@
         rows="3"
         placeholder="Источник"
         maxlength="{{ modelConstraints['MAX_SOURCE_LENGTH'] }}"
-        [(ngModel)]="questionSource"
+        required
+        [(ngModel)]="question.source"
       ></textarea>
       <mat-hint class="validation-text" *ngIf="questionSourceIsIncorrect"
         >Обязательное поле</mat-hint
@@ -34,7 +36,7 @@
         rows="3"
         placeholder="Комментарий"
         maxlength="{{ modelConstraints['MAX_COMMENT_LENGTH'] }}"
-        [(ngModel)]="questionComment"
+        [(ngModel)]="question.comment"
       ></textarea>
     </mat-form-field>
   </div>

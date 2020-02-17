@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.model;
+package com.github.cdefgah.poetica.model.config;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "CONFIGURATION")
-public class ConfigurationEntity {
+public class ConfigurationRecord {
 
     @Id
     @GeneratedValue
@@ -17,7 +17,7 @@ public class ConfigurationEntity {
 
     private String value;
 
-    public ConfigurationEntity() {
+    public ConfigurationRecord() {
     }
 
     public Long getId() {

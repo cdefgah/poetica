@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.model;
+package com.github.cdefgah.poetica.model.config;
 
 public enum ConfigurationKeys {
     CREDITED_QUESTIONS_QTY("creditedQuestionsQty"),

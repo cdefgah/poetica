@@ -1,7 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
-import com.github.cdefgah.poetica.model.ConfigurationEntity;
-import com.github.cdefgah.poetica.model.ConfigurationKeys;
+import com.github.cdefgah.poetica.model.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,64 +23,37 @@ public class ConfigurationController {
     @Autowired
     private EntityManager entityManager;
 
-    private static final CharsetEncodingEntity[] supportedReportEncodings = {
-            new CharsetEncodingEntity("Юникод (Unicode)", "UTF8"),
-            new CharsetEncodingEntity("КОИ-8Р (KOI-8R)", "KOI8_R")
-    };
+    @Autowired
+    private Configuration configuration;
 
     @RequestMapping(path = "/configuration/supported-report-encodings",
             method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<CharsetEncodingEntity[]> getSupportedReportEncodings() {
-        return new ResponseEntity<>(supportedReportEncodings, HttpStatus.OK);
+        return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/configuration/actual-report-encoding-system-name",
             method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<CharsetSystemName> getActualReportEncodingSystemName() {
-        TypedQuery<ConfigurationEntity> query =
-                entityManager.createQuery("select configurationEntity from ConfigurationEntity " +
+    public ResponseEntity<ConfigurationValue> getActualReportEncodingSystemName() {
+        TypedQuery<ConfigurationRecord> query =
+                entityManager.createQuery("select configurationEntity from ConfigurationRecord " +
                         "configurationEntity where configurationEntity.key=:encodingKeyName",
-                        ConfigurationEntity.class);
+                        ConfigurationRecord.class);
 
         query.setParameter("encodingKeyName", ConfigurationKeys.REPORTS_ENCODING.getKeyName());
-        List<ConfigurationEntity> resultList = query.getResultList();
-        String actualReportEncodingSystemName = supportedReportEncodings[0].systemName;
+        List<ConfigurationRecord> resultList = query.getResultList();
+        String actualReportEncodingSystemName = Configuration.SUPPORTED_ENCODINGS[0].getSystemName();
         if (!resultList.isEmpty()) {
-            ConfigurationEntity configurationEntity = resultList.get(0);
-            actualReportEncodingSystemName = configurationEntity.getValue();
+            ConfigurationRecord configurationRecord = resultList.get(0);
+            actualReportEncodingSystemName = configurationRecord.getValue();
         }
 
-        return new ResponseEntity<>(new CharsetSystemName(actualReportEncodingSystemName), HttpStatus.OK);
+        return new ResponseEntity<>(new ConfigurationValue(actualReportEncodingSystemName), HttpStatus.OK);
     }
 
-    final static class CharsetSystemName {
-
-        private final String name;
-
-        public CharsetSystemName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    final static class CharsetEncodingEntity {
-        private String humanReadableTitle;
-        private String systemName;
-
-        public CharsetEncodingEntity(String humanReadableTitle, String systemName) {
-            this.humanReadableTitle = humanReadableTitle;
-            this.systemName = systemName;
-        }
-
-        public String getHumanReadableTitle() {
-            return humanReadableTitle;
-        }
-
-        public String getSystemName() {
-            return systemName;
-        }
+    @RequestMapping(path = "/configuration/credited_questions_qty",
+            method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<ConfigurationValue> getCreditedQuestionsQty() {
+        return new ResponseEntity<>(new ConfigurationValue(configuration.getCreditedQuestionsQty()), HttpStatus.OK);
     }
 }

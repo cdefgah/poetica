@@ -66,6 +66,9 @@ public final class Question {
     @Column(length = ModelConstraints.MAX_COMMENT_LENGTH)
     private String comment;
 
+    @Column(nullable = false)
+    private boolean isCredited;
+
     public Question() {
     }
 
@@ -111,6 +114,18 @@ public final class Question {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public boolean isCredited() {
+        return isCredited;
+    }
+
+    public void setCredited(boolean credited) {
+        isCredited = credited;
     }
 
     @Override
