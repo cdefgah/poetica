@@ -21,12 +21,8 @@
 <button mat-raised-button (click)="openNewQuestionDialog()">
   Добавить задание
 </button>
-<button
-  mat-raised-button
-  *ngIf="removeActionIsAvailable()"
-  (click)="removeLastQuestion()"
->
-  Удалить последнее задание из списка
+<button mat-raised-button (click)="removeLastQuestion()">
+  Удалить последнее задание из общего списка
 </button>
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
   <ng-container matColumnDef="number">

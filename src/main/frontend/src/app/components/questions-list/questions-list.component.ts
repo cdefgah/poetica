@@ -12,10 +12,16 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
   styleUrls: ["./questions-list.component.css"]
 })
 export class QuestionsListComponent implements OnInit {
+  // эти псевдонимы также ипсользуются для формирования строки запроса, не меняй их.
+  private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = "all";
+  private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = "credited";
+  private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS =
+    "not-credited";
+
   displayModeAliases: string[] = [
-    "AllQuestions",
-    "CreditedQuestions",
-    "NotCreditedQuestions"
+    QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS,
+    QuestionsListComponent.DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS,
+    QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS
   ];
 
   displayModeTitles: string[] = ["Все", "Зачётные", "Внезачётные"];
@@ -31,13 +37,13 @@ export class QuestionsListComponent implements OnInit {
   selectedRowIndex: number;
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
-    this.loadConstraints();
+    this.loadOneQuestionModelConstraints();
     this.loadQuestionsList();
   }
 
   ngOnInit() {}
 
-  loadConstraints() {
+  loadOneQuestionModelConstraints() {
     var url: string = "/questions/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, number>) => (this.modelConstraints = data),
@@ -64,20 +70,24 @@ export class QuestionsListComponent implements OnInit {
     this.dialog.open(MessageBoxComponent, msgBoxConfig);
   }
 
-  removeActionIsAvailable() {
-    if (this.dataSource) {
-      return this.dataSource.length > 0;
-    } else {
-      return false;
-    }
-  }
-
   loadQuestionsList() {
-    var url: string = "/questions/all";
+    var urlBase: string = "/questions/";
+    var url: string = urlBase + this.selectedDisplayModeAlias;
+
     this.http.get(url).subscribe(
-      (data: Question[]) => (this.dataSource = data),
+      (data: Question[]) => {
+        this.dataSource = data;
+      },
       error => this.displayErrorMessage(error)
     );
+  }
+
+  listDisplayModeChanged(event: MatRadioChange) {
+    var receivedDisplayModeAlias = event.value;
+    if (this.selectedDisplayModeAlias != receivedDisplayModeAlias) {
+      this.selectedDisplayModeAlias = receivedDisplayModeAlias;
+      this.loadQuestionsList();
+    }
   }
 
   openNewQuestionDialog() {
@@ -104,25 +114,55 @@ export class QuestionsListComponent implements OnInit {
   }
 
   removeLastQuestion() {
-    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-      "Удалить последнее задание из списка?"
-    );
-    var dialogRef = this.dialog.open(
-      ConfirmationDialogComponent,
-      confirmationDialogConfig
-    );
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // если диалог был принят (accepted)
-        console.log("***** Question removal ACCEPTED!!! ******");
-      }
-    });
-  }
+    const url: string = "/questions/last-question";
 
-  listDisplayModeChanged(event: MatRadioChange) {
-    var actualRadioButtonValue = event.value;
-    console.log("****** RADIO START ********");
-    console.log(actualRadioButtonValue);
-    console.log("****** RADIO END ********");
+    this.http.get(url).subscribe(
+      (data: Map<string, any>) => {
+        const lastQuestion = new Question();
+        lastQuestion.initialize(data);
+
+        const creditedQuestionInfo = lastQuestion.credited
+          ? "зачётное"
+          : "внезачётное";
+        const confirmationMessage =
+          "Удалить " +
+          creditedQuestionInfo +
+          " задание с номером " +
+          lastQuestion.number +
+          "?";
+
+        var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+          confirmationMessage
+        );
+        var dialogRef = this.dialog.open(
+          ConfirmationDialogComponent,
+          confirmationDialogConfig
+        );
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            // если диалог был принят (accepted)
+            this.http.delete(url).subscribe(
+              (data: any) => {
+                this.selectedDisplayModeAlias =
+                  QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS;
+                this.loadQuestionsList();
+              },
+              error => this.displayErrorMessage(error)
+            );
+          }
+        });
+      },
+      error => {
+        // нет вопросов в системе
+        const errorMessage: string = "В базе данных нет ни одного задания.";
+
+        var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+          errorMessage,
+          "Внимание"
+        );
+
+        this.dialog.open(MessageBoxComponent, msgBoxConfig);
+      }
+    );
   }
 }

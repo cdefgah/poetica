@@ -14,6 +14,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Обрабатывает все запросы относительно непосредственной работы с вопросами (бескрылками).
@@ -61,14 +62,11 @@ public class QuestionsController extends AbstractController {
             return new ResponseEntity<>("Источник вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
         }
 
-        TypedQuery<Question> questionNumberQuery =
-                entityManager.createQuery("select question from " +
-                        "Question question order by question.number desc", Question.class);
 
         int questionNumber = 1;
-        List<Question> existingQuestions = questionNumberQuery.getResultList();
-        if (!existingQuestions.isEmpty()) {
-            questionNumber = existingQuestions.get(0).getNumber() + 1;
+        Optional<Question> lastQuestionInfo = getLastQuestion();
+        if (lastQuestionInfo.isPresent()) {
+            questionNumber = lastQuestionInfo.get().getNumber() + 1;
         }
 
         Question question = new Question();
@@ -83,6 +81,18 @@ public class QuestionsController extends AbstractController {
     }
 
 
+    private Optional<Question> getLastQuestion() {
+        final TypedQuery<Question> questionNumberQuery =
+                entityManager.createQuery("select question from " +
+                        "Question question order by question.number desc", Question.class);
+
+        final List<Question> existingQuestions = questionNumberQuery.getResultList();
+        if (!existingQuestions.isEmpty()) {
+            return Optional.of(existingQuestions.get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
 
     /**
      * Обновляет содержимое вопроса (бескрылки).
@@ -180,13 +190,7 @@ public class QuestionsController extends AbstractController {
         }
     }
 
-    /**
-     * Удаляет вопрос. На вопрос не должно быть дано ответов.
-     * @param questionId уникальный идентификатор вопроса.
-     * @return Http NO CONTENT, если всё в порядке, в случае ошибки вернёт соответствующий код http с сообщением.
-     */
-    @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity<String> deleteQuestion(@PathVariable long questionId) {
+    private ResponseEntity<String> deleteQuestion(long questionId) {
         if (thisQuestionIsNotAnsweredYet(questionId)) {
             Query deletionQuery = entityManager.createQuery("delete from Question q where q.id=:questionId");
             final int deletedCount = deletionQuery.setParameter("questionId", questionId).executeUpdate();
@@ -202,6 +206,23 @@ public class QuestionsController extends AbstractController {
         }
     }
 
+    @RequestMapping(path = "/questions/last-question", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Question> getLastQuestionInfo() {
+        Optional<Question> lastQuestionInfo = getLastQuestion();
+        return lastQuestionInfo.map(question -> ResponseEntity.status(HttpStatus.OK).body(question)).
+                orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @RequestMapping(path = "/questions/last-question", method = RequestMethod.DELETE, produces = "application/json")
+    public ResponseEntity<String> deleteLastQuestion() {
+        Optional<Question> lastQuestionInfo = getLastQuestion();
+        if (!lastQuestionInfo.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final long questionId = lastQuestionInfo.get().getId();
+        return deleteQuestion(questionId);
+    }
 
     /**
      * Удаляет все вопросы из базы. Ни на один вопрос не должно быть дано ответов.
@@ -236,7 +257,7 @@ public class QuestionsController extends AbstractController {
     private boolean thisQuestionIsNotAnsweredYet(long questionId) {
         Query query = entityManager.createQuery("from Answer a where a.questionId=:questionId", Answer.class);
         query.setParameter("questionId", questionId);
-        return !query.getResultList().isEmpty();
+        return query.getResultList().isEmpty();
     }
 
     /**
