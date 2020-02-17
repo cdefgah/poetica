@@ -237,7 +237,8 @@ public class QuestionsController extends AbstractController {
             for (Question question : questionsList) {
                 if (!thisQuestionIsNotAnsweredYet(question.getId())) {
                     return new ResponseEntity<>("Нельзя удалить все вопросы," +
-                            " так есть как минимум один вопрос, на который внесены ответы.",
+                            " так есть как минимум один вопрос (номер вопроса: " + question.getNumber()
+                            +"), на который внесены ответы.",
                             HttpStatus.BAD_REQUEST);
                 }
             }

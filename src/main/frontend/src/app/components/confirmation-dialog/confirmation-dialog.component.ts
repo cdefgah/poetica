@@ -113,27 +113,11 @@ export class ConfirmationDialogComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  getDialogTitle() {
-    return this.dialogTitle;
-  }
-
-  getConfirmationMessage() {
-    return this.confirmationMessage;
-  }
-
   confirmAction() {
     this.dialog.close(true);
   }
 
   declineAction() {
     this.dialog.close(false);
-  }
-
-  getConfirmButtonTitle() {
-    return this.confirmButtonTitle;
-  }
-
-  getDeclineButtonTitle() {
-    return this.declineButtonTitle;
   }
 }

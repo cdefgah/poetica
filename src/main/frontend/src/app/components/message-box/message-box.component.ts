@@ -91,19 +91,7 @@ export class MessageBoxComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  getDialogTitle() {
-    return this.dialogTitle;
-  }
-
-  getMessage() {
-    return this.dialogMessage;
-  }
-
   acceptDialog() {
     this.dialog.close(true);
-  }
-
-  getAcceptButtonTitle() {
-    return this.acceptButtonTitle;
   }
 }

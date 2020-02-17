@@ -1,12 +1,12 @@
-<p mat-dialog-title>{{ getDialogTitle() }}</p>
+<p mat-dialog-title>{{ dialogTitle }}</p>
 <mat-dialog-content>
-  <p>{{ getConfirmationMessage() }}</p>
+  <p>{{ confirmationMessage }}</p>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-raised-button color="primary" (click)="confirmAction()">
-    {{ getConfirmButtonTitle() }}
+    {{ confirmButtonTitle }}
   </button>
   <button mat-raised-button color="primary" (click)="declineAction()">
-    {{ getDeclineButtonTitle() }}
+    {{ declineButtonTitle }}
   </button>
 </mat-dialog-actions>
