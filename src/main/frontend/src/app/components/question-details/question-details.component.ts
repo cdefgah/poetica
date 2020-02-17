@@ -29,9 +29,15 @@ export class QuestionDetailsComponent implements OnInit {
     public dialog: MatDialogRef<QuestionDetailsComponent>,
     public otherDialog: MatDialog
   ) {
+    // создаём объект question сразу первой строчкой
+    // так как к нему подключены (bind)
+    // свойства в html-template комепонента
+    // и если не проинициализировать объект сразу
+    // то компонент может попытаться (асинхронно) получить свойство
+    // объекта, который мы ещё не проинициализировали,
+    // например в случаях, когда get запрос ещё не закончил выполняться
     this.question = new Question();
 
-    console.log("*** Loading dialog config ****** START");
     this.modelConstraints =
       dialogData[QuestionDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS];
 
@@ -40,32 +46,19 @@ export class QuestionDetailsComponent implements OnInit {
     if (questionId) {
       // редактируем существующее задание
       var url: string = "/questions/" + questionId;
-
-      console.log("******** calling the server ");
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          console.log("url request succeed: " + url);
-          console.log("********** data info *****************");
-          console.dir(data);
-          console.log("**************************************");
+          this.question.initialize(data);
 
-          console.log("********** question init *************");
-          this.question = new Question(data);
-          console.dir(this.question);
-          console.log("**************************************");
-
-          console.log("********** question copy init *************");
-          this.questionCopy = new Question(data);
-          console.dir(this.questionCopy);
-          console.log("**************************************");
+          this.questionCopy = new Question();
+          this.questionCopy.initialize(data);
 
           this.dialogTitle = this.getDialogTitle(this.question);
         },
         error => this.displayErrorMessage(error)
       );
     } else {
-      // создаём новое задание
-      this.question = new Question();
+      // создаём заголовок диалога для нового задания
       this.dialogTitle = this.getDialogTitle(this.question);
     }
   }
@@ -78,7 +71,7 @@ export class QuestionDetailsComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "50%";
+    dialogConfig.width = "62%";
 
     dialogConfig.data = new Map<string, any>();
 
@@ -86,18 +79,10 @@ export class QuestionDetailsComponent implements OnInit {
       QuestionDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS
     ] = modelConstraints;
 
-    console.log("**** Selected row ****");
-    console.dir(row);
-    console.log("**************************");
-
     if (row) {
       dialogConfig.data[QuestionDetailsComponent.KEY_DIALOG_ID] =
         row[QuestionDetailsComponent.KEY_DIALOG_ID];
     }
-
-    console.log("**** DIALOG CONFIG ****");
-    console.dir(dialogConfig);
-    console.log("**************************");
 
     return dialogConfig;
   }

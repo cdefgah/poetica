@@ -27,7 +27,7 @@ export class ConfirmationDialogComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "50%";
+    dialogConfig.width = "38%";
 
     dialogConfig.data = new Map<string, string>();
 
