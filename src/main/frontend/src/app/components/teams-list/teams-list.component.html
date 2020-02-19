@@ -1,17 +1,19 @@
 <mat-toolbar>
-  <span class="page-title">Команды</span>
+  <p class="page-title">Команды</p>
 </mat-toolbar>
 <hr />
-<button mat-raised-button>Добавить команду</button>
+<button mat-raised-button (click)="openDetailsDialog()">
+  Добавить команду
+</button>
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef>Номер</th>
-    <td mat-cell *matCellDef="let oneTeam">{{ oneTeam.number }}</td>
+    <td mat-cell *matCellDef="let team">{{ team.number }}</td>
   </ng-container>
 
-  <ng-container matColumnDef="body">
-    <th mat-header-cell *matHeaderCellDef>Содержание</th>
-    <td mat-cell *matCellDef="let oneTeam">{{ oneTeam.title }}</td>
+  <ng-container matColumnDef="title">
+    <th mat-header-cell *matHeaderCellDef>Название</th>
+    <td mat-cell *matCellDef="let team">{{ team.title }}</td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

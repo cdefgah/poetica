@@ -2,6 +2,9 @@ package com.github.cdefgah.poetica.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -10,6 +13,23 @@ import java.util.Objects;
 @Entity
 @Table(name = "Teams")
 public final class Team {
+
+    private static class ModelConstraints {
+        static final int REQUIRED_NUMBER_LENGTH = 3;
+        static final String NUMBER_VALIDATION_REGEXP = "\\d\\d\\d";
+        static final int MAX_TITLE_LENGTH = 256;
+    }
+
+    private static final Map<String, String> modelConstraintsMap;
+
+    static
+    {
+        final Map<String, String> localConstraintsMap = new HashMap<>();
+        localConstraintsMap.put("REQUIRED_NUMBER_LENGTH", String.valueOf(Team.ModelConstraints.REQUIRED_NUMBER_LENGTH));
+        localConstraintsMap.put("NUMBER_VALIDATION_REGEXP", Team.ModelConstraints.NUMBER_VALIDATION_REGEXP);
+        localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(Team.ModelConstraints.MAX_TITLE_LENGTH));
+        modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
+    }
 
     /**
      * Уникальный идентификатор для связи между таблицами.
@@ -30,6 +50,11 @@ public final class Team {
      */
     @Column(length = 256, nullable = false, unique=true)
     private String title;
+
+
+    public Team() {
+
+    }
 
     /**
      * Возвращает уникальный идентификатор.
@@ -99,5 +124,9 @@ public final class Team {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public static Map<String, String> getModelConstraintsMap() {
+        return modelConstraintsMap;
     }
 }

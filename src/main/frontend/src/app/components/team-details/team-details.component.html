@@ -1,0 +1,40 @@
+<p mat-dialog-title>{{ dialogTitle }}</p>
+<mat-dialog-content>
+  <div style="display: flex; flex-direction: column">
+    <mat-form-field appearance="outline">
+      <mat-label>Номер</mat-label>
+      <input
+        matInput
+        required
+        placeholder="Номер команды"
+        maxlength="{{ modelConstraints['REQUIRED_NUMBER_LENGTH'] }}"
+        [(ngModel)]="team.number"
+      />
+      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect"
+        >Обязательное поле (строго три цифры)</mat-hint
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Название</mat-label>
+      <input
+        matInput
+        required
+        placeholder="Название команды"
+        maxlength="{{ modelConstraints['MAX_TITLE_LENGTH'] }}"
+        [(ngModel)]="team.title"
+      />
+      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect"
+        >Обязательное поле</mat-hint
+      >
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="acceptDialog()">
+    Сохранить
+  </button>
+  <button mat-raised-button color="primary" (click)="cancelDialog()">
+    Отменить
+  </button>
+</mat-dialog-actions>

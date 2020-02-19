@@ -26,3 +26,7 @@ body {
 .mat-row:hover {
   background-color: lightblue;
 }
+
+table {
+  width: 100%;
+}

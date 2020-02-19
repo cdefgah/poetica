@@ -21,14 +21,14 @@ public final class Question {
         static final int MAX_COMMENT_LENGTH = 1024;
     }
 
-    private static final Map<String, Integer> modelConstraintsMap;
+    private static final Map<String, String> modelConstraintsMap;
 
     static
     {
-        final Map<String, Integer> localConstraintsMap = new HashMap<>();
-        localConstraintsMap.put("MAX_BODY_LENGTH", ModelConstraints.MAX_BODY_LENGTH);
-        localConstraintsMap.put("MAX_SOURCE_LENGTH", ModelConstraints.MAX_SOURCE_LENGTH);
-        localConstraintsMap.put("MAX_COMMENT_LENGTH", ModelConstraints.MAX_COMMENT_LENGTH);
+        final Map<String, String> localConstraintsMap = new HashMap<>();
+        localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
+        localConstraintsMap.put("MAX_SOURCE_LENGTH", String.valueOf(ModelConstraints.MAX_SOURCE_LENGTH));
+        localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
 
@@ -72,7 +72,7 @@ public final class Question {
     public Question() {
     }
 
-    public static Map<String, Integer> getModelConstraintsMap() {
+    public static Map<String, String> getModelConstraintsMap() {
         return modelConstraintsMap;
     }
 

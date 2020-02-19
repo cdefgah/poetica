@@ -37,6 +37,7 @@ import { EmailsWithAnswersListComponent } from "./components/emails-with-answers
 import { OneEmailWithAnswersComponent } from "./components/one-email-with-answers/one-email-with-answers.component";
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
 import { MessageBoxComponent } from "./components/message-box/message-box.component";
+import { TeamDetailsComponent } from "./components/team-details/team-details.component";
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { MessageBoxComponent } from "./components/message-box/message-box.compon
     EmailsWithAnswersListComponent,
     OneEmailWithAnswersComponent,
     AnswerDetailsComponent,
-    MessageBoxComponent
+    MessageBoxComponent,
+    TeamDetailsComponent
   ],
   imports: [
     FormsModule,
@@ -82,7 +84,8 @@ import { MessageBoxComponent } from "./components/message-box/message-box.compon
     QuestionsListImporterComponent,
     ConfigurationDialogComponent,
     AnswerDetailsComponent,
-    MessageBoxComponent
+    MessageBoxComponent,
+    TeamDetailsComponent
   ],
 
   providers: [

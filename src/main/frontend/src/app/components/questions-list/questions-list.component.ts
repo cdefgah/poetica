@@ -12,7 +12,7 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
   styleUrls: ["./questions-list.component.css"]
 })
 export class QuestionsListComponent implements OnInit {
-  // эти псевдонимы также ипсользуются для формирования строки запроса, не меняй их.
+  // эти псевдонимы также используются для формирования строки http-запроса, не меняй их.
   private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = "all";
   private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = "credited";
   private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS =
@@ -30,7 +30,7 @@ export class QuestionsListComponent implements OnInit {
 
   displayedColumns: string[] = ["number", "body", "source", "comment"];
 
-  modelConstraints: Map<string, number>;
+  modelConstraints: Map<string, string>;
 
   dataSource: Question[];
 
@@ -46,7 +46,7 @@ export class QuestionsListComponent implements OnInit {
   loadOneQuestionModelConstraints() {
     var url: string = "/questions/model-constraints";
     this.http.get(url).subscribe(
-      (data: Map<string, number>) => (this.modelConstraints = data),
+      (data: Map<string, string>) => (this.modelConstraints = data),
       error => this.displayErrorMessage(error)
     );
   }

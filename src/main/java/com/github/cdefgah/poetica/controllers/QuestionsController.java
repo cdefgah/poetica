@@ -33,7 +33,7 @@ public class QuestionsController extends AbstractController {
     private Configuration configuration;
 
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Map<String, Integer>> getModelConstraints() {
+    public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
     }
 

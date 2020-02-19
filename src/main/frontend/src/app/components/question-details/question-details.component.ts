@@ -64,7 +64,7 @@ export class QuestionDetailsComponent implements OnInit {
   }
 
   static getDialogConfigWithData(
-    modelConstraints: Map<string, number>,
+    modelConstraints: Map<string, string>,
     row?: any
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
