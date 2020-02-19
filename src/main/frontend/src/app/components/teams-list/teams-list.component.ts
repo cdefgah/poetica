@@ -51,7 +51,10 @@ export class TeamsListComponent implements OnInit {
   loadOneTeamModelConstraints() {
     var url: string = "/teams/model-constraints";
     this.http.get(url).subscribe(
-      (data: Map<string, string>) => (this.modelConstraints = data),
+      (data: Map<string, string>) => {
+        this.modelConstraints = data;
+        Team.initializeRegexpValidator(this.modelConstraints);
+      },
       error => this.displayErrorMessage(error)
     );
   }

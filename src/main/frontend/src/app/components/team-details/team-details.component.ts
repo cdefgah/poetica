@@ -208,7 +208,7 @@ export class TeamDetailsComponent implements OnInit {
    * @returns true, если поля заполнены, иначе false.
    */
   private validateFields(): boolean {
-    if (this.team.number.trim().length == 0) {
+    if (!Team.numberRegExValidator.test(this.team.number)) {
       this.teamNumberIsIncorrect = true;
     }
 

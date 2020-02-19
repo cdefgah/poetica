@@ -38,6 +38,7 @@ import { OneEmailWithAnswersComponent } from "./components/one-email-with-answer
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
 import { MessageBoxComponent } from "./components/message-box/message-box.component";
 import { TeamDetailsComponent } from "./components/team-details/team-details.component";
+import { PickListDialogComponent } from "./components/pick-list-dialog/pick-list-dialog.component";
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     OneEmailWithAnswersComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
-    TeamDetailsComponent
+    TeamDetailsComponent,
+    PickListDialogComponent
   ],
   imports: [
     FormsModule,
@@ -85,7 +87,8 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     ConfigurationDialogComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
-    TeamDetailsComponent
+    TeamDetailsComponent,
+    PickListDialogComponent
   ],
 
   providers: [
