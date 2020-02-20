@@ -64,8 +64,29 @@
       </table>
     </mat-tab>
     <mat-tab label="Two">
-      <h1>Some more tab content</h1>
-      <p>...</p>
+      <table mat-table [dataSource]="emailsDataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="sentOn">
+          <th mat-header-cell *matHeaderCellDef>Отправлено</th>
+          <td mat-cell *matCellDef="let email">{{ email.sentOn }}</td>
+        </ng-container>
+        <ng-container matColumnDef="processedOn">
+          <th mat-header-cell *matHeaderCellDef>Загружено в систему</th>
+          <td mat-cell *matCellDef="let email">{{ email.processedOn }}</td>
+        </ng-container>
+        <ng-container matColumnDef="numbersOfAnsweredQuestions">
+          <th mat-header-cell *matHeaderCellDef>Номера заданий</th>
+          <td mat-cell *matCellDef="let email">
+            {{ email.numbersOfAnsweredQuestions }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedEmailColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedEmailColumns"
+          (click)="onEmailRowClicked(row)"
+        ></tr>
+      </table>
     </mat-tab>
   </mat-tab-group>
 </div>
