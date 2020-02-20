@@ -128,4 +128,29 @@ public class TeamsController extends AbstractController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
+    public ResponseEntity<String> deleteTeam(@PathVariable  long teamId) {
+        if (thisTeamHasNoAnswers(teamId)) {
+            Query deletionQuery = entityManager.createQuery("delete from Team t where t.id=:teamId");
+            final int deletedCount = deletionQuery.setParameter("teamId", teamId).executeUpdate();
+            if (deletedCount > 0) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return new ResponseEntity<>("Не удалось удалить команду с идентификатором: " + teamId,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>("Нельзя удалить команду, " +
+                    "так как в базе сохранены полученные от неё ответы",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private boolean thisTeamHasNoAnswers(long teamId) {
+        Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
+        query.setParameter("teamId", teamId);
+        return query.getResultList().isEmpty();
+    }
+
 }

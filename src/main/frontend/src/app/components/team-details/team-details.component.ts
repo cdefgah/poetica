@@ -8,6 +8,7 @@ import {
 } from "@angular/material";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { MessageBoxComponent } from "../message-box/message-box.component";
+import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-team-details",
@@ -17,6 +18,10 @@ import { MessageBoxComponent } from "../message-box/message-box.component";
 export class TeamDetailsComponent implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
   private static readonly KEY_DIALOG_MODEL_CONSTRAINTS = "modelConstraints";
+
+  public static readonly DIALOG_RESULT_ACCEPTED: number = 1;
+  public static readonly DIALOG_RESULT_DECLINED: number = 2;
+  public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
 
   dialogTitle: string;
 
@@ -30,6 +35,8 @@ export class TeamDetailsComponent implements OnInit {
 
   serverResponse: any;
 
+  isExistingRecord: boolean;
+
   static getDialogConfigWithData(
     modelConstraints: Map<string, string>,
     row?: any
@@ -38,7 +45,7 @@ export class TeamDetailsComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "38%";
+    dialogConfig.width = "29%";
 
     dialogConfig.data = new Map<string, any>();
 
@@ -85,6 +92,7 @@ export class TeamDetailsComponent implements OnInit {
 
     if (teamId) {
       // редактируем существующее задание
+      this.isExistingRecord = true;
       var url: string = "/teams/" + teamId;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
@@ -99,6 +107,7 @@ export class TeamDetailsComponent implements OnInit {
       );
     } else {
       // создаём заголовок диалога для новой команды
+      this.isExistingRecord = false;
       this.dialogTitle = this.getDialogTitle();
     }
   }
@@ -106,16 +115,9 @@ export class TeamDetailsComponent implements OnInit {
   ngOnInit(): void {}
 
   acceptDialog() {
-    console.log("ACCEPT START ***");
-
     this.resetValidationFlags();
     if (this.validateFields()) {
-      console.log("VALIDATED");
-      console.log("this.team.id = " + this.team.id);
-
       if (!this.team.id) {
-        console.log("ADD NEW RECORD");
-
         // добавляем новую запись
         const payload = new HttpParams()
           .set("teamNumber", this.team.number)
@@ -124,30 +126,19 @@ export class TeamDetailsComponent implements OnInit {
         this.http.post("/teams", payload).subscribe(
           data => {
             this.serverResponse = data;
-            this.dialog.close(true);
+            this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
           },
           error => this.displayErrorMessage(error)
         );
       } else {
-        console.log("UPDATE RECORD");
-
         // обновляем существующую запись
         var newTeamNumber: string =
           this.team.number != this.teamCopy.number ? this.team.number : "";
 
-        console.log("newTeamNumber = " + newTeamNumber);
-        console.log("newTeamNumber.length = " + newTeamNumber.length);
-
         var newTeamTitle: string =
           this.team.title != this.teamCopy.title ? this.team.title : "";
 
-        console.log("newTeamTitle = " + newTeamTitle);
-        console.log("newTeamTitle.length = " + newTeamTitle.length);
-
-        console.log("HAS DATA CHANGED? ");
         if (newTeamNumber.length > 0 || newTeamTitle.length > 0) {
-          console.log("DATA HAS CHANGED!");
-
           // данные изменились, обновляем их на сервере
           var requestUrl = "/teams/" + this.team.id;
           const payload = new HttpParams()
@@ -156,24 +147,52 @@ export class TeamDetailsComponent implements OnInit {
 
           this.http.put(requestUrl, payload).subscribe(
             () => {
-              console.log("PUT REQUEST DONEH!");
-              this.dialog.close(true);
+              this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
             },
             error => this.displayErrorMessage(error)
           );
         } else {
-          console.log("DATA HAS NOT NOT NOOOOOOOOT CHANGED!");
-
           // никаких изменений не было
           // закрываем и не делаем лишнего запроса для обновления данных с сервера
-          this.dialog.close(false);
+          this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DECLINED);
         }
       }
     }
   }
 
   cancelDialog() {
-    this.dialog.close(false);
+    this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DECLINED);
+  }
+
+  deleteRecord() {
+    var confirmationMessage: string =
+      "Удалить команду: '" +
+      this.team.title +
+      "' (номер: " +
+      this.team.number +
+      ") ?";
+
+    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+      confirmationMessage
+    );
+
+    var dialogRef = this.otherDialog.open(
+      ConfirmationDialogComponent,
+      confirmationDialogConfig
+    );
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // если диалог был принят (accepted)
+        const url: string = "/teams/" + this.team.id;
+        this.http.delete(url).subscribe(
+          (data: any) => {
+            this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
+          },
+          error => this.displayErrorMessage(error)
+        );
+      }
+    });
   }
 
   private getDialogTitle(teamObject?: Team): string {

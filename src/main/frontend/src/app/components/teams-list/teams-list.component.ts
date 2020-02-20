@@ -25,12 +25,7 @@ export class TeamsListComponent implements OnInit {
   modelConstraints: Map<string, string>;
 
   onRowClicked(row: any) {
-    console.log("**** onRowClicked --- start");
-    console.dir(row);
-
     this.openDetailsDialog(row);
-
-    console.log("**** onRowClicked --- end");
   }
 
   openDetailsDialog(selectedRow?: any) {
@@ -40,8 +35,8 @@ export class TeamsListComponent implements OnInit {
     );
     var dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // если диалог был принят (accepted)
+      if (result != TeamDetailsComponent.DIALOG_RESULT_DECLINED) {
+        // если диалог был принят (accepted), либо была удалена запись о команде
         // обновляем таблицу со списком команд
         this.loadTeamsList();
       }
