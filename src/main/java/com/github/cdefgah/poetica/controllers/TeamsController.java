@@ -1,7 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
-import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 /**
@@ -152,5 +150,4 @@ public class TeamsController extends AbstractController {
         query.setParameter("teamId", teamId);
         return query.getResultList().isEmpty();
     }
-
 }

@@ -153,7 +153,7 @@ export class QuestionsListComponent implements OnInit {
         });
       },
       error => {
-        // нет вопросов в системе
+        // нет заданий в системе
         const errorMessage: string = "В базе данных нет ни одного задания.";
 
         var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(

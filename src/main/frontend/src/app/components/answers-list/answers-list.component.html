@@ -5,6 +5,55 @@
     Импортировать ответы из письма
   </button>
 </mat-toolbar>
-<div class="component-buttons-row">
-  <button mat-raised-button color="primary">Добавить ответ</button>
+<div>
+  <p>
+    <mat-form-field class="team-selection-field">
+      <mat-label>Команда:</mat-label>
+      <mat-select [(value)]="selectedTeamId" placeholder="Команда">
+        <mat-option
+          *ngFor="let teamId of allTeamIds; index as i"
+          [value]="teamId"
+        >
+          {{ teamTitleAndNumber[i] }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-radio-group [(ngModel)]="selectedRoundAlias">
+      <mat-radio-button
+        class="round-selection-radio-button"
+        *ngFor="let selectedRoundAlias of allRoundAliases; index as i"
+        [value]="selectedRoundAlias"
+        (change)="actualRoundChanged($event)"
+      >
+        {{ allRoundTitles[i] }}
+      </mat-radio-button>
+    </mat-radio-group>
+  </p>
+</div>
+<div>
+  <table mat-table [dataSource]="answersDataSource" class="mat-elevation-z8">
+    <ng-container matColumnDef="number">
+      <th mat-header-cell *matHeaderCellDef>Номер</th>
+      <td mat-cell *matCellDef="let answer">{{ answer.number }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="body">
+      <th mat-header-cell *matHeaderCellDef>Содержание</th>
+      <td mat-cell *matCellDef="let answer">{{ answer.body }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="comment">
+      <th mat-header-cell *matHeaderCellDef>Комментарий</th>
+      <td mat-cell *matCellDef="let answer">{{ answer.comment }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedAnswerColumns"
+      (click)="onAnswerRowClicked(row)"
+    ></tr>
+  </table>
 </div>

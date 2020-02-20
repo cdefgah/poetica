@@ -33,7 +33,6 @@ import { ConfirmationDialogComponent } from "./components/confirmation-dialog/co
 import { QuestionsListImporterComponent } from "./components/questions-list-importer/questions-list-importer.component";
 import { AnswersListImporterComponent } from "./components/answers-list-importer/answers-list-importer.component";
 import { ConfigurationDialogComponent } from "./components/configuration-dialog/configuration-dialog.component";
-import { EmailsWithAnswersListComponent } from "./components/emails-with-answers-list/emails-with-answers-list.component";
 import { OneEmailWithAnswersComponent } from "./components/one-email-with-answers/one-email-with-answers.component";
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
 import { MessageBoxComponent } from "./components/message-box/message-box.component";
@@ -52,7 +51,6 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     QuestionsListImporterComponent,
     AnswersListImporterComponent,
     ConfigurationDialogComponent,
-    EmailsWithAnswersListComponent,
     OneEmailWithAnswersComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,

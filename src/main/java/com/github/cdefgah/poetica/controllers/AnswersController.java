@@ -19,7 +19,7 @@ import java.util.Optional;
 public class AnswersController extends AbstractController {
 
     /**
-     * Entity manager that works with the underlying database.
+     * Менеджер сущностей для взаимодействия с базой данных.
      */
     @Autowired
     EntityManager entityManager;
