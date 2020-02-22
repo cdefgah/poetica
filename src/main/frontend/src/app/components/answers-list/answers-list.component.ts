@@ -16,16 +16,27 @@ export class AnswersListComponent implements OnInit {
   allTeamIds: number[];
   teamTitleAndNumber: string[];
 
-  allRoundAliases: string[] = ["1", "2"];
-  allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
+  allRoundAliases: string[] = ["0", "1", "2"];
+  allRoundTitles: string[] = [
+    "Все",
+    "Предварительный тур",
+    "Окончательный тур"
+  ];
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
   answersDataSource: Answer[];
 
+  answersWithoutGradesDataSource: Answer[];
+
   emailsDataSource: Email[];
 
-  displayedAnswerColumns: string[] = ["number", "body", "comment"];
+  displayedAnswerColumns: string[] = [
+    "number",
+    "body",
+    "roundNumber",
+    "comment"
+  ];
 
   displayedEmailColumns: string[] = [
     "sentOn",

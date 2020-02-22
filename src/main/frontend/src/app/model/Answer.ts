@@ -2,6 +2,9 @@
  * Модель данных ответа на вопрос (бескрылку).
  */
 export class Answer {
+  questionId: number;
+  roundNumber: number;
+
   /**
    * Уникальный номер вопроса (бескрылки).
    */
