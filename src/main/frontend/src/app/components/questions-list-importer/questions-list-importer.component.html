@@ -1,17 +1,18 @@
-<p mat-dialog-title>Импорт заданий</p>
+<p mat-dialog-title>Data import wizard</p>
 <mat-dialog-content>
   <mat-horizontal-stepper [linear]="true" #stepper>
     <mat-step [stepControl]="firstFormGroup">
       <form [formGroup]="firstFormGroup">
-        <ng-template matStepLabel>Fill out your name</ng-template>
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input
+        <ng-template matStepLabel>Raw text</ng-template>
+        <mat-form-field appearance="outline" class="w100">
+          <mat-label>Input raw text here</mat-label>
+          <textarea
             matInput
-            placeholder="Last name, First name"
-            formControlName="firstCtrl"
+            rows="15"
+            placeholder="Raw text"
             required
-          />
+            [(ngModel)]="sourceText"
+          ></textarea>
         </mat-form-field>
         <div>
           <button mat-button matStepperNext>Next</button>
@@ -20,34 +21,27 @@
     </mat-step>
     <mat-step [stepControl]="secondFormGroup">
       <form [formGroup]="secondFormGroup">
-        <ng-template matStepLabel>Fill out your address</ng-template>
-        <mat-form-field>
-          <mat-label>Address</mat-label>
-          <input
-            matInput
-            formControlName="secondCtrl"
-            placeholder="Ex. 1 Main St, New York, NY"
-            required
-          />
-        </mat-form-field>
+        <ng-template matStepLabel>Validation</ng-template>
+        <p>Тут данные проверяются</p>
         <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext>Next</button>
+          <button mat-button matStepperPrevious>Назад</button>
+          <button mat-button matStepperNext>Далее</button>
         </div>
       </form>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Done</ng-template>
-      <p>You are now done.</p>
+      <ng-template matStepLabel>Import</ng-template>
+      <p>Задания готовы для импортирования.</p>
+      <button mat-button>Импортировать задания</button>
       <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="stepper.reset()">Reset</button>
+        <button mat-button matStepperPrevious>Назад</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>
+  <mat-divider></mat-divider>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-raised-button color="primary" (click)="cancelDialog()">
-    Отменить
+    Cancel
   </button>
 </mat-dialog-actions>

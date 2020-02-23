@@ -11,6 +11,8 @@ export class QuestionsListImporterComponent implements OnInit {
   public firstFormGroup: FormGroup;
   public secondFormGroup: FormGroup;
 
+  sourceText: string;
+
   static getDialogConfigWithData(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
