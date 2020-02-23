@@ -4,7 +4,7 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 
 import { AppRoutingModule } from "./app-routing.module";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import {
@@ -22,6 +22,7 @@ import { MatRadioModule } from "@angular/material/radio";
 import { MatSelectModule } from "@angular/material/select";
 import { MatDialogModule } from "@angular/material";
 import { MatInputModule } from "@angular/material";
+import { MatStepperModule } from "@angular/material/stepper";
 
 import { QuestionsListComponent } from "./components/questions-list/questions-list.component";
 import { TeamsListComponent } from "./components/teams-list/teams-list.component";
@@ -54,6 +55,7 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
   ],
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
@@ -69,7 +71,8 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     MatSelectModule,
     MatDialogModule,
     MatInputModule,
-    MatTableModule
+    MatTableModule,
+    MatStepperModule
   ],
 
   entryComponents: [
@@ -79,7 +82,8 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     ConfigurationDialogComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
-    TeamDetailsComponent
+    TeamDetailsComponent,
+    QuestionsListImporterComponent
   ],
 
   providers: [

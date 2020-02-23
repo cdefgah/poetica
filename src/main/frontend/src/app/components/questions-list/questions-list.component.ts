@@ -5,6 +5,7 @@ import { QuestionDetailsComponent } from "../question-details/question-details.c
 import { Question } from "src/app/model/Question";
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 
 @Component({
   selector: "app-questions-list",
@@ -164,5 +165,33 @@ export class QuestionsListComponent implements OnInit {
         this.dialog.open(MessageBoxComponent, msgBoxConfig);
       }
     );
+  }
+
+  ImportQuestions() {
+    if (this.dataSource.length > 0) {
+      const errorMessage: string =
+        "В базе данных уже представлены задания. Удалите их все, прежде чем импортировать новые задания.";
+
+      var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+        errorMessage,
+        "Внимание"
+      );
+
+      this.dialog.open(MessageBoxComponent, msgBoxConfig);
+      return;
+    }
+
+    const dialogConfig = QuestionsListImporterComponent.getDialogConfigWithData();
+    var dialogRef = this.dialog.open(
+      QuestionsListImporterComponent,
+      dialogConfig
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // если диалог был принят (accepted)
+        // обновляем таблицу со списком вопросов
+        this.loadQuestionsList();
+      }
+    });
   }
 }
