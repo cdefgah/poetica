@@ -1,6 +1,13 @@
-import { Component, OnInit } from "@angular/core";
-import { MatDialogConfig } from "@angular/material/dialog";
+import { Component, OnInit, Inject } from "@angular/core";
+import {
+  MatDialogConfig,
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialog
+} from "@angular/material/dialog";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { HttpClient } from "@angular/common/http";
+import { Question } from "src/app/model/Question";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -8,10 +15,14 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
   styleUrls: ["./questions-list-importer.component.css"]
 })
 export class QuestionsListImporterComponent implements OnInit {
-  public firstFormGroup: FormGroup;
-  public secondFormGroup: FormGroup;
+  public rawTextFormGroup: FormGroup;
+  public textValidationFormGroup: FormGroup;
+
+  dataSource: Question[];
 
   sourceText: string;
+
+  displayedColumns: string[] = ["number", "body", "source", "comment"];
 
   static getDialogConfigWithData(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -23,16 +34,39 @@ export class QuestionsListImporterComponent implements OnInit {
     return dialogConfig;
   }
 
-  constructor(private _formBuilder: FormBuilder) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public dialogData: any,
+    private http: HttpClient,
+    public dialog: MatDialogRef<QuestionsListImporterComponent>,
+    public otherDialog: MatDialog,
+    private formBuilder: FormBuilder
+  ) {
+    this.dataSource = [];
+
+    for (var counter: number = 1; counter < 35; counter++) {
+      this.dataSource.push(this.getDummyQuestion(counter));
+    }
+  }
+
+  getDummyQuestion(index: number): Question {
+    var question: Question = new Question();
+    question.number = index;
+    question.body = "Some body for: " + index;
+    question.source = "Some source for " + index;
+    question.comment = "Some commend for " + index;
+
+    return question;
+  }
 
   ngOnInit() {
-    this.firstFormGroup = this._formBuilder.group({
-      firstCtrl: ["", Validators.required]
-    });
-    this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ["", Validators.required]
+    this.rawTextFormGroup = this.formBuilder.group({
+      rawTextControl: ["", Validators.required]
     });
   }
 
-  cancelDialog() {}
+  cancelDialog() {
+    this.dialog.close(false);
+  }
+
+  onRowClicked(row: any) {}
 }
