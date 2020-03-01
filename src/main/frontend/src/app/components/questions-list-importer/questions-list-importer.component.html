@@ -2,23 +2,100 @@
 <mat-dialog-content>
   <mat-horizontal-stepper [linear]="true" #stepper>
     <mat-step [stepControl]="rawTextFormGroup">
-      <form [formGroup]="rawTextFormGroup">
-        <ng-template matStepLabel>Ввод текста с заданиями</ng-template>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Текст с заданиями</mat-label>
-          <textarea
-            matInput
-            rows="20"
-            placeholder="Скопируйте текст с заданиями сюда"
-            formControlName="rawTextControl"
-            required
-            [(ngModel)]="sourceText"
-          ></textarea>
-        </mat-form-field>
-        <div>
-          <button mat-button color="primary" matStepperNext>Далее</button>
-        </div>
-      </form>
+      <mat-tab-group>
+        <mat-tab label="Текст с заданиями">
+          <form [formGroup]="rawTextFormGroup">
+            <ng-template matStepLabel>Ввод текста с заданиями</ng-template>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Текст с заданиями</mat-label>
+              <textarea
+                matInput
+                rows="20"
+                placeholder="Скопируйте текст с заданиями сюда"
+                formControlName="rawTextControl"
+                required
+                [(ngModel)]="sourceText"
+              ></textarea>
+            </mat-form-field>
+            <div>
+              <button mat-button color="primary" matStepperNext>Далее</button>
+            </div>
+          </form>
+        </mat-tab>
+        <mat-tab label="Описание формата">
+          <div class="table-container">
+            <p>
+              Для того, чтобы импортировать все задания разом, убедитесь, что
+              текст с&nbsp;заданиями соответствует следующему формату:
+            </p>
+            <p>
+              НОМЕР_ЗАДАНИЯ.ТЕКСТ ЗАДАНИЯ_ВКЛЮЧАЯ_ЗАГОЛОВОК_ЕСЛИ_НЕОБХОДИМО<br />
+              ПУСТАЯ СТРОКА<br />
+              ТЕКСТ_С_ИНФОРМАЦИЕЙ_ОБ_ИСТОЧНИКЕ_ЗАДАНИЯ<br />
+              ПУСТАЯ СТРОКА<br />
+              ТЕКСТ_С_КОММЕНТАРИЕМ
+            </p>
+            <p>Например:</p>
+            <div class="one-question-sample">
+              <p>
+                4. НОВОГОДНЕЕ<br />
+                Мой брат (меня он&nbsp;перерос)<br />
+                Доводит всех до&nbsp;слез.<br />
+                Он&nbsp;мне сказал, что Дед Мороз<br />
+                [...]
+              </p>
+              <p>
+                Агния Барто&nbsp;&mdash; &laquo;В&nbsp;защиту Деда-Мороза&raquo;
+              </p>
+              <p>В&nbsp;связи с&nbsp;грядущими праздниками.</p>
+            </div>
+            <p>В&nbsp;этом случае результат разбора будет следующим:</p>
+            <table class="properties-table">
+              <tr>
+                <th>Свойство</th>
+                <th>Значение</th>
+              </tr>
+              <tr>
+                <td>Номер задания</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>Текст задания</td>
+                <td>
+                  <p>
+                    Мой брат (меня он&nbsp;перерос)<br />
+                    Доводит всех до&nbsp;слез.<br />
+                    Он&nbsp;мне сказал, что Дед Мороз<br />
+                    [...]
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td>Источник</td>
+                <td>
+                  Агния Барто&nbsp;&mdash; &laquo;В&nbsp;защиту
+                  Деда-Мороза&raquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Комментарий</td>
+                <td>В&nbsp;связи с&nbsp;грядущими праздниками.</td>
+              </tr>
+            </table>
+
+            <div>
+              <p>
+                Обратите внимание, что номер задания от&nbsp;текста задания
+                обязательно должна отделять точка.<br />
+                Пробел после точки ставить необязательно. Только если для
+                удобства восприятия текста глазами.<br />
+                Блок начала задания воспринимается как окончание предшествующего
+                ему задания в&nbsp;блоке текста.
+              </p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </mat-step>
     <mat-step [stepControl]="textValidationFormGroup">
       <form [formGroup]="textValidationFormGroup">

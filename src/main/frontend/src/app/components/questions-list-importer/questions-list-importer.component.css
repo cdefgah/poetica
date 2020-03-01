@@ -7,3 +7,8 @@
   max-height: 400px;
   overflow: auto;
 }
+
+.properties-table {
+  border: dotted darkblue;
+  padding: 10px;
+}
