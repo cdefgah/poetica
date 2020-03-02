@@ -32,7 +32,6 @@ import { AboutComponent } from "./components/about/about.component";
 import { QuestionDetailsComponent } from "./components/question-details/question-details.component";
 import { ConfirmationDialogComponent } from "./components/confirmation-dialog/confirmation-dialog.component";
 import { QuestionsListImporterComponent } from "./components/questions-list-importer/questions-list-importer.component";
-import { ConfigurationDialogComponent } from "./components/configuration-dialog/configuration-dialog.component";
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
 import { MessageBoxComponent } from "./components/message-box/message-box.component";
 import { TeamDetailsComponent } from "./components/team-details/team-details.component";
@@ -48,7 +47,6 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     QuestionDetailsComponent,
     ConfirmationDialogComponent,
     QuestionsListImporterComponent,
-    ConfigurationDialogComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
     TeamDetailsComponent
@@ -79,7 +77,6 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     QuestionDetailsComponent,
     ConfirmationDialogComponent,
     QuestionsListImporterComponent,
-    ConfigurationDialogComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
     TeamDetailsComponent,
