@@ -3,12 +3,24 @@
 }
 
 .table-container {
-  margin-top: 10px;
-  max-height: 400px;
+  margin-top: 5px;
+  max-height: 500px;
   overflow: auto;
 }
 
-.properties-table {
-  border: dotted darkblue;
-  padding: 10px;
+.graded-questions-qty-field {
+  margin: 1em 1em 1em 1em;
+}
+
+.properties-table,
+th,
+td {
+  border: dotted gray 1px;
+  padding: 5px;
+}
+
+.format-description-emphasized-text {
+  font-family: sans-serif;
+  color: blue;
+  border: 1px orange dotted;
 }

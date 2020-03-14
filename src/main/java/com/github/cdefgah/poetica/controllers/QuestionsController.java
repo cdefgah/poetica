@@ -80,6 +80,14 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(String.valueOf(question.getId()), HttpStatus.CREATED);
     }
 
+    @RequestMapping(path = "/questions/import", method = RequestMethod.POST,
+            consumes = "application/x-www-form-urlencoded",
+            produces = "application/json")
+    public ResponseEntity<String> importQuestions(@RequestParam("qtyOfCreditedQuestions") int qtyOfCreditedQuestions,
+                                                 @RequestParam("allQuestions") Question[] allQuestions) {
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
 
     private Optional<Question> getLastQuestion() {
         final TypedQuery<Question> questionNumberQuery =

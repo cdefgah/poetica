@@ -8,6 +8,7 @@ import {
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { HttpClient } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
+import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -23,6 +24,9 @@ export class QuestionsListImporterComponent implements OnInit {
   sourceText: string;
 
   displayedColumns: string[] = ["number", "body", "source", "comment"];
+
+  gradedQuestionsQty: number = 31;
+  gradedQuestionsQtyIsIncorrect: boolean = false;
 
   static getDialogConfigWithData(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -60,12 +64,26 @@ export class QuestionsListImporterComponent implements OnInit {
 
   ngOnInit() {
     this.rawTextFormGroup = this.formBuilder.group({
+      gradedQuestionsQtyControl: ["", Validators.required],
       rawTextControl: ["", Validators.required]
     });
   }
 
   cancelDialog() {
-    this.dialog.close(false);
+    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+      "Прервать импорт заданий?"
+    );
+
+    var dialogRef = this.otherDialog.open(
+      ConfirmationDialogComponent,
+      confirmationDialogConfig
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // если диалог был принят (accepted)
+        this.dialog.close(false);
+      }
+    });
   }
 
   onRowClicked(row: any) {}
