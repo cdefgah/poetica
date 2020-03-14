@@ -64,7 +64,6 @@ export class QuestionsListImporterComponent implements OnInit {
 
   ngOnInit() {
     this.rawTextFormGroup = this.formBuilder.group({
-      gradedQuestionsQtyControl: ["", Validators.required],
       rawTextControl: ["", Validators.required]
     });
   }

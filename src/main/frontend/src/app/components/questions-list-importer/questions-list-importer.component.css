@@ -24,3 +24,7 @@ td {
   color: blue;
   border: 1px orange dotted;
 }
+
+.empty-row-for-properties-table {
+  background-color: peachpuff;
+}
