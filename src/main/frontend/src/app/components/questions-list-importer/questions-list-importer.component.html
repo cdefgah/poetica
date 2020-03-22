@@ -1,18 +1,22 @@
 <p mat-dialog-title>Импорт заданий</p>
 <mat-dialog-content>
-  <mat-horizontal-stepper [linear]="true" #stepper>
-    <mat-step [stepControl]="rawTextFormGroup">
+  <mat-horizontal-stepper
+    [linear]="true"
+    (selectionChange)="onStepChange($event)"
+    #stepper
+  >
+    <mat-step [stepControl]="rawSourceTextFormGroup">
       <mat-tab-group>
         <mat-tab label="Текст с заданиями">
-          <form [formGroup]="rawTextFormGroup">
+          <form>
             <ng-template matStepLabel>Ввод текста с заданиями</ng-template>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Текст с заданиями</mat-label>
               <textarea
                 matInput
                 rows="20"
+                name="rawSourceText"
                 placeholder="Скопируйте текст с заданиями сюда"
-                formControlName="rawTextControl"
                 required
                 [(ngModel)]="sourceText"
               ></textarea>
@@ -358,9 +362,11 @@
         </mat-tab>
       </mat-tab-group>
     </mat-step>
-    <mat-step [stepControl]="textValidationFormGroup">
-      <form [formGroup]="textValidationFormGroup">
-        <ng-template matStepLabel>Предварительный просмотр</ng-template>
+    <mat-step [stepControl]="rawSourceTextFormGroup">
+      <form>
+        <ng-template matStepLabel
+          >Предварительный просмотр и импорт</ng-template
+        >
         <div class="table-container">
           <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
             <ng-container matColumnDef="number">
@@ -401,17 +407,8 @@
         </div>
         <div>
           <button mat-button color="primary" matStepperPrevious>Назад</button>
-          <button mat-button color="primary" matStepperNext>Далее</button>
         </div>
       </form>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Импорт</ng-template>
-      <p>Задания готовы для импортирования.</p>
-      <button mat-button color="primary">Импортировать задания</button>
-      <div>
-        <button mat-button matStepperPrevious>Назад</button>
-      </div>
     </mat-step>
   </mat-horizontal-stepper>
   <mat-divider></mat-divider>

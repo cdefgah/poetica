@@ -4,7 +4,7 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 
 import { AppRoutingModule } from "./app-routing.module";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import {
@@ -53,7 +53,6 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
   ],
   imports: [
     FormsModule,
-    ReactiveFormsModule,
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,

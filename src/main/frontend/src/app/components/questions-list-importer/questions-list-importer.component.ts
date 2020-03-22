@@ -5,7 +5,12 @@ import {
   MatDialogRef,
   MatDialog
 } from "@angular/material/dialog";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl
+} from "@angular/forms";
 import { HttpClient } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
@@ -16,8 +21,7 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
   styleUrls: ["./questions-list-importer.component.css"]
 })
 export class QuestionsListImporterComponent implements OnInit {
-  public rawTextFormGroup: FormGroup;
-  public textValidationFormGroup: FormGroup;
+  rawSourceTextFormGroup: any;
 
   dataSource: Question[];
 
@@ -25,8 +29,11 @@ export class QuestionsListImporterComponent implements OnInit {
 
   displayedColumns: string[] = ["number", "body", "source", "comment"];
 
-  gradedQuestionsQty: number = 31;
-  gradedQuestionsQtyIsIncorrect: boolean = false;
+  gradedQuestionsQty: number;
+
+  questions: Question[] = [];
+
+  foundErrors: string[] = [];
 
   static getDialogConfigWithData(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -42,8 +49,7 @@ export class QuestionsListImporterComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private http: HttpClient,
     public dialog: MatDialogRef<QuestionsListImporterComponent>,
-    public otherDialog: MatDialog,
-    private formBuilder: FormBuilder
+    public otherDialog: MatDialog
   ) {
     this.dataSource = [];
 
@@ -62,11 +68,7 @@ export class QuestionsListImporterComponent implements OnInit {
     return question;
   }
 
-  ngOnInit() {
-    this.rawTextFormGroup = this.formBuilder.group({
-      rawTextControl: ["", Validators.required]
-    });
-  }
+  ngOnInit() {}
 
   cancelDialog() {
     var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
@@ -83,6 +85,15 @@ export class QuestionsListImporterComponent implements OnInit {
         this.dialog.close(false);
       }
     });
+  }
+
+  onStepChange(event: any) {
+    if (event.selectedIndex == 1 && event.previouslySelectedIndex == 0) {
+    }
+
+    console.log("========== ON STEP CHANGE START ===========");
+    console.dir(event);
+    console.log("========== ON STEP CHANGE END ===========");
   }
 
   onRowClicked(row: any) {}
