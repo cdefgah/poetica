@@ -14,6 +14,7 @@ import {
 import { HttpClient } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { strict } from "assert";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -88,12 +89,68 @@ export class QuestionsListImporterComponent implements OnInit {
   }
 
   onStepChange(event: any) {
-    if (event.selectedIndex == 1 && event.previouslySelectedIndex == 0) {
+    if (event.previouslySelectedIndex == 0) {
+      var lines: string[] = this.sourceText.trim().split("\n");
+      this.processSourceTextLines(lines);
+    }
+  }
+
+  private processSourceTextLines(sourceTextLines: string[]) {
+    this.foundErrors = [];
+    if (sourceTextLines == null || sourceTextLines.length == 0) {
+      this.foundErrors.push("Текст с заданиями не задан");
+      return;
     }
 
-    console.log("========== ON STEP CHANGE START ===========");
-    console.dir(event);
-    console.log("========== ON STEP CHANGE END ===========");
+    const creditedQuestionsAmountPrefix: string = "#G:";
+    var firstLine: string = sourceTextLines[0];
+
+    if (firstLine.startsWith(creditedQuestionsAmountPrefix)) {
+      var amountString = firstLine
+        .substring(
+          firstLine.indexOf(creditedQuestionsAmountPrefix) +
+            creditedQuestionsAmountPrefix.length
+        )
+        .trim();
+      console.log("AMOUNT - START");
+
+      // конвертируем строку в число
+
+      var incorrectNumericFormat: boolean = false;
+      var creditedQuestionsQty: number = 0;
+
+      try {
+        creditedQuestionsQty = parseInt(amountString);
+      } catch (Exception) {
+        incorrectNumericFormat = true;
+      }
+
+      if (
+        incorrectNumericFormat ||
+        !creditedQuestionsQty ||
+        creditedQuestionsQty <= 0 ||
+        creditedQuestionsQty.toString() !== amountString
+      ) {
+        this.foundErrors.push(
+          "Количество зачётных вопросов должно быть целым положительным числом. А вы указали: " +
+            amountString
+        );
+
+        console.log("FOUND ERRORS _ START");
+        console.log(this.foundErrors);
+        console.log("FOUND ERRORS _ END");
+        return;
+      }
+
+      console.log("|" + amountString + "|");
+
+      console.log(creditedQuestionsQty);
+      console.log("AMOUNT - END");
+
+      console.log("FOUND ERRORS _ START");
+      console.log(this.foundErrors);
+      console.log("FOUND ERRORS _ END");
+    }
   }
 
   onRowClicked(row: any) {}
