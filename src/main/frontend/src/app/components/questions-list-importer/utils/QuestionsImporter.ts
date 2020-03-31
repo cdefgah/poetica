@@ -2,12 +2,16 @@ import { Question } from "src/app/model/Question";
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 
 export class QuestionsImporter extends AbstractDataImporter {
+  private newLine: string = "\n";
+
   sourceTextLines: string[];
   amountOfCreditedQuestions: number;
 
   index: number;
 
   expectedQuestionNumber: number;
+
+  questions: Question[] = [];
 
   constructor(sourceText: string) {
     super();
@@ -16,24 +20,151 @@ export class QuestionsImporter extends AbstractDataImporter {
       throw new Error("Поле для текста с заданиями пусто");
     }
 
-    this.sourceTextLines = sourceText.trim().split("\n");
+    this.sourceTextLines = sourceText.trim().split(this.newLine);
 
     this.index = 0;
     this.amountOfCreditedQuestions = 0;
     this.expectedQuestionNumber = 1;
 
     this.scanForAmountOfCreditedQuestions();
+    this.scanForQuestions();
+  }
 
-    for (let i = this.index; i < this.sourceTextLines.length; i++) {
+  private scanForQuestions() {
+    while (this.index < this.sourceTextLines.length) {
       var questionNumberString: string = this.extractNumberFromTheLine(
-        this.sourceTextLines[i]
+        this.sourceTextLines[this.index]
       );
+
       if (questionNumberString.length > 0) {
-        console.log("**************** EXTRACTED NUMBER ****************");
-        console.log(questionNumberString);
-        console.log("**************** **************** ****************");
+        var questionNumber: number = Number(questionNumberString);
+        var question: Question = this.loadQuestion(questionNumber);
+        this.questions.push(question);
       }
     }
+  }
+
+  private loadQuestion(questionNumber: number): Question {
+    if (questionNumber != this.expectedQuestionNumber) {
+      throw new Error(
+        "Ожидался номер задания: " +
+          this.expectedQuestionNumber +
+          ", но в тексте вместо него идёт номер: " +
+          questionNumber
+      );
+    }
+
+    var questionBody: string;
+    this.expectedQuestionNumber++;
+    var processingString: string = this.sourceTextLines[this.index].trim();
+    questionBody = processingString.substring(processingString.indexOf("."));
+
+    // загружаем тело задания
+    while (processingString.length > 0) {
+      this.index++;
+      processingString = this.sourceTextLines[this.index].trim();
+      questionBody = processingString;
+
+      if (processingString.length > 0) {
+        if (this.extractNumberFromTheLine(processingString).length > 0) {
+          // внезапно начался следующий вопрос (следующее задание)
+          // а где источник для текущего вопроса (задания)?
+          // мы же его не загрузили?!
+          // бросаем исключение по этому поводу.
+          throw new Error(
+            "Начался следующий вопрос, хотя мы ожидали источник для вопроса номер: " +
+              questionNumber
+          );
+        }
+
+        questionBody = questionBody + this.newLine + processingString;
+      }
+    }
+
+    // попалась пустая строка
+    // тело задания загрузили, создаём объект
+    var question: Question = new Question();
+    question.number = questionNumber;
+    question.credited = questionNumber <= this.amountOfCreditedQuestions;
+    question.body = questionBody;
+
+    // сканируем в поиска источника задания
+    var questionSource: string = "";
+    var questionSourceStarted: boolean = false;
+    while (true) {
+      this.index++;
+      if (this.index < this.sourceTextLines.length) {
+        processingString = this.sourceTextLines[this.index].trim();
+        if (processingString.length > 0) {
+          if (this.extractNumberFromTheLine(processingString).length > 0) {
+            // внезапно начался следующий вопрос (следующее задание)
+            // хотя источник для текущего задания ещё не загружен.
+            // бросаем исключение по этому поводу.
+            throw new Error(
+              "Начался следующий вопрос, хотя мы ожидали источник для вопроса номер: " +
+                questionNumber
+            );
+          }
+
+          if (questionSource.length == 0) {
+            // ставим флаг, что загрузка источника началась
+            questionSourceStarted = true;
+            questionSource = processingString;
+          } else {
+            questionSource = questionSource + this.newLine + processingString;
+          }
+        } else {
+          // если пустая строка попалась после того, как мы начали загружать источник задания
+          // то источник задания загружен
+          if (questionSourceStarted) {
+            break;
+          }
+        }
+      } else {
+        throw new Error(
+          "Импортируемый текст закончился до того, как удалось найти источник для задания номер: " +
+            questionNumber
+        );
+      }
+    }
+
+    question.source = questionSource;
+
+    // сканируем в поиска комментария к заданию
+    var questionComment: string = "";
+    var questionCommentStarted: boolean = false;
+    while (true) {
+      this.index++;
+      if (this.index < this.sourceTextLines.length) {
+        processingString = this.sourceTextLines[this.index].trim();
+        if (processingString.length > 0) {
+          // проверяем, начался-ли следующий вопрос
+          if (this.extractNumberFromTheLine(processingString).length > 0) {
+            // начался следующий вопрос, выходим
+            break;
+          }
+
+          if (questionComment.length == 0) {
+            questionCommentStarted = true;
+            questionComment = processingString;
+          } else {
+            questionComment = questionComment + this.newLine + processingString;
+          }
+        } else {
+          // если пустая строка, и комментарий начал загружаться, завершаем загрузку комментария
+          if (questionCommentStarted) {
+            break;
+          }
+        }
+      } else {
+        // текст закончился, а комментария нет
+        break;
+      }
+    }
+
+    question.comment = questionComment;
+
+    return question;
   }
 
   private scanForAmountOfCreditedQuestions() {
@@ -74,18 +205,6 @@ export class QuestionsImporter extends AbstractDataImporter {
       this.amountOfCreditedQuestions = amount;
       this.index = amountFoundAtIndex + 1;
     }
-  }
-
-  next(): Question {
-    var question: Question = new Question();
-    var index = 1;
-
-    question.number = index;
-    question.body = "Some body for: " + index;
-    question.source = "Some source for " + index;
-    question.comment = "Some commend for " + index;
-
-    return question;
   }
 
   /**
