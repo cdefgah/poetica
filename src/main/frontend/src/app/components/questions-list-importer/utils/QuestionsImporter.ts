@@ -1,6 +1,7 @@
 import { Question } from "src/app/model/Question";
+import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 
-export class QuestionsImporter {
+export class QuestionsImporter extends AbstractDataImporter {
   sourceTextLines: string[];
   amountOfCreditedQuestions: number;
 
@@ -9,6 +10,8 @@ export class QuestionsImporter {
   expectedQuestionNumber: number;
 
   constructor(sourceText: string) {
+    super();
+
     if (sourceText == null || sourceText.length == 0) {
       throw new Error("Поле для текста с заданиями пусто");
     }
@@ -20,6 +23,17 @@ export class QuestionsImporter {
     this.expectedQuestionNumber = 1;
 
     this.scanForAmountOfCreditedQuestions();
+
+    for (let i = this.index; i < this.sourceTextLines.length; i++) {
+      var questionNumberString: string = this.extractNumberFromTheLine(
+        this.sourceTextLines[i]
+      );
+      if (questionNumberString.length > 0) {
+        console.log("**************** EXTRACTED NUMBER ****************");
+        console.log(questionNumberString);
+        console.log("**************** **************** ****************");
+      }
+    }
   }
 
   private scanForAmountOfCreditedQuestions() {
@@ -74,17 +88,27 @@ export class QuestionsImporter {
     return question;
   }
 
-  private isNumber(value: string | number): boolean {
-    return value != null && value !== "" && !isNaN(Number(value.toString()));
-  }
+  /**
+   * Извлекает номер задания из строки и возвращает строку с ним, если он там представлен.
+   * Иначе возвращает пустую строку.
+   * @param line строка для обработки.
+   * @returns строка с номером задания, если он представлен. Иначе - пустая строка.
+   */
+  protected extractNumberFromTheLine(line: string): string {
+    if (!line || line == null || line.length == 0) {
+      return "";
+    }
 
-  private isPositiveInteger(sourceString: string): boolean {
-    for (let character of sourceString) {
-      if (!this.isNumber(character)) {
-        return false;
+    var processingString: string = line.trim();
+    const dot: string = ".";
+    var dotPosition: number = processingString.indexOf(dot);
+    if (dotPosition != -1) {
+      var prefixString: string = processingString.substring(0, dotPosition);
+      if (this.isPositiveInteger(prefixString)) {
+        return prefixString;
       }
     }
 
-    return Number(sourceString) > 0;
+    return "";
   }
 }
