@@ -31,16 +31,27 @@ export class QuestionsImporter extends AbstractDataImporter {
   }
 
   private scanForQuestions() {
+    var questionNumber: number = 0;
     while (this.index < this.sourceTextLines.length) {
       var questionNumberString: string = this.extractNumberFromTheLine(
         this.sourceTextLines[this.index]
       );
 
       if (questionNumberString.length > 0) {
-        var questionNumber: number = Number(questionNumberString);
+        questionNumber = Number(questionNumberString);
         var question: Question = this.loadQuestion(questionNumber);
         this.questions.push(question);
       }
+    }
+
+    if (questionNumber < this.amountOfCreditedQuestions) {
+      throw new Error(
+        "Общее количество загруженных заданий (" +
+          questionNumber +
+          ") меньше, чем указанное количество зачётных заданий (" +
+          this.amountOfCreditedQuestions +
+          ")."
+      );
     }
   }
 
@@ -72,7 +83,7 @@ export class QuestionsImporter extends AbstractDataImporter {
           // мы же его не загрузили?!
           // бросаем исключение по этому поводу.
           throw new Error(
-            "Начался следующий вопрос, хотя мы ожидали источник для вопроса номер: " +
+            "Начался блок следующего задания, хотя мы ожидали источник для задания номер: " +
               questionNumber
           );
         }
@@ -101,7 +112,7 @@ export class QuestionsImporter extends AbstractDataImporter {
             // хотя источник для текущего задания ещё не загружен.
             // бросаем исключение по этому поводу.
             throw new Error(
-              "Начался следующий вопрос, хотя мы ожидали источник для вопроса номер: " +
+              "Начался блок следующего задания, хотя мы ожидали источник для задания номер: " +
                 questionNumber
             );
           }
