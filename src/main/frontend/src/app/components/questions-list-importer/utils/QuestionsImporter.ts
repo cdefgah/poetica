@@ -20,26 +20,57 @@ export class QuestionsImporter extends AbstractDataImporter {
       throw new Error("Поле для текста с заданиями пусто");
     }
 
+    console.log("**** Generating text lines");
+
     this.sourceTextLines = sourceText.trim().split(this.newLine);
 
     this.index = 0;
     this.amountOfCreditedQuestions = 0;
     this.expectedQuestionNumber = 1;
 
+    console.log("**** Scanning for amount of credited questions");
     this.scanForAmountOfCreditedQuestions();
+    console.log(
+      "**** Amount of credited questions = " + this.amountOfCreditedQuestions
+    );
+
+    console.log("**** Scanning for questions");
     this.scanForQuestions();
+
+    console.log("**** End of scanning");
   }
 
   private scanForQuestions() {
     var questionNumber: number = 0;
+    console.log(">>> SCAN FOR QUESTIONS START");
     while (this.index < this.sourceTextLines.length) {
+      console.log("..... loop start. this.index = " + this.index);
+      console.log("... skipping empty lines");
+      while (this.sourceTextLines[this.index].trim().length == 0) {
+        this.index++;
+      }
+      console.log(".... text block started. this.index = " + this.index);
+
+      var processingLine: string = this.sourceTextLines[this.index].trim();
+
       var questionNumberString: string = this.extractNumberFromTheLine(
-        this.sourceTextLines[this.index]
+        processingLine
+      );
+
+      console.log("processing line: " + this.sourceTextLines[this.index]);
+      console.log(
+        "..... extracted question number from the line: " + questionNumberString
       );
 
       if (questionNumberString.length > 0) {
         questionNumber = Number(questionNumberString);
+        console.log("..... converted question number: " + questionNumber);
+
+        console.log(".... loading question start ");
         var question: Question = this.loadQuestion(questionNumber);
+        console.log(".... loading question end ");
+        console.dir(question);
+
         this.questions.push(question);
       }
     }
@@ -53,6 +84,8 @@ export class QuestionsImporter extends AbstractDataImporter {
           ")."
       );
     }
+
+    console.log(">>> SCAN FOR QUESTIONS END");
   }
 
   private loadQuestion(questionNumber: number): Question {
@@ -69,6 +102,8 @@ export class QuestionsImporter extends AbstractDataImporter {
     this.expectedQuestionNumber++;
     var processingString: string = this.sourceTextLines[this.index].trim();
     questionBody = processingString.substring(processingString.indexOf("."));
+
+    console.log(" ======== QUESTION BODY START =============");
 
     // загружаем тело задания
     while (processingString.length > 0) {
@@ -98,6 +133,9 @@ export class QuestionsImporter extends AbstractDataImporter {
     question.number = questionNumber;
     question.credited = questionNumber <= this.amountOfCreditedQuestions;
     question.body = questionBody;
+    var nextQuestionBlockStarted: boolean = false;
+
+    console.log(" ======== QUESTION BODY END=============");
 
     // сканируем в поиска источника задания
     var questionSource: string = "";
@@ -108,13 +146,19 @@ export class QuestionsImporter extends AbstractDataImporter {
         processingString = this.sourceTextLines[this.index].trim();
         if (processingString.length > 0) {
           if (this.extractNumberFromTheLine(processingString).length > 0) {
-            // внезапно начался следующий вопрос (следующее задание)
-            // хотя источник для текущего задания ещё не загружен.
-            // бросаем исключение по этому поводу.
-            throw new Error(
-              "Начался блок следующего задания, хотя мы ожидали источник для задания номер: " +
-                questionNumber
-            );
+            if (!questionSourceStarted) {
+              // внезапно начался следующий вопрос (следующее задание)
+              // хотя источник для текущего задания ещё не загружен.
+              // бросаем исключение по этому поводу.
+              throw new Error(
+                "Начался блок следующего задания, хотя мы ожидали источник для задания номер: " +
+                  questionNumber
+              );
+            } else {
+              // начался блок следующего задания
+              nextQuestionBlockStarted = true;
+              break;
+            }
           }
 
           if (questionSource.length == 0) {
@@ -141,39 +185,43 @@ export class QuestionsImporter extends AbstractDataImporter {
 
     question.source = questionSource;
 
-    // сканируем в поиска комментария к заданию
-    var questionComment: string = "";
-    var questionCommentStarted: boolean = false;
-    while (true) {
-      this.index++;
-      if (this.index < this.sourceTextLines.length) {
-        processingString = this.sourceTextLines[this.index].trim();
-        if (processingString.length > 0) {
-          // проверяем, начался-ли следующий вопрос
-          if (this.extractNumberFromTheLine(processingString).length > 0) {
-            // начался следующий вопрос, выходим
-            break;
-          }
+    if (!nextQuestionBlockStarted) {
+      // сканируем в поиска комментария к заданию
+      // если предыдущий блок закончился не началом блока нового задания
+      var questionComment: string = "";
+      var questionCommentStarted: boolean = false;
+      while (true) {
+        this.index++;
+        if (this.index < this.sourceTextLines.length) {
+          processingString = this.sourceTextLines[this.index].trim();
+          if (processingString.length > 0) {
+            // проверяем, начался-ли следующий вопрос
+            if (this.extractNumberFromTheLine(processingString).length > 0) {
+              // начался следующий вопрос, выходим
+              break;
+            }
 
-          if (questionComment.length == 0) {
-            questionCommentStarted = true;
-            questionComment = processingString;
+            if (questionComment.length == 0) {
+              questionCommentStarted = true;
+              questionComment = processingString;
+            } else {
+              questionComment =
+                questionComment + this.newLine + processingString;
+            }
           } else {
-            questionComment = questionComment + this.newLine + processingString;
+            // если пустая строка, и комментарий начал загружаться, завершаем загрузку комментария
+            if (questionCommentStarted) {
+              break;
+            }
           }
         } else {
-          // если пустая строка, и комментарий начал загружаться, завершаем загрузку комментария
-          if (questionCommentStarted) {
-            break;
-          }
+          // текст закончился, а комментария нет
+          break;
         }
-      } else {
-        // текст закончился, а комментария нет
-        break;
       }
-    }
 
-    question.comment = questionComment;
+      question.comment = questionComment;
+    }
 
     return question;
   }

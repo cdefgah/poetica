@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, QueryList } from "@angular/core";
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
@@ -79,6 +79,7 @@ export class QuestionsListImporterComponent implements OnInit {
   private processSourceText() {
     try {
       var questionsImporter = new QuestionsImporter(this.sourceText);
+      this.dataSource = questionsImporter.questions;
     } catch (Error) {
       this.foundError = Error.message;
     }
