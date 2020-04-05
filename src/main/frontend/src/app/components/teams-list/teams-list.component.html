@@ -1,10 +1,11 @@
 <mat-toolbar>
   <p class="page-title">Команды</p>
+  <span class="fill-remaining-space"></span>
+  <button mat-raised-button color="primary" (click)="openDetailsDialog()">
+    Добавить команду
+  </button>
 </mat-toolbar>
 <hr />
-<button mat-raised-button (click)="openDetailsDialog()">
-  Добавить команду
-</button>
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef>Номер</th>

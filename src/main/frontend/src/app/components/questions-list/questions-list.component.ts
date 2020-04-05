@@ -4,13 +4,12 @@ import { MatDialog, MatDialogConfig, MatRadioChange } from "@angular/material";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { Question } from "src/app/model/Question";
 import { MessageBoxComponent } from "../message-box/message-box.component";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 
 @Component({
   selector: "app-questions-list",
   templateUrl: "./questions-list.component.html",
-  styleUrls: ["./questions-list.component.css"]
+  styleUrls: ["./questions-list.component.css"],
 })
 export class QuestionsListComponent implements OnInit {
   // эти псевдонимы также используются для формирования строки http-запроса, не меняй их.
@@ -22,7 +21,7 @@ export class QuestionsListComponent implements OnInit {
   displayModeAliases: string[] = [
     QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS,
     QuestionsListComponent.DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS,
-    QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS
+    QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS,
   ];
 
   displayModeTitles: string[] = ["Все", "Зачётные", "Внезачётные"];
@@ -48,7 +47,7 @@ export class QuestionsListComponent implements OnInit {
     var url: string = "/questions/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.modelConstraints = data),
-      error => this.displayErrorMessage(error)
+      (error) => this.displayErrorMessage(error)
     );
   }
 
@@ -79,7 +78,7 @@ export class QuestionsListComponent implements OnInit {
       (data: Question[]) => {
         this.dataSource = data;
       },
-      error => this.displayErrorMessage(error)
+      (error) => this.displayErrorMessage(error)
     );
   }
 
@@ -91,17 +90,13 @@ export class QuestionsListComponent implements OnInit {
     }
   }
 
-  openNewQuestionDialog() {
-    this.openDetailsDialog();
-  }
-
   openDetailsDialog(selectedRow?: any) {
     const dialogConfig = QuestionDetailsComponent.getDialogConfigWithData(
       this.modelConstraints,
       selectedRow
     );
     var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
         // обновляем таблицу со списком вопросов
@@ -112,59 +107,6 @@ export class QuestionsListComponent implements OnInit {
 
   onRowClicked(row: any) {
     this.openDetailsDialog(row);
-  }
-
-  removeLastQuestion() {
-    const url: string = "/questions/last-question";
-
-    this.http.get(url).subscribe(
-      (data: Map<string, any>) => {
-        const lastQuestion = new Question();
-        lastQuestion.initialize(data);
-
-        const creditedQuestionInfo = lastQuestion.credited
-          ? "зачётное"
-          : "внезачётное";
-        const confirmationMessage =
-          "Удалить " +
-          creditedQuestionInfo +
-          " задание с номером " +
-          lastQuestion.number +
-          "?";
-
-        var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-          confirmationMessage
-        );
-        var dialogRef = this.dialog.open(
-          ConfirmationDialogComponent,
-          confirmationDialogConfig
-        );
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            // если диалог был принят (accepted)
-            this.http.delete(url).subscribe(
-              (data: any) => {
-                this.selectedDisplayModeAlias =
-                  QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS;
-                this.loadQuestionsList();
-              },
-              error => this.displayErrorMessage(error)
-            );
-          }
-        });
-      },
-      error => {
-        // нет заданий в системе
-        const errorMessage: string = "В базе данных нет ни одного задания.";
-
-        var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-          errorMessage,
-          "Внимание"
-        );
-
-        this.dialog.open(MessageBoxComponent, msgBoxConfig);
-      }
-    );
   }
 
   ImportQuestions() {
@@ -186,7 +128,7 @@ export class QuestionsListComponent implements OnInit {
       QuestionsListImporterComponent,
       dialogConfig
     );
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
         // обновляем таблицу со списком вопросов
