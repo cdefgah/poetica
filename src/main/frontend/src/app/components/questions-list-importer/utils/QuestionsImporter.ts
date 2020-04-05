@@ -40,15 +40,20 @@ export class QuestionsImporter extends AbstractDataImporter {
     console.log("**** End of scanning");
   }
 
+  private skipEmptyLines() {
+    while (this.sourceTextLines[this.index].trim().length == 0) {
+      this.index++;
+    }
+  }
+
   private scanForQuestions() {
     var questionNumber: number = 0;
     console.log(">>> SCAN FOR QUESTIONS START");
     while (this.index < this.sourceTextLines.length) {
       console.log("..... loop start. this.index = " + this.index);
       console.log("... skipping empty lines");
-      while (this.sourceTextLines[this.index].trim().length == 0) {
-        this.index++;
-      }
+      this.skipEmptyLines();
+
       console.log(".... text block started. this.index = " + this.index);
 
       var processingLine: string = this.sourceTextLines[this.index].trim();
@@ -136,6 +141,9 @@ export class QuestionsImporter extends AbstractDataImporter {
     var nextQuestionBlockStarted: boolean = false;
 
     console.log(" ======== QUESTION BODY END=============");
+
+    // пропускаем пустые строки
+    this.skipEmptyLines();
 
     // сканируем в поиска источника задания
     var questionSource: string = "";
