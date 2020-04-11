@@ -2,12 +2,7 @@ import { Question } from "src/app/model/Question";
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 
 export class QuestionsImporter extends AbstractDataImporter {
-  private newLine: string = "\n";
-
-  sourceTextLines: string[];
   amountOfCreditedQuestions: number;
-
-  index: number;
 
   expectedQuestionNumber: number;
 
@@ -245,7 +240,7 @@ export class QuestionsImporter extends AbstractDataImporter {
           var amountString: string = processingLine.substring(prefix.length);
           var amount: number = -1;
 
-          if (this.isPositiveInteger(amountString)) {
+          if (QuestionsImporter.isPositiveInteger(amountString)) {
             amount = Number(amountString);
           } else {
             throw new Error(
@@ -290,7 +285,7 @@ export class QuestionsImporter extends AbstractDataImporter {
     var dotPosition: number = processingString.indexOf(dot);
     if (dotPosition != -1) {
       var prefixString: string = processingString.substring(0, dotPosition);
-      if (this.isPositiveInteger(prefixString)) {
+      if (QuestionsImporter.isPositiveInteger(prefixString)) {
         return prefixString;
       }
     }

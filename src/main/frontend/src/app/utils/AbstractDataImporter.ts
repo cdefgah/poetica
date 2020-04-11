@@ -1,11 +1,19 @@
+import { StringLinesIterator } from "./StringLinesIterator";
+
 export abstract class AbstractDataImporter {
-  private isNumber(value: string | number): boolean {
-    return value != null && value !== "" && !isNaN(Number(value.toString()));
+  protected sourceTextLinesIterator: StringLinesIterator;
+
+  constructor(sourceString: string) {
+    this.sourceTextLinesIterator = new StringLinesIterator(sourceString);
   }
 
-  protected isPositiveInteger(sourceString: string): boolean {
+  protected static isPositiveInteger(sourceString: string): boolean {
+    function isNumber(value: string | number): boolean {
+      return value != null && value !== "" && !isNaN(Number(value.toString()));
+    }
+
     for (let character of sourceString) {
-      if (!this.isNumber(character)) {
+      if (!isNumber(character)) {
         return false;
       }
     }
