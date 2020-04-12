@@ -33,7 +33,7 @@ export class StringLinesIterator {
 
     var normalizedString = normalizeString(sourceText);
     this.sourceTextLines = normalizedString.trim().split(this.newLine);
-    this.sourceTextLinesIndex = 0;
+    this.sourceTextLinesIndex = -1;
   }
 
   public hasNextLine(): boolean {

@@ -3,7 +3,7 @@ import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
   MatDialogRef,
-  MatDialog
+  MatDialog,
 } from "@angular/material/dialog";
 
 import { HttpClient } from "@angular/common/http";
@@ -14,7 +14,7 @@ import { QuestionsImporter } from "./utils/QuestionsImporter";
 @Component({
   selector: "app-questions-list-importer",
   templateUrl: "./questions-list-importer.component.html",
-  styleUrls: ["./questions-list-importer.component.css"]
+  styleUrls: ["./questions-list-importer.component.css"],
 })
 export class QuestionsListImporterComponent implements OnInit {
   rawSourceTextFormGroup: any;
@@ -55,7 +55,7 @@ export class QuestionsListImporterComponent implements OnInit {
       ConfirmationDialogComponent,
       confirmationDialogConfig
     );
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
         this.dialog.close(false);
@@ -79,6 +79,8 @@ export class QuestionsListImporterComponent implements OnInit {
   private processSourceText() {
     try {
       var questionsImporter = new QuestionsImporter(this.sourceText);
+      questionsImporter.doImport();
+
       this.dataSource = questionsImporter.questions;
     } catch (Error) {
       this.foundError = Error.message;
