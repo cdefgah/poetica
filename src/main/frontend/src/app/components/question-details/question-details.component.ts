@@ -3,7 +3,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialogConfig,
-  MatDialog
+  MatDialog,
 } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { MessageBoxComponent } from "../message-box/message-box.component";
@@ -12,7 +12,7 @@ import { Question } from "src/app/model/Question";
 @Component({
   selector: "app-question-details",
   templateUrl: "./question-details.component.html",
-  styleUrls: ["./question-details.component.css"]
+  styleUrls: ["./question-details.component.css"],
 })
 export class QuestionDetailsComponent implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
@@ -55,7 +55,7 @@ export class QuestionDetailsComponent implements OnInit {
 
           this.dialogTitle = this.getDialogTitle(this.question);
         },
-        error => this.displayErrorMessage(error)
+        (error) => this.displayErrorMessage(error)
       );
     } else {
       // создаём заголовок диалога для нового задания
@@ -119,11 +119,11 @@ export class QuestionDetailsComponent implements OnInit {
     if (questionObject.number === 0) {
       return "Новое задание";
     } else {
-      var isCreditedString = questionObject.credited
+      var isGradedString = questionObject.graded
         ? " (Зачётное)"
         : " (Внезачётное)";
 
-      return "Задание №" + String(questionObject.number) + isCreditedString;
+      return "Задание №" + String(questionObject.number) + isGradedString;
     }
   }
 
@@ -138,11 +138,11 @@ export class QuestionDetailsComponent implements OnInit {
           .set("questionComment", this.question.comment);
 
         this.http.post("/questions", payload).subscribe(
-          data => {
+          (data) => {
             this.serverResponse = data;
             this.dialog.close(true);
           },
-          error => this.displayErrorMessage(error)
+          (error) => this.displayErrorMessage(error)
         );
       } else {
         // обновляем существующую запись
@@ -181,7 +181,7 @@ export class QuestionDetailsComponent implements OnInit {
             () => {
               this.dialog.close(true);
             },
-            error => this.displayErrorMessage(error)
+            (error) => this.displayErrorMessage(error)
           );
         } else {
           // никаких изменений не было

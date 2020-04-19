@@ -23,4 +23,8 @@ export class Question {
     this.source = initialMap["source"];
     this.graded = initialMap["graded"];
   }
+
+  toString(): string {
+    return `id:${this.id}\nnumber:${this.number}\ngraded:${this.graded}\nbody:${this.body}\nsource:${this.source}\ncomment:${this.comment}\n`;
+  }
 }

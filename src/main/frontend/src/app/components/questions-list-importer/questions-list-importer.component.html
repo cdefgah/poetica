@@ -349,7 +349,6 @@
                 <td>=== отстутствует ===</td>
               </tr>
             </table>
-
             <br />
             <br />
             <br />
@@ -368,6 +367,13 @@
               <th mat-header-cell *matHeaderCellDef>Номер</th>
               <td mat-cell *matCellDef="let oneQuestion">
                 {{ oneQuestion.number }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="number">
+              <th mat-header-cell *matHeaderCellDef>Зачётное задание?</th>
+              <td mat-cell *matCellDef="let oneQuestion">
+                {{ oneQuestion.graded ? "Да" : "Нет" }}
               </td>
             </ng-container>
 
