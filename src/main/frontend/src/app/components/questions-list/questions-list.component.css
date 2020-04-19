@@ -6,9 +6,3 @@ button {
   margin: 1em 1em 1em 1em;
   background: lightcyan;
 }
-
-.table-container {
-  margin-top: 1em;
-  max-height: 50%;
-  overflow: auto;
-}

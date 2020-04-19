@@ -4,7 +4,7 @@ export class Question {
   body: string;
   source: string;
   comment: string;
-  credited: boolean;
+  graded: boolean;
 
   constructor() {
     this.id = 0;
@@ -12,7 +12,7 @@ export class Question {
     this.body = "";
     this.source = "";
     this.comment = "";
-    this.credited = true;
+    this.graded = true;
   }
 
   initialize(initialMap: Map<string, any>) {
@@ -21,6 +21,6 @@ export class Question {
     this.body = initialMap["body"];
     this.comment = initialMap["comment"];
     this.source = initialMap["source"];
-    this.credited = initialMap["credited"];
+    this.graded = initialMap["graded"];
   }
 }

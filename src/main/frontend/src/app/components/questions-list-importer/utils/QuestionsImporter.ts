@@ -2,6 +2,9 @@ import { Question } from "src/app/model/Question";
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 
 export class QuestionsImporter extends AbstractDataImporter {
+  private static readonly sourcePrefix: string = "#S:";
+  private static readonly commentNotePrefix: string = "#N:";
+
   amountOfGradedQuestions: number;
 
   expectedQuestionNumber: number;
@@ -10,11 +13,19 @@ export class QuestionsImporter extends AbstractDataImporter {
 
   constructor(sourceText: string) {
     super(sourceText);
+    this.expectedQuestionNumber = 1;
   }
 
   public doImport() {
     this.amountOfGradedQuestions = this.loadGradedQuestionsQty();
-    this.questions = this.loadAllQuestions();
+
+    do {
+      var question = this.nextQuestion();
+
+      if (question != null) {
+        this.questions.push(question);
+      }
+    } while (question != null);
   }
 
   private loadGradedQuestionsQty(): number {
@@ -49,23 +60,163 @@ export class QuestionsImporter extends AbstractDataImporter {
     }
   }
 
-  private loadAllQuestions(): Question[] {}
+  private nextQuestion(): Question {
+    // первая строка должна быть с номером вопроса
+    // функция должна быть isQuestionStartLine():bool
+    // собираем текст до строки, которая начинается с #
+    // второй символ должен быть S - если да, то загружаем source
+    // до тех пор, пока не встретим строку, которая начинается с # (или до конца всех строк)
+    // если второй символ не N - завершаем формирование вопроса и отдаём его
+    // если N - загружаем комментарий пока не встретим строку начинающуюся с # (или до конца всех строк)
+
+    if (!this.sourceTextLinesIterator.hasNextLine()) {
+      return null;
+    }
+
+    var firstQuestionLine: string = this.sourceTextLinesIterator.nextLine();
+    var questionNumber: number = this.extractQuestionNumber(firstQuestionLine);
+
+    if (questionNumber != this.expectedQuestionNumber) {
+      throw new Error(
+        `Ожидался номер задания: ${this.expectedQuestionNumber}, но передан: ${questionNumber} в строке ${firstQuestionLine}`
+      );
+    }
+
+    this.expectedQuestionNumber = this.expectedQuestionNumber + 1;
+    var numberPrefix: string = "#" + questionNumber + ":";
+    var numberPrefixLength: number = numberPrefix.length;
+    var questionBody: string = firstQuestionLine.substring(numberPrefixLength);
+    var processingLine: string;
+    var nextSegmentDetected: boolean = false;
+
+    // загружаем непосредственный текст задания
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      processingLine = this.sourceTextLinesIterator.nextLine();
+      if (QuestionsImporter.hasControlPrefix(processingLine)) {
+        nextSegmentDetected = true;
+        break;
+      }
+
+      questionBody = questionBody + "\n" + processingLine;
+    }
+
+    var rtfmMessage: string =
+      "Ознакомьтесь, пожалуйста, с требованиями к формату текста.";
+
+    if (!nextSegmentDetected) {
+      throw new Error(
+        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился.${rtfmMessage}`
+      );
+    }
+
+    if (!QuestionsImporter.isQuestionSourceLine(processingLine)) {
+      throw new Error(
+        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но вместо него оказалась вот эта строка: ${processingLine}. ${rtfmMessage}`
+      );
+    }
+
+    var questionSourceBody: string = processingLine.substring(
+      QuestionsImporter.sourcePrefix.length
+    );
+
+    // загружаем информацию об источнике для задания
+    nextSegmentDetected = false;
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      processingLine = this.sourceTextLinesIterator.nextLine();
+
+      if (QuestionsImporter.hasControlPrefix(processingLine)) {
+        nextSegmentDetected = true;
+        break;
+      }
+
+      questionSourceBody = questionSourceBody + processingLine;
+    }
+
+    var questionCommentNoteBody: string = "";
+
+    if (
+      nextSegmentDetected &&
+      QuestionsImporter.isQuestionCommentNoteLine(processingLine)
+    ) {
+      // если начался блок комментария к заданию
+      questionCommentNoteBody = processingLine.substring(
+        QuestionsImporter.commentNotePrefix.length
+      );
+
+      // загружаем тело комментариев к заданию
+      while (this.sourceTextLinesIterator.hasNextLine()) {
+        processingLine = this.sourceTextLinesIterator.nextLine();
+
+        if (QuestionsImporter.hasControlPrefix(processingLine)) {
+          break;
+        }
+
+        questionCommentNoteBody = questionCommentNoteBody + processingLine;
+      }
+    }
+
+    var question: Question = new Question();
+    question.number = questionNumber;
+    question.graded = questionNumber <= this.amountOfGradedQuestions;
+    question.body = questionBody;
+    question.source = questionSourceBody;
+    question.comment = questionCommentNoteBody;
+
+    return question;
+  }
 
   /**
-   * Загружает вопрос из текстового блока.
-   * @param firstQuestionBlockLine первая строка из блока заданий.
-   * Когда мы загружаем второе и последующее задание, то чтобы понять,
-   * что блок с одним заданием закончен, мы должны считать строку начала следующего задания.
-   * И если мы её считали, то передаём в качестве параметра в метод считывания задания.
-   * @returns объект
+   * Возвращает true, если строка начинается с контрольного префикса #.
+   * @param sourceStringLine строка к проверке.
+   * @returns true если строка начинается с контрольного префикса #.
    */
-  private loadOneQuestion(firstQuestionBlockLine: string): Question {
-    var processingLine: string = firstQuestionBlockLine;
+  private static hasControlPrefix(sourceStringLine: string): boolean {
+    return sourceStringLine.startsWith("#");
+  }
 
-    if (processingLine == null || processingLine.length == 0) {
-      // не надо проверять на наличие следующей строки, если бы строки кончились,
-      // этот метод не был бы вызван
-      processingLine = this.sourceTextLinesIterator.nextLine();
+  private static isQuestionSourceLine(sourceStringLine: string): boolean {
+    return sourceStringLine.startsWith(QuestionsImporter.sourcePrefix);
+  }
+
+  private static isQuestionCommentNoteLine(sourceStringLine: string): boolean {
+    return sourceStringLine.startsWith(QuestionsImporter.commentNotePrefix);
+  }
+
+  /**
+   * Извлекает номер задания из строки.
+   * @param sourceStringLine строка для обработки.
+   * @returns номер задания.
+   */
+  private extractQuestionNumber(sourceStringLine: string): number {
+    if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
+      throw new Error(
+        "Первым символом строки ожидался символ #. Строка: " + sourceStringLine
+      );
+    }
+
+    var colonSymbolPosition: number = sourceStringLine.indexOf(":");
+
+    if (colonSymbolPosition == -1) {
+      throw new Error(
+        "В начале строки должен быть символ двоеточия. Строка: " +
+          sourceStringLine
+      );
+    }
+
+    var numberString: string = sourceStringLine.substring(
+      1,
+      colonSymbolPosition
+    );
+
+    if (QuestionsImporter.isPositiveInteger(numberString)) {
+      return Number(numberString);
+    } else {
+      throw new Error(
+        "Номер задания должен быть целым положительным числом, а вы передали: " +
+          numberString +
+          " в строке: " +
+          sourceStringLine
+      );
     }
   }
 }

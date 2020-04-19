@@ -69,9 +69,9 @@ export class QuestionsListImporterComponent implements OnInit {
       this.processSourceText();
 
       if (this.foundError.length > 0) {
-        console.log("+++++++++++++++++++++++++++++++++");
-        console.log("Ашипка: " + this.foundError);
-        console.log("+++++++++++++++++++++++++++++++++");
+        console.log("+++++ ++ +++  ++  ++  ++  +++ ++++++++++++++");
+        console.log(this.foundError);
+        console.log("+++++ ++ +++  ++  ++  ++  +++ ++++++++++++++");
       }
     }
   }
