@@ -19,6 +19,7 @@ export class QuestionsImporter extends AbstractDataImporter {
   public doImport() {
     this.amountOfGradedQuestions = this.loadGradedQuestionsQty();
 
+    this.questions = [];
     do {
       var question = this.nextQuestion();
 
