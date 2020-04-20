@@ -21,7 +21,13 @@ export class QuestionsListImporterComponent implements OnInit {
 
   dataSource: Question[] = [];
 
-  displayedColumns: string[] = ["number", "body", "source", "comment"];
+  displayedColumns: string[] = [
+    "number",
+    "graded",
+    "body",
+    "source",
+    "comment",
+  ];
 
   sourceText: string;
 

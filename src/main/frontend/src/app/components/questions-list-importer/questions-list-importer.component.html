@@ -371,14 +371,14 @@
             </ng-container>
 
             <ng-container matColumnDef="graded">
-              <th mat-header-cell *matHeaderCellDef>Зачётное задание?</th>
+              <th mat-header-cell *matHeaderCellDef>Зачётное?</th>
               <td mat-cell *matCellDef="let oneQuestion">
-                {{ oneQuestion.graded ? "Да" : "Нет" }}
+                {{ oneQuestion.graded ? "Зачётное" : "Внезачётное" }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="body">
-              <th mat-header-cell *matHeaderCellDef>Содержание</th>
+              <th mat-header-cell *matHeaderCellDef>ФФСодержание</th>
               <td mat-cell *matCellDef="let oneQuestion">
                 {{ oneQuestion.body }}
               </td>

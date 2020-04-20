@@ -1,12 +1,19 @@
-# объявляем список
-my_list = ["яблоки", "груши", "апельсины", "мандарины", "абрикосы", "персики", "виноград", "лимоны", "киви"]
+def compose_greeting_text(name):
+    if len(name) == 0:
+        return "Не передали имя, как я буду приветствовать вообще?"
+    else:
+        return f"Здрасти-привет, {name}, давно не виделись!"
 
-# записываем длину списка в переменную my_list_size
-my_list_size = len(my_list)
 
-print("Вывод произвольных элементов списка")
-print("Начало")
-    
+user_name = ""
+message = compose_greeting_text(user_name)
+print(message)
 
-print("Конец")
+
+
+
+
+
+
+
 

@@ -4,6 +4,7 @@ import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 export class QuestionsImporter extends AbstractDataImporter {
   private static readonly sourcePrefix: string = "#S:";
   private static readonly commentNotePrefix: string = "#N:";
+  private static readonly newLineReplacement: string = " // ";
 
   amountOfGradedQuestions: number;
 
@@ -24,6 +25,13 @@ export class QuestionsImporter extends AbstractDataImporter {
       var question = this.nextQuestion();
 
       if (question != null) {
+        console.log(
+          "======================= QUESTION START ====================="
+        );
+        console.log(question.toString());
+        console.log(
+          "======================= QUESTION END ====================="
+        );
         this.questions.push(question);
       }
     } while (question != null);
@@ -98,7 +106,8 @@ export class QuestionsImporter extends AbstractDataImporter {
         break;
       }
 
-      questionBody = questionBody + "\n" + processingLine;
+      questionBody =
+        questionBody + QuestionsImporter.newLineReplacement + processingLine;
     }
 
     var rtfmMessage: string =
@@ -130,29 +139,48 @@ export class QuestionsImporter extends AbstractDataImporter {
         break;
       }
 
-      questionSourceBody = questionSourceBody + processingLine;
+      questionSourceBody =
+        questionSourceBody +
+        QuestionsImporter.newLineReplacement +
+        processingLine;
     }
 
     var questionCommentNoteBody: string = "";
 
-    if (
-      nextSegmentDetected &&
-      QuestionsImporter.isQuestionCommentNoteLine(processingLine)
-    ) {
-      // если начался блок комментария к заданию
-      questionCommentNoteBody = processingLine.substring(
-        QuestionsImporter.commentNotePrefix.length
-      );
+    if (nextSegmentDetected) {
+      if (QuestionsImporter.isQuestionCommentNoteLine(processingLine)) {
+        // если начался блок комментария к заданию
+        questionCommentNoteBody = processingLine.substring(
+          QuestionsImporter.commentNotePrefix.length
+        );
 
-      // загружаем тело комментариев к заданию
-      while (this.sourceTextLinesIterator.hasNextLine()) {
-        processingLine = this.sourceTextLinesIterator.nextLine();
+        // загружаем тело комментариев к заданию
+        var textBlockContinuesFurther: boolean = false;
+        while (this.sourceTextLinesIterator.hasNextLine()) {
+          processingLine = this.sourceTextLinesIterator.nextLine();
 
-        if (QuestionsImporter.hasControlPrefix(processingLine)) {
-          break;
+          if (QuestionsImporter.hasControlPrefix(processingLine)) {
+            textBlockContinuesFurther = true;
+            break;
+          }
+
+          questionCommentNoteBody =
+            questionCommentNoteBody +
+            QuestionsImporter.newLineReplacement +
+            processingLine;
         }
 
-        questionCommentNoteBody = questionCommentNoteBody + processingLine;
+        // отматываем номер строки на одну строку назад,
+        // так как мы зацепили следующий вопрос
+        if (textBlockContinuesFurther) {
+          this.sourceTextLinesIterator.stepIndexBack();
+        }
+      } else {
+        // следующий вопрос
+
+        // отматываем номер строки на одну строку назад,
+        // так как мы зацепили следующий вопрос
+        this.sourceTextLinesIterator.stepIndexBack();
       }
     }
 

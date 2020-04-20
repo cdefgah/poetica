@@ -50,4 +50,10 @@ export class StringLinesIterator {
       );
     }
   }
+
+  public stepIndexBack() {
+    if (this.sourceTextLinesIndex > 0) {
+      this.sourceTextLinesIndex--;
+    }
+  }
 }
