@@ -123,7 +123,9 @@ export class QuestionsListComponent implements OnInit {
       return;
     }
 
-    const dialogConfig = QuestionsListImporterComponent.getDialogConfigWithData();
+    const dialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
+      this.modelConstraints
+    );
     var dialogRef = this.dialog.open(
       QuestionsListImporterComponent,
       dialogConfig

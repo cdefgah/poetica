@@ -33,12 +33,33 @@ export class QuestionsListImporterComponent implements OnInit {
 
   foundError: string = "";
 
-  static getDialogConfigWithData(): MatDialogConfig {
+  dataIsReadyForImport: boolean = false;
+
+  private static readonly KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS =
+    "oneQuestionModelConstraints";
+
+  private oneQuestionModelConstraintsMap: Map<string, number>;
+
+  static getDialogConfigWithData(
+    oneQuestionModelConstraints: Map<string, string>
+  ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.width = "62%";
+
+    dialogConfig.data = new Map<string, any>();
+    var constraints = new Map<string, number>();
+
+    for (let key in oneQuestionModelConstraints) {
+      let stringConstraintsValue = oneQuestionModelConstraints[key];
+      constraints[key] = parseInt(stringConstraintsValue);
+    }
+
+    dialogConfig.data[
+      QuestionsListImporterComponent.KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS
+    ] = constraints;
 
     return dialogConfig;
   }
@@ -48,7 +69,26 @@ export class QuestionsListImporterComponent implements OnInit {
     private http: HttpClient,
     public dialog: MatDialogRef<QuestionsListImporterComponent>,
     public otherDialog: MatDialog
-  ) {}
+  ) {
+    if (!dialogData) {
+      return;
+    }
+
+    var constraintsMap: any = this.getMapValue(
+      QuestionsListImporterComponent.KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS,
+      dialogData
+    );
+
+    this.oneQuestionModelConstraintsMap = constraintsMap;
+  }
+
+  getMapValue(mapKey: string, map: Map<string, string>): string {
+    if (mapKey in map && map[mapKey]) {
+      return map[mapKey];
+    } else {
+      return "";
+    }
+  }
 
   ngOnInit() {}
 
@@ -74,17 +114,19 @@ export class QuestionsListImporterComponent implements OnInit {
       this.foundError = "";
       this.processSourceText();
 
-      if (this.foundError.length > 0) {
-        console.log("+++++ ++ +++  ++  ++  ++  +++ ++++++++++++++");
-        console.log(this.foundError);
-        console.log("+++++ ++ +++  ++  ++  ++  +++ ++++++++++++++");
-      }
+      this.dataIsReadyForImport = this.foundError.length == 0;
+    } else if (event.previouslySelectedIndex == 1) {
+      // если вернулись назад
+      this.dataIsReadyForImport = false;
     }
   }
 
   private processSourceText() {
     try {
-      var questionsImporter = new QuestionsImporter(this.sourceText);
+      var questionsImporter = new QuestionsImporter(
+        this.sourceText,
+        this.oneQuestionModelConstraintsMap
+      );
       questionsImporter.doImport();
 
       this.dataSource = questionsImporter.questions;
@@ -94,4 +136,26 @@ export class QuestionsListImporterComponent implements OnInit {
   }
 
   onRowClicked(row: any) {}
+
+  doImportQuestions() {
+    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+      "Импортировать задания?"
+    );
+
+    var dialogRef = this.otherDialog.open(
+      ConfirmationDialogComponent,
+      confirmationDialogConfig
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если диалог был принят (accepted)
+        this.dialog.close(false);
+
+        // импортируем задания
+        console.log("DO IMPORT!!!!!!!!!!!!!");
+        console.log("DO IMPORT!!!!!!!!!!!!!");
+        console.log("DO IMPORT!!!!!!!!!!!!!");
+      }
+    });
+  }
 }

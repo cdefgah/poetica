@@ -2,13 +2,13 @@ import { Component, OnInit, Inject } from "@angular/core";
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
-  MatDialogRef
+  MatDialogRef,
 } from "@angular/material/dialog";
 
 @Component({
   selector: "app-confirmation-dialog",
   templateUrl: "./confirmation-dialog.component.html",
-  styleUrls: ["./confirmation-dialog.component.css"]
+  styleUrls: ["./confirmation-dialog.component.css"],
 })
 export class ConfirmationDialogComponent implements OnInit {
   private static readonly KEY_DIALOG_TITLE = "dialogTitle";
@@ -27,7 +27,7 @@ export class ConfirmationDialogComponent implements OnInit {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "38%";
+    dialogConfig.width = "19%";
 
     dialogConfig.data = new Map<string, string>();
 

@@ -37,49 +37,6 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
     }
 
-    /**
-     * Добавляет вопрос (бескрылку) в базу.
-     * Номер вопроса присваивается автоматически.
-     * Признак зачётной/внезачётной бескрылки определяется согласно настройкам, в которых указано количество
-     * зачётных бескрылок. Все номера выше этого числа являются номерами внезачётных бескрылок.
-     * @param questionBody содержимое вопроса (бескрылки).
-     * @param questionSource источник вопроса (бескрылки).
-     * @param questionComment комментарий к вопросу (бескрылке) от создателя этого вопроса.
-     * @return Http CREATED вместе с идентификатором добавленного вопроса. Иначе - код http ошибки + сообщение.
-     */
-    @RequestMapping(path = "/questions", method = RequestMethod.POST,
-            consumes = "application/x-www-form-urlencoded",
-            produces = "application/json")
-    public ResponseEntity<String> addNewQuestion(@RequestParam("questionBody") String questionBody,
-                                                 @RequestParam("questionSource") String questionSource,
-                                                 @RequestParam("questionComment") String questionComment) {
-
-        if (isStringEmpty(questionBody)) {
-            return new ResponseEntity<>("Содержание вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
-        }
-
-        if (isStringEmpty(questionSource)) {
-            return new ResponseEntity<>("Источник вопроса не может быть пустым", HttpStatus.BAD_REQUEST);
-        }
-
-
-        int questionNumber = 1;
-        Optional<Question> lastQuestionInfo = getLastQuestion();
-        if (lastQuestionInfo.isPresent()) {
-            questionNumber = lastQuestionInfo.get().getNumber() + 1;
-        }
-
-        Question question = new Question();
-        question.setNumber(questionNumber);
-        question.setBody(questionBody);
-        question.setSource(questionSource);
-        question.setComment(questionComment);
-        question.setCredited(questionNumber <= configuration.getCreditedQuestionsQty());
-
-        entityManager.persist(question);
-        return new ResponseEntity<>(String.valueOf(question.getId()), HttpStatus.CREATED);
-    }
-
     @RequestMapping(path = "/questions/import", method = RequestMethod.POST,
             consumes = "application/x-www-form-urlencoded",
             produces = "application/json")

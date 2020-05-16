@@ -12,9 +12,17 @@ export class QuestionsImporter extends AbstractDataImporter {
 
   questions: Question[];
 
-  constructor(sourceText: string) {
+  private readonly maxBodyLength: number;
+  private readonly maxCommentLength: number;
+  private readonly maxSourceLength: number;
+
+  constructor(sourceText: string, modelConstraints: Map<string, number>) {
     super(sourceText);
     this.expectedQuestionNumber = 1;
+
+    this.maxBodyLength = modelConstraints["MAX_BODY_LENGTH"];
+    this.maxCommentLength = modelConstraints["MAX_COMMENT_LENGTH"];
+    this.maxSourceLength = modelConstraints["MAX_SOURCE_LENGTH"];
   }
 
   public doImport() {
@@ -51,7 +59,7 @@ export class QuestionsImporter extends AbstractDataImporter {
         } else {
           var additionalMessage: string =
             amountString.length > 0
-              ? "А вы передаёте: " + amountString
+              ? 'А вы передаёте: "' + amountString + '"'
               : "Но вы не передали никакого значения.";
 
           throw new Error(
@@ -70,14 +78,6 @@ export class QuestionsImporter extends AbstractDataImporter {
   }
 
   private nextQuestion(): Question {
-    // первая строка должна быть с номером вопроса
-    // функция должна быть isQuestionStartLine():bool
-    // собираем текст до строки, которая начинается с #
-    // второй символ должен быть S - если да, то загружаем source
-    // до тех пор, пока не встретим строку, которая начинается с # (или до конца всех строк)
-    // если второй символ не N - завершаем формирование вопроса и отдаём его
-    // если N - загружаем комментарий пока не встретим строку начинающуюся с # (или до конца всех строк)
-
     if (!this.sourceTextLinesIterator.hasNextLine()) {
       return null;
     }
@@ -87,7 +87,7 @@ export class QuestionsImporter extends AbstractDataImporter {
 
     if (questionNumber != this.expectedQuestionNumber) {
       throw new Error(
-        `Ожидался номер задания: ${this.expectedQuestionNumber}, но передан: ${questionNumber} в строке ${firstQuestionLine}`
+        `Ожидался номер задания: ${this.expectedQuestionNumber}, но передан: ${questionNumber} в строке "${firstQuestionLine}"`
       );
     }
 
@@ -184,6 +184,26 @@ export class QuestionsImporter extends AbstractDataImporter {
       }
     }
 
+    // проверяем ограничения на длину полей
+    if (questionBody.length > this.maxBodyLength) {
+      throw new Error(
+        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBody.length} символов и превышает максимальный разрешённый размер в ${this.maxBodyLength} символов`
+      );
+    }
+
+    if (questionSourceBody.length > this.maxSourceLength) {
+      throw new Error(
+        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this.maxSourceLength} символов`
+      );
+    }
+
+    if (questionCommentNoteBody.length > this.maxCommentLength) {
+      throw new Error(
+        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this.maxCommentLength} символов`
+      );
+    }
+
+    // формируем вопрос
     var question: Question = new Question();
     question.number = questionNumber;
     question.graded = questionNumber <= this.amountOfGradedQuestions;
