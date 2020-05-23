@@ -128,11 +128,21 @@ export class QuestionsListComponent implements OnInit {
       confirmationDialogRef.afterClosed().subscribe((result) => {
         if (result) {
           // если диалог был принят (accepted)
-          // ставим флаг, что импортируем задания
-          this.StartImportingQuestions();
+          // удаляем задания на сервере
+          this.http.delete("/questions/all").subscribe(
+            (data: any) => {
+              // обновляем таблицу со списком вопросов (уже пустую)
+              this.loadQuestionsList();
+
+              // запускаем импорт вопросов
+              this.StartImportingQuestions();
+            },
+            (error) => this.displayErrorMessage(error)
+          );
         }
       });
     } else {
+      // запускаем импорт вопросов
       this.StartImportingQuestions();
     }
   }
