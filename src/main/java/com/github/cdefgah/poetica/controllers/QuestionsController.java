@@ -41,13 +41,9 @@ public class QuestionsController extends AbstractController {
             consumes = "application/json",
             produces = "application/json")
      public ResponseEntity<String> importQuestions(@RequestBody Question[] allQuestions) {
-        System.out.println("*************************************************");
-        System.out.println("**********Q U E S T I O N S *********************");
-        System.out.println("*************************************************");
         for(Question question: allQuestions) {
-           System.out.println(question);
+            entityManager.persist(question);
         }
-        System.out.println("*************************************************");
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
@@ -160,40 +156,6 @@ public class QuestionsController extends AbstractController {
         }
     }
 
-    private ResponseEntity<String> deleteQuestion(long questionId) {
-        if (thisQuestionIsNotAnsweredYet(questionId)) {
-            Query deletionQuery = entityManager.createQuery("delete from Question q where q.id=:questionId");
-            final int deletedCount = deletionQuery.setParameter("questionId", questionId).executeUpdate();
-            if (deletedCount > 0) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return new ResponseEntity<>("Не удалось удалить вопрос с идентификатором: " + questionId,
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return new ResponseEntity<>("Нельзя удалить вопрос, так как на него уже есть ответы.",
-                    HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @RequestMapping(path = "/questions/last-question", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Question> getLastQuestionInfo() {
-        Optional<Question> lastQuestionInfo = getLastQuestion();
-        return lastQuestionInfo.map(question -> ResponseEntity.status(HttpStatus.OK).body(question)).
-                orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @RequestMapping(path = "/questions/last-question", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity<String> deleteLastQuestion() {
-        Optional<Question> lastQuestionInfo = getLastQuestion();
-        if (!lastQuestionInfo.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        final long questionId = lastQuestionInfo.get().getId();
-        return deleteQuestion(questionId);
-    }
-
     /**
      * Удаляет все вопросы из базы. Ни на один вопрос не должно быть дано ответов.
      * Иначе операция завершится с ошибкой.
@@ -205,7 +167,7 @@ public class QuestionsController extends AbstractController {
         List<Question> questionsList = allQuestionsResponseObject.getBody();
         if (questionsList != null && !questionsList.isEmpty()) {
             for (Question question : questionsList) {
-                if (!thisQuestionIsNotAnsweredYet(question.getId())) {
+                if (thisQuestionIsAnswered(question.getId())) {
                     return new ResponseEntity<>("Нельзя удалить все вопросы," +
                             " так есть как минимум один вопрос (номер вопроса: " + question.getNumber()
                             +"), на который внесены ответы.",
@@ -221,27 +183,27 @@ public class QuestionsController extends AbstractController {
     }
 
     /**
-     * Возвращает true, если на вопрос нет ответов в системе.
+     * Возвращает true, если на вопрос дан ответ.
      * @param questionId уникальный идентификатор вопроса.
-     * @return true, если на вопрос нет ответов в системе.
+     * @return true, если на вопрос дан ответ в системе.
      */
-    private boolean thisQuestionIsNotAnsweredYet(long questionId) {
+    private boolean thisQuestionIsAnswered(long questionId) {
         Query query = entityManager.createQuery("from Answer a where a.questionId=:questionId", Answer.class);
         query.setParameter("questionId", questionId);
-        return query.getResultList().isEmpty();
+        return !query.getResultList().isEmpty();
     }
 
     /**
      * Возвращает список вопросов (бескрылок).
-     * @param onlyCreditedQuestions true, если мы запрашиваем список зачётных вопросов (бескрылок).
+     * @param onlyGradedQuestions true, если мы запрашиваем список зачётных вопросов (бескрылок).
      *                                  Для внезачётных - false.
      * @return список запрошенных вопросов (бескрылок).
      */
-    private List<Question> getQuestionsList(boolean onlyCreditedQuestions) {
+    private List<Question> getQuestionsList(boolean onlyGradedQuestions) {
         TypedQuery<Question> query =
                 entityManager.createQuery("select question from Question " +
-                        "question where question.isCredited=:isCredited", Question.class);
-        query.setParameter("isCredited", onlyCreditedQuestions);
+                        "question where question.graded=:graded", Question.class);
+        query.setParameter("graded", onlyGradedQuestions);
         return query.getResultList();
     }
 }
