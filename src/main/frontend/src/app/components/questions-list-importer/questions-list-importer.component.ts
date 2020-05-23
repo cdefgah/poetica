@@ -6,10 +6,11 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
+import { MessageBoxComponent } from "../message-box/message-box.component";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -149,13 +150,38 @@ export class QuestionsListImporterComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
-        this.dialog.close(false);
-
         // импортируем задания
-        console.log("DO IMPORT!!!!!!!!!!!!!");
-        console.log("DO IMPORT!!!!!!!!!!!!!");
-        console.log("DO IMPORT!!!!!!!!!!!!!");
+        const headers = new HttpHeaders().set(
+          "Content-Type",
+          "application/json; charset=utf-8"
+        );
+
+        this.http
+          .post("/questions/import", this.dataSource, { headers: headers })
+          .subscribe(
+            (data) => {
+              this.dialog.close(true);
+            },
+            (error) => this.displayErrorMessage(error)
+          );
       }
     });
+  }
+
+  displayErrorMessage(error: any) {
+    var errorMessage: string =
+      error.error +
+      ". " +
+      "Код статуса: " +
+      error.status +
+      ". " +
+      "Сообщение сервера: '" +
+      error.message +
+      "'";
+
+    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+      errorMessage,
+      "Ошибка"
+    );
   }
 }

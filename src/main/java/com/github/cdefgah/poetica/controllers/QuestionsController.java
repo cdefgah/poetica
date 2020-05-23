@@ -38,13 +38,18 @@ public class QuestionsController extends AbstractController {
     }
 
     @RequestMapping(path = "/questions/import", method = RequestMethod.POST,
-            consumes = "application/x-www-form-urlencoded",
+            consumes = "application/json",
             produces = "application/json")
-    public ResponseEntity<String> importQuestions(@RequestParam("qtyOfCreditedQuestions") int qtyOfCreditedQuestions,
-                                                 @RequestParam("allQuestions") Question[] allQuestions) {
+     public ResponseEntity<String> importQuestions(@RequestBody Question[] allQuestions) {
+        System.out.println("*************************************************");
+        System.out.println("**********Q U E S T I O N S *********************");
+        System.out.println("*************************************************");
+        for(Question question: allQuestions) {
+           System.out.println(question);
+        }
+        System.out.println("*************************************************");
         return new ResponseEntity<>("", HttpStatus.OK);
     }
-
 
     private Optional<Question> getLastQuestion() {
         final TypedQuery<Question> questionNumberQuery =
