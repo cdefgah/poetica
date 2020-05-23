@@ -5,6 +5,7 @@ import { QuestionDetailsComponent } from "../question-details/question-details.c
 import { Question } from "src/app/model/Question";
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
+import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-questions-list",
@@ -36,7 +37,11 @@ export class QuestionsListComponent implements OnInit {
 
   selectedRowIndex: number;
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {
+  constructor(
+    private http: HttpClient,
+    public dialog: MatDialog,
+    public otherDialog: MatDialog
+  ) {
     this.loadOneQuestionModelConstraints();
     this.loadQuestionsList();
   }
@@ -111,24 +116,34 @@ export class QuestionsListComponent implements OnInit {
 
   ImportQuestions() {
     if (this.dataSource.length > 0) {
-      const errorMessage: string =
-        "В базе данных уже представлены задания. Удалите их все, прежде чем импортировать новые задания.";
-
-      var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-        errorMessage,
-        "Внимание"
+      var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+        "В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?"
       );
 
-      this.dialog.open(MessageBoxComponent, msgBoxConfig);
-      return;
-    }
+      var confirmationDialogRef = this.otherDialog.open(
+        ConfirmationDialogComponent,
+        confirmationDialogConfig
+      );
 
-    const dialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
+      confirmationDialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          // если диалог был принят (accepted)
+          // ставим флаг, что импортируем задания
+          this.StartImportingQuestions();
+        }
+      });
+    } else {
+      this.StartImportingQuestions();
+    }
+  }
+
+  private StartImportingQuestions() {
+    const importDialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
       this.modelConstraints
     );
     var dialogRef = this.dialog.open(
       QuestionsListImporterComponent,
-      dialogConfig
+      importDialogConfig
     );
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
