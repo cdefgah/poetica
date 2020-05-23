@@ -5,11 +5,12 @@ import { Answer } from "src/app/model/Answer";
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { Team } from "src/app/model/Team";
 import { Email } from "src/app/model/Email";
+import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 
 @Component({
   selector: "app-answers-list",
   templateUrl: "./answers-list.component.html",
-  styleUrls: ["./answers-list.component.css"]
+  styleUrls: ["./answers-list.component.css"],
 })
 export class AnswersListComponent implements OnInit {
   selectedTeamId: number;
@@ -20,8 +21,10 @@ export class AnswersListComponent implements OnInit {
   allRoundTitles: string[] = [
     "Все",
     "Предварительный тур",
-    "Окончательный тур"
+    "Окончательный тур",
   ];
+
+  modelConstraints: Map<string, string>;
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
@@ -35,13 +38,13 @@ export class AnswersListComponent implements OnInit {
     "number",
     "body",
     "roundNumber",
-    "comment"
+    "comment",
   ];
 
   displayedEmailColumns: string[] = [
     "sentOn",
     "processedOn",
-    "numbersOfAnsweredQuestions"
+    "numbersOfAnsweredQuestions",
   ];
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
@@ -52,9 +55,20 @@ export class AnswersListComponent implements OnInit {
   ngOnInit() {}
 
   ImportAnswers() {
-    // use Angular Material Stepper for wizard creation (modal dialog for example)
-    // https://material.angular.io/components/stepper/overview
-    // https://material.angular.io/components/dialog/examples
+    const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
+      this.modelConstraints
+    );
+    var dialogRef = this.dialog.open(
+      AnswersListImporterComponent,
+      importDialogConfig
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если диалог был принят (accepted)
+        // обновляем таблицу со списком вопросов
+        this.loadAnswersList();
+      }
+    });
   }
 
   loadTeamsList() {
@@ -65,7 +79,7 @@ export class AnswersListComponent implements OnInit {
         this.allTeamIds = [];
         this.teamTitleAndNumber = [];
 
-        data.forEach(oneTeam => {
+        data.forEach((oneTeam) => {
           this.allTeamIds.push(oneTeam.id);
           this.teamTitleAndNumber.push(
             oneTeam.title + " (" + oneTeam.number + ")"
@@ -74,7 +88,7 @@ export class AnswersListComponent implements OnInit {
 
         this.selectedTeamId = this.allTeamIds[0];
       },
-      error => this.displayErrorMessage(error)
+      (error) => this.displayErrorMessage(error)
     );
   }
 

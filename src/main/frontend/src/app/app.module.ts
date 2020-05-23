@@ -10,7 +10,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import {
   MatRippleModule,
   MAT_DIALOG_DEFAULT_OPTIONS,
-  MatTableModule
+  MatTableModule,
 } from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
@@ -35,6 +35,7 @@ import { QuestionsListImporterComponent } from "./components/questions-list-impo
 import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
 import { MessageBoxComponent } from "./components/message-box/message-box.component";
 import { TeamDetailsComponent } from "./components/team-details/team-details.component";
+import { AnswersListImporterComponent } from "./components/answers-list-importer/answers-list-importer.component";
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     QuestionsListImporterComponent,
     AnswerDetailsComponent,
     MessageBoxComponent,
-    TeamDetailsComponent
+    TeamDetailsComponent,
+    AnswersListImporterComponent,
   ],
   imports: [
     FormsModule,
@@ -69,7 +71,7 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     MatDialogModule,
     MatInputModule,
     MatTableModule,
-    MatStepperModule
+    MatStepperModule,
   ],
 
   entryComponents: [
@@ -79,12 +81,12 @@ import { TeamDetailsComponent } from "./components/team-details/team-details.com
     AnswerDetailsComponent,
     MessageBoxComponent,
     TeamDetailsComponent,
-    QuestionsListImporterComponent
+    QuestionsListImporterComponent,
   ],
 
   providers: [
-    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } }
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

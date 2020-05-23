@@ -56,6 +56,7 @@ export class QuestionsListComponent implements OnInit {
     );
   }
 
+  // TODO вынести в родительский класс общий код
   displayErrorMessage(error: any) {
     var errorMessage: string =
       error.error +

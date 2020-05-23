@@ -1,0 +1,91 @@
+<p mat-dialog-title>Импорт ответов</p>
+<mat-dialog-content>
+  <mat-horizontal-stepper
+    [linear]="true"
+    (selectionChange)="onStepChange($event)"
+    #stepper
+  >
+    <mat-step [stepControl]="rawSourceTextFormGroup">
+      <mat-tab-group>
+        <mat-tab label="Текст письма">
+          <form>
+            <ng-template matStepLabel>Ввод текста из писем</ng-template>
+            <table>
+              <tr>
+                <td>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Тема письма</mat-label>
+                    <input
+                      matInput
+                      required
+                      placeholder="Тема письма"
+                      [(ngModel)]="emailSubject"
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Содержание письма</mat-label>
+                    <textarea
+                      matInput
+                      rows="12"
+                      placeholder="Скопируйте содержание письма сюда"
+                      required
+                      [(ngModel)]="emailBody"
+                    ></textarea>
+                  </mat-form-field>
+                </td>
+              </tr>
+            </table>
+            <div>
+              <button mat-button color="primary" matStepperNext>Далее</button>
+            </div>
+          </form>
+        </mat-tab>
+        <mat-tab label="Описание формата"> </mat-tab>
+      </mat-tab-group>
+    </mat-step>
+    <mat-step [stepControl]="rawSourceTextFormGroup">
+      <form>
+        <ng-template matStepLabel
+          >Предварительный просмотр и импорт</ng-template
+        >
+        <div
+          *ngIf="
+            dataIsReadyForImport;
+            then processedDataBlock;
+            else errorsBlock
+          "
+        ></div>
+
+        <ng-template #processedDataBlock>
+          <div class="table-container"></div>
+        </ng-template>
+
+        <ng-template #errorsBlock>
+          <div>
+            {{ foundError }}
+          </div>
+        </ng-template>
+
+        <div>
+          <button mat-button color="primary" matStepperPrevious>Назад</button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+  <mat-divider></mat-divider>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span class="fill-remaining-space"></span>
+  <ng-template [ngIf]="dataIsReadyForImport">
+    <button mat-raised-button color="primary" (click)="doImportAnswers()">
+      Импортировать ответы
+    </button>
+  </ng-template>
+  <button mat-raised-button color="accent" (click)="cancelDialog()">
+    Отмена
+  </button>
+</mat-dialog-actions>
