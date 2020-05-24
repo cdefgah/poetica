@@ -82,6 +82,7 @@ import { AnswersListImporterComponent } from "./components/answers-list-importer
     MessageBoxComponent,
     TeamDetailsComponent,
     QuestionsListImporterComponent,
+    AnswersListImporterComponent,
   ],
 
   providers: [
