@@ -13,6 +13,17 @@
             <table>
               <tr>
                 <td>
+                  <input
+                    [matDatepicker]="myDatepicker"
+                    name="emailDate"
+                    [(ngModel)]="emailDate"
+                  />
+                  <mat-datepicker #myDatepicker></mat-datepicker>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
                   <mat-form-field appearance="outline">
                     <mat-label>Тема письма</mat-label>
                     <input

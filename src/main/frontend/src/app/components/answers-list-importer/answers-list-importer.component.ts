@@ -18,6 +18,7 @@ export class AnswersListImporterComponent implements OnInit {
   foundError: string;
   dataIsReadyForImport: boolean;
 
+  emailDate: any;
   emailSubject: string;
   emailBody: string;
 

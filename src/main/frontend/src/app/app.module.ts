@@ -11,6 +11,8 @@ import {
   MatRippleModule,
   MAT_DIALOG_DEFAULT_OPTIONS,
   MatTableModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
 } from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
@@ -72,6 +74,8 @@ import { AnswersListImporterComponent } from "./components/answers-list-importer
     MatInputModule,
     MatTableModule,
     MatStepperModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
 
   entryComponents: [
