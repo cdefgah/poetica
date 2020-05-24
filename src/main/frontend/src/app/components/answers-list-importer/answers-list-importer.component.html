@@ -8,6 +8,24 @@
     <mat-step [stepControl]="rawSourceTextFormGroup">
       <form>
         <ng-template matStepLabel>Время отправки и тур</ng-template>
+        <table>
+          <tr>
+            <td>
+              <mat-form-field>
+                <input matInput [matDatepicker]="emailSentOnDatePicker" />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="emailSentOnDatePicker"
+                  name="emailSentOnDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #emailSentOnDatePicker
+                  [startAt]="emailSentOnDate"
+                ></mat-datepicker>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
 
         <div>
           <button mat-button color="primary" matStepperNext>Далее</button>
@@ -23,25 +41,13 @@
             <table>
               <tr>
                 <td>
-                  <mat-form-field>
-                    <input matInput [matDatepicker]="myDatepicker" />
-                    <mat-datepicker-toggle
-                      matSuffix
-                      [for]="myDatepicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #myDatepicker></mat-datepicker>
-                  </mat-form-field>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>
                   <mat-form-field appearance="outline">
                     <mat-label>Тема письма</mat-label>
                     <input
                       matInput
-                      required
                       placeholder="Тема письма"
+                      name="emailSubjectText"
+                      placeholder="Скопируйте тему письма сюда"
                       [(ngModel)]="emailSubject"
                     />
                   </mat-form-field>
@@ -55,6 +61,7 @@
                       matInput
                       rows="12"
                       placeholder="Скопируйте содержание письма сюда"
+                      name="emailBodyText"
                       required
                       [(ngModel)]="emailBody"
                     ></textarea>

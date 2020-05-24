@@ -13,6 +13,7 @@ import {
   MatTableModule,
   MatDatepickerModule,
   MatNativeDateModule,
+  MAT_DATE_LOCALE,
 } from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
@@ -91,6 +92,7 @@ import { AnswersListImporterComponent } from "./components/answers-list-importer
 
   providers: [
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
+    { provide: MAT_DATE_LOCALE, useValue: "ru" },
   ],
   bootstrap: [AppComponent],
 })

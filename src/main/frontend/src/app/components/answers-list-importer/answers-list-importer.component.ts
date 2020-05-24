@@ -7,6 +7,7 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -15,10 +16,10 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
 })
 export class AnswersListImporterComponent implements OnInit {
   rawSourceTextFormGroup: any;
-  foundError: string;
+  foundError: string = "";
   dataIsReadyForImport: boolean;
 
-  emailDate: any;
+  emailSentOnDate: any;
   emailSubject: string;
   emailBody: string;
 
