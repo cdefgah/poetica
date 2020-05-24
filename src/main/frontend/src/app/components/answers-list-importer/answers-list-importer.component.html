@@ -6,6 +6,16 @@
     #stepper
   >
     <mat-step [stepControl]="rawSourceTextFormGroup">
+      <form>
+        <ng-template matStepLabel>Время отправки и тур</ng-template>
+
+        <div>
+          <button mat-button color="primary" matStepperNext>Далее</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="rawSourceTextFormGroup">
       <mat-tab-group>
         <mat-tab label="Текст письма">
           <form>
@@ -13,12 +23,14 @@
             <table>
               <tr>
                 <td>
-                  <input
-                    [matDatepicker]="myDatepicker"
-                    name="emailDate"
-                    [(ngModel)]="emailDate"
-                  />
-                  <mat-datepicker #myDatepicker></mat-datepicker>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="myDatepicker" />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="myDatepicker"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #myDatepicker></mat-datepicker>
+                  </mat-form-field>
                 </td>
                 <td></td>
               </tr>
@@ -51,6 +63,9 @@
               </tr>
             </table>
             <div>
+              <button mat-button color="primary" matStepperPrevious>
+                Назад
+              </button>
               <button mat-button color="primary" matStepperNext>Далее</button>
             </div>
           </form>

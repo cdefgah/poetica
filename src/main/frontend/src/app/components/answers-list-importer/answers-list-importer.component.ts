@@ -61,17 +61,25 @@ export class AnswersListImporterComponent implements OnInit {
 
   ImportAnswers() {}
 
-  private processSourceText() {}
+  private processEmailDateTimeAndRoundNumber() {
+    console.log("*******************************************");
+    console.log("****** PROCESSING EMAIL DATE AND TIME *****");
+    console.log("*******************************************");
+  }
+
+  private processEmailSourceText() {
+    console.log("++++++++++++++++++++++++++++++++++++++++++++");
+    console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
+    console.log("++++++++++++++++++++++++++++++++++++++++++++");
+  }
 
   onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
-      this.foundError = "";
-      this.processSourceText();
-
-      this.dataIsReadyForImport = this.foundError.length == 0;
-    } else if (event.previouslySelectedIndex == 1) {
-      // если вернулись назад
+      this.processEmailDateTimeAndRoundNumber();
       this.dataIsReadyForImport = false;
+    } else if (event.previouslySelectedIndex == 1) {
+      this.processEmailSourceText();
+      this.dataIsReadyForImport = this.foundError.length == 0;
     }
   }
 
