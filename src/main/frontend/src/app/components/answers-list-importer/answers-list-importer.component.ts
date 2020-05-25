@@ -23,6 +23,10 @@ export class AnswersListImporterComponent implements OnInit {
   emailSubject: string;
   emailBody: string;
 
+  allRoundAliases: string[] = ["1", "2"];
+  allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
+  selectedRoundAlias: string;
+
   static getDialogConfigWithData(
     answerAndEmailModelConstraints: Map<string, string>
   ): MatDialogConfig {
@@ -53,6 +57,8 @@ export class AnswersListImporterComponent implements OnInit {
     public dialog: MatDialogRef<AnswersListImporterComponent>,
     public otherDialog: MatDialog
   ) {
+    this.selectedRoundAlias;
+
     if (!dialogData) {
       return;
     }

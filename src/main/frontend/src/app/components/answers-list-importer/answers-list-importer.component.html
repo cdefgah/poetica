@@ -7,8 +7,26 @@
   >
     <mat-step [stepControl]="rawSourceTextFormGroup">
       <form>
-        <ng-template matStepLabel>Время отправки и тур</ng-template>
+        <ng-template matStepLabel>Базовая информация</ng-template>
         <table>
+          <tr>
+            <td>
+              <mat-form-field>
+                <mat-label>На какой тур?</mat-label>
+                <mat-select>
+                  <mat-option
+                    *ngFor="
+                      let selectedRoundAlias of allRoundAliases;
+                      index as i
+                    "
+                    [value]="selectedRoundAlias"
+                  >
+                    {{ allRoundTitles[i] }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </tr>
           <tr>
             <td>
               <mat-form-field>
@@ -17,11 +35,9 @@
                   matSuffix
                   [for]="emailSentOnDatePicker"
                   name="emailSentOnDate"
+                  placeholder="Дата отправки"
                 ></mat-datepicker-toggle>
-                <mat-datepicker
-                  #emailSentOnDatePicker
-                  [startAt]="emailSentOnDate"
-                ></mat-datepicker>
+                <mat-datepicker #emailSentOnDatePicker></mat-datepicker>
               </mat-form-field>
             </td>
           </tr>
