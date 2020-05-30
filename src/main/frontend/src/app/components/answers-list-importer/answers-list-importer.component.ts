@@ -15,7 +15,6 @@ import { FormControl } from "@angular/forms";
   styleUrls: ["./answers-list-importer.component.css"],
 })
 export class AnswersListImporterComponent implements OnInit {
-  rawSourceTextFormGroup: any;
   foundError: string = "";
   dataIsReadyForImport: boolean;
 

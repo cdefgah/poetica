@@ -5,7 +5,7 @@
     (selectionChange)="onStepChange($event)"
     #stepper
   >
-    <mat-step [stepControl]="rawSourceTextFormGroup">
+    <mat-step>
       <form>
         <ng-template matStepLabel>Базовая информация</ng-template>
         <table>
@@ -13,7 +13,7 @@
             <td>
               <mat-form-field>
                 <mat-label>На какой тур?</mat-label>
-                <mat-select>
+                <mat-select required>
                   <mat-option
                     *ngFor="
                       let selectedRoundAlias of allRoundAliases;
@@ -31,7 +31,11 @@
             <td>
               <mat-form-field>
                 <mat-label>Дата отправки письма</mat-label>
-                <input matInput [matDatepicker]="emailSentOnDatePicker" />
+                <input
+                  matInput
+                  [matDatepicker]="emailSentOnDatePicker"
+                  required
+                />
                 <mat-datepicker-toggle
                   matSuffix
                   [for]="emailSentOnDatePicker"
@@ -43,8 +47,8 @@
             </td>
             <td>
               <mat-form-field>
-                <mat-label>Час отправки</mat-label>
-                <mat-select>
+                <mat-label>Час отправки письма</mat-label>
+                <mat-select required>
                   <mat-option
                     *ngFor="let hourOption of hourOptions"
                     [value]="hourOption"
@@ -55,8 +59,8 @@
               </mat-form-field>
               :
               <mat-form-field>
-                <mat-label>Минута отправки</mat-label>
-                <mat-select>
+                <mat-label>Минута отправки письма</mat-label>
+                <mat-select required>
                   <mat-option
                     *ngFor="let minuteOption of minuteOptions"
                     [value]="minuteOption"
@@ -75,7 +79,7 @@
       </form>
     </mat-step>
 
-    <mat-step [stepControl]="rawSourceTextFormGroup">
+    <mat-step>
       <mat-tab-group>
         <mat-tab label="Текст письма">
           <form>
@@ -83,7 +87,7 @@
             <table>
               <tr>
                 <td>
-                  <mat-form-field appearance="outline">
+                  <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Тема письма</mat-label>
                     <input
                       matInput
@@ -119,10 +123,73 @@
             </div>
           </form>
         </mat-tab>
-        <mat-tab label="Описание формата"> </mat-tab>
+        <mat-tab label="Описание формата для писем с ответами">
+          <div class="table-container">
+            <p>
+              Для удобства обработки ответов дежурной бригадой ответы должны
+              быть посланы с&nbsp;соблюдением следующих правил:
+            </p>
+            <p>1. В&nbsp;Subject-е письма должна обязательно стоять фраза:</p>
+            <p class="sample-one-line-text">
+              Ответы команды &laquo;название команды&raquo;, регистрационный
+              номер команды (предвар./основн.)
+            </p>
+            <p>
+              Название команды обязательно должно быть взято в&nbsp;кавычки.
+              НАСТОЯТЕЛЬНО рекомендуется писать Subject в&nbsp;translite, ибо
+              не&nbsp;все почтовые клиенты понимают кириллицу в&nbsp;Subject-е.
+            </p>
+            <p>Пример:</p>
+            <p class="sample-one-line-text">
+              Otvety komandy &laquo;Nedotepy&raquo;, 666 (osnovn.)
+            </p>
+            <p>
+              2. Собственно ответы должны начинаться со&nbsp;служебной строки:
+            </p>
+            <p class="sample-one-line-text">
+              *** &laquo;название команды&raquo;, регистрационный номер команды
+            </p>
+            <p>
+              Название и&nbsp;регистрационный номер обязательно должны совпадать
+              с&nbsp;указанными в&nbsp;теме письма (Subject-е).
+            </p>
+            <p>Вот так, например:</p>
+            <p class="sample-one-line-text">
+              *** &laquo;Недотепы&raquo;, 666
+            </p>
+            <p>
+              До&nbsp;этой служебной строки могут идти строки
+              с&nbsp;произвольным текстом. Но&nbsp;после этой строки должна идти
+              информация об&nbsp;ответах.
+            </p>
+            <p>
+              3. Каждый ответ начинается с&nbsp;новой строки. Перед ответом
+              обязательно проставляется знак &laquo;#&raquo;, номер бескрылки
+              и&nbsp;точка. Вот так, например:
+            </p>
+            <p class="sample-one-line-text">
+              #19. Я помню чудное мгновенье
+            </p>
+            <p>Ответ может продолжаться и на следующей строчке.</p>
+            <p>
+              Если вы&nbsp;хотите неофициально прокомментировать ваш ответ или
+              дать частную версию, напишите ее&nbsp;после знака &laquo;%&raquo;.
+              Вот так, например:
+            </p>
+            <p class="sample-one-line-text">
+              #19. Я&nbsp;помню чудное мгновенье %&nbsp;Частная версия: Люблю
+              тебя, Петра творенье
+            </p>
+            <p>
+              После ответов обязательно поставьте разделитель:
+            </p>
+            <p class="sample-one-line-text">***</p>
+            <p>После разделителя вы&nbsp;можете дальше писать что угодно.</p>
+          </div>
+        </mat-tab>
       </mat-tab-group>
     </mat-step>
-    <mat-step [stepControl]="rawSourceTextFormGroup">
+    <mat-step>
       <form>
         <ng-template matStepLabel
           >Предварительный просмотр и импорт</ng-template

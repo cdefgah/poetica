@@ -1,3 +1,15 @@
-.round-selection-field {
+.full-width {
   width: 100%;
+}
+
+.table-container {
+  margin-top: 5px;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.sample-one-line-text {
+  font-family: sans-serif;
+  font-style: italic;
+  font-weight: bold;
 }
