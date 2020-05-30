@@ -51,6 +51,11 @@ export class AnswersListImporterComponent implements OnInit {
     return dialogConfig;
   }
 
+  hourOptions: string[] = AnswersListImporterComponent.generateClockOptions(23);
+  minuteOptions: string[] = AnswersListImporterComponent.generateClockOptions(
+    59
+  );
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private http: HttpClient,
@@ -62,6 +67,17 @@ export class AnswersListImporterComponent implements OnInit {
     if (!dialogData) {
       return;
     }
+  }
+
+  private static generateClockOptions(maxValue): any {
+    var result: string[] = [];
+    var element: string;
+    for (let i = 0; i <= maxValue; i++) {
+      element = i < 10 ? "0" : "";
+      result.push(element + i);
+    }
+
+    return result;
   }
 
   ngOnInit(): void {}

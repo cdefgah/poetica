@@ -30,6 +30,7 @@
           <tr>
             <td>
               <mat-form-field>
+                <mat-label>Дата отправки письма</mat-label>
                 <input matInput [matDatepicker]="emailSentOnDatePicker" />
                 <mat-datepicker-toggle
                   matSuffix
@@ -38,6 +39,31 @@
                   placeholder="Дата отправки"
                 ></mat-datepicker-toggle>
                 <mat-datepicker #emailSentOnDatePicker></mat-datepicker>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field>
+                <mat-label>Час отправки</mat-label>
+                <mat-select>
+                  <mat-option
+                    *ngFor="let hourOption of hourOptions"
+                    [value]="hourOption"
+                  >
+                    {{ hourOption }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              :
+              <mat-form-field>
+                <mat-label>Минута отправки</mat-label>
+                <mat-select>
+                  <mat-option
+                    *ngFor="let minuteOption of minuteOptions"
+                    [value]="minuteOption"
+                  >
+                    {{ minuteOption }}
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
             </td>
           </tr>
