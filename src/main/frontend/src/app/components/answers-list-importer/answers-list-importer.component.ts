@@ -7,7 +7,6 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
-import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -15,6 +14,13 @@ import { FormControl } from "@angular/forms";
   styleUrls: ["./answers-list-importer.component.css"],
 })
 export class AnswersListImporterComponent implements OnInit {
+  private static readonly CONSTRAINTS_ALL = "all-constraints";
+  private static readonly CONSTRAINTS_EMAIL = "email-constraints";
+  private static readonly CONSTRAINTS_ANSWER = "answer-constraints";
+
+  answerConstraints: Map<string, number>;
+  emailConstraints: Map<string, number>;
+
   foundError: string = "";
   dataIsReadyForImport: boolean;
 
@@ -27,7 +33,8 @@ export class AnswersListImporterComponent implements OnInit {
   selectedRoundAlias: string;
 
   static getDialogConfigWithData(
-    answerAndEmailModelConstraints: Map<string, string>
+    emailModelConstraints: Map<string, string>,
+    answerModelConstraints: Map<string, string>
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
@@ -36,16 +43,18 @@ export class AnswersListImporterComponent implements OnInit {
     dialogConfig.width = "62%";
 
     dialogConfig.data = new Map<string, any>();
-    var constraints = new Map<string, number>();
+    var constraints = new Map<string, Map<string, number>>();
 
-    for (let key in answerAndEmailModelConstraints) {
-      let stringConstraintsValue = answerAndEmailModelConstraints[key];
-      constraints[key] = parseInt(stringConstraintsValue);
-    }
+    constraints[
+      AnswersListImporterComponent.CONSTRAINTS_EMAIL
+    ] = emailModelConstraints;
+    constraints[
+      AnswersListImporterComponent.CONSTRAINTS_ANSWER
+    ] = answerModelConstraints;
 
-    //    dialogConfig.data[
-    //      QuestionsListImporterComponent.KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS
-    //    ] = constraints;
+    dialogConfig.data[
+      AnswersListImporterComponent.CONSTRAINTS_ALL
+    ] = constraints;
 
     return dialogConfig;
   }
@@ -66,6 +75,28 @@ export class AnswersListImporterComponent implements OnInit {
     if (!dialogData) {
       return;
     }
+
+    var allConstraints =
+      dialogData[AnswersListImporterComponent.CONSTRAINTS_ALL];
+
+    this.emailConstraints = AnswersListImporterComponent.convertMap(
+      allConstraints[AnswersListImporterComponent.CONSTRAINTS_EMAIL]
+    );
+
+    this.answerConstraints = AnswersListImporterComponent.convertMap(
+      allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
+    );
+  }
+
+  private static convertMap(
+    sourceMap: Map<string, string>
+  ): Map<string, number> {
+    var constraints = new Map<string, number>();
+    for (let key in sourceMap) {
+      let stringConstraintsValue = sourceMap[key];
+      constraints[key] = parseInt(stringConstraintsValue);
+    }
+    return constraints;
   }
 
   private static generateClockOptions(maxValue): any {

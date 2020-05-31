@@ -29,20 +29,10 @@ export class QuestionsImporter extends AbstractDataImporter {
     this.amountOfGradedQuestions = this.loadGradedQuestionsQty();
 
     this.questions = [];
-    do {
-      var question = this.nextQuestion();
-
-      if (question != null) {
-        console.log(
-          "======================= QUESTION START ====================="
-        );
-        console.log(question.toString());
-        console.log(
-          "======================= QUESTION END ====================="
-        );
-        this.questions.push(question);
-      }
-    } while (question != null);
+    var question: Question;
+    while ((question = this.nextQuestion()) != null) {
+      this.questions.push(question);
+    }
   }
 
   private loadGradedQuestionsQty(): number {

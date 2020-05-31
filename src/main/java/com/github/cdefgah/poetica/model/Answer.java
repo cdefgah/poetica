@@ -1,6 +1,10 @@
 package com.github.cdefgah.poetica.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -9,6 +13,25 @@ import java.util.Objects;
 @Entity
 @Table(name = "Answers")
 public final class Answer {
+
+    private static class ModelConstraints {
+        static final int MAX_BODY_LENGTH = 1024;
+        static final int MAX_COMMENT_LENGTH = 256;
+    }
+
+    private static final Map<String, String> modelConstraintsMap;
+
+    static
+    {
+        final Map<String, String> localConstraintsMap = new HashMap<>();
+        localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
+        localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
+        modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
+    }
+
+    public static Map<String, String> getModelConstraintsMap() {
+        return modelConstraintsMap;
+    }
 
     /**
      * Уникальный идентификатор ответа, для связи между таблицами.
@@ -47,13 +70,15 @@ public final class Answer {
     /**
      * Содержимое ответа.
      */
-    @Column(length = 1024, nullable = false)
+    @Column(length = ModelConstraints.MAX_BODY_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_BODY_LENGTH)
     private String body;
 
     /**
      * Комментарий к ответу, данный ответившей командой.
      */
-    @Column(length = 256, nullable = true)
+    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH, nullable = true)
+    @Size(max = ModelConstraints.MAX_COMMENT_LENGTH)
     private String comment;
 
     /**
@@ -63,4 +88,59 @@ public final class Answer {
     @Enumerated(EnumType.STRING)
     private Grade grade = Grade.None;
 
+    public Long getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
+    }
+
+    public Long getEmailId() {
+        return emailId;
+    }
+
+    public void setEmailId(Long emailId) {
+        this.emailId = emailId;
+    }
+
+    public boolean isFirstRoundAnswer() {
+        return isFirstRoundAnswer;
+    }
+
+    public void setFirstRoundAnswer(boolean firstRoundAnswer) {
+        isFirstRoundAnswer = firstRoundAnswer;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Grade getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Grade grade) {
+        this.grade = grade;
+    }
 }

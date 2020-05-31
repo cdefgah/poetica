@@ -24,7 +24,9 @@ export class AnswersListComponent implements OnInit {
     "Окончательный тур",
   ];
 
-  modelConstraints: Map<string, string>;
+  emailModelConstraints: Map<string, string>;
+
+  answerModelConstraints: Map<string, string>;
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
@@ -46,6 +48,22 @@ export class AnswersListComponent implements OnInit {
     "processedOn",
     "numbersOfAnsweredQuestions",
   ];
+
+  loadEmailModelConstraints() {
+    var url: string = "/emails/model-constraints";
+    this.http.get(url).subscribe(
+      (data: Map<string, string>) => (this.emailModelConstraints = data),
+      (error) => this.displayErrorMessage(error)
+    );
+  }
+
+  loadAnswerModelConstraints() {
+    var url: string = "/answers/model-constraints";
+    this.http.get(url).subscribe(
+      (data: Map<string, string>) => (this.answerModelConstraints = data),
+      (error) => this.displayErrorMessage(error)
+    );
+  }
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
     this.loadTeamsList();

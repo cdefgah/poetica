@@ -2,6 +2,7 @@
  * Модель данных ответа на вопрос (бескрылку).
  */
 export class Answer {
+  emailId: number;
   questionId: number;
   roundNumber: number;
 
@@ -22,7 +23,7 @@ export class Answer {
 
   /**
    * Конструктор класса.
-   * @param questionNumber уникальный номер вопроса (бескрылки).
+   * @param questionNumber уникальный номер задания (бескрылки).
    * @param body содержимое ответа.
    * @param comment необязательный комментарий.
    */
