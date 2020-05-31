@@ -21,7 +21,7 @@ export class AnswersListImporterComponent implements OnInit {
   answerConstraints: Map<string, number>;
   emailConstraints: Map<string, number>;
 
-  foundError: string = "";
+  foundErrors: string[];
   dataIsReadyForImport: boolean;
 
   emailSentOnDate: any;
@@ -114,10 +114,32 @@ export class AnswersListImporterComponent implements OnInit {
 
   ImportAnswers() {}
 
-  private processEmailDateTimeAndRoundNumber() {
-    console.log("*******************************************");
-    console.log("****** PROCESSING EMAIL DATE AND TIME *****");
-    console.log("*******************************************");
+  private processRoundNumberAndEmailDateTime() {
+    this.foundErrors = [];
+    this.dataIsReadyForImport = false;
+    console.log("*** PROCESSING ROUND NUMBER AND DATE TIME **********");
+
+    if (this.emailSentOnDate) {
+      console.log("this.emailSentOnDate = " + this.emailSentOnDate);
+
+      var day = this.emailSentOnDate.getDate();
+      var month = this.emailSentOnDate.getMonth() + 1; // месяц считается с 1 до 12
+      var year = this.emailSentOnDate.getFullYear();
+
+      console.log("---------------------");
+      console.log("day: " + day);
+      console.log("month: " + month);
+      console.log("year: " + year);
+      console.log("---------------------");
+
+      // тут собираем строку: "DD.MM.YYYY HH:MM" и фигачим её на сервер.
+      // для чтения даты и времени и отображения на экране
+      // https://stackoverflow.com/questions/11722790/how-to-convert-javascript-date-to-date-in-java
+    } else {
+      console.log("ERROR: EMAIL DATE IS NOT SET");
+      this.foundErrors.push("Не указана дата отправки письма");
+    }
+    console.log("***************************************************");
   }
 
   private processEmailSourceText() {
@@ -128,11 +150,10 @@ export class AnswersListImporterComponent implements OnInit {
 
   onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
-      this.processEmailDateTimeAndRoundNumber();
-      this.dataIsReadyForImport = false;
+      this.processRoundNumberAndEmailDateTime();
     } else if (event.previouslySelectedIndex == 1) {
       this.processEmailSourceText();
-      this.dataIsReadyForImport = this.foundError.length == 0;
+      this.dataIsReadyForImport = this.foundErrors.length == 0;
     }
   }
 

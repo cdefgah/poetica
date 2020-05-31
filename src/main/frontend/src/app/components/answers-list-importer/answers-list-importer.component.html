@@ -34,12 +34,14 @@
                 <input
                   matInput
                   [matDatepicker]="emailSentOnDatePicker"
+                  [(ngModel)]="emailSentOnDate"
+                  name="emailSentOnDate"
                   required
                 />
                 <mat-datepicker-toggle
                   matSuffix
                   [for]="emailSentOnDatePicker"
-                  name="emailSentOnDate"
+                  name="sentOnDatePicker"
                   placeholder="Дата отправки"
                 ></mat-datepicker-toggle>
                 <mat-datepicker #emailSentOnDatePicker></mat-datepicker>
@@ -230,7 +232,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
 
         <ng-template #errorsBlock>
           <div>
-            {{ foundError }}
+            {{ foundErrors }}
           </div>
         </ng-template>
 

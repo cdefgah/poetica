@@ -66,6 +66,8 @@ export class AnswersListComponent implements OnInit {
   }
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
+    this.loadEmailModelConstraints();
+    this.loadAnswerModelConstraints();
     this.loadTeamsList();
     this.loadAnswersList();
   }
@@ -74,7 +76,8 @@ export class AnswersListComponent implements OnInit {
 
   ImportAnswers() {
     const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
-      this.modelConstraints
+      this.emailModelConstraints,
+      this.answerModelConstraints
     );
     var dialogRef = this.dialog.open(
       AnswersListImporterComponent,
