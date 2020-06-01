@@ -24,7 +24,12 @@ export class AnswersListImporterComponent implements OnInit {
   foundErrors: string[];
   dataIsReadyForImport: boolean;
 
+  selectedRoundNumber: string;
+
   emailSentOnDate: any;
+  emailSentOnHour: string;
+  emailSentOnMinute: string;
+
   emailSubject: string;
   emailBody: string;
 
@@ -118,23 +123,45 @@ export class AnswersListImporterComponent implements OnInit {
     this.foundErrors = [];
     this.dataIsReadyForImport = false;
     console.log("*** PROCESSING ROUND NUMBER AND DATE TIME **********");
+    if (this.selectedRoundNumber) {
+      console.log("ROUND NUMBER: " + this.selectedRoundNumber);
+    } else {
+      console.log("**** ERROR: Round number is not specified!");
+      this.foundErrors.push(
+        "Не указано на какой раунд (тур) прислано письмо. Предварительный или основной."
+      );
+    }
 
     if (this.emailSentOnDate) {
       console.log("this.emailSentOnDate = " + this.emailSentOnDate);
 
       var day = this.emailSentOnDate.getDate();
-      var month = this.emailSentOnDate.getMonth() + 1; // месяц считается с 1 до 12
+      var month = this.emailSentOnDate.getMonth();
       var year = this.emailSentOnDate.getFullYear();
 
-      console.log("---------------------");
-      console.log("day: " + day);
-      console.log("month: " + month);
-      console.log("year: " + year);
-      console.log("---------------------");
+      if (!this.emailSentOnHour) {
+        this.emailSentOnHour = "0";
+      }
 
-      // тут собираем строку: "DD.MM.YYYY HH:MM" и фигачим её на сервер.
-      // для чтения даты и времени и отображения на экране
-      // https://stackoverflow.com/questions/11722790/how-to-convert-javascript-date-to-date-in-java
+      if (!this.emailSentOnMinute) {
+        this.emailSentOnMinute = "0";
+      }
+
+      var compoundDate = new Date(
+        year,
+        month,
+        day,
+        parseInt(this.emailSentOnHour),
+        parseInt(this.emailSentOnMinute),
+        0,
+        0
+      );
+
+      // отправляем compoundDate на сервер и строим там java-Date
+      // new Date(compoundDate);
+      console.log("**********************");
+      console.log("compound date: " + compoundDate.getTime());
+      console.log("**********************");
     } else {
       console.log("ERROR: EMAIL DATE IS NOT SET");
       this.foundErrors.push("Не указана дата отправки письма");

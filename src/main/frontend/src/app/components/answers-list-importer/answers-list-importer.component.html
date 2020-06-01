@@ -13,7 +13,11 @@
             <td>
               <mat-form-field>
                 <mat-label>На какой тур?</mat-label>
-                <mat-select required>
+                <mat-select
+                  required
+                  name="selectedRoundNumber"
+                  [(ngModel)]="selectedRoundNumber"
+                >
                   <mat-option
                     *ngFor="
                       let selectedRoundAlias of allRoundAliases;
@@ -50,7 +54,11 @@
             <td>
               <mat-form-field>
                 <mat-label>Час отправки письма</mat-label>
-                <mat-select required>
+                <mat-select
+                  required
+                  name="emailSentOnHour"
+                  [(ngModel)]="emailSentOnHour"
+                >
                   <mat-option
                     *ngFor="let hourOption of hourOptions"
                     [value]="hourOption"
@@ -62,7 +70,11 @@
               :
               <mat-form-field>
                 <mat-label>Минута отправки письма</mat-label>
-                <mat-select required>
+                <mat-select
+                  required
+                  name="emailSentOnMinute"
+                  [(ngModel)]="emailSentOnMinute"
+                >
                   <mat-option
                     *ngFor="let minuteOption of minuteOptions"
                     [value]="minuteOption"
