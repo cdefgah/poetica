@@ -24,6 +24,8 @@ export class AnswersListComponent implements OnInit {
     "Окончательный тур",
   ];
 
+  teamModelConstraints: Map<string, string>;
+
   emailModelConstraints: Map<string, string>;
 
   answerModelConstraints: Map<string, string>;
@@ -49,6 +51,17 @@ export class AnswersListComponent implements OnInit {
     "numbersOfAnsweredQuestions",
   ];
 
+  loadOneTeamModelConstraints() {
+    var url: string = "/teams/model-constraints";
+    this.http.get(url).subscribe(
+      (data: Map<string, string>) => {
+        this.teamModelConstraints = data;
+        Team.initializeRegexpValidator(this.teamModelConstraints);
+      },
+      (error) => this.displayErrorMessage(error)
+    );
+  }
+
   loadEmailModelConstraints() {
     var url: string = "/emails/model-constraints";
     this.http.get(url).subscribe(
@@ -66,6 +79,7 @@ export class AnswersListComponent implements OnInit {
   }
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
+    this.loadOneTeamModelConstraints();
     this.loadEmailModelConstraints();
     this.loadAnswerModelConstraints();
     this.loadTeamsList();
@@ -76,6 +90,7 @@ export class AnswersListComponent implements OnInit {
 
   ImportAnswers() {
     const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
+      this.teamModelConstraints,
       this.emailModelConstraints,
       this.answerModelConstraints
     );

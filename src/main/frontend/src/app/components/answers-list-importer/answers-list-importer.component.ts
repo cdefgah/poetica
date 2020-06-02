@@ -15,6 +15,7 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
 })
 export class AnswersListImporterComponent implements OnInit {
   private static readonly CONSTRAINTS_ALL = "all-constraints";
+  private static readonly CONSTRAINTS_TEAM = "team-constraints";
   private static readonly CONSTRAINTS_EMAIL = "email-constraints";
   private static readonly CONSTRAINTS_ANSWER = "answer-constraints";
 
@@ -38,6 +39,7 @@ export class AnswersListImporterComponent implements OnInit {
   selectedRoundAlias: string;
 
   static getDialogConfigWithData(
+    teamModelConstraints: Map<string, string>,
     emailModelConstraints: Map<string, string>,
     answerModelConstraints: Map<string, string>
   ): MatDialogConfig {
@@ -49,6 +51,10 @@ export class AnswersListImporterComponent implements OnInit {
 
     dialogConfig.data = new Map<string, any>();
     var constraints = new Map<string, Map<string, number>>();
+
+    constraints[
+      AnswersListImporterComponent.CONSTRAINTS_TEAM
+    ] = teamModelConstraints;
 
     constraints[
       AnswersListImporterComponent.CONSTRAINTS_EMAIL
