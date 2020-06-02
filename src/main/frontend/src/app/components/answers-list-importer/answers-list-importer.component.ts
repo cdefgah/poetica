@@ -75,11 +75,11 @@ export class AnswersListImporterComponent implements OnInit {
     public dialog: MatDialogRef<AnswersListImporterComponent>,
     public otherDialog: MatDialog
   ) {
-    this.selectedRoundAlias;
-
     if (!dialogData) {
       return;
     }
+
+    this.initializeDateHourAndMinuteSelectors();
 
     var allConstraints =
       dialogData[AnswersListImporterComponent.CONSTRAINTS_ALL];
@@ -91,6 +91,20 @@ export class AnswersListImporterComponent implements OnInit {
     this.answerConstraints = AnswersListImporterComponent.convertMap(
       allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
     );
+  }
+
+  private initializeDateHourAndMinuteSelectors() {
+    var currentDate: Date = new Date();
+    var currentHour = currentDate.getHours();
+    var currentMinute = currentDate.getMinutes();
+
+    var currentHourString: string = (currentHour < 10 ? "0" : "") + currentHour;
+    var currentMinuteString: string =
+      (currentMinute < 10 ? "0" : "") + currentMinute;
+
+    this.emailSentOnDate = currentDate;
+    this.emailSentOnHour = currentHourString;
+    this.emailSentOnMinute = currentMinuteString;
   }
 
   private static convertMap(
@@ -120,8 +134,6 @@ export class AnswersListImporterComponent implements OnInit {
   ImportAnswers() {}
 
   private processRoundNumberAndEmailDateTime() {
-    this.foundErrors = [];
-    this.dataIsReadyForImport = false;
     console.log("*** PROCESSING ROUND NUMBER AND DATE TIME **********");
     if (this.selectedRoundNumber) {
       console.log("ROUND NUMBER: " + this.selectedRoundNumber);
@@ -177,9 +189,11 @@ export class AnswersListImporterComponent implements OnInit {
 
   onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
-      this.processRoundNumberAndEmailDateTime();
-    } else if (event.previouslySelectedIndex == 1) {
+      this.foundErrors = [];
+      this.dataIsReadyForImport = false;
       this.processEmailSourceText();
+    } else if (event.previouslySelectedIndex == 1) {
+      this.processRoundNumberAndEmailDateTime();
       this.dataIsReadyForImport = this.foundErrors.length == 0;
     }
   }
