@@ -122,7 +122,7 @@ export class QuestionsListImporterComponent implements OnInit {
     }
   }
 
-  private processSourceText() {
+  private processSourceText(): void {
     try {
       var questionsImporter = new QuestionsImporter(
         this.sourceText,

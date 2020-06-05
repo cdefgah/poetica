@@ -7,6 +7,7 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { AnswersImporter } from "./utils/AnswersImporter";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -21,6 +22,7 @@ export class AnswersListImporterComponent implements OnInit {
 
   answerConstraints: Map<string, number>;
   emailConstraints: Map<string, number>;
+  teamConstraints: Map<string, number>;
 
   foundErrors: string[];
   dataIsReadyForImport: boolean;
@@ -97,6 +99,10 @@ export class AnswersListImporterComponent implements OnInit {
     this.answerConstraints = AnswersListImporterComponent.convertMap(
       allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
     );
+
+    this.teamConstraints = AnswersListImporterComponent.convertMap(
+      allConstraints[AnswersListImporterComponent.CONSTRAINTS_TEAM]
+    );
   }
 
   private initializeDateHourAndMinuteSelectors() {
@@ -124,7 +130,7 @@ export class AnswersListImporterComponent implements OnInit {
     return constraints;
   }
 
-  private static generateClockOptions(maxValue): any {
+  private static generateClockOptions(maxValue: number): any {
     var result: string[] = [];
     var element: string;
     for (let i = 0; i <= maxValue; i++) {
@@ -138,6 +144,25 @@ export class AnswersListImporterComponent implements OnInit {
   ngOnInit(): void {}
 
   ImportAnswers() {}
+
+  private processEmailSourceText() {
+    console.log("++++++++++++++++++++++++++++++++++++++++++++");
+    console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
+    console.log("++++++++++++++++++++++++++++++++++++++++++++");
+
+    var answersImporter: AnswersImporter = new AnswersImporter(
+      this.emailSubject,
+      this.emailBody,
+      this.teamConstraints,
+      this.emailConstraints,
+      this.answerConstraints
+    );
+
+    answersImporter.parse();
+    console.log("*******************************************");
+    console.log("*********** PROCESSING EMAIL DONE**********");
+    console.log("*******************************************");
+  }
 
   private processRoundNumberAndEmailDateTime() {
     console.log("*** PROCESSING ROUND NUMBER AND DATE TIME **********");
@@ -185,12 +210,6 @@ export class AnswersListImporterComponent implements OnInit {
       this.foundErrors.push("Не указана дата отправки письма");
     }
     console.log("***************************************************");
-  }
-
-  private processEmailSourceText() {
-    console.log("++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++");
   }
 
   onStepChange(event: any) {
