@@ -11,6 +11,7 @@ export class AnswersImporter extends AbstractDataImporter {
   private emailSubject: string;
 
   private teamInfoFromEmailSubject: Team;
+  private teamInfoFromEmailBody: Team;
 
   constructor(
     emailSubject: string,
@@ -200,5 +201,56 @@ export class AnswersImporter extends AbstractDataImporter {
     return processedSubject;
   }
 
-  private parseEmailBody(): void {}
+  /**
+   * Проматывает указатель итератора на начало блока ответов
+   * и возвращает её.
+   * @returns первая строка блока ответов, из которой исключён префикс в три звёздочки.
+   */
+  private getTheFirstLineOfAnswersBlock(): string {
+    const answersBlockPrefix: string = "***";
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      var oneLine = this.sourceTextLinesIterator.nextLine();
+      if (oneLine.startsWith(answersBlockPrefix)) {
+        return oneLine.substring(answersBlockPrefix.length + 1).trim();
+      }
+    }
+
+    throw new Error("В теле письма не обнаружен признак начала блока ответов.");
+  }
+
+  private static processFirstLineOfTheAnswersBlock(firstLine: string): Team {
+    var foundTeamTitle: string = "";
+    var foundTeamNumber: string = "";
+
+    if (firstLine.indexOf(",") !== -1) {
+      var firstLineParts = firstLine.split(",");
+      foundTeamTitle = firstLineParts[0].trim();
+      foundTeamNumber = firstLineParts[1].trim();
+    } else {
+      foundTeamTitle = firstLine;
+    }
+
+    foundTeamTitle = AnswersImporter.removeDoubleQuotations(foundTeamTitle);
+
+    return new Team(foundTeamNumber, foundTeamTitle);
+  }
+
+  private parseEmailBody(): void {
+    console.log("=== EMAIL BODY PARSING METHOD START ===");
+    var firstLineFromAnswersBlock: string = this.getTheFirstLineOfAnswersBlock();
+
+    console.log("--- firstLineFromAnswersBlock start --- ");
+    console.log("|" + firstLineFromAnswersBlock + "|");
+    console.log("--- firstLineFromAnswersBlock end --- ");
+
+    this.teamInfoFromEmailBody = AnswersImporter.processFirstLineOfTheAnswersBlock(
+      firstLineFromAnswersBlock
+    );
+
+    console.log("************ team info ******************");
+    console.log("title: " + this.teamInfoFromEmailBody.title);
+    console.log("number: " + this.teamInfoFromEmailBody.number);
+    console.log("************ ********* ******************");
+    console.log("=== EMAIL BODY PARSING METHOD END ===");
+  }
 }
