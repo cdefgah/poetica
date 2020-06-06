@@ -1,5 +1,6 @@
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { Team } from "src/app/model/Team";
+import { AnswersImporterParameters } from "./AnswersImporterParameters";
 
 export class AnswersImporter extends AbstractDataImporter {
   private teamModelConstraints: Map<string, number>;
@@ -13,19 +14,13 @@ export class AnswersImporter extends AbstractDataImporter {
   private teamInfoFromEmailSubject: Team;
   private teamInfoFromEmailBody: Team;
 
-  constructor(
-    emailSubject: string,
-    emailBody: string,
-    teamModelConstraints: Map<string, number>,
-    emailModelConstraints: Map<string, number>,
-    answerModelConstraints: Map<string, number>
-  ) {
-    super(emailBody);
-    this.emailSubject = AnswersImporter.normalizeString(emailSubject);
+  constructor(paremters: AnswersImporterParameters) {
+    super(paremters.emailBody);
+    this.emailSubject = AnswersImporter.normalizeString(paremters.emailSubject);
 
-    this.teamModelConstraints = teamModelConstraints;
-    this.emailModelConstraints = emailModelConstraints;
-    this.answerModelConstraints = answerModelConstraints;
+    this.teamModelConstraints = paremters.teamModelConstraints;
+    this.emailModelConstraints = paremters.emailModelConstraints;
+    this.answerModelConstraints = paremters.answerModelConstraints;
   }
 
   public parse(): void {

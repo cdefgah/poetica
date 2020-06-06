@@ -8,6 +8,7 @@ import {
 } from "@angular/material/dialog";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { AnswersImporter } from "./utils/AnswersImporter";
+import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -150,13 +151,15 @@ export class AnswersListImporterComponent implements OnInit {
     console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
     console.log("++++++++++++++++++++++++++++++++++++++++++++");
 
-    var answersImporter: AnswersImporter = new AnswersImporter(
-      this.emailSubject,
-      this.emailBody,
-      this.teamConstraints,
-      this.emailConstraints,
-      this.answerConstraints
-    );
+    var parameters: AnswersImporterParameters = new AnswersImporterParameters();
+    parameters.http = this.http; // нужно для проверок в базе через REST API
+    parameters.emailSubject = this.emailSubject;
+    parameters.emailBody = this.emailBody;
+    parameters.teamModelConstraints = this.teamConstraints;
+    parameters.emailModelConstraints = this.emailConstraints;
+    parameters.answerModelConstraints = this.answerConstraints;
+
+    var answersImporter: AnswersImporter = new AnswersImporter(parameters);
 
     answersImporter.parse();
 

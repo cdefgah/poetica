@@ -4,8 +4,13 @@ export abstract class AbstractDataImporter {
   protected sourceTextLinesIterator: StringLinesIterator;
 
   constructor(sourceString: string) {
+    var string2Process = "";
+    if (sourceString) {
+      string2Process = sourceString;
+    }
+
     var normalizedSourceString = AbstractDataImporter.normalizeString(
-      sourceString
+      string2Process
     );
     this.sourceTextLinesIterator = new StringLinesIterator(
       normalizedSourceString
