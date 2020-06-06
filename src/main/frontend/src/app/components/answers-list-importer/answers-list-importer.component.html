@@ -146,14 +146,12 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
                 <mat-select
                   required
                   name="selectedRoundNumber"
+                  [(value)]="selectedRoundNumber"
                   [(ngModel)]="selectedRoundNumber"
                 >
                   <mat-option
-                    *ngFor="
-                      let selectedRoundAlias of allRoundAliases;
-                      index as i
-                    "
-                    [value]="selectedRoundAlias"
+                    *ngFor="let roundAliasOption of allRoundAliases; index as i"
+                    [value]="roundAliasOption"
                   >
                     {{ allRoundTitles[i] }}
                   </mat-option>

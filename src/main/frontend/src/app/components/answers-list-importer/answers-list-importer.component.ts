@@ -27,7 +27,8 @@ export class AnswersListImporterComponent implements OnInit {
   foundErrors: string[];
   dataIsReadyForImport: boolean;
 
-  selectedRoundNumber: string;
+  selectedRoundNumber: string; // используется для хранения выбранного варианта
+  roundAliasOption: string; // используется для формирования списка вариантов
 
   emailSentOnDate: any;
   emailSentOnHour: string;
@@ -38,7 +39,6 @@ export class AnswersListImporterComponent implements OnInit {
 
   allRoundAliases: string[] = ["1", "2"];
   allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
-  selectedRoundAlias: string;
 
   static getDialogConfigWithData(
     teamModelConstraints: Map<string, string>,
@@ -159,6 +159,8 @@ export class AnswersListImporterComponent implements OnInit {
     );
 
     answersImporter.parse();
+
+    this.selectedRoundNumber = answersImporter.getRoundNumber();
     console.log("*******************************************");
     console.log("*********** PROCESSING EMAIL DONE**********");
     console.log("*******************************************");
