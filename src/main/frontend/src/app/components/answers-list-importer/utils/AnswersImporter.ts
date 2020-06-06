@@ -1,4 +1,5 @@
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
+import { Team } from "src/app/model/Team";
 
 export class AnswersImporter extends AbstractDataImporter {
   private teamModelConstraints: Map<string, number>;
@@ -6,10 +7,10 @@ export class AnswersImporter extends AbstractDataImporter {
   private answerModelConstraints: Map<string, number>;
 
   private roundNumber: string;
-  private teamTitle: string;
-  private teamNumber: string;
 
   private emailSubject: string;
+
+  private teamInfoFromEmailSubject: Team;
 
   constructor(
     emailSubject: string,
@@ -35,12 +36,8 @@ export class AnswersImporter extends AbstractDataImporter {
     return this.roundNumber;
   }
 
-  public getTeamTitle(): string {
-    return this.teamTitle;
-  }
-
-  public getTeamNumber(): string {
-    return this.teamNumber;
+  public getTeamFromEmailSubject(): Team {
+    return this.teamInfoFromEmailSubject;
   }
 
   private parseEmailSubject(sourceEmailSubject: string): void {
@@ -54,7 +51,7 @@ export class AnswersImporter extends AbstractDataImporter {
       throw new Error("Некорректный формат темы письма. Нет запятой.");
     }
 
-    this.teamTitle = AnswersImporter.removeDoubleQuotations(
+    var teamTitle = AnswersImporter.removeDoubleQuotations(
       processedSubject.substring(0, commaPosition)
     );
 
@@ -65,12 +62,14 @@ export class AnswersImporter extends AbstractDataImporter {
       foundRoundNumber,
     } = AnswersImporter.extractTeamAndRoundNumbers(afterCommaSubjectPart);
 
-    this.teamNumber = foundTeamNumber;
+    var teamNumber = foundTeamNumber;
+    this.teamInfoFromEmailSubject = new Team(teamTitle, teamNumber);
+
     this.roundNumber = foundRoundNumber;
 
     console.log("=========== SUBJECT PARSING RESULT======================");
-    console.log("teamTitle: " + this.teamTitle);
-    console.log("teamNumber: " + this.teamNumber);
+    console.log("teamTitle: " + this.teamInfoFromEmailSubject.title);
+    console.log("teamNumber: " + this.teamInfoFromEmailSubject.number);
     console.log("roundNumber: " + this.roundNumber);
     console.log("========================================================");
   }

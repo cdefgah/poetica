@@ -37,11 +37,7 @@ export class Team {
    * @param number уникальный номер команды.
    * @param title название команды.
    */
-  constructor(
-    number?: string,
-    title?: string,
-    modelConstraints?: Map<string, string>
-  ) {
+  constructor(number?: string, title?: string) {
     this.number = number ? number : "";
     this.title = title ? title : "";
   }
