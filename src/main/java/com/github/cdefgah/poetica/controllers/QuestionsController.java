@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -35,6 +36,34 @@ public class QuestionsController extends AbstractController {
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/questions/total-amount", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Long> getTotalQuestionsAmount() {
+        TypedQuery<Long> query =
+                entityManager.createQuery("select count(*) FROM Question question", Long.class);
+
+        return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/questions/id-by-number/{questionNumber}",
+                                        method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> getQuestionIdByQuestionNumber(@PathVariable int questionNumber) {
+        TypedQuery<Long> query =
+                entityManager.createQuery("select id FROM Question question WHERE " +
+                        "question.number=:requestedQuestionNumber", Long.class);
+
+        query.setParameter("requestedQuestionNumber", questionNumber);
+
+        try {
+            long foundId = query.getSingleResult();
+            return new ResponseEntity<>(String.valueOf(foundId), HttpStatus.OK);
+
+        } catch(NoResultException noResultException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                    body("Не удалось найти вопрос (бескрылку) " +
+                            "с указанным номером:  " + questionNumber);
+        }
     }
 
     @RequestMapping(path = "/questions/import", method = RequestMethod.POST,
