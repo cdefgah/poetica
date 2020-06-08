@@ -2,7 +2,9 @@ export class StringBuilder {
   private contentLines: string[] = [];
 
   public addString(string: string) {
-    this.contentLines.push(string);
+    if (string && string.length > 0) {
+      this.contentLines.push(string);
+    }
   }
 
   public length(): number {

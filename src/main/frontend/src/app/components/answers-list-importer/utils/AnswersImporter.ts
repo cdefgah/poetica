@@ -263,7 +263,11 @@ export class AnswersImporter extends AbstractDataImporter {
     var commentPrefixLocation: number;
     var processedQuestionNumbers = new Set();
     var previousQuestionNumber: number = -1;
-    while (this.sourceTextLinesIterator.hasNextLine()) {
+    var continueProcessingLines: boolean = true;
+    while (
+      this.sourceTextLinesIterator.hasNextLine() &&
+      continueProcessingLines
+    ) {
       var currentLine = this.sourceTextLinesIterator.nextLine();
 
       if (currentLine.startsWith("#")) {
@@ -311,25 +315,30 @@ export class AnswersImporter extends AbstractDataImporter {
           );
         }
       } else {
-        // если строка НЕ начинается с символа, который знаменует начало ответа
+        if (!currentLine.startsWith("***")) {
+          // если строка НЕ начинается с символа, который знаменует начало ответа
 
-        commentPrefixLocation = currentLine.indexOf(commentPrefix);
+          commentPrefixLocation = currentLine.indexOf(commentPrefix);
 
-        if (commentPrefixLocation !== -1) {
-          // в обрабатываемой строке есть комментарий
-          var onlyAnswerPart: string = currentLine
-            .substring(0, commentPrefixLocation)
-            .trim();
-          wholeAnswer.addString(onlyAnswerPart);
+          if (commentPrefixLocation !== -1) {
+            // в обрабатываемой строке есть комментарий
+            var onlyAnswerPart: string = currentLine
+              .substring(0, commentPrefixLocation)
+              .trim();
+            wholeAnswer.addString(onlyAnswerPart);
 
-          var onlyCommentPart: string = currentLine
-            .substring(commentPrefixLocation + 1)
-            .trim();
+            var onlyCommentPart: string = currentLine
+              .substring(commentPrefixLocation + 1)
+              .trim();
 
-          wholeComment.addString(onlyCommentPart);
+            wholeComment.addString(onlyCommentPart);
+          } else {
+            // в обрабатываемой строке нет комментария
+            wholeAnswer.addString(currentLine);
+          }
         } else {
-          // в обрабатываемой строке нет комментария
-          wholeAnswer.addString(currentLine);
+          // встретился знак конца блока ответов
+          continueProcessingLines = false;
         }
       }
     }
@@ -376,6 +385,9 @@ export class AnswersImporter extends AbstractDataImporter {
 
       previousQuestionNumber = Number(questionNumber);
 
+      // в ответе может быть просто номер с точкой
+      // но не быть ответа (placeholder для читабельности),
+      // в таком случае пустой ответ не регистрируем а пропускаем
       if (wholeAnswer.length() > 0) {
         currentObjectReference.answers.push(
           new Answer(
@@ -383,10 +395,6 @@ export class AnswersImporter extends AbstractDataImporter {
             wholeAnswer.toString(),
             wholeComment.toString()
           )
-        );
-      } else {
-        throw new Error(
-          "По очень загадочной причине тело ответа пусто. Так быть не должно, но так случилось. Свяжитесь, пожалуйста, с разработчиком."
         );
       }
 
