@@ -1,6 +1,8 @@
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { Team } from "src/app/model/Team";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
+import { Answer } from "src/app/model/Answer";
+import { StringBuilder } from "./StringBuilder";
 
 export class AnswersImporter extends AbstractDataImporter {
   private teamModelConstraints: Map<string, number>;
@@ -13,6 +15,8 @@ export class AnswersImporter extends AbstractDataImporter {
 
   private teamInfoFromEmailSubject: Team;
   private teamInfoFromEmailBody: Team;
+
+  private answers: Answer[] = [];
 
   constructor(paremters: AnswersImporterParameters) {
     super(paremters.emailBody);
@@ -231,6 +235,10 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   private parseEmailBody(): void {
+    if (this.answers.length > 0) {
+      this.answers = [];
+    }
+
     console.log("=== EMAIL BODY PARSING METHOD START ===");
     var firstLineFromAnswersBlock: string = this.getTheFirstLineOfAnswersBlock();
 
@@ -246,6 +254,146 @@ export class AnswersImporter extends AbstractDataImporter {
     console.log("title: " + this.teamInfoFromEmailBody.title);
     console.log("number: " + this.teamInfoFromEmailBody.number);
     console.log("************ ********* ******************");
-    console.log("=== EMAIL BODY PARSING METHOD END ===");
+
+    var wholeAnswer: StringBuilder = new StringBuilder();
+    var wholeComment: StringBuilder = new StringBuilder();
+
+    const commentPrefix: string = "%";
+    var questionNumber: string = "";
+    var commentPrefixLocation: number;
+    var processedQuestionNumbers = new Set();
+    var previousQuestionNumber: number = -1;
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      var currentLine = this.sourceTextLinesIterator.nextLine();
+
+      if (currentLine.startsWith("#")) {
+        // если строка начинается с символа, который знаменует начало ответа
+        // сохраняем ранее сформированный ответ и комментарий к нему
+        if (questionNumber.length > 0) {
+          registerAnswer(this);
+        }
+
+        var dotLocation: number = currentLine.indexOf(".");
+        if (dotLocation !== -1) {
+          questionNumber = currentLine.substring(1, dotLocation).trim();
+          if (!AnswersImporter.isPositiveInteger(questionNumber)) {
+            throw new Error(
+              "Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '" +
+                questionNumber +
+                "'"
+            );
+          }
+
+          var firstLineOfTheAnswer: string = currentLine
+            .substring(dotLocation + 1)
+            .trim();
+
+          var firstLineOfTheComment: string;
+          commentPrefixLocation = firstLineOfTheAnswer.indexOf(commentPrefix);
+          if (commentPrefixLocation !== -1) {
+            // комментарий в первой строке представлен
+            firstLineOfTheComment = firstLineOfTheAnswer
+              .substring(commentPrefixLocation + 1)
+              .trim();
+            firstLineOfTheAnswer = firstLineOfTheAnswer
+              .substring(0, commentPrefixLocation)
+              .trim();
+
+            wholeComment.addString(firstLineOfTheComment);
+          }
+
+          wholeAnswer.addString(firstLineOfTheAnswer);
+        } else {
+          throw new Error(
+            "Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '" +
+              currentLine +
+              "'"
+          );
+        }
+      } else {
+        // если строка НЕ начинается с символа, который знаменует начало ответа
+
+        commentPrefixLocation = currentLine.indexOf(commentPrefix);
+
+        if (commentPrefixLocation !== -1) {
+          // в обрабатываемой строке есть комментарий
+          var onlyAnswerPart: string = currentLine
+            .substring(0, commentPrefixLocation)
+            .trim();
+          wholeAnswer.addString(onlyAnswerPart);
+
+          var onlyCommentPart: string = currentLine
+            .substring(commentPrefixLocation + 1)
+            .trim();
+
+          wholeComment.addString(onlyCommentPart);
+        } else {
+          // в обрабатываемой строке нет комментария
+          wholeAnswer.addString(currentLine);
+        }
+      }
+    }
+
+    if (questionNumber.length > 0) {
+      registerAnswer(this);
+    }
+
+    if (this.answers.length == 0) {
+      throw new Error("В содержании письма не представлено ни одного ответа.");
+    }
+    // ================================================================================
+    console.log(" ====== body parsing results start =====");
+
+    this.answers.forEach((oneAnswer) => {
+      console.log("-----------------------------------");
+      console.log("Номер бескрылки: " + oneAnswer.questionNumber);
+      console.log("Тело ответа: " + oneAnswer.body);
+      console.log("Комментарий: " + oneAnswer.comment);
+      console.log("-----------------------------------");
+    });
+
+    console.log(" ====== body parsing results end =====");
+    // ================================ Локальные функции ==============================
+    function registerAnswer(currentObjectReference: AnswersImporter) {
+      if (processedQuestionNumbers.has(questionNumber)) {
+        throw new Error(
+          "Повторяющийся номер бескрылки в блоке ответов: " + questionNumber
+        );
+      }
+
+      if (previousQuestionNumber != -1) {
+        if (Number(questionNumber) <= previousQuestionNumber) {
+          throw new Error(
+            "Номера бескрылок в блоке ответов должны идти в порядке возрастания. А у нас после номера: " +
+              previousQuestionNumber +
+              " идёт номер: " +
+              questionNumber
+          );
+        }
+
+        processedQuestionNumbers.add(questionNumber);
+      }
+
+      previousQuestionNumber = Number(questionNumber);
+
+      if (wholeAnswer.length() > 0) {
+        currentObjectReference.answers.push(
+          new Answer(
+            questionNumber,
+            wholeAnswer.toString(),
+            wholeComment.toString()
+          )
+        );
+      } else {
+        throw new Error(
+          "По очень загадочной причине тело ответа пусто. Так быть не должно, но так случилось. Свяжитесь, пожалуйста, с разработчиком."
+        );
+      }
+
+      questionNumber = "";
+      wholeAnswer.reset();
+      wholeComment.reset();
+    }
+    // =====================================================================================================
   }
 }
