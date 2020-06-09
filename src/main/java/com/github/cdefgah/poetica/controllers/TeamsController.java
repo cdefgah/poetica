@@ -127,6 +127,19 @@ public class TeamsController extends AbstractController {
         }
     }
 
+    @RequestMapping(path = "/teams/numbers/{teamNumber}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Team> getTeamByNumber(@PathVariable String teamNumber) {
+        TypedQuery<Team> query = entityManager.createQuery("select team from Team " +
+                "team where team.number=:teamNumber", Team.class);
+        query.setParameter("teamNumber", teamNumber);
+        final List<Team> foundTeamInfo = query.getResultList();
+        if (foundTeamInfo.size() > 0) {
+            return ResponseEntity.status(HttpStatus.OK).body(foundTeamInfo.get(0));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<String> deleteTeam(@PathVariable  long teamId) {
         if (thisTeamHasNoAnswers(teamId)) {

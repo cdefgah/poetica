@@ -414,7 +414,18 @@ export class AnswersImporter extends AbstractDataImporter {
     // =====================================================================================================
   }
 
-  private validateTeamDataCorrectness(): void {}
+  private validateTeamDataCorrectness(): void {
+    if (
+      this.teamInfoFromEmailSubject.number != this.teamInfoFromEmailBody.number
+    ) {
+      throw new Error(
+        "Номер команды в теме письма: " +
+          this.teamInfoFromEmailSubject.number +
+          " не совпадает с номером команды в содержании письма: " +
+          this.teamInfoFromEmailBody.number
+      );
+    }
+  }
 
   private validateAnswerConstraints(): void {
     const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
