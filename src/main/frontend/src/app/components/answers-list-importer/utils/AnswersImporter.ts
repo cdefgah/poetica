@@ -459,11 +459,11 @@ export class AnswersImporter extends AbstractDataImporter {
     const KEY_MAX_SUBJECT_LENGTH: string = "MAX_SUBJECT_LENGTH";
     const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
 
-    const MAX_SUBJECT_LENGTH: number = this.answerModelConstraints[
+    const MAX_SUBJECT_LENGTH: number = this.emailModelConstraints[
       KEY_MAX_SUBJECT_LENGTH
     ];
 
-    const MAX_BODY_LENGTH: number = this.answerModelConstraints[
+    const MAX_BODY_LENGTH: number = this.emailModelConstraints[
       KEY_MAX_BODY_LENGTH
     ];
 
@@ -473,6 +473,16 @@ export class AnswersImporter extends AbstractDataImporter {
           this.emailSubject.length +
           ") превышает максимально разрешенный размер в " +
           MAX_SUBJECT_LENGTH +
+          " символов"
+      );
+    }
+
+    if (this.emailBody && this.emailBody.length > MAX_BODY_LENGTH) {
+      throw new Error(
+        "Длина содержимого письма (" +
+          this.emailBody.length +
+          ") превышает максимально разрешенный размер в " +
+          MAX_BODY_LENGTH +
           " символов"
       );
     }
