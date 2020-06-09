@@ -17,7 +17,6 @@ import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 })
 export class AnswersListImporterComponent implements OnInit {
   private static readonly CONSTRAINTS_ALL = "all-constraints";
-  private static readonly CONSTRAINTS_TEAM = "team-constraints";
   private static readonly CONSTRAINTS_EMAIL = "email-constraints";
   private static readonly CONSTRAINTS_ANSWER = "answer-constraints";
 
@@ -42,7 +41,6 @@ export class AnswersListImporterComponent implements OnInit {
   allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
 
   static getDialogConfigWithData(
-    teamModelConstraints: Map<string, string>,
     emailModelConstraints: Map<string, string>,
     answerModelConstraints: Map<string, string>
   ): MatDialogConfig {
@@ -54,10 +52,6 @@ export class AnswersListImporterComponent implements OnInit {
 
     dialogConfig.data = new Map<string, any>();
     var constraints = new Map<string, Map<string, number>>();
-
-    constraints[
-      AnswersListImporterComponent.CONSTRAINTS_TEAM
-    ] = teamModelConstraints;
 
     constraints[
       AnswersListImporterComponent.CONSTRAINTS_EMAIL
@@ -73,9 +67,14 @@ export class AnswersListImporterComponent implements OnInit {
     return dialogConfig;
   }
 
-  hourOptions: string[] = AnswersListImporterComponent.generateClockOptions(23);
+  private static readonly MAX_HOURS: number = 23;
+  private static readonly MAX_MINUTES: number = 59;
+
+  hourOptions: string[] = AnswersListImporterComponent.generateClockOptions(
+    AnswersListImporterComponent.MAX_HOURS
+  );
   minuteOptions: string[] = AnswersListImporterComponent.generateClockOptions(
-    59
+    AnswersListImporterComponent.MAX_MINUTES
   );
 
   constructor(
@@ -99,10 +98,6 @@ export class AnswersListImporterComponent implements OnInit {
 
     this.answerConstraints = AnswersListImporterComponent.convertMap(
       allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
-    );
-
-    this.teamConstraints = AnswersListImporterComponent.convertMap(
-      allConstraints[AnswersListImporterComponent.CONSTRAINTS_TEAM]
     );
   }
 
@@ -155,7 +150,6 @@ export class AnswersListImporterComponent implements OnInit {
     parameters.http = this.http; // нужно для проверок в базе через REST API
     parameters.emailSubject = this.emailSubject;
     parameters.emailBody = this.emailBody;
-    parameters.teamModelConstraints = this.teamConstraints;
     parameters.emailModelConstraints = this.emailConstraints;
     parameters.answerModelConstraints = this.answerConstraints;
 

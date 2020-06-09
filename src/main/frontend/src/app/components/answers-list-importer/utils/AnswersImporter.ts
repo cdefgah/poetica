@@ -1,30 +1,36 @@
-import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
-import { Team } from "src/app/model/Team";
-import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { Answer } from "src/app/model/Answer";
+import { Team } from "src/app/model/Team";
+import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
+import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { StringBuilder } from "./StringBuilder";
 
 export class AnswersImporter extends AbstractDataImporter {
-  private teamModelConstraints: Map<string, number>;
   private emailModelConstraints: Map<string, number>;
   private answerModelConstraints: Map<string, number>;
 
   private roundNumber: string;
 
   private emailSubject: string;
+  private emailBody: string;
 
   private teamInfoFromEmailSubject: Team;
   private teamInfoFromEmailBody: Team;
 
   private answers: Answer[] = [];
 
-  constructor(paremters: AnswersImporterParameters) {
-    super(paremters.emailBody);
-    this.emailSubject = AnswersImporter.normalizeString(paremters.emailSubject);
+  constructor(parameters: AnswersImporterParameters) {
+    super(parameters.emailBody);
 
-    this.teamModelConstraints = paremters.teamModelConstraints;
-    this.emailModelConstraints = paremters.emailModelConstraints;
-    this.answerModelConstraints = paremters.answerModelConstraints;
+    this.emailSubject = AnswersImporter.normalizeString(
+      parameters.emailSubject
+    );
+    this.emailBody = AnswersImporter.normalizeString(parameters.emailBody);
+
+    this.emailModelConstraints = parameters.emailModelConstraints;
+    this.answerModelConstraints = parameters.answerModelConstraints;
+
+    // проверяем корректность по размерам для письма
+    this.validateEmailConstraints();
   }
 
   public parse(): void {
@@ -361,6 +367,9 @@ export class AnswersImporter extends AbstractDataImporter {
       console.log("-----------------------------------");
     });
 
+    console.log(" ========== validating data ==========");
+    this.validateTeamDataCorrectness();
+    this.validateAnswerConstraints();
     console.log(" ====== body parsing results end =====");
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: AnswersImporter) {
@@ -403,5 +412,69 @@ export class AnswersImporter extends AbstractDataImporter {
       wholeComment.reset();
     }
     // =====================================================================================================
+  }
+
+  private validateTeamDataCorrectness(): void {}
+
+  private validateAnswerConstraints(): void {
+    const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
+    const KEY_MAX_COMMENT_LENGTH: string = "MAX_COMMENT_LENGTH";
+
+    const MAX_BODY_LENGTH: number = this.answerModelConstraints[
+      KEY_MAX_BODY_LENGTH
+    ];
+
+    const MAX_COMMENT_LENGTH: number = this.answerModelConstraints[
+      KEY_MAX_COMMENT_LENGTH
+    ];
+
+    this.answers.forEach((oneAnswer) => {
+      if (oneAnswer.body && oneAnswer.body.length > MAX_BODY_LENGTH) {
+        throw new Error(
+          "Длина строки ответа на бескрылку с номером: " +
+            oneAnswer.questionNumber +
+            " (" +
+            oneAnswer.body.length +
+            ")превышает максимально разрешённый размер в " +
+            MAX_BODY_LENGTH +
+            " символов"
+        );
+      }
+
+      if (oneAnswer.comment && oneAnswer.comment.length > MAX_COMMENT_LENGTH) {
+        throw new Error(
+          "Длина строки с комментарием к ответу на бескрылку с номером: " +
+            oneAnswer.questionNumber +
+            " ( " +
+            oneAnswer.comment.length +
+            ") превышает максимально разрешённый размер в " +
+            MAX_COMMENT_LENGTH +
+            " символов"
+        );
+      }
+    });
+  }
+
+  private validateEmailConstraints(): void {
+    const KEY_MAX_SUBJECT_LENGTH: string = "MAX_SUBJECT_LENGTH";
+    const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
+
+    const MAX_SUBJECT_LENGTH: number = this.answerModelConstraints[
+      KEY_MAX_SUBJECT_LENGTH
+    ];
+
+    const MAX_BODY_LENGTH: number = this.answerModelConstraints[
+      KEY_MAX_BODY_LENGTH
+    ];
+
+    if (this.emailSubject && this.emailSubject.length > MAX_SUBJECT_LENGTH) {
+      throw new Error(
+        "Длина строки с темой письма (" +
+          this.emailSubject.length +
+          ") превышает максимально разрешенный размер в " +
+          MAX_SUBJECT_LENGTH +
+          " символов"
+      );
+    }
   }
 }

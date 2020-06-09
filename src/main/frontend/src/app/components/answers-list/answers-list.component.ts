@@ -90,7 +90,6 @@ export class AnswersListComponent implements OnInit {
 
   ImportAnswers() {
     const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
-      this.teamModelConstraints,
       this.emailModelConstraints,
       this.answerModelConstraints
     );
