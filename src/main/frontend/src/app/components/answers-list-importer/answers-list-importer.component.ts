@@ -9,6 +9,8 @@ import {
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
+import { MessageBoxComponent } from "../message-box/message-box.component";
+import { MatStepper } from "@angular/material";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -239,5 +241,17 @@ export class AnswersListImporterComponent implements OnInit {
         this.dialog.close(false);
       }
     });
+  }
+
+  displayErrorMessage(
+    errorMessage: string,
+    messageBoxTitle: string = "Ошибка"
+  ) {
+    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+      errorMessage,
+      messageBoxTitle
+    );
+
+    this.otherDialog.open(MessageBoxComponent, msgBoxConfig);
   }
 }

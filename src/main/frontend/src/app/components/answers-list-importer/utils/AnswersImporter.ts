@@ -3,6 +3,7 @@ import { Team } from "src/app/model/Team";
 import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { StringBuilder } from "./StringBuilder";
+import { HttpClient } from "@angular/common/http";
 
 export class AnswersImporter extends AbstractDataImporter {
   private emailModelConstraints: Map<string, number>;
@@ -18,6 +19,8 @@ export class AnswersImporter extends AbstractDataImporter {
 
   private answers: Answer[] = [];
 
+  private http: HttpClient;
+
   constructor(parameters: AnswersImporterParameters) {
     super(parameters.emailBody);
 
@@ -28,6 +31,8 @@ export class AnswersImporter extends AbstractDataImporter {
 
     this.emailModelConstraints = parameters.emailModelConstraints;
     this.answerModelConstraints = parameters.answerModelConstraints;
+
+    this.http = parameters.http;
 
     // проверяем корректность по размерам для письма
     this.validateEmailConstraints();
@@ -52,6 +57,8 @@ export class AnswersImporter extends AbstractDataImporter {
       sourceEmailSubject
     );
 
+    console.log("processedSubject: " + processedSubject);
+
     var commaPosition = processedSubject.indexOf(",");
     if (commaPosition == -1) {
       throw new Error("Некорректный формат темы письма. Нет запятой.");
@@ -69,7 +76,7 @@ export class AnswersImporter extends AbstractDataImporter {
     } = AnswersImporter.extractTeamAndRoundNumbers(afterCommaSubjectPart);
 
     var teamNumber = foundTeamNumber;
-    this.teamInfoFromEmailSubject = new Team(teamTitle, teamNumber);
+    this.teamInfoFromEmailSubject = new Team(teamNumber, teamTitle);
 
     this.roundNumber = foundRoundNumber;
 
@@ -261,6 +268,10 @@ export class AnswersImporter extends AbstractDataImporter {
     console.log("number: " + this.teamInfoFromEmailBody.number);
     console.log("************ ********* ******************");
 
+    console.log("validating team information == start");
+    this.validateTeamDataCorrectness();
+    console.log("validating team information == end");
+
     var wholeAnswer: StringBuilder = new StringBuilder();
     var wholeComment: StringBuilder = new StringBuilder();
 
@@ -368,7 +379,6 @@ export class AnswersImporter extends AbstractDataImporter {
     });
 
     console.log(" ========== validating data ==========");
-    this.validateTeamDataCorrectness();
     this.validateAnswerConstraints();
     console.log(" ====== body parsing results end =====");
     // ================================ Локальные функции ==============================
@@ -425,6 +435,45 @@ export class AnswersImporter extends AbstractDataImporter {
           this.teamInfoFromEmailBody.number
       );
     }
+
+    var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
+    var importingTeamTitle = this.teamInfoFromEmailBody.title;
+    this.http.get(url).subscribe(
+      (data: Map<string, any>) => {
+        var loadedTeamTitle: string = data["title"];
+        if (
+          loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
+        ) {
+          throw new Error(
+            "В базе данных команда с номером: " +
+              this.teamInfoFromEmailBody.number +
+              " записана как '" +
+              loadedTeamTitle +
+              "'. А в письме передано название команды: '" +
+              importingTeamTitle +
+              "'"
+          );
+        }
+      },
+      (error) => {
+        const NOT_FOUND_STATUS: number = 404;
+        if (error.status == NOT_FOUND_STATUS) {
+          throw new Error(
+            "Не удалось найти в базе данных команду с номером: " +
+              this.teamInfoFromEmailBody.number
+          );
+        } else {
+          throw new Error(
+            "Не удалось получить информацию из базы данных о команде с номером: " +
+              this.teamInfoFromEmailBody.number +
+              ". Дополнительная информация от сервера: Сообщение: " +
+              error.message +
+              " \nКод ошибки: " +
+              error.status
+          );
+        }
+      }
+    );
   }
 
   private validateAnswerConstraints(): void {
