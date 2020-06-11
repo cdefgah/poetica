@@ -217,10 +217,52 @@ export class AnswersListImporterComponent implements OnInit {
     if (event.previouslySelectedIndex == 0) {
       this.foundErrors = [];
       this.dataIsReadyForImport = false;
-      this.processEmailSourceText();
+
+      try {
+        this.processEmailSourceText();
+      } catch (Error) {
+        console.log("========== EXCEPTION IN processEmailSourceText() ****");
+        console.dir(Error);
+        console.log(
+          "================================================================="
+        );
+
+        this.foundErrors.push(Error.message);
+      }
     } else if (event.previouslySelectedIndex == 1) {
-      this.processRoundNumberAndEmailDateTime();
+      try {
+        this.processRoundNumberAndEmailDateTime();
+      } catch (Error) {
+        console.log(
+          "========== EXCEPTION IN processRoundNumberAndEmailDateTime() ****"
+        );
+        console.dir(Error);
+        console.log(
+          "================================================================="
+        );
+        this.foundErrors.push(Error.message);
+      }
+
       this.dataIsReadyForImport = this.foundErrors.length == 0;
+    }
+
+    // if (event.previouslySelectedIndex == 0) {
+    //   this.foundErrors = [];
+    //   this.dataIsReadyForImport = false;
+
+    //   this.processEmailSourceText();
+    // } else if (event.previouslySelectedIndex == 1) {
+    //   this.processRoundNumberAndEmailDateTime();
+
+    //   this.dataIsReadyForImport = this.foundErrors.length == 0;
+    // }
+
+    if (this.foundErrors.length == 0) {
+      console.log("******** NO IMPORT ERRORS FOUND **************");
+    } else {
+      console.log("******** IMPORT ERRORS FOUND START **************");
+      this.foundErrors.map((element) => console.log(element));
+      console.log("******** IMPORT ERRORS FOUND END **************");
     }
   }
 

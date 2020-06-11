@@ -37,6 +37,10 @@ export abstract class AbstractDataImporter {
    * @returns нормализованная строка.
    */
   protected static normalizeString(sourceString: string): string {
+    if (!sourceString || sourceString.length == 0) {
+      return "";
+    }
+
     // убираем ненужные символы
     var processedString: string = sourceString.replace(/[¶]/g, "");
 

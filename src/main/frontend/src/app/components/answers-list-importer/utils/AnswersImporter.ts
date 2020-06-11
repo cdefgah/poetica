@@ -52,6 +52,12 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   private parseEmailSubject(sourceEmailSubject: string): void {
+    // если тема письма не задана - выходим
+    // исключение не бросаем. Ожидаем, что в теле письма есть информация нужная
+    if (!sourceEmailSubject || sourceEmailSubject.length == 0) {
+      return;
+    }
+
     // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
     var processedSubject: string = AnswersImporter.extractSignificantPartFromTheEmailSubject(
       sourceEmailSubject
@@ -436,6 +442,7 @@ export class AnswersImporter extends AbstractDataImporter {
 
   private validateTeamDataCorrectness(): void {
     if (
+      this.teamInfoFromEmailSubject &&
       this.teamInfoFromEmailSubject.number != this.teamInfoFromEmailBody.number
     ) {
       throw new Error(
