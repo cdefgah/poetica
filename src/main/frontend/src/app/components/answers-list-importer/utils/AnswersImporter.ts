@@ -254,6 +254,7 @@ export class AnswersImporter extends AbstractDataImporter {
 
     console.log("=== EMAIL BODY PARSING METHOD START ===");
     var firstLineFromAnswersBlock: string = this.getTheFirstLineOfAnswersBlock();
+    var maxQuestionNumber: number = 1;
 
     console.log("--- firstLineFromAnswersBlock start --- ");
     console.log("|" + firstLineFromAnswersBlock + "|");
@@ -302,6 +303,14 @@ export class AnswersImporter extends AbstractDataImporter {
               "Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '" +
                 questionNumber +
                 "'"
+            );
+          } else {
+            // номера заданий могут идти не порядку, так что заводим отдельную переменную
+            // и фиксируем в ней максимальный номер задания (вопроса)
+            // это нужно, чтобы потом проверить корректность загружаемых данных.
+            maxQuestionNumber = Math.max(
+              maxQuestionNumber,
+              Number(questionNumber)
             );
           }
 
@@ -379,6 +388,7 @@ export class AnswersImporter extends AbstractDataImporter {
     });
 
     console.log(" ========== validating data ==========");
+    this.validateMaxQuestionNumber(maxQuestionNumber);
     this.validateAnswerConstraints();
     console.log(" ====== body parsing results end =====");
     // ================================ Локальные функции ==============================
@@ -546,5 +556,30 @@ export class AnswersImporter extends AbstractDataImporter {
           " символов"
       );
     }
+  }
+
+  private validateMaxQuestionNumber(maxQuestionNumberInAnswers: number): void {
+    var url: string = "/questions/max-number";
+    this.http.get(url).subscribe(
+      (maxNumberOfRegisteredQuestion: number) => {
+        if (maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers) {
+          throw new Error(
+            "Максимальный номер задания, зарегистрированного в базе данных равен: " +
+              maxNumberOfRegisteredQuestion +
+              ". Но среди импортируемых ответов представлен ответ на задание с номером: " +
+              maxQuestionNumberInAnswers
+          );
+        }
+      },
+      (error) => {
+        throw new Error(
+          "Не удалось получить информацию из базы данных о максимальном номере загруженного задания. " +
+            "Дополнительная информация от сервера: Сообщение: " +
+            error.message +
+            " \nКод ошибки: " +
+            error.status
+        );
+      }
+    );
   }
 }

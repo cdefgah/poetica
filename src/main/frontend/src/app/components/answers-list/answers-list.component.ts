@@ -88,7 +88,64 @@ export class AnswersListComponent implements OnInit {
 
   ngOnInit() {}
 
-  ImportAnswers() {
+  public checkPrerequisitesAndDoImportAnswers(): void {
+    var questionsMaxNumberEndPointUrl: string = "/questions/max-number";
+    this.http.get(questionsMaxNumberEndPointUrl).subscribe(
+      (maxNumberOfRegisteredQuestion: number) => {
+        if (maxNumberOfRegisteredQuestion > 0) {
+          // вопросы в базе представлены, проверяем наличие команд
+          var teamsTotalEndpointUrl: string = "/teams/total-number";
+          this.http.get(teamsTotalEndpointUrl).subscribe(
+            (numberOfTeamsPresent: number) => {
+              if (numberOfTeamsPresent > 0) {
+                this.importAnswers();
+              } else {
+                var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+                  "Не найдено зарегистрированных команд. Пожалуйста зарегистрируйте команды в системе, прежде чем импортировать ответы.",
+                  "Внимание"
+                );
+
+                this.dialog.open(MessageBoxComponent, msgBoxConfig);
+              }
+            },
+            (error) => {
+              var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+                "Не удалось получить информацию из базы данных о количестве команд. " +
+                  "Дополнительная информация от сервера: Сообщение: " +
+                  error.message +
+                  " \nКод ошибки: " +
+                  error.status,
+                "Ошибка"
+              );
+
+              this.dialog.open(MessageBoxComponent, msgBoxConfig);
+            }
+          );
+        } else {
+          var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+            "Не удалось найти зарегистрированных заданий. Пожалуйста импортируйте в систему задания прежде чем импортировать ответы.",
+            "Внимание"
+          );
+
+          this.dialog.open(MessageBoxComponent, msgBoxConfig);
+        }
+      },
+      (error) => {
+        var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
+          "Не удалось получить информацию из базы данных о количестве заданий. " +
+            "Дополнительная информация от сервера: Сообщение: " +
+            error.message +
+            " \nКод ошибки: " +
+            error.status,
+          "Ошибка"
+        );
+
+        this.dialog.open(MessageBoxComponent, msgBoxConfig);
+      }
+    );
+  }
+
+  private importAnswers() {
     const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
       this.emailModelConstraints,
       this.answerModelConstraints

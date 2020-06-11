@@ -158,6 +158,14 @@ public class TeamsController extends AbstractController {
         }
     }
 
+    @RequestMapping(path = "/teams/total-number", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Long> getTotalNumberOfTeams() {
+        TypedQuery<Long> query =
+                entityManager.createQuery("select count(*) FROM Team team", Long.class);
+
+        return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
+    }
+
     private boolean thisTeamHasNoAnswers(long teamId) {
         Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
         query.setParameter("teamId", teamId);

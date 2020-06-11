@@ -1,7 +1,11 @@
 <mat-toolbar>
   <span>Ответы</span>
   <span class="fill-remaining-space"></span>
-  <button mat-raised-button color="primary" (click)="ImportAnswers()">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="checkPrerequisitesAndDoImportAnswers()"
+  >
     Импортировать ответы из письма
   </button>
 </mat-toolbar>

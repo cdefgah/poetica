@@ -38,10 +38,10 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/questions/total-amount", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Long> getTotalQuestionsAmount() {
-        TypedQuery<Long> query =
-                entityManager.createQuery("select count(*) FROM Question question", Long.class);
+    @RequestMapping(path = "/questions/max-number", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Integer> getMaxQuestionNumber() {
+        TypedQuery<Integer> query =
+                entityManager.createQuery("select max(number) FROM Question question", Integer.class);
 
         return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
     }
