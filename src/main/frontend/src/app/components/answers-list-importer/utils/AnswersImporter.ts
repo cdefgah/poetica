@@ -275,10 +275,6 @@ export class AnswersImporter extends AbstractDataImporter {
     console.log("number: " + this.teamInfoFromEmailBody.number);
     console.log("************ ********* ******************");
 
-    console.log("validating team information == start");
-    this.validateTeamDataCorrectness();
-    console.log("validating team information == end");
-
     var wholeAnswer: StringBuilder = new StringBuilder();
     var wholeComment: StringBuilder = new StringBuilder();
 
@@ -383,7 +379,7 @@ export class AnswersImporter extends AbstractDataImporter {
       throw new Error("В содержании письма не представлено ни одного ответа.");
     }
     // ================================================================================
-    console.log(" ====== body parsing results start =====");
+    console.log(" ====== body parsing results block start =====");
 
     this.answers.forEach((oneAnswer) => {
       console.log("-----------------------------------");
@@ -394,9 +390,9 @@ export class AnswersImporter extends AbstractDataImporter {
     });
 
     console.log(" ========== validating data ==========");
-    this.validateMaxQuestionNumber(maxQuestionNumber);
+    this.validateMaxQuestionNumberAnsTeamCorrectness(maxQuestionNumber);
     this.validateAnswerConstraints();
-    console.log(" ====== body parsing results end =====");
+    console.log(" ====== body parsing results block end =====");
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: AnswersImporter) {
       if (processedQuestionNumbers.has(questionNumber)) {
@@ -438,6 +434,39 @@ export class AnswersImporter extends AbstractDataImporter {
       wholeComment.reset();
     }
     // =====================================================================================================
+  }
+
+  // this.validateMaxQuestionNumber(maxQuestionNumber);
+
+  // TODO use promises and then() mechanism.
+  private validateMaxQuestionNumberAnsTeamCorrectness(
+    maxQuestionNumberInAnswers: number
+  ): void {
+    var url: string = "/questions/max-number";
+    this.http.get(url).subscribe(
+      (maxNumberOfRegisteredQuestion: number) => {
+        if (maxNumberOfRegisteredQuestion <= maxQuestionNumberInAnswers) {
+          // TODO use promises and then() mechanism.
+          this.validateTeamDataCorrectness();
+        } else {
+          throw new Error(
+            "Максимальный номер задания, зарегистрированного в базе данных равен: " +
+              maxNumberOfRegisteredQuestion +
+              ". Но среди импортируемых ответов представлен ответ на задание с номером: " +
+              maxQuestionNumberInAnswers
+          );
+        }
+      },
+      (error) => {
+        throw new Error(
+          "Не удалось получить информацию из базы данных о максимальном номере загруженного задания. " +
+            "Дополнительная информация от сервера: Сообщение: " +
+            error.message +
+            " \nКод ошибки: " +
+            error.status
+        );
+      }
+    );
   }
 
   private validateTeamDataCorrectness(): void {
@@ -563,30 +592,5 @@ export class AnswersImporter extends AbstractDataImporter {
           " символов"
       );
     }
-  }
-
-  private validateMaxQuestionNumber(maxQuestionNumberInAnswers: number): void {
-    var url: string = "/questions/max-number";
-    this.http.get(url).subscribe(
-      (maxNumberOfRegisteredQuestion: number) => {
-        if (maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers) {
-          throw new Error(
-            "Максимальный номер задания, зарегистрированного в базе данных равен: " +
-              maxNumberOfRegisteredQuestion +
-              ". Но среди импортируемых ответов представлен ответ на задание с номером: " +
-              maxQuestionNumberInAnswers
-          );
-        }
-      },
-      (error) => {
-        throw new Error(
-          "Не удалось получить информацию из базы данных о максимальном номере загруженного задания. " +
-            "Дополнительная информация от сервера: Сообщение: " +
-            error.message +
-            " \nКод ошибки: " +
-            error.status
-        );
-      }
-    );
   }
 }
