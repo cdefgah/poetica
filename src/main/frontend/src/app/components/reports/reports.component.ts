@@ -47,7 +47,7 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   loadAllReportEncodingVariants() {
-    var url: string = "/configuration/supported-report-encodings";
+    const url: string = "/configuration/supported-report-encodings";
     this.http.get(url).subscribe(
       (data: CharsetEncodingEntity[]) => {
         data.forEach((element) => {
@@ -62,7 +62,7 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   initActualReportEncodingSystemName() {
-    var url: string = "/configuration/actual-report-encoding-system-name";
+    const url: string = "/configuration/actual-report-encoding-system-name";
     this.http.get(url).subscribe(
       (data: ConfigurationValue) => {
         this.selectedEncodingSystemName = data.value;

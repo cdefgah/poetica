@@ -48,7 +48,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
 
     if (questionId) {
       // редактируем существующее задание
-      var url: string = "/questions/" + questionId;
+      const url: string = `/questions/${questionId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
           this.question.initialize(data);
@@ -158,7 +158,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
           updateComment
         ) {
           // данные изменились, обновляем их на сервере
-          var requestUrl = "/questions/" + this.question.id;
+          var requestUrl = `/questions/${this.question.id}`;
           const payload = new HttpParams()
             .set("newQuestionBody", newQuestionBody)
             .set("newQuestionSource", newQuestionSource)

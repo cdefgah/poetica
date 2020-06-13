@@ -53,7 +53,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   ];
 
   loadOneTeamModelConstraints() {
-    var url: string = "/teams/model-constraints";
+    const url: string = "/teams/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => {
         this.teamModelConstraints = data;
@@ -64,7 +64,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadEmailModelConstraints() {
-    var url: string = "/emails/model-constraints";
+    const url: string = "/emails/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.emailModelConstraints = data),
       (error) => this.reportServerError(error)
@@ -72,7 +72,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadAnswerModelConstraints() {
-    var url: string = "/answers/model-constraints";
+    const url: string = "/answers/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.answerModelConstraints = data),
       (error) => this.reportServerError(error)
@@ -149,7 +149,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadTeamsList() {
-    var url: string = "/teams/all";
+    const url: string = "/teams/all";
 
     this.http.get(url).subscribe(
       (data: Team[]) => {

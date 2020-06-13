@@ -95,7 +95,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     if (teamId) {
       // редактируем существующее задание
       this.isExistingRecord = true;
-      var url: string = "/teams/" + teamId;
+      const url: string = `/teams/${teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
           this.team.initialize(data);
@@ -146,7 +146,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
         if (newTeamNumber.length > 0 || newTeamTitle.length > 0) {
           // данные изменились, обновляем их на сервере
-          var requestUrl = "/teams/" + this.team.id;
+          var requestUrl = `/teams/${this.team.id}`;
           const payload = new HttpParams()
             .set("newTeamNumber", newTeamNumber)
             .set("newTeamTitle", newTeamTitle);
@@ -175,7 +175,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
-      const url: string = "/teams/" + this.team.id;
+      const url: string = `/teams/${this.team.id}`;
       this.http.delete(url).subscribe(
         (data: any) => {
           this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
@@ -198,13 +198,12 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
    * @returns true, если поля заполнены, иначе false.
    */
   private validateFields(): boolean {
-    if (!Team.numberRegExValidator.test(this.team.number)) {
-      this.teamNumberIsIncorrect = true;
-    }
+    this.teamNumberIsIncorrect = !Team.numberRegExValidator.test(
+      this.team.number
+    );
 
-    if (this.team.title.trim().length == 0) {
-      this.teamTitleIsIncorrect = true;
-    }
+    this.teamTitleIsIncorrect =
+      !this.team.title || this.team.title.trim().length == 0;
 
     return !(this.teamNumberIsIncorrect || this.teamTitleIsIncorrect);
   }

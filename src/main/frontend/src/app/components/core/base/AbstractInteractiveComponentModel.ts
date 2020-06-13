@@ -42,7 +42,7 @@ export abstract class AbstractInteractiveComponentModel {
 
     confirmationDialogRef.afterClosed().subscribe((actionConfirmed) => {
       if (actionConfirmed) {
-        dialogAcceptedAction;
+        dialogAcceptedAction();
       }
     });
   }

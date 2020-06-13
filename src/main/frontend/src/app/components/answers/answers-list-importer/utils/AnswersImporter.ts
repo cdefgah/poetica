@@ -441,7 +441,7 @@ export class AnswersImporter extends AbstractDataImporter {
   private async validateMaxQuestionNumberAsync(
     maxQuestionNumberInAnswers: number
   ) {
-    var url: string = "/questions/max-number";
+    const url: string = "/questions/max-number";
     this.http.get(url).subscribe(
       (maxNumberOfRegisteredQuestion: number) => {
         if (maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers) {
@@ -459,7 +459,7 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   private async validateTeamDataCorrectnessAsync() {
-    var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
+    const url: string = `/teams/numbers/${this.teamInfoFromEmailBody.number}`;
     var importingTeamTitle = this.teamInfoFromEmailBody.title;
     this.http.get(url).subscribe(
       (data: Map<string, any>) => {
