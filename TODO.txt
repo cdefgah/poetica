@@ -1,0 +1,4 @@
+1. Добавить ConfirmationMessageBox в AbstractInteractiveComponentModel
+2. Прикрутить AbstractInteractiveComponentModel ко всем моделям компонент
+3. Реализовать корректный отладочный режим работы, а не непонятную кучу console.log-ов. 
+Будет что-то вроде глобального флага DEBUG=true, в случае истинности которого будет красиво выводиться отладочная информация в консоли.
