@@ -6,13 +6,15 @@ import { MessageBoxComponent } from "../message-box/message-box.component";
 import { Team } from "src/app/model/Team";
 import { Email } from "src/app/model/Email";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
+import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-answers-list",
   templateUrl: "./answers-list.component.html",
   styleUrls: ["./answers-list.component.css"],
 })
-export class AnswersListComponent implements OnInit {
+export class AnswersListComponent extends AbstractInteractiveComponentModel
+  implements OnInit {
   selectedTeamId: number;
   allTeamIds: number[];
   teamTitleAndNumber: string[];
@@ -58,7 +60,7 @@ export class AnswersListComponent implements OnInit {
         this.teamModelConstraints = data;
         Team.initializeRegexpValidator(this.teamModelConstraints);
       },
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
   }
 
@@ -66,7 +68,7 @@ export class AnswersListComponent implements OnInit {
     var url: string = "/emails/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.emailModelConstraints = data),
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
   }
 
@@ -74,11 +76,13 @@ export class AnswersListComponent implements OnInit {
     var url: string = "/answers/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.answerModelConstraints = data),
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
   }
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
+    super();
+
     this.loadOneTeamModelConstraints();
     this.loadEmailModelConstraints();
     this.loadAnswerModelConstraints();
@@ -100,47 +104,29 @@ export class AnswersListComponent implements OnInit {
               if (numberOfTeamsPresent > 0) {
                 this.importAnswers();
               } else {
-                var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-                  "Не найдено зарегистрированных команд. Пожалуйста зарегистрируйте команды в системе, прежде чем импортировать ответы.",
-                  "Внимание"
+                this.displayMessage(
+                  "Не найдено зарегистрированных команд. Пожалуйста зарегистрируйте команды в системе, прежде чем импортировать ответы."
                 );
-
-                this.dialog.open(MessageBoxComponent, msgBoxConfig);
               }
             },
             (error) => {
-              var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-                "Не удалось получить информацию из базы данных о количестве команд. " +
-                  "Дополнительная информация от сервера: Сообщение: " +
-                  error.message +
-                  " \nКод ошибки: " +
-                  error.status,
-                "Ошибка"
+              this.reportServerError(
+                error,
+                "Не удалось получить информацию из базы данных о количестве команд."
               );
-
-              this.dialog.open(MessageBoxComponent, msgBoxConfig);
             }
           );
         } else {
-          var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-            "Не удалось найти зарегистрированных заданий. Пожалуйста импортируйте в систему задания прежде чем импортировать ответы.",
-            "Внимание"
+          this.displayMessage(
+            "Не удалось найти зарегистрированных заданий. Пожалуйста импортируйте в систему задания прежде чем импортировать ответы."
           );
-
-          this.dialog.open(MessageBoxComponent, msgBoxConfig);
         }
       },
       (error) => {
-        var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-          "Не удалось получить информацию из базы данных о количестве заданий. " +
-            "Дополнительная информация от сервера: Сообщение: " +
-            error.message +
-            " \nКод ошибки: " +
-            error.status,
-          "Ошибка"
+        this.reportServerError(
+          error,
+          "Не удалось получить информацию из базы данных о количестве заданий."
         );
-
-        this.dialog.open(MessageBoxComponent, msgBoxConfig);
       }
     );
   }
@@ -180,7 +166,7 @@ export class AnswersListComponent implements OnInit {
 
         this.selectedTeamId = this.allTeamIds[0];
       },
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
   }
 
@@ -194,7 +180,7 @@ export class AnswersListComponent implements OnInit {
       (data: Answer[]) => {
         this.dataSource = data;
       },
-      error => this.displayErrorMessage(error)
+      error => this.reportServerError(error)
     );
   }
 
@@ -207,15 +193,8 @@ export class AnswersListComponent implements OnInit {
      */
   }
 
-  displayErrorMessage(error: any) {
-    var errorMessage: string = `${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
-
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      "Ошибка"
-    );
-
-    this.dialog.open(MessageBoxComponent, msgBoxConfig);
+  protected getMessageDialogReference(): MatDialog {
+    return this.dialog;
   }
 
   actualRoundChanged(event: MatRadioChange) {

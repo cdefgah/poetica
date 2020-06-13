@@ -228,11 +228,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
           >Предварительный просмотр и импорт</ng-template
         >
         <div
-          *ngIf="
-            dataIsReadyForImport;
-            then processedDataBlock;
-            else errorsBlock
-          "
+          *ngIf="errorsFound; then processedDataBlock; else errorsBlock"
         ></div>
 
         <ng-template #processedDataBlock>
@@ -255,8 +251,12 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
 </mat-dialog-content>
 <mat-dialog-actions>
   <span class="fill-remaining-space"></span>
-  <ng-template [ngIf]="dataIsReadyForImport">
-    <button mat-raised-button color="primary" (click)="doImportAnswers()">
+  <ng-template [ngIf]="displayImportButton">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="uploadProcessedDataToTheServer()"
+    >
       Импортировать ответы
     </button>
   </ng-template>

@@ -50,6 +50,9 @@ export class AnswersListImporterComponent implements OnInit {
   minuteOptions: string[] = AnswersListImporterComponent.generateClockOptions(
     AnswersListImporterComponent.MAX_MINUTES
   );
+
+  errorsFound: boolean = false;
+  displayImportButton: boolean = false;
   //#endregion
 
   //#region ErrorsCollection
@@ -228,7 +231,8 @@ export class AnswersListImporterComponent implements OnInit {
   async onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
       this.foundErrors = [];
-      this.dataIsReadyForImport = false;
+      this.displayImportButton = false;
+      this.errorsFound = false;
 
       try {
         await this.processEmailSourceText();
@@ -255,7 +259,8 @@ export class AnswersListImporterComponent implements OnInit {
         this.foundErrors.push(Error.message);
       }
 
-      this.dataIsReadyForImport = this.foundErrors.length == 0;
+      this.errorsFound = this.foundErrors.length > 0;
+      this.displayImportButton = true;
     }
 
     if (this.foundErrors.length == 0) {
