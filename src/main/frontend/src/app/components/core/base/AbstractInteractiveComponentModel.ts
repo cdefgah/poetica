@@ -1,5 +1,7 @@
 import { MatDialogConfig, MatDialog } from "@angular/material/dialog";
-import { MessageBoxComponent } from "../components/message-box/message-box.component";
+import { MessageBoxComponent } from "../message-box/message-box.component";
+import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { Action } from "rxjs/internal/scheduler/Action";
 
 export abstract class AbstractInteractiveComponentModel {
   protected abstract getMessageDialogReference(): MatDialog;
@@ -23,5 +25,28 @@ export abstract class AbstractInteractiveComponentModel {
     );
 
     this.getMessageDialogReference().open(MessageBoxComponent, msgBoxConfig);
+  }
+
+  protected confirmationDialog(
+    confirmationMessage: string,
+    dialogAcceptedAction: Function,
+    dialogDeclinedAction: Function = null
+  ): void {
+    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+      confirmationMessage
+    );
+
+    var confirmationDialogRef = this.getMessageDialogReference().open(
+      ConfirmationDialogComponent,
+      confirmationDialogConfig
+    );
+
+    confirmationDialogRef.afterClosed().subscribe((actionConfirmed) => {
+      if (actionConfirmed) {
+        dialogAcceptedAction;
+      } else {
+        dialogDeclinedAction;
+      }
+    });
   }
 }

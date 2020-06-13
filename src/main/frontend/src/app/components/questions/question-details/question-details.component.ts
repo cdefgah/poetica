@@ -6,15 +6,16 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { MessageBoxComponent } from "../message-box/message-box.component";
 import { Question } from "src/app/model/Question";
+import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-question-details",
   templateUrl: "./question-details.component.html",
   styleUrls: ["./question-details.component.css"],
 })
-export class QuestionDetailsComponent implements OnInit {
+export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
+  implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
   private static readonly KEY_DIALOG_MODEL_CONSTRAINTS = "modelConstraints";
 
@@ -29,6 +30,8 @@ export class QuestionDetailsComponent implements OnInit {
     public dialog: MatDialogRef<QuestionDetailsComponent>,
     public otherDialog: MatDialog
   ) {
+    super();
+
     // создаём объект question сразу первой строчкой
     // так как к нему подключены (bind)
     // свойства в html-template комепонента
@@ -55,12 +58,16 @@ export class QuestionDetailsComponent implements OnInit {
 
           this.dialogTitle = this.getDialogTitle(this.question);
         },
-        (error) => this.displayErrorMessage(error)
+        (error) => this.reportServerError(error)
       );
     } else {
       // создаём заголовок диалога для нового задания
       this.dialogTitle = this.getDialogTitle(this.question);
     }
+  }
+
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
   }
 
   static getDialogConfigWithData(
@@ -87,25 +94,6 @@ export class QuestionDetailsComponent implements OnInit {
     return dialogConfig;
   }
 
-  displayErrorMessage(error: any) {
-    var errorMessage: string =
-      error.error +
-      ". " +
-      "Код статуса: " +
-      error.status +
-      ". " +
-      "Сообщение сервера: '" +
-      error.message +
-      "'";
-
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      "Ошибка"
-    );
-
-    this.otherDialog.open(MessageBoxComponent, msgBoxConfig);
-  }
-
   modelConstraints: Map<string, number>;
 
   questionBodyIsIncorrect: boolean = false;
@@ -123,7 +111,7 @@ export class QuestionDetailsComponent implements OnInit {
         ? " (Зачётное)"
         : " (Внезачётное)";
 
-      return "Задание №" + String(questionObject.number) + isGradedString;
+      return `Задание №${String(questionObject.number)}${isGradedString}`;
     }
   }
 
@@ -142,7 +130,7 @@ export class QuestionDetailsComponent implements OnInit {
             this.serverResponse = data;
             this.dialog.close(true);
           },
-          (error) => this.displayErrorMessage(error)
+          (error) => this.reportServerError(error)
         );
       } else {
         // обновляем существующую запись
@@ -181,7 +169,7 @@ export class QuestionDetailsComponent implements OnInit {
             () => {
               this.dialog.close(true);
             },
-            (error) => this.displayErrorMessage(error)
+            (error) => this.reportServerError(error)
           );
         } else {
           // никаких изменений не было

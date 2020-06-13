@@ -1,19 +1,19 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog, MatDialogConfig, MatRadioChange } from "@angular/material";
-import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { Question } from "src/app/model/Question";
-import { MessageBoxComponent } from "../message-box/message-box.component";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { QuestionDetailsComponent } from "../question-details/question-details.component";
+import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-questions-list",
   templateUrl: "./questions-list.component.html",
   styleUrls: ["./questions-list.component.css"],
 })
-export class QuestionsListComponent implements OnInit {
-  // эти псевдонимы также используются для формирования строки http-запроса, не меняй их.
+export class QuestionsListComponent extends AbstractInteractiveComponentModel
+  implements OnInit {
+  // эти псевдонимы также используются для формирования строки http-запроса, не меняйте их.
   private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = "all";
   private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = "credited";
   private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS =
@@ -42,8 +42,13 @@ export class QuestionsListComponent implements OnInit {
     public dialog: MatDialog,
     public otherDialog: MatDialog
   ) {
+    super();
     this.loadOneQuestionModelConstraints();
     this.loadQuestionsList();
+  }
+
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
   }
 
   ngOnInit() {}
@@ -52,28 +57,8 @@ export class QuestionsListComponent implements OnInit {
     var url: string = "/questions/model-constraints";
     this.http.get(url).subscribe(
       (data: Map<string, string>) => (this.modelConstraints = data),
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
-  }
-
-  // TODO вынести в родительский класс общий код
-  displayErrorMessage(error: any) {
-    var errorMessage: string =
-      error.error +
-      ". " +
-      "Код статуса: " +
-      error.status +
-      ". " +
-      "Сообщение сервера: '" +
-      error.message +
-      "'";
-
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      "Ошибка"
-    );
-
-    this.dialog.open(MessageBoxComponent, msgBoxConfig);
   }
 
   loadQuestionsList() {
@@ -84,7 +69,7 @@ export class QuestionsListComponent implements OnInit {
       (data: Question[]) => {
         this.dataSource = data;
       },
-      (error) => this.displayErrorMessage(error)
+      (error) => this.reportServerError(error)
     );
   }
 
@@ -117,38 +102,32 @@ export class QuestionsListComponent implements OnInit {
 
   ImportQuestions() {
     if (this.dataSource.length > 0) {
-      var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-        "В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?"
-      );
+      var confirmationMessage =
+        "В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?";
 
-      var confirmationDialogRef = this.otherDialog.open(
-        ConfirmationDialogComponent,
-        confirmationDialogConfig
-      );
+      var dialogAcceptedAction: Function = () => {
+        // если диалог был принят (accepted)
+        // удаляем задания на сервере
+        this.http.delete("/questions/all").subscribe(
+          (data: any) => {
+            // обновляем таблицу со списком вопросов (уже пустую)
+            this.loadQuestionsList();
 
-      confirmationDialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          // если диалог был принят (accepted)
-          // удаляем задания на сервере
-          this.http.delete("/questions/all").subscribe(
-            (data: any) => {
-              // обновляем таблицу со списком вопросов (уже пустую)
-              this.loadQuestionsList();
+            // запускаем импорт вопросов
+            this.startImportingQuestions();
+          },
+          (error) => this.reportServerError(error)
+        );
+      };
 
-              // запускаем импорт вопросов
-              this.StartImportingQuestions();
-            },
-            (error) => this.displayErrorMessage(error)
-          );
-        }
-      });
+      this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
     } else {
       // запускаем импорт вопросов
-      this.StartImportingQuestions();
+      this.startImportingQuestions();
     }
   }
 
-  private StartImportingQuestions() {
+  private startImportingQuestions() {
     const importDialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
       this.modelConstraints
     );

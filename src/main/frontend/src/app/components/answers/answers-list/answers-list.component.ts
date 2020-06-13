@@ -1,8 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { MatRadioChange, MatDialog, MatDialogConfig } from "@angular/material";
+import { MatRadioChange, MatDialog } from "@angular/material";
 import { HttpClient } from "@angular/common/http";
 import { Answer } from "src/app/model/Answer";
-import { MessageBoxComponent } from "../message-box/message-box.component";
 import { Team } from "src/app/model/Team";
 import { Email } from "src/app/model/Email";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";

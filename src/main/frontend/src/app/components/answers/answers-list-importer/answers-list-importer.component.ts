@@ -6,17 +6,19 @@ import {
   MatDialogRef,
   MatDialog,
 } from "@angular/material/dialog";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
-import { MessageBoxComponent } from "../message-box/message-box.component";
+import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
+import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-answers-list-importer",
   templateUrl: "./answers-list-importer.component.html",
   styleUrls: ["./answers-list-importer.component.css"],
 })
-export class AnswersListImporterComponent implements OnInit {
+export class AnswersListImporterComponent
+  extends AbstractInteractiveComponentModel
+  implements OnInit {
   //#region ConstraintInfo
   private static readonly CONSTRAINTS_ALL = "all-constraints";
   private static readonly CONSTRAINTS_EMAIL = "email-constraints";
@@ -95,6 +97,8 @@ export class AnswersListImporterComponent implements OnInit {
     public dialog: MatDialogRef<AnswersListImporterComponent>,
     public otherDialog: MatDialog
   ) {
+    super();
+
     if (!dialogData) {
       return;
     }
@@ -111,6 +115,10 @@ export class AnswersListImporterComponent implements OnInit {
     this.answerConstraints = AnswersListImporterComponent.convertMap(
       allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
     );
+  }
+
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
   }
 
   private initializeDateHourAndMinuteSelectors() {

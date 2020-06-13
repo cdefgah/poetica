@@ -27,34 +27,34 @@ import { MatDialogModule } from "@angular/material";
 import { MatInputModule } from "@angular/material";
 import { MatStepperModule } from "@angular/material/stepper";
 
-import { QuestionsListComponent } from "./components/questions-list/questions-list.component";
-import { TeamsListComponent } from "./components/teams-list/teams-list.component";
-import { AnswersListComponent } from "./components/answers-list/answers-list.component";
 import { ReportsComponent } from "./components/reports/reports.component";
 import { AboutComponent } from "./components/about/about.component";
-import { QuestionDetailsComponent } from "./components/question-details/question-details.component";
-import { ConfirmationDialogComponent } from "./components/confirmation-dialog/confirmation-dialog.component";
-import { QuestionsListImporterComponent } from "./components/questions-list-importer/questions-list-importer.component";
-import { AnswerDetailsComponent } from "./components/answer-details/answer-details.component";
-import { MessageBoxComponent } from "./components/message-box/message-box.component";
-import { TeamDetailsComponent } from "./components/team-details/team-details.component";
-import { AnswersListImporterComponent } from "./components/answers-list-importer/answers-list-importer.component";
+import { ConfirmationDialogComponent } from "./components/core/confirmation-dialog/confirmation-dialog.component";
+import { MessageBoxComponent } from "./components/core/message-box/message-box.component";
+import { AnswersListComponent } from "./components/answers/answers-list/answers-list.component";
+import { AnswerDetailsComponent } from "./components/answers/answer-details/answer-details.component";
+import { AnswersListImporterComponent } from "./components/answers/answers-list-importer/answers-list-importer.component";
+import { QuestionsListComponent } from "./components/questions/questions-list/questions-list.component";
+import { QuestionsListImporterComponent } from "./components/questions/questions-list-importer/questions-list-importer.component";
+import { QuestionDetailsComponent } from "./components/questions/question-details/question-details.component";
+import { TeamDetailsComponent } from "./components/teams/team-details/team-details.component";
+import { TeamsListComponent } from "./components/teams/teams-list/teams-list.component";
 
 @NgModule({
   declarations: [
     AppComponent,
+    MessageBoxComponent,
+    ConfirmationDialogComponent,
+    AnswersListImporterComponent,
     QuestionsListComponent,
+    QuestionDetailsComponent,
+    QuestionsListImporterComponent,
     TeamsListComponent,
+    TeamDetailsComponent,
     AnswersListComponent,
+    AnswerDetailsComponent,
     ReportsComponent,
     AboutComponent,
-    QuestionDetailsComponent,
-    ConfirmationDialogComponent,
-    QuestionsListImporterComponent,
-    AnswerDetailsComponent,
-    MessageBoxComponent,
-    TeamDetailsComponent,
-    AnswersListImporterComponent,
   ],
   imports: [
     FormsModule,
