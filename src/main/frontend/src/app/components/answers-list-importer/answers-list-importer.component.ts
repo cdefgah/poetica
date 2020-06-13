@@ -11,6 +11,7 @@ import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { MatStepper } from "@angular/material";
+import { ConditionalExpr } from "@angular/compiler";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -143,7 +144,7 @@ export class AnswersListImporterComponent implements OnInit {
 
   ImportAnswers() {}
 
-  private processEmailSourceText() {
+  private async processEmailSourceText() {
     console.log("++++++++++++++++++++++++++++++++++++++++++++");
     console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
     console.log("++++++++++++++++++++++++++++++++++++++++++++");
@@ -157,7 +158,11 @@ export class AnswersListImporterComponent implements OnInit {
 
     var answersImporter: AnswersImporter = new AnswersImporter(parameters);
 
-    answersImporter.parse();
+    await answersImporter.parse().catch((e) => {
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA SUKA POIMALSAAAAAA: START");
+      console.log(e);
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA SUKA POIMALSAAAAAA: END");
+    });
 
     this.selectedRoundNumber = answersImporter.getRoundNumber();
     console.log("*******************************************");
@@ -213,13 +218,13 @@ export class AnswersListImporterComponent implements OnInit {
     console.log("***************************************************");
   }
 
-  onStepChange(event: any) {
+  async onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
       this.foundErrors = [];
       this.dataIsReadyForImport = false;
 
       try {
-        this.processEmailSourceText();
+        await this.processEmailSourceText();
       } catch (Error) {
         console.log("========== EXCEPTION IN processEmailSourceText() ****");
         console.dir(Error);

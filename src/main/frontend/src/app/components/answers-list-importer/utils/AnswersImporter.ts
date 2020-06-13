@@ -38,15 +38,9 @@ export class AnswersImporter extends AbstractDataImporter {
     this.validateEmailConstraints();
   }
 
-  public parse(): void {
-    try {
-      this.parseEmailSubject(this.emailSubject);
-      this.parseEmailBody();
-    } catch (Error) {
-      console.log("++++++++++ PARSE LEVEL CATCH ++++++++++++++++++++++ ");
-      console.log(Error.message);
-      console.log("++++++++++ PARSE LEVEL CATCH ++++++++++++++++++++++ ");
-    }
+  public async parse() {
+    this.parseEmailSubject();
+    await this.parseEmailBodyAsync();
   }
 
   public getRoundNumber(): string {
@@ -57,16 +51,16 @@ export class AnswersImporter extends AbstractDataImporter {
     return this.teamInfoFromEmailSubject;
   }
 
-  private parseEmailSubject(sourceEmailSubject: string): void {
+  private parseEmailSubject(): void {
     // если тема письма не задана - выходим
     // исключение не бросаем. Ожидаем, что в теле письма есть информация нужная
-    if (!sourceEmailSubject || sourceEmailSubject.length == 0) {
+    if (!this.emailSubject || this.emailSubject.length == 0) {
       return;
     }
 
     // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
     var processedSubject: string = AnswersImporter.extractSignificantPartFromTheEmailSubject(
-      sourceEmailSubject
+      this.emailSubject
     );
 
     console.log("processedSubject: " + processedSubject);
@@ -258,7 +252,7 @@ export class AnswersImporter extends AbstractDataImporter {
     return new Team(foundTeamNumber, foundTeamTitle);
   }
 
-  private parseEmailBody(): void {
+  private async parseEmailBodyAsync() {
     if (this.answers.length > 0) {
       this.answers = [];
     }
@@ -267,18 +261,9 @@ export class AnswersImporter extends AbstractDataImporter {
     var firstLineFromAnswersBlock: string = this.getTheFirstLineOfAnswersBlock();
     var maxQuestionNumber: number = 1;
 
-    console.log("--- firstLineFromAnswersBlock start --- ");
-    console.log("|" + firstLineFromAnswersBlock + "|");
-    console.log("--- firstLineFromAnswersBlock end --- ");
-
     this.teamInfoFromEmailBody = AnswersImporter.processFirstLineOfTheAnswersBlock(
       firstLineFromAnswersBlock
     );
-
-    console.log("************ team info ******************");
-    console.log("title: " + this.teamInfoFromEmailBody.title);
-    console.log("number: " + this.teamInfoFromEmailBody.number);
-    console.log("************ ********* ******************");
 
     var wholeAnswer: StringBuilder = new StringBuilder();
     var wholeComment: StringBuilder = new StringBuilder();
@@ -395,21 +380,8 @@ export class AnswersImporter extends AbstractDataImporter {
     this.validateTeamInfoCongruenceBetweenSubjectAndBody();
     this.validateAnswerConstraints();
 
-    this.validateMaxQuestionNumberAsync(maxQuestionNumber).then(
-      () =>
-        this.validateTeamDataCorrectnessAsync().then(null, (error) => {
-          console.log("==== THEN ERROR TIMMM START");
-          console.log(error);
-          console.log("==== THEN ERROR TIMMM ENT");
-          throw error;
-        }),
-      (error) => {
-        console.log("==== THEN ERROR QUUUUSTION START");
-        console.log(error);
-        console.log("==== THEN ERROR QUUUUSTION END");
-        throw error;
-      }
-    );
+    await this.validateMaxQuestionNumberAsync(maxQuestionNumber);
+    await this.validateTeamDataCorrectnessAsync();
 
     console.log(" ====== body parsing results block end =====");
 
@@ -466,72 +438,54 @@ export class AnswersImporter extends AbstractDataImporter {
     }
   }
 
-  private validateMaxQuestionNumberAsync(maxQuestionNumberInAnswers: number) {
-    var promise = new Promise((resolve, reject) => {
-      var url: string = "/questions/max-number";
-      this.http.get(url).subscribe(
-        (maxNumberOfRegisteredQuestion: number) => {
-          if (maxNumberOfRegisteredQuestion <= maxQuestionNumberInAnswers) {
-            // С номерами вопросов всё в порядке. Номера ответов не выходят за диапазон существующих в базе номеров заданий.
-            resolve();
-          } else {
-            reject(
-              new Error(`Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
-            Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`)
-            );
-          }
-        },
-        (error) => {
-          reject(
-            new Error(
-              `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
-            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
-            )
-          );
+  private async validateMaxQuestionNumberAsync(
+    maxQuestionNumberInAnswers: number
+  ) {
+    var url: string = "/questions/max-number";
+    this.http.get(url).subscribe(
+      (maxNumberOfRegisteredQuestion: number) => {
+        if (maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers) {
+          throw new Error(`Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
+          Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`);
         }
-      );
-    });
-
-    return promise;
+      },
+      (error) => {
+        throw new Error(
+          `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
+          Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
+        );
+      }
+    );
   }
 
-  private validateTeamDataCorrectnessAsync() {
-    var promise = new Promise((resolve, reject) => {
-      var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
-      var importingTeamTitle = this.teamInfoFromEmailBody.title;
-      this.http.get(url).subscribe(
-        (data: Map<string, any>) => {
-          var loadedTeamTitle: string = data["title"];
-          if (
-            loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
-          ) {
-            reject(
-              new Error(
-                `В базе данных команда с номером: ${this.teamInfoFromEmailBody.number} записана как '${loadedTeamTitle}'. 
-              А в письме передано название команды: '${importingTeamTitle}'`
-              )
-            );
-          } else {
-            // названия команд из письма и базы совпадают
-            resolve();
-          }
-        },
-        (error) => {
-          const NOT_FOUND_STATUS: number = 404;
-          var errorMessage: string;
-          if (error.status == NOT_FOUND_STATUS) {
-            errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.number}`;
-          } else {
-            errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.number}.
-              Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
-          }
-
-          reject(new Error(errorMessage));
+  private async validateTeamDataCorrectnessAsync() {
+    var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
+    var importingTeamTitle = this.teamInfoFromEmailBody.title;
+    this.http.get(url).subscribe(
+      (data: Map<string, any>) => {
+        var loadedTeamTitle: string = data["title"];
+        if (
+          loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
+        ) {
+          throw new Error(
+            `В базе данных команда с номером: ${this.teamInfoFromEmailBody.number} записана как '${loadedTeamTitle}'. 
+            А в письме передано название команды: '${importingTeamTitle}'`
+          );
         }
-      );
-    });
+      },
+      (error) => {
+        const NOT_FOUND_STATUS: number = 404;
+        var errorMessage: string;
+        if (error.status == NOT_FOUND_STATUS) {
+          errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.number}`;
+        } else {
+          errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.number}.
+            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
+        }
 
-    return promise;
+        throw new Error(errorMessage);
+      }
+    );
   }
 
   private validateAnswerConstraints(): void {
