@@ -10,8 +10,6 @@ import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation
 import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { MessageBoxComponent } from "../message-box/message-box.component";
-import { MatStepper } from "@angular/material";
-import { ConditionalExpr } from "@angular/compiler";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -19,6 +17,7 @@ import { ConditionalExpr } from "@angular/compiler";
   styleUrls: ["./answers-list-importer.component.css"],
 })
 export class AnswersListImporterComponent implements OnInit {
+  //#region ConstraintInfo
   private static readonly CONSTRAINTS_ALL = "all-constraints";
   private static readonly CONSTRAINTS_EMAIL = "email-constraints";
   private static readonly CONSTRAINTS_ANSWER = "answer-constraints";
@@ -26,10 +25,9 @@ export class AnswersListImporterComponent implements OnInit {
   answerConstraints: Map<string, number>;
   emailConstraints: Map<string, number>;
   teamConstraints: Map<string, number>;
+  //#endregion
 
-  foundErrors: string[];
-  dataIsReadyForImport: boolean;
-
+  //#region TemplateFields
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
 
@@ -43,6 +41,22 @@ export class AnswersListImporterComponent implements OnInit {
   allRoundAliases: string[] = ["1", "2"];
   allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
 
+  private static readonly MAX_HOURS: number = 23;
+  private static readonly MAX_MINUTES: number = 59;
+
+  hourOptions: string[] = AnswersListImporterComponent.generateClockOptions(
+    AnswersListImporterComponent.MAX_HOURS
+  );
+  minuteOptions: string[] = AnswersListImporterComponent.generateClockOptions(
+    AnswersListImporterComponent.MAX_MINUTES
+  );
+  //#endregion
+
+  //#region ErrorsCollection
+  foundErrors: string[];
+  //#endregion
+
+  //#region StaticMethodForDialogs
   static getDialogConfigWithData(
     emailModelConstraints: Map<string, string>,
     answerModelConstraints: Map<string, string>
@@ -69,17 +83,9 @@ export class AnswersListImporterComponent implements OnInit {
 
     return dialogConfig;
   }
+  //#endregion
 
-  private static readonly MAX_HOURS: number = 23;
-  private static readonly MAX_MINUTES: number = 59;
-
-  hourOptions: string[] = AnswersListImporterComponent.generateClockOptions(
-    AnswersListImporterComponent.MAX_HOURS
-  );
-  minuteOptions: string[] = AnswersListImporterComponent.generateClockOptions(
-    AnswersListImporterComponent.MAX_MINUTES
-  );
-
+  //#region ConstructorAndInitializers
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private http: HttpClient,
@@ -141,6 +147,7 @@ export class AnswersListImporterComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+  //#endregion
 
   ImportAnswers() {}
 
@@ -251,17 +258,6 @@ export class AnswersListImporterComponent implements OnInit {
       this.dataIsReadyForImport = this.foundErrors.length == 0;
     }
 
-    // if (event.previouslySelectedIndex == 0) {
-    //   this.foundErrors = [];
-    //   this.dataIsReadyForImport = false;
-
-    //   this.processEmailSourceText();
-    // } else if (event.previouslySelectedIndex == 1) {
-    //   this.processRoundNumberAndEmailDateTime();
-
-    //   this.dataIsReadyForImport = this.foundErrors.length == 0;
-    // }
-
     if (this.foundErrors.length == 0) {
       console.log("******** NO IMPORT ERRORS FOUND **************");
     } else {
@@ -271,7 +267,7 @@ export class AnswersListImporterComponent implements OnInit {
     }
   }
 
-  doImportAnswers() {}
+  uploadProcessedDataToTheServer() {}
 
   cancelDialog() {
     var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
@@ -288,17 +284,5 @@ export class AnswersListImporterComponent implements OnInit {
         this.dialog.close(false);
       }
     });
-  }
-
-  displayErrorMessage(
-    errorMessage: string,
-    messageBoxTitle: string = "Ошибка"
-  ) {
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      messageBoxTitle
-    );
-
-    this.otherDialog.open(MessageBoxComponent, msgBoxConfig);
   }
 }
