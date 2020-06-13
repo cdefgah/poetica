@@ -39,8 +39,14 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   public parse(): void {
-    this.parseEmailSubject(this.emailSubject);
-    this.parseEmailBody();
+    try {
+      this.parseEmailSubject(this.emailSubject);
+      this.parseEmailBody();
+    } catch (Error) {
+      console.log("++++++++++ PARSE LEVEL CATCH ++++++++++++++++++++++ ");
+      console.log(Error.message);
+      console.log("++++++++++ PARSE LEVEL CATCH ++++++++++++++++++++++ ");
+    }
   }
 
   public getRoundNumber(): string {
@@ -145,8 +151,7 @@ export class AnswersImporter extends AbstractDataImporter {
   private static checkTeamNumberFormat(stringWithTeamNumber: string) {
     if (!AnswersImporter.isPositiveInteger(stringWithTeamNumber)) {
       throw new Error(
-        "Номер команды в теме письма должен быть целым положительным числом, а вы передали: " +
-          stringWithTeamNumber
+        `Номер команды в теме письма должен быть целым положительным числом, а вы передали: ${stringWithTeamNumber}`
       );
     }
     return true;
@@ -302,9 +307,8 @@ export class AnswersImporter extends AbstractDataImporter {
           questionNumber = currentLine.substring(1, dotLocation).trim();
           if (!AnswersImporter.isPositiveInteger(questionNumber)) {
             throw new Error(
-              "Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '" +
-                questionNumber +
-                "'"
+              `Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. 
+              Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`
             );
           } else {
             // номера заданий могут идти не порядку, так что заводим отдельную переменную
@@ -337,9 +341,7 @@ export class AnswersImporter extends AbstractDataImporter {
           wholeAnswer.addString(firstLineOfTheAnswer);
         } else {
           throw new Error(
-            "Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '" +
-              currentLine +
-              "'"
+            `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
           );
         }
       } else {
@@ -390,24 +392,40 @@ export class AnswersImporter extends AbstractDataImporter {
     });
 
     console.log(" ========== validating data ==========");
-    this.validateMaxQuestionNumberAnsTeamCorrectness(maxQuestionNumber);
+    this.validateTeamInfoCongruenceBetweenSubjectAndBody();
     this.validateAnswerConstraints();
+
+    this.validateMaxQuestionNumberAsync(maxQuestionNumber).then(
+      () =>
+        this.validateTeamDataCorrectnessAsync().then(null, (error) => {
+          console.log("==== THEN ERROR TIMMM START");
+          console.log(error);
+          console.log("==== THEN ERROR TIMMM ENT");
+          throw error;
+        }),
+      (error) => {
+        console.log("==== THEN ERROR QUUUUSTION START");
+        console.log(error);
+        console.log("==== THEN ERROR QUUUUSTION END");
+        throw error;
+      }
+    );
+
     console.log(" ====== body parsing results block end =====");
+
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: AnswersImporter) {
       if (processedQuestionNumbers.has(questionNumber)) {
         throw new Error(
-          "Повторяющийся номер бескрылки в блоке ответов: " + questionNumber
+          `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
         );
       }
 
       if (previousQuestionNumber != -1) {
         if (Number(questionNumber) <= previousQuestionNumber) {
           throw new Error(
-            "Номера бескрылок в блоке ответов должны идти в порядке возрастания. А у нас после номера: " +
-              previousQuestionNumber +
-              " идёт номер: " +
-              questionNumber
+            `Номера бескрылок в блоке ответов должны идти в порядке возрастания. 
+            А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
           );
         }
 
@@ -436,90 +454,84 @@ export class AnswersImporter extends AbstractDataImporter {
     // =====================================================================================================
   }
 
-  // this.validateMaxQuestionNumber(maxQuestionNumber);
-
-  // TODO use promises and then() mechanism.
-  private validateMaxQuestionNumberAnsTeamCorrectness(
-    maxQuestionNumberInAnswers: number
-  ): void {
-    var url: string = "/questions/max-number";
-    this.http.get(url).subscribe(
-      (maxNumberOfRegisteredQuestion: number) => {
-        if (maxNumberOfRegisteredQuestion <= maxQuestionNumberInAnswers) {
-          // TODO use promises and then() mechanism.
-          this.validateTeamDataCorrectness();
-        } else {
-          throw new Error(
-            "Максимальный номер задания, зарегистрированного в базе данных равен: " +
-              maxNumberOfRegisteredQuestion +
-              ". Но среди импортируемых ответов представлен ответ на задание с номером: " +
-              maxQuestionNumberInAnswers
-          );
-        }
-      },
-      (error) => {
-        throw new Error(
-          "Не удалось получить информацию из базы данных о максимальном номере загруженного задания. " +
-            "Дополнительная информация от сервера: Сообщение: " +
-            error.message +
-            " \nКод ошибки: " +
-            error.status
-        );
-      }
-    );
-  }
-
-  private validateTeamDataCorrectness(): void {
+  private validateTeamInfoCongruenceBetweenSubjectAndBody() {
     if (
       this.teamInfoFromEmailSubject &&
       this.teamInfoFromEmailSubject.number != this.teamInfoFromEmailBody.number
     ) {
       throw new Error(
-        "Номер команды в теме письма: " +
-          this.teamInfoFromEmailSubject.number +
-          " не совпадает с номером команды в содержании письма: " +
-          this.teamInfoFromEmailBody.number
+        `Номер команды в теме письма: ${this.teamInfoFromEmailSubject.number} не совпадает с номером команды в содержании письма: 
+        ${this.teamInfoFromEmailBody.number}`
       );
     }
+  }
 
-    var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
-    var importingTeamTitle = this.teamInfoFromEmailBody.title;
-    this.http.get(url).subscribe(
-      (data: Map<string, any>) => {
-        var loadedTeamTitle: string = data["title"];
-        if (
-          loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
-        ) {
-          throw new Error(
-            "В базе данных команда с номером: " +
-              this.teamInfoFromEmailBody.number +
-              " записана как '" +
-              loadedTeamTitle +
-              "'. А в письме передано название команды: '" +
-              importingTeamTitle +
-              "'"
+  private validateMaxQuestionNumberAsync(maxQuestionNumberInAnswers: number) {
+    var promise = new Promise((resolve, reject) => {
+      var url: string = "/questions/max-number";
+      this.http.get(url).subscribe(
+        (maxNumberOfRegisteredQuestion: number) => {
+          if (maxNumberOfRegisteredQuestion <= maxQuestionNumberInAnswers) {
+            // С номерами вопросов всё в порядке. Номера ответов не выходят за диапазон существующих в базе номеров заданий.
+            resolve();
+          } else {
+            reject(
+              new Error(`Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
+            Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`)
+            );
+          }
+        },
+        (error) => {
+          reject(
+            new Error(
+              `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
+            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
+            )
           );
         }
-      },
-      (error) => {
-        const NOT_FOUND_STATUS: number = 404;
-        if (error.status == NOT_FOUND_STATUS) {
-          throw new Error(
-            "Не удалось найти в базе данных команду с номером: " +
-              this.teamInfoFromEmailBody.number
-          );
-        } else {
-          throw new Error(
-            "Не удалось получить информацию из базы данных о команде с номером: " +
-              this.teamInfoFromEmailBody.number +
-              ". Дополнительная информация от сервера: Сообщение: " +
-              error.message +
-              " \nКод ошибки: " +
-              error.status
-          );
+      );
+    });
+
+    return promise;
+  }
+
+  private validateTeamDataCorrectnessAsync() {
+    var promise = new Promise((resolve, reject) => {
+      var url: string = "/teams/numbers/" + this.teamInfoFromEmailBody.number;
+      var importingTeamTitle = this.teamInfoFromEmailBody.title;
+      this.http.get(url).subscribe(
+        (data: Map<string, any>) => {
+          var loadedTeamTitle: string = data["title"];
+          if (
+            loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
+          ) {
+            reject(
+              new Error(
+                `В базе данных команда с номером: ${this.teamInfoFromEmailBody.number} записана как '${loadedTeamTitle}'. 
+              А в письме передано название команды: '${importingTeamTitle}'`
+              )
+            );
+          } else {
+            // названия команд из письма и базы совпадают
+            resolve();
+          }
+        },
+        (error) => {
+          const NOT_FOUND_STATUS: number = 404;
+          var errorMessage: string;
+          if (error.status == NOT_FOUND_STATUS) {
+            errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.number}`;
+          } else {
+            errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.number}.
+              Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
+          }
+
+          reject(new Error(errorMessage));
         }
-      }
-    );
+      );
+    });
+
+    return promise;
   }
 
   private validateAnswerConstraints(): void {
@@ -537,25 +549,15 @@ export class AnswersImporter extends AbstractDataImporter {
     this.answers.forEach((oneAnswer) => {
       if (oneAnswer.body && oneAnswer.body.length > MAX_BODY_LENGTH) {
         throw new Error(
-          "Длина строки ответа на бескрылку с номером: " +
-            oneAnswer.questionNumber +
-            " (" +
-            oneAnswer.body.length +
-            ")превышает максимально разрешённый размер в " +
-            MAX_BODY_LENGTH +
-            " символов"
+          `Длина строки ответа на бескрылку с номером: ${oneAnswer.questionNumber} (${oneAnswer.body.length}) 
+          превышает максимально разрешённый размер в ${MAX_BODY_LENGTH} символов`
         );
       }
 
       if (oneAnswer.comment && oneAnswer.comment.length > MAX_COMMENT_LENGTH) {
         throw new Error(
-          "Длина строки с комментарием к ответу на бескрылку с номером: " +
-            oneAnswer.questionNumber +
-            " ( " +
-            oneAnswer.comment.length +
-            ") превышает максимально разрешённый размер в " +
-            MAX_COMMENT_LENGTH +
-            " символов"
+          `Длина строки с комментарием к ответу на бескрылку с номером: ${oneAnswer.questionNumber} (${oneAnswer.comment.length}) 
+          превышает максимально разрешённый размер в ${MAX_COMMENT_LENGTH} символов`
         );
       }
     });
@@ -575,21 +577,13 @@ export class AnswersImporter extends AbstractDataImporter {
 
     if (this.emailSubject && this.emailSubject.length > MAX_SUBJECT_LENGTH) {
       throw new Error(
-        "Длина строки с темой письма (" +
-          this.emailSubject.length +
-          ") превышает максимально разрешенный размер в " +
-          MAX_SUBJECT_LENGTH +
-          " символов"
+        `Длина строки с темой письма (${this.emailSubject.length}) превышает максимально разрешенный размер в ${MAX_SUBJECT_LENGTH} символов`
       );
     }
 
     if (this.emailBody && this.emailBody.length > MAX_BODY_LENGTH) {
       throw new Error(
-        "Длина содержимого письма (" +
-          this.emailBody.length +
-          ") превышает максимально разрешенный размер в " +
-          MAX_BODY_LENGTH +
-          " символов"
+        `Длина содержимого письма (${this.emailBody.length}) превышает максимально разрешенный размер в ${MAX_BODY_LENGTH} символов`
       );
     }
   }
