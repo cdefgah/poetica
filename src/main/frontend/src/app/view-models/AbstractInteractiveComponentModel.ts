@@ -1,7 +1,7 @@
 import { MatDialogConfig, MatDialog } from "@angular/material/dialog";
 import { MessageBoxComponent } from "../components/message-box/message-box.component";
 
-export abstract class AbstractComponentModel {
+export abstract class AbstractInteractiveComponentModel {
   protected abstract getMessageDialogReference(): MatDialog;
 
   protected reportException(error: Error): void {
