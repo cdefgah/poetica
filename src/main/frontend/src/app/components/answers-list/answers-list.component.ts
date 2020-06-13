@@ -208,15 +208,7 @@ export class AnswersListComponent implements OnInit {
   }
 
   displayErrorMessage(error: any) {
-    var errorMessage: string =
-      error.error +
-      ". " +
-      "Код статуса: " +
-      error.status +
-      ". " +
-      "Сообщение сервера: '" +
-      error.message +
-      "'";
+    var errorMessage: string = `${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
 
     var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
       errorMessage,

@@ -4,7 +4,12 @@ import { MessageBoxComponent } from "../components/message-box/message-box.compo
 export abstract class AbstractInteractiveComponentModel {
   protected abstract getMessageDialogReference(): MatDialog;
 
-  protected reportException(error: Error): void {
+  protected reportServerError(error: any) {
+    var errorMessage: string = `${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+    this.displayErrorMessage(errorMessage);
+  }
+
+  protected reportGeneralError(error: Error): void {
     this.displayErrorMessage(error.message);
   }
 
