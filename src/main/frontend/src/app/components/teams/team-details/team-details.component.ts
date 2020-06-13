@@ -4,18 +4,18 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialog,
-  MatDialogConfig
+  MatDialogConfig,
 } from "@angular/material";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { MessageBoxComponent } from "../message-box/message-box.component";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-team-details",
   templateUrl: "./team-details.component.html",
-  styleUrls: ["./team-details.component.css"]
+  styleUrls: ["./team-details.component.css"],
 })
-export class TeamDetailsComponent implements OnInit {
+export class TeamDetailsComponent extends AbstractInteractiveComponentModel
+  implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
   private static readonly KEY_DIALOG_MODEL_CONSTRAINTS = "modelConstraints";
 
@@ -76,6 +76,8 @@ export class TeamDetailsComponent implements OnInit {
     public dialog: MatDialogRef<TeamDetailsComponent>,
     public otherDialog: MatDialog
   ) {
+    super();
+
     // создаём объект team сразу первой строчкой
     // так как к нему подключены (bind)
     // свойства в html-template комепонента
@@ -103,7 +105,7 @@ export class TeamDetailsComponent implements OnInit {
 
           this.dialogTitle = this.getDialogTitle(this.team);
         },
-        error => this.displayErrorMessage(error)
+        (error) => this.reportServerError(error)
       );
     } else {
       // создаём заголовок диалога для новой команды
@@ -113,6 +115,10 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
+  }
 
   acceptDialog() {
     this.resetValidationFlags();
@@ -124,11 +130,11 @@ export class TeamDetailsComponent implements OnInit {
           .set("teamTitle", this.team.title);
 
         this.http.post("/teams", payload).subscribe(
-          data => {
+          (data) => {
             this.serverResponse = data;
             this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
           },
-          error => this.displayErrorMessage(error)
+          (error) => this.reportServerError(error)
         );
       } else {
         // обновляем существующую запись
@@ -149,7 +155,7 @@ export class TeamDetailsComponent implements OnInit {
             () => {
               this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
             },
-            error => this.displayErrorMessage(error)
+            (error) => this.reportServerError(error)
           );
         } else {
           // никаких изменений не было
@@ -165,33 +171,17 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   deleteRecord() {
-    var confirmationMessage: string =
-      "Удалить команду: '" +
-      this.team.title +
-      "' (номер: " +
-      this.team.number +
-      ") ?";
+    var confirmationMessage: string = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
 
-    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-      confirmationMessage
-    );
-
-    var dialogRef = this.otherDialog.open(
-      ConfirmationDialogComponent,
-      confirmationDialogConfig
-    );
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // если диалог был принят (accepted)
-        const url: string = "/teams/" + this.team.id;
-        this.http.delete(url).subscribe(
-          (data: any) => {
-            this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
-          },
-          error => this.displayErrorMessage(error)
-        );
-      }
+    this.confirmationDialog(confirmationMessage, () => {
+      // если диалог был принят (accepted)
+      const url: string = "/teams/" + this.team.id;
+      this.http.delete(url).subscribe(
+        (data: any) => {
+          this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
+        },
+        (error) => this.reportServerError(error)
+      );
     });
   }
 
@@ -199,27 +189,8 @@ export class TeamDetailsComponent implements OnInit {
     if (!teamObject) {
       return "Новая команда";
     } else {
-      return "Команда №" + teamObject.number;
+      return `Команда №${teamObject.number}`;
     }
-  }
-
-  displayErrorMessage(error: any) {
-    var errorMessage: string =
-      error.error +
-      ". " +
-      "Код статуса: " +
-      error.status +
-      ". " +
-      "Сообщение сервера: '" +
-      error.message +
-      "'";
-
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      "Ошибка"
-    );
-
-    this.otherDialog.open(MessageBoxComponent, msgBoxConfig);
   }
 
   /**

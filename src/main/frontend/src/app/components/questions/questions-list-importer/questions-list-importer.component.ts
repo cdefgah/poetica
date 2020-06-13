@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, QueryList } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
@@ -8,16 +8,17 @@ import {
 
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
-import { MessageBoxComponent } from "../message-box/message-box.component";
+import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-questions-list-importer",
   templateUrl: "./questions-list-importer.component.html",
   styleUrls: ["./questions-list-importer.component.css"],
 })
-export class QuestionsListImporterComponent implements OnInit {
+export class QuestionsListImporterComponent
+  extends AbstractInteractiveComponentModel
+  implements OnInit {
   rawSourceTextFormGroup: any;
 
   dataSource: Question[] = [];
@@ -71,6 +72,8 @@ export class QuestionsListImporterComponent implements OnInit {
     public dialog: MatDialogRef<QuestionsListImporterComponent>,
     public otherDialog: MatDialog
   ) {
+    super();
+
     if (!dialogData) {
       return;
     }
@@ -91,22 +94,16 @@ export class QuestionsListImporterComponent implements OnInit {
     }
   }
 
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
+  }
+
   ngOnInit() {}
 
   cancelDialog() {
-    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-      "Прервать импорт заданий?"
-    );
-
-    var dialogRef = this.otherDialog.open(
-      ConfirmationDialogComponent,
-      confirmationDialogConfig
-    );
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // если диалог был принят (accepted)
-        this.dialog.close(false);
-      }
+    this.confirmationDialog("Прервать импорт заданий?", () => {
+      // если диалог был принят (accepted)
+      this.dialog.close(false);
     });
   }
 
@@ -139,49 +136,22 @@ export class QuestionsListImporterComponent implements OnInit {
   onRowClicked(row: any) {}
 
   doImportQuestions() {
-    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-      "Импортировать задания?"
-    );
+    this.confirmationDialog("Импортировать задания?", () => {
+      // если диалог был принят (accepted)
+      // импортируем задания
+      const headers = new HttpHeaders().set(
+        "Content-Type",
+        "application/json; charset=utf-8"
+      );
 
-    var dialogRef = this.otherDialog.open(
-      ConfirmationDialogComponent,
-      confirmationDialogConfig
-    );
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // если диалог был принят (accepted)
-        // импортируем задания
-        const headers = new HttpHeaders().set(
-          "Content-Type",
-          "application/json; charset=utf-8"
+      this.http
+        .post("/questions/import", this.dataSource, { headers: headers })
+        .subscribe(
+          (data) => {
+            this.dialog.close(true);
+          },
+          (error) => this.reportServerError(error, "Сбой при импорте заданий.")
         );
-
-        this.http
-          .post("/questions/import", this.dataSource, { headers: headers })
-          .subscribe(
-            (data) => {
-              this.dialog.close(true);
-            },
-            (error) => this.displayErrorMessage(error)
-          );
-      }
     });
-  }
-
-  displayErrorMessage(error: any) {
-    var errorMessage: string =
-      error.error +
-      ". " +
-      "Код статуса: " +
-      error.status +
-      ". " +
-      "Сообщение сервера: '" +
-      error.message +
-      "'";
-
-    var msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
-      "Ошибка"
-    );
   }
 }

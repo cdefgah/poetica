@@ -5,7 +5,7 @@ import { Answer } from "src/app/model/Answer";
 import { Team } from "src/app/model/Team";
 import { Email } from "src/app/model/Email";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
-import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
+import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-answers-list",

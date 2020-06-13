@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { MatDialog, MatDialogConfig, MatRadioChange } from "@angular/material";
+import { MatDialog, MatRadioChange } from "@angular/material";
 import { Question } from "src/app/model/Question";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";

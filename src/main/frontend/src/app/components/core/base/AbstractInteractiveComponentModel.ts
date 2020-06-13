@@ -29,8 +29,7 @@ export abstract class AbstractInteractiveComponentModel {
 
   protected confirmationDialog(
     confirmationMessage: string,
-    dialogAcceptedAction: Function,
-    dialogDeclinedAction: Function = null
+    dialogAcceptedAction: Function
   ): void {
     var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
       confirmationMessage
@@ -44,8 +43,6 @@ export abstract class AbstractInteractiveComponentModel {
     confirmationDialogRef.afterClosed().subscribe((actionConfirmed) => {
       if (actionConfirmed) {
         dialogAcceptedAction;
-      } else {
-        dialogDeclinedAction;
       }
     });
   }

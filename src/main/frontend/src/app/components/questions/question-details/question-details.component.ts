@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -7,7 +7,7 @@ import {
 } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Question } from "src/app/model/Question";
-import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
+import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-question-details",

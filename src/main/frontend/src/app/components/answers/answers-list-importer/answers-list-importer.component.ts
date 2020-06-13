@@ -9,7 +9,7 @@ import {
 import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
-import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
+import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 
 @Component({
   selector: "app-answers-list-importer",

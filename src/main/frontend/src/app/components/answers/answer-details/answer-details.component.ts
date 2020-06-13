@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { AbstractInteractiveComponentModel } from "src/app/view-models/AbstractInteractiveComponentModel";
+import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { MatDialog } from "@angular/material";
 
 @Component({
