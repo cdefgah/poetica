@@ -23,7 +23,7 @@ export class Team {
    */
   private title: string = "";
 
-  public static numberRegExValidator: RegExp;
+  private static numberRegExValidator: RegExp;
 
   public static initializeRegexpValidator(
     modelConstraints: Map<string, string>
@@ -32,17 +32,34 @@ export class Team {
     Team.numberRegExValidator = new RegExp(regexpString);
   }
 
+  public static createTeamByNumberAndTitle(
+    number: string,
+    title: string
+  ): Team {
+    return new Team(number, title);
+  }
+
+  public static createTeamByMapOfValues(mapWithValues: Map<string, any>): Team {
+    var team = new Team();
+    team.setValuesFromMap(mapWithValues);
+    return team;
+  }
+
+  public static createtTeam(): Team {
+    return new Team();
+  }
+
   /**
    * Конструктор класса.
    * @param number уникальный номер команды.
    * @param title название команды.
    */
-  constructor(number?: string, title?: string) {
+  private constructor(number?: string, title?: string) {
     this.number = number ? number : "";
     this.title = title ? title : "";
   }
 
-  initialize(initialMap: Map<string, any>) {
+  private setValuesFromMap(initialMap: Map<string, any>) {
     this.id = initialMap["id"];
     this.number = initialMap["number"];
     this.title = initialMap["title"];

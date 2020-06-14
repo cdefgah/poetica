@@ -157,9 +157,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
         this.teamTitleAndNumber = [];
 
         data.forEach((oneTeam) => {
-          this.allTeamIds.push(oneTeam.id);
+          this.allTeamIds.push(oneTeam.getId());
           this.teamTitleAndNumber.push(
-            oneTeam.title + " (" + oneTeam.number + ")"
+            oneTeam.getTitle() + " (" + oneTeam.getNumber() + ")"
           );
         });
 
