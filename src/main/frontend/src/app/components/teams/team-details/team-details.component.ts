@@ -125,11 +125,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   acceptDialog() {
     this.resetValidationFlags();
     if (this.validateFields()) {
-      if (!this.team.getId()) {
+      if (!this.team.id) {
         // добавляем новую запись
         const payload = new HttpParams()
-          .set("teamNumber", this.team.getNumber())
-          .set("teamTitle", this.team.getTitle());
+          .set("teamNumber", this.team.number)
+          .set("teamTitle", this.team.title);
 
         this.http.post("/teams", payload).subscribe(
           (data) => {
@@ -141,18 +141,14 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       } else {
         // обновляем существующую запись
         var newTeamNumber: string =
-          this.team.getNumber() != this.teamCopy.getNumber()
-            ? this.team.getNumber()
-            : "";
+          this.team.number != this.teamCopy.number ? this.team.number : "";
 
         var newTeamTitle: string =
-          this.team.getTitle() != this.teamCopy.getTitle()
-            ? this.team.getTitle()
-            : "";
+          this.team.title != this.teamCopy.title ? this.team.title : "";
 
         if (newTeamNumber.length > 0 || newTeamTitle.length > 0) {
           // данные изменились, обновляем их на сервере
-          var requestUrl = `/teams/${this.team.getId()}`;
+          var requestUrl = `/teams/${this.team.id}`;
           const payload = new HttpParams()
             .set("newTeamNumber", newTeamNumber)
             .set("newTeamTitle", newTeamTitle);
@@ -177,11 +173,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   deleteRecord() {
-    var confirmationMessage: string = `Удалить команду: '${this.team.getTitle()}' (номер: ${this.team.getNumber()}) ?`;
+    var confirmationMessage: string = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
-      const url: string = `/teams/${this.team.getId()}`;
+      const url: string = `/teams/${this.team.id}`;
       this.http.delete(url).subscribe(
         (data: any) => {
           this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
@@ -195,7 +191,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     if (!teamObject) {
       return "Новая команда";
     } else {
-      return `Команда №${teamObject.getNumber()}`;
+      return `Команда №${teamObject.number}`;
     }
   }
 
@@ -204,12 +200,12 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
    * @returns true, если поля заполнены, иначе false.
    */
   private validateFields(): boolean {
-    this.teamNumberIsIncorrect = !Team.numberRegExValidator.test(
-      this.team.getNumber()
+    this.teamNumberIsIncorrect = !this.modelValidatorService.isTeamNumberCorrect(
+      this.team.number
     );
 
     this.teamTitleIsIncorrect =
-      !this.team.getTitle() || this.team.getTitle().trim().length == 0;
+      !this.team.title || this.team.title.trim().length == 0;
 
     return !(this.teamNumberIsIncorrect || this.teamTitleIsIncorrect);
   }

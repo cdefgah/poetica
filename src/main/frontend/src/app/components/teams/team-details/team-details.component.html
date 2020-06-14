@@ -1,6 +1,6 @@
 <p mat-dialog-title>{{ dialogTitle }}</p>
 <mat-dialog-content>
-  <div style="display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column;">
     <mat-form-field appearance="outline">
       <mat-label>Номер</mat-label>
       <input
@@ -20,7 +20,7 @@
         matInput
         required
         placeholder="Название команды"
-        maxlength="{{ modelConstraints['MAX_TITLE_LENGTH'] }}"
+        maxlength="{{ modelValidatorService.maxTeamTitleLength }}"
         [(ngModel)]="team.title"
       />
       <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect"

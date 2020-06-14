@@ -11,26 +11,17 @@ export class Team {
   /**
    * Идентификатор записи в базе данных.
    */
-  private id: number;
+  private _id: number;
 
   /**
    * Уникальный номер команды.
    */
-  private number: string = "";
+  private _number: string = "";
 
   /**
    * Название команды.
    */
-  private title: string = "";
-
-  private static numberRegExValidator: RegExp;
-
-  public static initializeRegexpValidator(
-    modelConstraints: Map<string, string>
-  ) {
-    const regexpString: string = modelConstraints["NUMBER_VALIDATION_REGEXP"];
-    Team.numberRegExValidator = new RegExp(regexpString);
-  }
+  private _title: string = "";
 
   public static createTeamByNumberAndTitle(
     number: string,
@@ -55,31 +46,43 @@ export class Team {
    * @param title название команды.
    */
   private constructor(number?: string, title?: string) {
-    this.number = number ? number : "";
-    this.title = title ? title : "";
+    this._number = number ? number : "";
+    this._title = title ? title : "";
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap["id"];
-    this.number = initialMap["number"];
-    this.title = initialMap["title"];
+    this._id = initialMap["id"];
+    this._number = initialMap["number"];
+    this._title = initialMap["title"];
   }
 
-  public getId(): number {
-    return this.id;
+  get id(): number {
+    return this._id;
   }
 
-  public getNumber(): string {
-    return this.number;
+  set id(value: number) {
+    this._id = value;
   }
 
-  public getTitle(): string {
-    return this.title;
+  get number() {
+    return this._number;
+  }
+
+  set number(value: string) {
+    this._number = value;
+  }
+
+  get title() {
+    return this._title;
+  }
+
+  set title(value: string) {
+    this._title = value;
   }
 
   public toString(): string {
-    return `id: ${this.id}
-number: ${this.number}
-title: ${this.title}`;
+    return `id: ${this._id}
+number: ${this._number}
+title: ${this._title}`;
   }
 }
