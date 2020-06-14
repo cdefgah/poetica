@@ -1,12 +1,12 @@
 import { Answer } from "src/app/model/Answer";
 import { Team } from "src/app/model/Team";
-import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { StringBuilder } from "./StringBuilder";
 import { HttpClient } from "@angular/common/http";
 import { debugString } from "src/app/utils/Config";
+import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 
-export class AnswersImporter extends AbstractDataImporter {
+export class AnswersImporter extends AbstractMultiLineDataImporter {
   private emailModelConstraints: Map<string, number>;
   private answerModelConstraints: Map<string, number>;
 

@@ -1,7 +1,7 @@
-import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { Team } from "src/app/model/Team";
+import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSinglelineDataImporter";
 
-export class EmailSubject extends AbstractDataImporter {
+export class EmailSubject extends AbstractSingleLineDataImporter {
   private readonly team: Team;
   private readonly roundNumber: string;
 
@@ -16,4 +16,6 @@ export class EmailSubject extends AbstractDataImporter {
   public getRoundNumber(): string {
     return this.roundNumber;
   }
+
+  private parseEmailSubject() {}
 }
