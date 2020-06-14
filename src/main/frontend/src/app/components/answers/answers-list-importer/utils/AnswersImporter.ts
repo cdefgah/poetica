@@ -53,7 +53,7 @@ export class AnswersImporter extends AbstractDataImporter {
     const subjectParsingResult = await this.sureThing(this.parseEmailSubject());
     if (subjectParsingResult.ok) {
       debugString("Subject parsed ok. Parsing email body");
-      const emailParsingResult;
+      // const emailParsingResult;
     } else {
       var errorMessage = subjectParsingResult["error"];
       debugString(`Subject parsed failed. Error message: ${errorMessage}`);
@@ -120,8 +120,7 @@ export class AnswersImporter extends AbstractDataImporter {
       this.roundNumber = foundRoundNumber;
 
       debugString("=========== SUBJECT PARSING RESULT======================");
-      debugString("teamTitle: " + this.teamInfoFromEmailSubject.title);
-      debugString("teamNumber: " + this.teamInfoFromEmailSubject.number);
+      debugString("team: " + this.teamInfoFromEmailSubject.toString());
       debugString("roundNumber: " + this.roundNumber);
       debugString("========================================================");
     });
@@ -465,11 +464,12 @@ export class AnswersImporter extends AbstractDataImporter {
   private validateTeamInfoCongruenceBetweenSubjectAndBody() {
     if (
       this.teamInfoFromEmailSubject &&
-      this.teamInfoFromEmailSubject.number != this.teamInfoFromEmailBody.number
+      this.teamInfoFromEmailSubject.getNumber() !=
+        this.teamInfoFromEmailBody.getNumber()
     ) {
       throw new Error(
-        `Номер команды в теме письма: ${this.teamInfoFromEmailSubject.number} не совпадает с номером команды в содержании письма: 
-        ${this.teamInfoFromEmailBody.number}`
+        `Номер команды в теме письма: ${this.teamInfoFromEmailSubject.getNumber()} не совпадает с номером команды в содержании письма: 
+        ${this.teamInfoFromEmailBody.getNumber()}`
       );
     }
   }
@@ -495,8 +495,8 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   private async validateTeamDataCorrectnessAsync() {
-    const url: string = `/teams/numbers/${this.teamInfoFromEmailBody.number}`;
-    var importingTeamTitle = this.teamInfoFromEmailBody.title;
+    const url: string = `/teams/numbers/${this.teamInfoFromEmailBody.getNumber()}`;
+    var importingTeamTitle = this.teamInfoFromEmailBody.getTitle();
     this.http.get(url).subscribe(
       (data: Map<string, any>) => {
         var loadedTeamTitle: string = data["title"];
@@ -504,7 +504,7 @@ export class AnswersImporter extends AbstractDataImporter {
           loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
         ) {
           throw new Error(
-            `В базе данных команда с номером: ${this.teamInfoFromEmailBody.number} записана как '${loadedTeamTitle}'. 
+            `В базе данных команда с номером: ${this.teamInfoFromEmailBody.getNumber()} записана как '${loadedTeamTitle}'. 
             А в письме передано название команды: '${importingTeamTitle}'`
           );
         }
@@ -513,10 +513,12 @@ export class AnswersImporter extends AbstractDataImporter {
         const NOT_FOUND_STATUS: number = 404;
         var errorMessage: string;
         if (error.status == NOT_FOUND_STATUS) {
-          errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.number}`;
+          errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.getNumber()}`;
         } else {
-          errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.number}.
-            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
+          errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.getNumber()}.
+            Дополнительная информация от сервера: Сообщение: ${
+              error.message
+            }. Код ошибки: ${error.status}`;
         }
 
         throw new Error(errorMessage);

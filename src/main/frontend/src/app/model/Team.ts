@@ -6,22 +6,22 @@ export class Team {
    * Используется в случаях, когда нет информации о команде,
    * чтобы не создавать новых экземпляров класса.
    */
-  public static emptyTeam: Team = new Team();
+  public static readonly emptyTeam: Team = new Team();
 
   /**
    * Идентификатор записи в базе данных.
    */
-  id: number;
+  private id: number;
 
   /**
    * Уникальный номер команды.
    */
-  number: string = "";
+  private number: string = "";
 
   /**
    * Название команды.
    */
-  title: string = "";
+  private title: string = "";
 
   public static numberRegExValidator: RegExp;
 
@@ -46,5 +46,23 @@ export class Team {
     this.id = initialMap["id"];
     this.number = initialMap["number"];
     this.title = initialMap["title"];
+  }
+
+  public getId(): number {
+    return this.id;
+  }
+
+  public getNumber(): string {
+    return this.number;
+  }
+
+  public getTitle(): string {
+    return this.title;
+  }
+
+  public toString(): string {
+    return `id: ${this.id}
+number: ${this.number}
+title: ${this.title}`;
   }
 }

@@ -1,15 +1,12 @@
 import { StringLinesIterator } from "./StringLinesIterator";
 
 export abstract class AbstractDataImporter {
-  protected sourceTextLinesIterator: StringLinesIterator;
+  protected readonly sourceTextLinesIterator: StringLinesIterator;
 
   constructor(sourceString: string) {
-    var string2Process = "";
-    if (sourceString) {
-      string2Process = sourceString;
-    }
+    var string2Process: string = sourceString ? sourceString : "";
 
-    var normalizedSourceString = AbstractDataImporter.normalizeString(
+    var normalizedSourceString: string = AbstractDataImporter.normalizeString(
       string2Process
     );
     this.sourceTextLinesIterator = new StringLinesIterator(
@@ -22,7 +19,7 @@ export abstract class AbstractDataImporter {
       rawString
     );
 
-    const newLineSurrogate: string = "//";
+    const newLineSurrogate: string = " // ";
     return sourceString.replace(/\n/g, newLineSurrogate);
   }
 
