@@ -1,9 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { Team } from "src/app/model/Team";
 import { HttpClient } from "@angular/common/http";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { TeamDetailsComponent } from "../team-details/team-details.component";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
+import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
 
 @Component({
   selector: "app-teams-list",
@@ -14,9 +15,16 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   implements OnInit {
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
-    this.loadOneTeamModelConstraints();
+    this.teamValidationService = new TeamShallowValidationService(http);
+    if (!this.teamValidationService.isInternalStateCorrect()) {
+      this.displayMessage(this.teamValidationService.brokenStateDescription);
+      return;
+    }
+
     this.loadTeamsList();
   }
+
+  private teamValidationService: TeamShallowValidationService;
 
   ngOnInit() {}
 
@@ -36,7 +44,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   openDetailsDialog(selectedRow?: any) {
     const dialogConfig = TeamDetailsComponent.getDialogConfigWithData(
-      this.modelConstraints,
+      this.teamValidationService,
       selectedRow
     );
     var dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
@@ -47,17 +55,6 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
         this.loadTeamsList();
       }
     });
-  }
-
-  loadOneTeamModelConstraints() {
-    const url: string = "/teams/model-constraints";
-    this.http.get(url).subscribe(
-      (data: Map<string, string>) => {
-        this.modelConstraints = data;
-        Team.initializeRegexpValidator(this.modelConstraints);
-      },
-      (error) => this.reportServerError(error)
-    );
   }
 
   loadTeamsList() {

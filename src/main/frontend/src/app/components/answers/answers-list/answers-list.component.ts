@@ -6,6 +6,7 @@ import { Team } from "src/app/model/Team";
 import { Email } from "src/app/model/Email";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
 
 @Component({
   selector: "app-answers-list",
@@ -25,7 +26,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     "Окончательный тур",
   ];
 
-  teamModelConstraints: Map<string, string>;
+  private teamShallowValidationService: TeamShallowValidationService;
 
   emailModelConstraints: Map<string, string>;
 
@@ -52,17 +53,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     "numbersOfAnsweredQuestions",
   ];
 
-  loadOneTeamModelConstraints() {
-    const url: string = "/teams/model-constraints";
-    this.http.get(url).subscribe(
-      (data: Map<string, string>) => {
-        this.teamModelConstraints = data;
-        Team.initializeRegexpValidator(this.teamModelConstraints);
-      },
-      (error) => this.reportServerError(error)
-    );
-  }
-
   loadEmailModelConstraints() {
     const url: string = "/emails/model-constraints";
     this.http.get(url).subscribe(
@@ -82,7 +72,14 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
 
-    this.loadOneTeamModelConstraints();
+    this.teamShallowValidationService = new TeamShallowValidationService(http);
+    if (!this.teamShallowValidationService.isInternalStateCorrect()) {
+      this.displayMessage(
+        this.teamShallowValidationService.brokenStateDescription
+      );
+      return;
+    }
+
     this.loadEmailModelConstraints();
     this.loadAnswerModelConstraints();
     this.loadTeamsList();
@@ -157,10 +154,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
         this.teamTitleAndNumber = [];
 
         data.forEach((oneTeam) => {
-          this.allTeamIds.push(oneTeam.getId());
-          this.teamTitleAndNumber.push(
-            oneTeam.getTitle() + " (" + oneTeam.getNumber() + ")"
-          );
+          this.allTeamIds.push(oneTeam.id);
+          this.teamTitleAndNumber.push(`${oneTeam.title} (${oneTeam.number})`);
         });
 
         this.selectedTeamId = this.allTeamIds[0];

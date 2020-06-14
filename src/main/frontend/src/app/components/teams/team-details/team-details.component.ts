@@ -25,7 +25,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   public static readonly DIALOG_RESULT_DECLINED: number = 2;
   public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
 
-  private readonly modelValidatorService: TeamShallowValidationService;
+  private readonly _modelValidatorService: TeamShallowValidationService;
 
   dialogTitle: string;
 
@@ -91,7 +91,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     // например в случаях, когда get запрос ещё не закончил выполняться
     this.team = Team.emptyTeam;
 
-    this.modelValidatorService =
+    this._modelValidatorService =
       dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
     var teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
@@ -187,6 +187,10 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     });
   }
 
+  get modelValidatorService(): TeamShallowValidationService {
+    return this._modelValidatorService;
+  }
+
   private getDialogTitle(teamObject?: Team): string {
     if (!teamObject) {
       return "Новая команда";
@@ -200,7 +204,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
    * @returns true, если поля заполнены, иначе false.
    */
   private validateFields(): boolean {
-    this.teamNumberIsIncorrect = !this.modelValidatorService.isTeamNumberCorrect(
+    this.teamNumberIsIncorrect = !this._modelValidatorService.isTeamNumberCorrect(
       this.team.number
     );
 

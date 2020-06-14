@@ -7,11 +7,12 @@
         matInput
         required
         placeholder="Номер команды"
-        maxlength="{{ modelConstraints['REQUIRED_NUMBER_LENGTH'] }}"
+        maxlength="{{ modelValidatorService.requiredTeamNumberLength }}"
         [(ngModel)]="team.number"
       />
       <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect"
-        >Номер должен состоять из трёх цифр</mat-hint
+        >Ожидается {{ modelValidatorService.requiredTeamNumberLength }}-значное
+        число</mat-hint
       >
     </mat-form-field>
     <mat-form-field appearance="outline">

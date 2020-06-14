@@ -48,9 +48,8 @@ public final class Team {
     /**
      * Название команды.
      */
-    @Column(length = 256, nullable = false, unique=true)
+    @Column(length = 96, nullable = false, unique=true)
     private String title;
-
 
     public Team() {
 

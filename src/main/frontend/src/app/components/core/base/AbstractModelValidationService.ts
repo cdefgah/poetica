@@ -7,19 +7,23 @@ export abstract class AbstractModelValidationService {
   protected httpClient: HttpClient;
 
   // используется в случае поломок, для хранения описания, что сломалось
-  protected brokenStateDescription: string = "";
+  protected _brokenStateDescription: string = "";
 
   constructor(http: HttpClient) {
     this.httpClient = http;
   }
 
   protected setBrokenInternalState(description: string) {
-    this.brokenStateDescription = description;
+    this._brokenStateDescription = description;
   }
 
-  protected isInternalStateCorrect() {
+  public isInternalStateCorrect() {
     return !(
-      this.brokenStateDescription && this.brokenStateDescription.length > 0
+      this._brokenStateDescription && this._brokenStateDescription.length > 0
     );
+  }
+
+  get brokenStateDescription(): string {
+    return this._brokenStateDescription;
   }
 }
