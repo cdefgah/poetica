@@ -1,30 +1,10 @@
-import { StringLinesIterator } from "./StringLinesIterator";
+export abstract class AbstractSingleLineDataImporter {
+  protected normalizedSourceString: string;
 
-export abstract class AbstractDataImporter {
-  protected readonly sourceTextLinesIterator: StringLinesIterator;
-
-  constructor(sourceString: string) {
-    var string2Process: string = sourceString ? sourceString : "";
-
-    var normalizedSourceString: string = AbstractDataImporter.normalizeString(
-      string2Process
+  constructor(rawSourceText: string) {
+    this.normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(
+      rawSourceText
     );
-    this.sourceTextLinesIterator = new StringLinesIterator(
-      normalizedSourceString
-    );
-  }
-
-  protected static introduceNewLineSurrogates(rawString: string): string {
-    var sourceString: string = AbstractDataImporter.compressSequentialNewLines(
-      rawString
-    );
-
-    const newLineSurrogate: string = " // ";
-    return sourceString.replace(/\n/g, newLineSurrogate);
-  }
-
-  protected static compressSequentialNewLines(sourceString: string) {
-    return sourceString.replace(/[\r\n]+/g, "\n");
   }
 
   /**

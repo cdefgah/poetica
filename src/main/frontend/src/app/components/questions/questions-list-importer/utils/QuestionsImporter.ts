@@ -1,10 +1,9 @@
 import { Question } from "src/app/model/Question";
-import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
+import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 
-export class QuestionsImporter extends AbstractDataImporter {
+export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
   private static readonly commentNotePrefix: string = "#N:";
-  private static readonly newLineReplacement: string = " // ";
 
   amountOfGradedQuestions: number;
 
@@ -49,12 +48,11 @@ export class QuestionsImporter extends AbstractDataImporter {
         } else {
           var additionalMessage: string =
             amountString.length > 0
-              ? 'А вы передаёте: "' + amountString + '"'
+              ? `А вы передаёте: "${amountString}"`
               : "Но вы не передали никакого значения.";
 
           throw new Error(
-            "Количество зачётных заданий должно быть целым положительным числом. " +
-              additionalMessage
+            `Количество зачётных заданий должно быть целым положительным числом. ${additionalMessage}`
           );
         }
       } else {
@@ -82,7 +80,7 @@ export class QuestionsImporter extends AbstractDataImporter {
     }
 
     this.expectedQuestionNumber = this.expectedQuestionNumber + 1;
-    var numberPrefix: string = "#" + questionNumber + ":";
+    var numberPrefix: string = `#${questionNumber}:`;
     var numberPrefixLength: number = numberPrefix.length;
     var questionBody: string = firstQuestionLine.substring(numberPrefixLength);
     var processingLine: string;
@@ -97,7 +95,7 @@ export class QuestionsImporter extends AbstractDataImporter {
       }
 
       questionBody =
-        questionBody + QuestionsImporter.newLineReplacement + processingLine;
+        questionBody + QuestionsImporter.newLineSurrogate + processingLine;
     }
 
     var rtfmMessage: string =
@@ -131,7 +129,7 @@ export class QuestionsImporter extends AbstractDataImporter {
 
       questionSourceBody =
         questionSourceBody +
-        QuestionsImporter.newLineReplacement +
+        QuestionsImporter.newLineSurrogate +
         processingLine;
     }
 
@@ -156,7 +154,7 @@ export class QuestionsImporter extends AbstractDataImporter {
 
           questionCommentNoteBody =
             questionCommentNoteBody +
-            QuestionsImporter.newLineReplacement +
+            QuestionsImporter.newLineSurrogate +
             processingLine;
         }
 
@@ -229,7 +227,7 @@ export class QuestionsImporter extends AbstractDataImporter {
   private extractQuestionNumber(sourceStringLine: string): number {
     if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
       throw new Error(
-        "Первым символом строки ожидался символ #. Строка: " + sourceStringLine
+        `Первым символом строки ожидался символ #. Строка: ${sourceStringLine}`
       );
     }
 
@@ -237,8 +235,7 @@ export class QuestionsImporter extends AbstractDataImporter {
 
     if (colonSymbolPosition == -1) {
       throw new Error(
-        "В начале строки должен быть символ двоеточия. Строка: " +
-          sourceStringLine
+        `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`
       );
     }
 
@@ -251,10 +248,7 @@ export class QuestionsImporter extends AbstractDataImporter {
       return Number(numberString);
     } else {
       throw new Error(
-        "Номер задания должен быть целым положительным числом, а вы передали: " +
-          numberString +
-          " в строке: " +
-          sourceStringLine
+        `Номер задания должен быть целым положительным числом, а вы передали: ${numberString} в строке: ${sourceStringLine}`
       );
     }
   }
