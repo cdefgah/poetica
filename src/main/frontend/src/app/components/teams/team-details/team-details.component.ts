@@ -8,6 +8,7 @@ import {
 } from "@angular/material";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
+import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
 
 @Component({
   selector: "app-team-details",
@@ -17,11 +18,14 @@ import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInter
 export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
-  private static readonly KEY_DIALOG_MODEL_CONSTRAINTS = "modelConstraints";
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
+    "modelValidatorService";
 
   public static readonly DIALOG_RESULT_ACCEPTED: number = 1;
   public static readonly DIALOG_RESULT_DECLINED: number = 2;
   public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
+
+  private readonly modelValidatorService: TeamShallowValidationService;
 
   dialogTitle: string;
 
@@ -38,7 +42,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   isExistingRecord: boolean;
 
   static getDialogConfigWithData(
-    modelConstraints: Map<string, string>,
+    modelValidatorService: TeamShallowValidationService,
     row?: any
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -50,8 +54,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     dialogConfig.data = new Map<string, any>();
 
     dialogConfig.data[
-      TeamDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS
-    ] = modelConstraints;
+      TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
+    ] = modelValidatorService;
 
     if (row) {
       dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_ID] =
@@ -78,17 +82,17 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    // создаём объект team сразу первой строчкой
+    // инициализируем объект team сразу первой строчкой
     // так как к нему подключены (bind)
     // свойства в html-template комепонента
     // и если не проинициализировать объект сразу
     // то компонент может попытаться (асинхронно) получить свойство
     // объекта, который мы ещё не проинициализировали,
     // например в случаях, когда get запрос ещё не закончил выполняться
-    this.team = new Team();
+    this.team = Team.emptyTeam;
 
-    this.modelConstraints =
-      dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS];
+    this.modelValidatorService =
+      dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
     var teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
 
@@ -98,10 +102,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       const url: string = `/teams/${teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.team.initialize(data);
-
-          this.teamCopy = new Team();
-          this.teamCopy.initialize(data);
+          this.team = Team.createTeamByMapOfValues(data);
+          this.teamCopy = Team.createTeamByMapOfValues(data);
 
           this.dialogTitle = this.getDialogTitle(this.team);
         },
