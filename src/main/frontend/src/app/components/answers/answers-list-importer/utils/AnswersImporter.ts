@@ -22,7 +22,7 @@ export class AnswersImporter extends AbstractDataImporter {
 
   private http: HttpClient;
 
-  // обёртка вокруг Promise, гарантирующая,
+  // обёртка вокруг Promise, гарантирующая (на самом деле - нихуя не гарантирующая),
   // что Promise будет всегда будет в состоянии resolved().
   // даже при ошибке.
   private sureThing = (promise: Promise<any>) =>
