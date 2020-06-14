@@ -4,6 +4,7 @@ import { AbstractDataImporter } from "src/app/utils/AbstractDataImporter";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { StringBuilder } from "./StringBuilder";
 import { HttpClient } from "@angular/common/http";
+import { debugString } from "src/app/utils/Config";
 
 export class AnswersImporter extends AbstractDataImporter {
   private emailModelConstraints: Map<string, number>;
@@ -20,6 +21,14 @@ export class AnswersImporter extends AbstractDataImporter {
   private answers: Answer[] = [];
 
   private http: HttpClient;
+
+  // обёртка вокруг Promise, гарантирующая,
+  // что Promise будет всегда будет в состоянии resolved().
+  // даже при ошибке.
+  private sureThing = (promise: Promise<any>) =>
+    promise
+      .then((data) => ({ ok: true, data }))
+      .catch((error) => Promise.resolve({ ok: false, error }));
 
   constructor(parameters: AnswersImporterParameters) {
     super(parameters.emailBody);
@@ -39,8 +48,19 @@ export class AnswersImporter extends AbstractDataImporter {
   }
 
   public async parse() {
-    this.parseEmailSubject();
-    await this.parseEmailBodyAsync();
+    debugString("Parsing process started");
+
+    const subjectParsingResult = await this.sureThing(this.parseEmailSubject());
+    if (subjectParsingResult.ok) {
+      debugString("Subject parsed ok. Parsing email body");
+      const emailParsingResult;
+    } else {
+      var errorMessage = subjectParsingResult["error"];
+      debugString(`Subject parsed failed. Error message: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+
+    // await this.parseEmailBodyAsync();
   }
 
   public getRoundNumber(): string {
@@ -51,46 +71,60 @@ export class AnswersImporter extends AbstractDataImporter {
     return this.teamInfoFromEmailSubject;
   }
 
-  private parseEmailSubject(): void {
-    // если тема письма не задана - выходим
-    // исключение не бросаем. Ожидаем, что в теле письма есть информация нужная
-    if (!this.emailSubject || this.emailSubject.length == 0) {
-      return;
-    }
+  private parseEmailSubject(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      debugString("Parsing email subject: start");
 
-    // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
-    var processedSubject: string = AnswersImporter.extractSignificantPartFromTheEmailSubject(
-      this.emailSubject
-    );
+      // если тема письма не задана - выходим
+      // исключение не бросаем. Ожидаем, что в теле письма есть информация нужная
+      if (this.emailSubject.length == 0) {
+        debugString("Email subject is empty. Exiting");
+        resolve();
+        return;
+      }
 
-    console.log("processedSubject: " + processedSubject);
+      // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
+      var processedSubject: string = AnswersImporter.extractSignificantPartFromTheEmailSubject(
+        this.emailSubject
+      );
 
-    var commaPosition = processedSubject.indexOf(",");
-    if (commaPosition == -1) {
-      throw new Error("Некорректный формат темы письма. Нет запятой.");
-    }
+      debugString(`processedSubject: ${processedSubject}`);
 
-    var teamTitle = AnswersImporter.removeDoubleQuotations(
-      processedSubject.substring(0, commaPosition)
-    );
+      var commaPosition = processedSubject.indexOf(",");
+      if (commaPosition == -1) {
+        reject("Некорректный формат темы письма. Нет запятой.");
+        return;
+      }
 
-    var afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
+      var teamTitle = AnswersImporter.removeDoubleQuotations(
+        processedSubject.substring(0, commaPosition)
+      );
 
-    let {
-      foundTeamNumber,
-      foundRoundNumber,
-    } = AnswersImporter.extractTeamAndRoundNumbers(afterCommaSubjectPart);
+      debugString(`teamTitle: ${teamTitle}`);
 
-    var teamNumber = foundTeamNumber;
-    this.teamInfoFromEmailSubject = new Team(teamNumber, teamTitle);
+      var afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
 
-    this.roundNumber = foundRoundNumber;
+      debugString(`afterCommaSubjectPart: ${afterCommaSubjectPart}`);
 
-    console.log("=========== SUBJECT PARSING RESULT======================");
-    console.log("teamTitle: " + this.teamInfoFromEmailSubject.title);
-    console.log("teamNumber: " + this.teamInfoFromEmailSubject.number);
-    console.log("roundNumber: " + this.roundNumber);
-    console.log("========================================================");
+      let {
+        foundTeamNumber,
+        foundRoundNumber,
+      } = AnswersImporter.extractTeamAndRoundNumbers(afterCommaSubjectPart);
+
+      debugString(`foundTeamNumber: ${foundTeamNumber}`);
+      debugString(`foundRoundNumber: ${foundRoundNumber}`);
+
+      var teamNumber = foundTeamNumber;
+      this.teamInfoFromEmailSubject = new Team(teamNumber, teamTitle);
+
+      this.roundNumber = foundRoundNumber;
+
+      debugString("=========== SUBJECT PARSING RESULT======================");
+      debugString("teamTitle: " + this.teamInfoFromEmailSubject.title);
+      debugString("teamNumber: " + this.teamInfoFromEmailSubject.number);
+      debugString("roundNumber: " + this.roundNumber);
+      debugString("========================================================");
+    });
   }
 
   /**
@@ -132,10 +166,12 @@ export class AnswersImporter extends AbstractDataImporter {
       // по этому номеру будем делать запрос
       // и получать информацию о команде. И сверять название команды в базе
       // с названием команды по номеру.
-      if (
-        AnswersImporter.checkTeamNumberFormat(afterCommaPartOfTheEmailSubject)
-      ) {
+      if (AnswersImporter.isPositiveInteger(afterCommaPartOfTheEmailSubject)) {
         foundTeamNumber = afterCommaPartOfTheEmailSubject;
+      } else {
+        throw new Error(
+          `Номер команды в теме письма должен быть целым положительным числом, а вы передали: ${afterCommaPartOfTheEmailSubject}`
+        );
       }
     }
 
