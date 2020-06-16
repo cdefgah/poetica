@@ -71,24 +71,10 @@ public class QuestionsController extends AbstractController {
             produces = "application/json")
      public ResponseEntity<String> importQuestions(@RequestBody Question[] allQuestions) {
 
-        System.out.println("=============== IMPORTING STARTED ===========================");
-        System.out.println("=============== IMPORTING STARTED ===========================");
-        System.out.println("=============== IMPORTING STARTED ===========================");
-
         for(Question question: allQuestions) {
-            System.out.println("----------------------------");
-            System.out.println(question);
-            System.out.println("----------------------------");
-
-            System.out.println("Persisting question: " + question.getNumber());
             entityManager.persist(question);
-            System.out.println("Persisting question: " + question.getNumber() + " DONE!");
         }
-
-        System.out.println("=============== IMPORTING FINISHED ===========================");
-        System.out.println("=============== IMPORTING FINISHED ===========================");
-        System.out.println("=============== IMPORTING FINISHED ===========================");
-
+        
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
