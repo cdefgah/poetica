@@ -129,6 +129,9 @@ export class QuestionsListImporterComponent
         "application/json; charset=utf-8"
       );
 
+      console.log(" ========== DATA START =============");
+      this.dataSource.forEach((element) => console.log(element.toString()));
+      console.log(" ========== DATA END =============");
       this.http
         .post("/questions/import", this.dataSource, { headers: headers })
         .subscribe(

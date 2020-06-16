@@ -3,6 +3,12 @@
  */
 export class QuestionDataModel {
   /**
+   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса на сервер приходят пустые объекты без значений в полях.
+   * Скорее всего это баг в Angular.
+   * Так что в модели все поля публичные.
+   */
+
+  /**
    * Используется в случаях, когда нет информации о задании,
    * чтобы не создавать новых экземпляров класса.
    */
@@ -11,32 +17,32 @@ export class QuestionDataModel {
   /**
    * Идентификатор записи в базе данных.
    */
-  private _id: number;
+  id: number;
 
   /**
    * Уникальный номер задания.
    */
-  private _number: number;
+  number: number;
 
   /**
    * Содержание задания.
    */
-  private _body: string;
+  body: string;
 
   /**
    * Источник задания.
    */
-  private _source: string;
+  source: string;
 
   /**
    * Комментарий к заданию.
    */
-  private _comment: string;
+  comment: string;
 
   /**
    * Отметка, является-ли задание зачётным (значение true).
    */
-  private _graded: boolean;
+  graded: boolean;
 
   public static createQuestion(): QuestionDataModel {
     return new QuestionDataModel();
@@ -51,72 +57,24 @@ export class QuestionDataModel {
   }
 
   private constructor() {
-    this._id = 0;
-    this._number = 0;
-    this._body = "";
-    this._source = "";
-    this._comment = "";
-    this._graded = true;
+    this.id = 0;
+    this.number = 0;
+    this.body = "";
+    this.source = "";
+    this.comment = "";
+    this.graded = true;
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this._id = initialMap["id"];
-    this._number = initialMap["number"];
-    this._body = initialMap["body"];
-    this._comment = initialMap["comment"];
-    this._source = initialMap["source"];
-    this._graded = initialMap["graded"];
-  }
-
-  get id(): number {
-    return this._id;
-  }
-
-  set id(value: number) {
-    this._id = value;
-  }
-
-  get number(): number {
-    return this._number;
-  }
-
-  set number(value: number) {
-    this._number = value;
-  }
-
-  get body(): string {
-    return this._body;
-  }
-
-  set body(value: string) {
-    this._body = value;
-  }
-
-  get source(): string {
-    return this._source;
-  }
-
-  set source(value: string) {
-    this._source = value;
-  }
-
-  get comment(): string {
-    return this._comment;
-  }
-
-  set comment(value: string) {
-    this._comment = value;
-  }
-
-  get graded(): boolean {
-    return this._graded;
-  }
-
-  set graded(value: boolean) {
-    this._graded = value;
+    this.id = initialMap["id"];
+    this.number = initialMap["number"];
+    this.body = initialMap["body"];
+    this.comment = initialMap["comment"];
+    this.source = initialMap["source"];
+    this.graded = initialMap["graded"];
   }
 
   toString(): string {
-    return `id:${this._id}\nnumber:${this._number}\ngraded:${this._graded}\nbody:${this._body}\nsource:${this._source}\ncomment:${this._comment}\n`;
+    return `id:${this.id}\nnumber:${this.number}\ngraded:${this.graded}\nbody:${this.body}\nsource:${this.source}\ncomment:${this.comment}\n`;
   }
 }

@@ -3,6 +3,12 @@
  */
 export class TeamDataModel {
   /**
+   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса на сервер приходят пустые объекты без значений в полях.
+   * Скорее всего это баг в Angular.
+   * Так что в модели все поля публичные.
+   */
+
+  /**
    * Используется в случаях, когда нет информации о команде,
    * чтобы не создавать новых экземпляров класса.
    */
@@ -11,17 +17,17 @@ export class TeamDataModel {
   /**
    * Идентификатор записи в базе данных.
    */
-  private _id: number;
+  id: number;
 
   /**
    * Уникальный номер команды.
    */
-  private _number: string = "";
+  number: string = "";
 
   /**
    * Название команды.
    */
-  private _title: string = "";
+  title: string = "";
 
   public static createTeamByNumberAndTitle(
     number: string,
@@ -48,43 +54,19 @@ export class TeamDataModel {
    * @param title название команды.
    */
   private constructor(number?: string, title?: string) {
-    this._number = number ? number : "";
-    this._title = title ? title : "";
+    this.number = number ? number : "";
+    this.title = title ? title : "";
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this._id = initialMap["id"];
-    this._number = initialMap["number"];
-    this._title = initialMap["title"];
-  }
-
-  get id(): number {
-    return this._id;
-  }
-
-  set id(value: number) {
-    this._id = value;
-  }
-
-  get number() {
-    return this._number;
-  }
-
-  set number(value: string) {
-    this._number = value;
-  }
-
-  get title() {
-    return this._title;
-  }
-
-  set title(value: string) {
-    this._title = value;
+    this.id = initialMap["id"];
+    this.number = initialMap["number"];
+    this.title = initialMap["title"];
   }
 
   public toString(): string {
-    return `id: ${this._id}
-number: ${this._number}
-title: ${this._title}`;
+    return `id: ${this.id}
+number: ${this.number}
+title: ${this.title}`;
   }
 }
