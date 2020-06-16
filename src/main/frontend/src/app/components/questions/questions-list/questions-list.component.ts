@@ -64,7 +64,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
   loadQuestionsList() {
     const url: string = `/questions/${this.selectedDisplayModeAlias}`;
     this.http.get(url).subscribe(
-      (data: Question[]) => {
+      (data: QuestionDataModel[]) => {
         this.dataSource = data;
       },
       (error) => this.reportServerError(error)
@@ -81,7 +81,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   openDetailsDialog(selectedRow?: any) {
     const dialogConfig = QuestionDetailsComponent.getDialogConfigWithData(
-      this.modelConstraints,
+      this.questionValidationService,
       selectedRow
     );
     var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
@@ -127,7 +127,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   private startImportingQuestions() {
     const importDialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
-      this.modelConstraints
+      this.questionValidationService
     );
     var dialogRef = this.dialog.open(
       QuestionsListImporterComponent,

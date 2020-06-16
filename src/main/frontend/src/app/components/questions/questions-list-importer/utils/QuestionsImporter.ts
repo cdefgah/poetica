@@ -1,5 +1,6 @@
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
+import { QuestionShallowValidationService } from "src/app/components/core/validators/QuestionShallowValidationService";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
@@ -11,13 +12,15 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   questions: QuestionDataModel[];
 
-  constructor(sourceText: string) {
+  private questionModelValidatorService: QuestionShallowValidationService;
+
+  constructor(
+    sourceText: string,
+    questionModelValidatorService: QuestionShallowValidationService
+  ) {
     super(sourceText);
     this.expectedQuestionNumber = 1;
-
-    this.maxBodyLength = modelConstraints["MAX_BODY_LENGTH"];
-    this.maxCommentLength = modelConstraints["MAX_COMMENT_LENGTH"];
-    this.maxSourceLength = modelConstraints["MAX_SOURCE_LENGTH"];
+    this.questionModelValidatorService = questionModelValidatorService;
   }
 
   public doImport() {
@@ -169,21 +172,30 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     // проверяем ограничения на длину полей
-    if (questionBody.length > this.maxBodyLength) {
+
+    if (
+      questionBody.length > this.questionModelValidatorService.maxBodyLength
+    ) {
       throw new Error(
-        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBody.length} символов и превышает максимальный разрешённый размер в ${this.maxBodyLength} символов`
+        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxBodyLength} символов`
       );
     }
 
-    if (questionSourceBody.length > this.maxSourceLength) {
+    if (
+      questionSourceBody.length >
+      this.questionModelValidatorService.maxSourceLength
+    ) {
       throw new Error(
-        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this.maxSourceLength} символов`
+        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxSourceLength} символов`
       );
     }
 
-    if (questionCommentNoteBody.length > this.maxCommentLength) {
+    if (
+      questionCommentNoteBody.length >
+      this.questionModelValidatorService.maxCommentLength
+    ) {
       throw new Error(
-        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this.maxCommentLength} символов`
+        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxCommentLength} символов`
       );
     }
 

@@ -108,7 +108,7 @@ export class QuestionsListImporterComponent
     try {
       var questionsImporter = new QuestionsImporter(
         this.sourceText,
-        this.oneQuestionModelConstraintsMap
+        this.questionValidationService
       );
       questionsImporter.doImport();
 

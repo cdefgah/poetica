@@ -1,12 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { MatRadioChange, MatDialog } from "@angular/material";
 import { HttpClient } from "@angular/common/http";
-import { Answer } from "src/app/model/Answer";
-import { Team } from "src/app/model/Team";
-import { Email } from "src/app/model/Email";
+import { AnswerDataModel } from "src/app/model/AnswerDataModel";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
+import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
 
 @Component({
   selector: "app-answers-list",
@@ -34,11 +34,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
-  answersDataSource: Answer[];
+  answersDataSource: AnswerDataModel[];
 
-  answersWithoutGradesDataSource: Answer[];
+  answersWithoutGradesDataSource: AnswerDataModel[];
 
-  emailsDataSource: Email[];
+  emailsDataSource: EmailDataModel[];
 
   displayedAnswerColumns: string[] = [
     "number",
@@ -149,7 +149,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     const url: string = "/teams/all";
 
     this.http.get(url).subscribe(
-      (data: Team[]) => {
+      (data: TeamDataModel[]) => {
         this.allTeamIds = [];
         this.teamTitleAndNumber = [];
 

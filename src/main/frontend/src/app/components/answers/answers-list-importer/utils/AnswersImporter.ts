@@ -1,5 +1,5 @@
-import { Answer } from "src/app/model/Answer";
-import { Team } from "src/app/model/Team";
+import { AnswerDataModel } from "src/app/model/AnswerDataModel";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { StringBuilder } from "./StringBuilder";
 import { HttpClient } from "@angular/common/http";
@@ -15,10 +15,10 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
   private emailSubject: string;
   private emailBody: string;
 
-  private teamInfoFromEmailSubject: Team;
-  private teamInfoFromEmailBody: Team;
+  private teamInfoFromEmailSubject: TeamDataModel;
+  private teamInfoFromEmailBody: TeamDataModel;
 
-  private answers: Answer[] = [];
+  private answers: AnswerDataModel[] = [];
 
   private http: HttpClient;
 
@@ -67,7 +67,7 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
     return this.roundNumber;
   }
 
-  public getTeamFromEmailSubject(): Team {
+  public getTeamFromEmailSubject(): TeamDataModel {
     return this.teamInfoFromEmailSubject;
   }
 
@@ -115,7 +115,7 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
       debugString(`foundRoundNumber: ${foundRoundNumber}`);
 
       var teamNumber = foundTeamNumber;
-      this.teamInfoFromEmailSubject = Team.createTeamByNumberAndTitle(
+      this.teamInfoFromEmailSubject = TeamDataModel.createTeamByNumberAndTitle(
         teamNumber,
         teamTitle
       );
@@ -273,7 +273,9 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
     throw new Error("В теле письма не обнаружен признак начала блока ответов.");
   }
 
-  private static processFirstLineOfTheAnswersBlock(firstLine: string): Team {
+  private static processFirstLineOfTheAnswersBlock(
+    firstLine: string
+  ): TeamDataModel {
     var foundTeamTitle: string = "";
     var foundTeamNumber: string = "";
 
@@ -287,7 +289,10 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
 
     foundTeamTitle = AnswersImporter.removeDoubleQuotations(foundTeamTitle);
 
-    return Team.createTeamByNumberAndTitle(foundTeamNumber, foundTeamTitle);
+    return TeamDataModel.createTeamByNumberAndTitle(
+      foundTeamNumber,
+      foundTeamTitle
+    );
   }
 
   private async parseEmailBodyAsync() {
@@ -449,7 +454,7 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
       // в таком случае пустой ответ не регистрируем а пропускаем
       if (wholeAnswer.length() > 0) {
         currentObjectReference.answers.push(
-          new Answer(
+          new AnswerDataModel(
             questionNumber,
             wholeAnswer.toString(),
             wholeComment.toString()

@@ -1,13 +1,13 @@
 <p mat-dialog-title>{{ dialogTitle }}</p>
 <mat-dialog-content>
-  <div style="display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column;">
     <mat-form-field appearance="outline">
       <mat-label>Содержание</mat-label>
       <textarea
         matInput
         rows="7"
         placeholder="Содержание"
-        maxlength="{{ modelConstraints['MAX_BODY_LENGTH'] }}"
+        maxlength="{{ questionValidationService.maxBodyLength }}"
         required
         [(ngModel)]="question.body"
       ></textarea>
@@ -21,7 +21,7 @@
         matInput
         rows="3"
         placeholder="Источник"
-        maxlength="{{ modelConstraints['MAX_SOURCE_LENGTH'] }}"
+        maxlength="{{ questionValidationService.maxSourceLength }}"
         required
         [(ngModel)]="question.source"
       ></textarea>
@@ -35,7 +35,7 @@
         matInput
         rows="3"
         placeholder="Комментарий"
-        maxlength="{{ modelConstraints['MAX_COMMENT_LENGTH'] }}"
+        maxlength="{{ questionValidationService.maxCommentLength }}"
         [(ngModel)]="question.comment"
       ></textarea>
     </mat-form-field>
