@@ -2,15 +2,17 @@ import { Component, OnInit, Inject } from "@angular/core";
 import {
   MAT_DIALOG_DATA,
   MatDialogConfig,
-  MatDialogRef
+  MatDialogRef,
 } from "@angular/material";
+import { AbstractBareComponent } from "../base/AbstractBareComponent";
 
 @Component({
   selector: "app-message-box",
   templateUrl: "./message-box.component.html",
-  styleUrls: ["./message-box.component.css"]
+  styleUrls: ["./message-box.component.css"],
 })
-export class MessageBoxComponent implements OnInit {
+export class MessageBoxComponent extends AbstractBareComponent
+  implements OnInit {
   private static readonly KEY_DIALOG_TITLE = "dialogTitle";
   private static readonly KEY_DIALOG_MESSAGE = "dialogMessage";
   private static readonly KEY_ACCEPT_BUTTON_TITLE = "acceptButtonTitle";
@@ -47,6 +49,7 @@ export class MessageBoxComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     public dialog: MatDialogRef<MessageBoxComponent>
   ) {
+    super();
     if (!dialogData) {
       return;
     }
@@ -73,14 +76,6 @@ export class MessageBoxComponent implements OnInit {
     );
     if (passedValue.length > 0) {
       this.acceptButtonTitle = passedValue;
-    }
-  }
-
-  getMapValue(mapKey: string, map: Map<string, string>): string {
-    if (mapKey in map && map[mapKey]) {
-      return map[mapKey];
-    } else {
-      return "";
     }
   }
 

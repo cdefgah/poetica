@@ -7,9 +7,10 @@ import {
 } from "@angular/material/dialog";
 
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
-import { Question } from "src/app/model/Question";
+import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -21,7 +22,7 @@ export class QuestionsListImporterComponent
   implements OnInit {
   rawSourceTextFormGroup: any;
 
-  dataSource: Question[] = [];
+  dataSource: QuestionDataModel[] = [];
 
   displayedColumns: string[] = [
     "number",
@@ -37,13 +38,13 @@ export class QuestionsListImporterComponent
 
   dataIsReadyForImport: boolean = false;
 
-  private static readonly KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS =
-    "oneQuestionModelConstraints";
+  private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE =
+    "questionModelValidatorService";
 
-  private oneQuestionModelConstraintsMap: Map<string, number>;
+  private questionValidationService: QuestionShallowValidationService;
 
   static getDialogConfigWithData(
-    oneQuestionModelConstraints: Map<string, string>
+    questionValidationService: QuestionShallowValidationService
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
@@ -52,16 +53,10 @@ export class QuestionsListImporterComponent
     dialogConfig.width = "62%";
 
     dialogConfig.data = new Map<string, any>();
-    var constraints = new Map<string, number>();
-
-    for (let key in oneQuestionModelConstraints) {
-      let stringConstraintsValue = oneQuestionModelConstraints[key];
-      constraints[key] = parseInt(stringConstraintsValue);
-    }
 
     dialogConfig.data[
-      QuestionsListImporterComponent.KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS
-    ] = constraints;
+      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
+    ] = questionValidationService;
 
     return dialogConfig;
   }
@@ -78,20 +73,10 @@ export class QuestionsListImporterComponent
       return;
     }
 
-    var constraintsMap: any = this.getMapValue(
-      QuestionsListImporterComponent.KEY_DIALOG_ONE_QUESTION_MODEL_CONSTRAINTS,
-      dialogData
-    );
-
-    this.oneQuestionModelConstraintsMap = constraintsMap;
-  }
-
-  getMapValue(mapKey: string, map: Map<string, string>): string {
-    if (mapKey in map && map[mapKey]) {
-      return map[mapKey];
-    } else {
-      return "";
-    }
+    this.questionValidationService =
+      dialogData[
+        QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
+      ];
   }
 
   protected getMessageDialogReference(): MatDialog {

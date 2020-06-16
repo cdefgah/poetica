@@ -6,8 +6,9 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Question } from "src/app/model/Question";
+import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
 
 @Component({
   selector: "app-question-details",
@@ -17,12 +18,15 @@ import { AbstractInteractiveComponentModel } from "src/app/components/core/base/
 export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
   private static readonly KEY_DIALOG_ID = "id";
-  private static readonly KEY_DIALOG_MODEL_CONSTRAINTS = "modelConstraints";
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
+    "modelValidatorService";
 
   dialogTitle: string;
 
-  question: Question;
-  questionCopy: Question; // используется для сравнения, были-ли изменения при редактировании
+  question: QuestionDataModel;
+  questionCopy: QuestionDataModel; // используется для сравнения, были-ли изменения при редактировании
+
+  questionValidationService: QuestionShallowValidationService;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -32,17 +36,17 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    // создаём объект question сразу первой строчкой
+    // инициализируем объект question сразу первой строчкой
     // так как к нему подключены (bind)
     // свойства в html-template комепонента
     // и если не проинициализировать объект сразу
     // то компонент может попытаться (асинхронно) получить свойство
     // объекта, который мы ещё не проинициализировали,
     // например в случаях, когда get запрос ещё не закончил выполняться
-    this.question = new Question();
+    this.question = QuestionDataModel.emptyQuestion;
 
-    this.modelConstraints =
-      dialogData[QuestionDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS];
+    this.questionValidationService =
+      dialogData[QuestionDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
     var questionId = dialogData[QuestionDetailsComponent.KEY_DIALOG_ID];
 
@@ -51,17 +55,16 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
       const url: string = `/questions/${questionId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.question.initialize(data);
-
-          this.questionCopy = new Question();
-          this.questionCopy.initialize(data);
+          this.question = QuestionDataModel.createTeamByMapOfValues(data);
+          this.questionCopy = QuestionDataModel.createTeamByMapOfValues(data);
 
           this.dialogTitle = this.getDialogTitle(this.question);
         },
         (error) => this.reportServerError(error)
       );
     } else {
-      // создаём заголовок диалога для нового задания
+      // создаём объект задания и заголовок диалога для нового задания
+      this.question = QuestionDataModel.createQuestion();
       this.dialogTitle = this.getDialogTitle(this.question);
     }
   }
@@ -71,7 +74,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   static getDialogConfigWithData(
-    modelConstraints: Map<string, string>,
+    questionValidationService: QuestionShallowValidationService,
     row?: any
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -83,8 +86,8 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
     dialogConfig.data = new Map<string, any>();
 
     dialogConfig.data[
-      QuestionDetailsComponent.KEY_DIALOG_MODEL_CONSTRAINTS
-    ] = modelConstraints;
+      QuestionDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
+    ] = questionValidationService;
 
     if (row) {
       dialogConfig.data[QuestionDetailsComponent.KEY_DIALOG_ID] =
@@ -103,7 +106,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
 
   ngOnInit() {}
 
-  private getDialogTitle(questionObject: Question): string {
+  private getDialogTitle(questionObject: QuestionDataModel): string {
     if (questionObject.number === 0) {
       return "Новое задание";
     } else {

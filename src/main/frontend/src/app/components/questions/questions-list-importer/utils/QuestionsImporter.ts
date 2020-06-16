@@ -1,4 +1,4 @@
-import { Question } from "src/app/model/Question";
+import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
@@ -9,13 +9,9 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   expectedQuestionNumber: number;
 
-  questions: Question[];
+  questions: QuestionDataModel[];
 
-  private readonly maxBodyLength: number;
-  private readonly maxCommentLength: number;
-  private readonly maxSourceLength: number;
-
-  constructor(sourceText: string, modelConstraints: Map<string, number>) {
+  constructor(sourceText: string) {
     super(sourceText);
     this.expectedQuestionNumber = 1;
 
@@ -28,7 +24,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     this.amountOfGradedQuestions = this.loadGradedQuestionsQty();
 
     this.questions = [];
-    var question: Question;
+    var question: QuestionDataModel;
     while ((question = this.nextQuestion()) != null) {
       this.questions.push(question);
     }
@@ -65,7 +61,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
   }
 
-  private nextQuestion(): Question {
+  private nextQuestion(): QuestionDataModel {
     if (!this.sourceTextLinesIterator.hasNextLine()) {
       return null;
     }
@@ -103,7 +99,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
     if (!nextSegmentDetected) {
       throw new Error(
-        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился.${rtfmMessage}`
+        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился. ${rtfmMessage}`
       );
     }
 
@@ -192,7 +188,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     // формируем вопрос
-    var question: Question = new Question();
+    var question: QuestionDataModel = QuestionDataModel.createQuestion();
     question.number = questionNumber;
     question.graded = questionNumber <= this.amountOfGradedQuestions;
     question.body = questionBody;

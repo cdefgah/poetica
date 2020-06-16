@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog, MatRadioChange } from "@angular/material";
-import { Question } from "src/app/model/Question";
+import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
 
 @Component({
   selector: "app-questions-list",
@@ -31,11 +32,11 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   displayedColumns: string[] = ["number", "body", "source", "comment"];
 
-  modelConstraints: Map<string, string>;
-
-  dataSource: Question[];
+  dataSource: QuestionDataModel[];
 
   selectedRowIndex: number;
+
+  private questionValidationService: QuestionShallowValidationService;
 
   constructor(
     private http: HttpClient,
@@ -43,7 +44,14 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
     public otherDialog: MatDialog
   ) {
     super();
-    this.loadOneQuestionModelConstraints();
+    this.questionValidationService = new QuestionShallowValidationService(http);
+    if (!this.questionValidationService.isInternalStateCorrect) {
+      this.displayMessage(
+        this.questionValidationService.brokenStateDescription
+      );
+      return;
+    }
+
     this.loadQuestionsList();
   }
 

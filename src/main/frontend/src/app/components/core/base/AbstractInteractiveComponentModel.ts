@@ -1,9 +1,9 @@
 import { MatDialogConfig, MatDialog } from "@angular/material/dialog";
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
-import { Action } from "rxjs/internal/scheduler/Action";
+import { AbstractBareComponent } from "./AbstractBareComponent";
 
-export abstract class AbstractInteractiveComponentModel {
+export abstract class AbstractInteractiveComponentModel extends AbstractBareComponent {
   protected abstract getMessageDialogReference(): MatDialog;
 
   protected reportServerError(error: any, customMessage: string = "") {

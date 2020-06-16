@@ -4,13 +4,15 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef,
 } from "@angular/material/dialog";
+import { AbstractBareComponent } from "../base/AbstractBareComponent";
 
 @Component({
   selector: "app-confirmation-dialog",
   templateUrl: "./confirmation-dialog.component.html",
   styleUrls: ["./confirmation-dialog.component.css"],
 })
-export class ConfirmationDialogComponent implements OnInit {
+export class ConfirmationDialogComponent extends AbstractBareComponent
+  implements OnInit {
   private static readonly KEY_DIALOG_TITLE = "dialogTitle";
   private static readonly KEY_DIALOG_CONFIRMATION_MESSAGE =
     "dialogConfirmationMessage";
@@ -60,6 +62,8 @@ export class ConfirmationDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     public dialog: MatDialogRef<ConfirmationDialogComponent>
   ) {
+    super();
+
     if (!dialogData) {
       return;
     }
@@ -94,14 +98,6 @@ export class ConfirmationDialogComponent implements OnInit {
     );
     if (passedValue.length > 0) {
       this.declineButtonTitle = passedValue;
-    }
-  }
-
-  getMapValue(mapKey: string, map: Map<string, string>): string {
-    if (mapKey in map && map[mapKey]) {
-      return map[mapKey];
-    } else {
-      return "";
     }
   }
 

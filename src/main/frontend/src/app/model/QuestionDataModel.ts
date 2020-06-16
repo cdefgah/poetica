@@ -68,6 +68,54 @@ export class QuestionDataModel {
     this._graded = initialMap["graded"];
   }
 
+  get id(): number {
+    return this._id;
+  }
+
+  set id(value: number) {
+    this._id = value;
+  }
+
+  get number(): number {
+    return this._number;
+  }
+
+  set number(value: number) {
+    this._number = value;
+  }
+
+  get body(): string {
+    return this._body;
+  }
+
+  set body(value: string) {
+    this._body = value;
+  }
+
+  get source(): string {
+    return this._source;
+  }
+
+  set source(value: string) {
+    this._source = value;
+  }
+
+  get comment(): string {
+    return this._comment;
+  }
+
+  set comment(value: string) {
+    this._comment = value;
+  }
+
+  get graded(): boolean {
+    return this._graded;
+  }
+
+  set graded(value: boolean) {
+    this._graded = value;
+  }
+
   toString(): string {
     return `id:${this._id}\nnumber:${this._number}\ngraded:${this._graded}\nbody:${this._body}\nsource:${this._source}\ncomment:${this._comment}\n`;
   }
