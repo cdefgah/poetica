@@ -1,4 +1,4 @@
-import { AbstractModelValidationService } from "./AbstractModelValidationService";
+import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
 import { HttpClient } from "@angular/common/http";
 
 export class TeamShallowValidationService extends AbstractModelValidationService {
@@ -8,11 +8,11 @@ export class TeamShallowValidationService extends AbstractModelValidationService
   private _maxTeamTitleLength: number;
   private _requiredTeamNumberLength: number;
 
-  constructor(http: HttpClient) {
-    super(http);
+  constructor(httpClient: HttpClient) {
+    super();
 
     const url: string = "/teams/model-constraints";
-    this.httpClient.get(url).subscribe(
+    httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
         this._modelConstraints = data;
 

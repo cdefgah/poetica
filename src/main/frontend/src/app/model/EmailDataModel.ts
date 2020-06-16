@@ -1,4 +1,4 @@
-export class Email {
+export class EmailDataModel {
   id: any;
   subject: string;
   body: string;

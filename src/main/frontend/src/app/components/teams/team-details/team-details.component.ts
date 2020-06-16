@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from "@angular/core";
-import { Team } from "src/app/model/Team";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -8,7 +8,8 @@ import {
 } from "@angular/material";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
+import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
   selector: "app-team-details",
@@ -29,13 +30,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
   dialogTitle: string;
 
-  team: Team;
-  teamCopy: Team;
+  team: TeamDataModel;
+  teamCopy: TeamDataModel;
 
   teamNumberIsIncorrect: boolean = false;
   teamTitleIsIncorrect: boolean = false;
-
-  modelConstraints: Map<string, string>;
 
   serverResponse: any;
 
@@ -57,9 +56,14 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
     ] = modelValidatorService;
 
+    debugString("Checking the row validity");
+    debugString(row);
     if (row) {
+      debugString("Checking the row validity ... row is TRUE");
       dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_ID] =
         row[TeamDetailsComponent.KEY_DIALOG_ID];
+    } else {
+      debugString("Checking the row validity - ROW IS FALSE");
     }
 
     return dialogConfig;
@@ -89,7 +93,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     // то компонент может попытаться (асинхронно) получить свойство
     // объекта, который мы ещё не проинициализировали,
     // например в случаях, когда get запрос ещё не закончил выполняться
-    this.team = Team.emptyTeam;
+    this.team = TeamDataModel.emptyTeam;
 
     this._modelValidatorService =
       dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
@@ -102,15 +106,16 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       const url: string = `/teams/${teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.team = Team.createTeamByMapOfValues(data);
-          this.teamCopy = Team.createTeamByMapOfValues(data);
+          this.team = TeamDataModel.createTeamByMapOfValues(data);
+          this.teamCopy = TeamDataModel.createTeamByMapOfValues(data);
 
           this.dialogTitle = this.getDialogTitle(this.team);
         },
         (error) => this.reportServerError(error)
       );
     } else {
-      // создаём заголовок диалога для новой команды
+      // создаём объект новой команды и заголовок диалога для новой команды
+      this.team = TeamDataModel.createtTeam();
       this.isExistingRecord = false;
       this.dialogTitle = this.getDialogTitle();
     }
@@ -191,7 +196,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     return this._modelValidatorService;
   }
 
-  private getDialogTitle(teamObject?: Team): string {
+  private getDialogTitle(teamObject?: TeamDataModel): string {
     if (!teamObject) {
       return "Новая команда";
     } else {

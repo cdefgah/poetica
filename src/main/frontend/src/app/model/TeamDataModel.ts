@@ -1,12 +1,12 @@
 /**
  * Модель данных команды.
  */
-export class Team {
+export class TeamDataModel {
   /**
    * Используется в случаях, когда нет информации о команде,
    * чтобы не создавать новых экземпляров класса.
    */
-  public static readonly emptyTeam: Team = new Team();
+  public static readonly emptyTeam: TeamDataModel = new TeamDataModel();
 
   /**
    * Идентификатор записи в базе данных.
@@ -26,18 +26,20 @@ export class Team {
   public static createTeamByNumberAndTitle(
     number: string,
     title: string
-  ): Team {
-    return new Team(number, title);
+  ): TeamDataModel {
+    return new TeamDataModel(number, title);
   }
 
-  public static createTeamByMapOfValues(mapWithValues: Map<string, any>): Team {
-    var team = new Team();
+  public static createTeamByMapOfValues(
+    mapWithValues: Map<string, any>
+  ): TeamDataModel {
+    var team = new TeamDataModel();
     team.setValuesFromMap(mapWithValues);
     return team;
   }
 
-  public static createtTeam(): Team {
-    return new Team();
+  public static createtTeam(): TeamDataModel {
+    return new TeamDataModel();
   }
 
   /**

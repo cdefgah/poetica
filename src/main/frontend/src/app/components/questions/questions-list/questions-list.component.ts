@@ -53,14 +53,6 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   ngOnInit() {}
 
-  loadOneQuestionModelConstraints() {
-    const url: string = "/questions/model-constraints";
-    this.http.get(url).subscribe(
-      (data: Map<string, string>) => (this.modelConstraints = data),
-      (error) => this.reportServerError(error)
-    );
-  }
-
   loadQuestionsList() {
     const url: string = `/questions/${this.selectedDisplayModeAlias}`;
     this.http.get(url).subscribe(

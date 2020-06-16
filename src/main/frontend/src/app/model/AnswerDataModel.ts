@@ -1,7 +1,7 @@
 /**
  * Модель данных ответа на вопрос (бескрылку).
  */
-export class Answer {
+export class AnswerDataModel {
   emailId: number;
   questionId: number;
   roundNumber: number;

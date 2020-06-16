@@ -7,7 +7,9 @@ export abstract class AbstractInteractiveComponentModel {
   protected abstract getMessageDialogReference(): MatDialog;
 
   protected reportServerError(error: any, customMessage: string = "") {
-    var errorMessage: string = `${customMessage}. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+    var customePrefixMessage =
+      customMessage && customMessage.length > 0 ? customMessage + ". " : "";
+    var errorMessage: string = `${customePrefixMessage}${error.error}. Код статуса сервера: ${error.status}. Сообщение сервера: '${error.message}'`;
     this.displayMessage(errorMessage);
   }
 

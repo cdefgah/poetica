@@ -1,10 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { Team } from "src/app/model/Team";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog } from "@angular/material/dialog";
 import { TeamDetailsComponent } from "../team-details/team-details.component";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/base/TeamShallowValidationService";
+import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
 
 @Component({
   selector: "app-teams-list",
@@ -30,9 +30,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   displayedColumns: string[] = ["number", "title"];
 
-  dataSource: Team[];
-
-  modelConstraints: Map<string, string>;
+  dataSource: TeamDataModel[];
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
@@ -60,7 +58,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   loadTeamsList() {
     const url: string = "/teams/all";
     this.http.get(url).subscribe(
-      (data: Team[]) => {
+      (data: TeamDataModel[]) => {
         this.dataSource = data;
       },
       (error) => this.reportServerError(error)
