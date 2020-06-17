@@ -2,7 +2,6 @@ import { AbstractModelValidationService } from "../base/AbstractModelValidationS
 import { HttpClient } from "@angular/common/http";
 
 export class TeamShallowValidationService extends AbstractModelValidationService {
-  private _modelConstraints: Map<string, string>;
   private _numberRegExValidator: RegExp;
 
   private _maxTeamTitleLength: number;
@@ -14,17 +13,13 @@ export class TeamShallowValidationService extends AbstractModelValidationService
     const url: string = "/teams/model-constraints";
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._modelConstraints = data;
-
         this._numberRegExValidator = new RegExp(
-          this._modelConstraints["NUMBER_VALIDATION_REGEXP"]
+          data["NUMBER_VALIDATION_REGEXP"]
         );
         this._requiredTeamNumberLength = parseInt(
-          this._modelConstraints["REQUIRED_NUMBER_LENGTH"]
+          data["REQUIRED_NUMBER_LENGTH"]
         );
-        this._maxTeamTitleLength = parseInt(
-          this._modelConstraints["MAX_TITLE_LENGTH"]
-        );
+        this._maxTeamTitleLength = parseInt(data["MAX_TITLE_LENGTH"]);
       },
       (error) => {
         var errorMessage: string = `$Ошибка при получении model-constraints для Team. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;

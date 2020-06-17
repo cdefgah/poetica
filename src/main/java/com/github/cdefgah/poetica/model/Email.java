@@ -15,7 +15,7 @@ public class Email {
 
     private static class ModelConstraints {
         static final int MAX_SUBJECT_LENGTH = 256;
-        static final int MAX_BODY_LENGTH = 16384;
+        static final int MAX_BODY_LENGTH = 32768;
     }
 
     private static final Map<String, String> modelConstraintsMap;

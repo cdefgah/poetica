@@ -26,12 +26,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     "Окончательный тур",
   ];
 
-  private teamShallowValidationService: TeamShallowValidationService;
-
-  emailModelConstraints: Map<string, string>;
-
-  answerModelConstraints: Map<string, string>;
-
   selectedRoundAlias: string = this.allRoundAliases[0];
 
   answersDataSource: AnswerDataModel[];

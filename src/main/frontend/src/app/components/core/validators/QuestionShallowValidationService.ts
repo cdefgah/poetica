@@ -2,8 +2,6 @@ import { AbstractModelValidationService } from "../base/AbstractModelValidationS
 import { HttpClient } from "@angular/common/http";
 
 export class QuestionShallowValidationService extends AbstractModelValidationService {
-  private _modelConstraints: Map<string, string>;
-
   private _maxBodyLength: number;
   private _maxSourceLength: number;
   private _maxCommentlength: number;
@@ -14,17 +12,9 @@ export class QuestionShallowValidationService extends AbstractModelValidationSer
     const url: string = "/questions/model-constraints";
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._modelConstraints = data;
-
-        this._maxBodyLength = parseInt(
-          this._modelConstraints["MAX_BODY_LENGTH"]
-        );
-        this._maxSourceLength = parseInt(
-          this._modelConstraints["MAX_SOURCE_LENGTH"]
-        );
-        this._maxCommentlength = parseInt(
-          this._modelConstraints["MAX_COMMENT_LENGTH"]
-        );
+        this._maxBodyLength = parseInt(data["MAX_BODY_LENGTH"]);
+        this._maxSourceLength = parseInt(data["MAX_SOURCE_LENGTH"]);
+        this._maxCommentlength = parseInt(data["MAX_COMMENT_LENGTH"]);
       },
       (error) => {
         var errorMessage: string = `$Ошибка при получении model-constraints для Question. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
