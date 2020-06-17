@@ -135,7 +135,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
       </mat-tab-group>
     </mat-step>
 
-    <mat-step>
+    <mat-step *ngIf="allThingsAreOk">
       <form>
         <ng-template matStepLabel>Тур и время отправки</ng-template>
         <table>
@@ -228,7 +228,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
           >Предварительный просмотр и импорт</ng-template
         >
         <div
-          *ngIf="errorsFound; then processedDataBlock; else errorsBlock"
+          *ngIf="errorsPresent; then processedDataBlock; else errorsBlock"
         ></div>
 
         <ng-template #processedDataBlock>

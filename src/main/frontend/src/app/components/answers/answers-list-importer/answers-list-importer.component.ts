@@ -10,6 +10,10 @@ import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { EmailShallowValidationService } from "../../core/validators/EmailShallowValidationService";
+import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
+import { AnswerShallowValidationService } from "../../core/validators/AnswerShallowValidationService";
+import { RemoteDataValidationService } from "../../core/validators/RemoteDataValidationService";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -19,6 +23,13 @@ import { AbstractInteractiveComponentModel } from "src/app/components/core/base/
 export class AnswersListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
+  //#region ValidatorServices
+  emailShallowValidationService: EmailShallowValidationService;
+  teamShallowValidationService: TeamShallowValidationService;
+  answerShallowValidationService: AnswerShallowValidationService;
+  remoteDataValidationService: RemoteDataValidationService;
+  //#endregion
+
   //#region TemplateFields
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
@@ -43,12 +54,19 @@ export class AnswersListImporterComponent
     AnswersListImporterComponent.MAX_MINUTES
   );
 
-  errorsFound: boolean = false;
   displayImportButton: boolean = false;
   //#endregion
 
   //#region ErrorsCollection
   foundErrors: string[];
+
+  get errorsPresent(): boolean {
+    return this.foundErrors && this.foundErrors.length > 0;
+  }
+
+  get allThingsAreOk(): boolean {
+    return !this.errorsPresent;
+  }
   //#endregion
 
   //#region StaticMethodForDialogs
@@ -71,8 +89,38 @@ export class AnswersListImporterComponent
     public otherDialog: MatDialog
   ) {
     super();
-
     this.initializeDateHourAndMinuteSelectors();
+
+    this.emailShallowValidationService = new EmailShallowValidationService(
+      http
+    );
+
+    if (!this.emailShallowValidationService.isInternalStateCorrect) {
+      this.displayMessage(
+        this.emailShallowValidationService.brokenStateDescription
+      );
+      return;
+    }
+
+    this.teamShallowValidationService = new TeamShallowValidationService(http);
+    if (!this.teamShallowValidationService.isInternalStateCorrect) {
+      this.displayMessage(
+        this.teamShallowValidationService.brokenStateDescription
+      );
+      return;
+    }
+
+    this.answerShallowValidationService = new AnswerShallowValidationService(
+      http
+    );
+    if (!this.answerShallowValidationService.isInternalStateCorrect) {
+      this.displayMessage(
+        this.answerShallowValidationService.brokenStateDescription
+      );
+      return;
+    }
+
+    this.remoteDataValidationService = new RemoteDataValidationService(http);
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -93,17 +141,6 @@ export class AnswersListImporterComponent
     this.emailSentOnMinute = currentMinuteString;
   }
 
-  private static convertMap(
-    sourceMap: Map<string, string>
-  ): Map<string, number> {
-    var constraints = new Map<string, number>();
-    for (let key in sourceMap) {
-      let stringConstraintsValue = sourceMap[key];
-      constraints[key] = parseInt(stringConstraintsValue);
-    }
-    return constraints;
-  }
-
   private static generateClockOptions(maxValue: number): any {
     var result: string[] = [];
     var element: string;
@@ -121,27 +158,33 @@ export class AnswersListImporterComponent
   ImportAnswers() {}
 
   private async processEmailSourceText() {
-    console.log("++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++ PROCESSING EMAIL SUBJ AND BODY ++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++");
-
     var parameters: AnswersImporterParameters = new AnswersImporterParameters();
     parameters.http = this.http; // нужно для проверок в базе через REST API
     parameters.emailSubject = this.emailSubject;
     parameters.emailBody = this.emailBody;
 
-    var answersImporter: AnswersImporter = new AnswersImporter(parameters);
+    parameters.emailShallowValidationService = this.emailShallowValidationService;
+    parameters.teamShallowValidationService = this.teamShallowValidationService;
+    parameters.answerShallowValidationService = this.answerShallowValidationService;
+    parameters.remoteDataValidationService = this.remoteDataValidationService;
 
-    await answersImporter.parse().catch((e) => {
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA SUKA POIMALSAAAAAA: START");
-      console.log(e);
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA SUKA POIMALSAAAAAA: END");
-    });
+    var answersImporter: AnswersImporter = new AnswersImporter(parameters);
+    if (answersImporter.errorsPresent) {
+      this.registerFoundErrors(answersImporter.foundErrors);
+      return;
+    }
+
+    answersImporter.parse();
 
     this.selectedRoundNumber = answersImporter.getRoundNumber();
-    console.log("*******************************************");
-    console.log("*********** PROCESSING EMAIL DONE**********");
-    console.log("*******************************************");
+  }
+
+  private registerFoundErrors(foundErrorsArray: string[]) {
+    if (this.foundErrors) {
+      this.foundErrors = this.foundErrors.concat(foundErrorsArray);
+    } else {
+      this.foundErrors = foundErrorsArray;
+    }
   }
 
   private processRoundNumberAndEmailDateTime() {
@@ -196,7 +239,6 @@ export class AnswersListImporterComponent
     if (event.previouslySelectedIndex == 0) {
       this.foundErrors = [];
       this.displayImportButton = false;
-      this.errorsFound = false;
 
       try {
         await this.processEmailSourceText();
@@ -210,20 +252,7 @@ export class AnswersListImporterComponent
         this.foundErrors.push(Error.message);
       }
     } else if (event.previouslySelectedIndex == 1) {
-      try {
-        this.processRoundNumberAndEmailDateTime();
-      } catch (Error) {
-        console.log(
-          "========== EXCEPTION IN processRoundNumberAndEmailDateTime() ****"
-        );
-        console.dir(Error);
-        console.log(
-          "================================================================="
-        );
-        this.foundErrors.push(Error.message);
-      }
-
-      this.errorsFound = this.foundErrors.length > 0;
+      this.processRoundNumberAndEmailDateTime();
       this.displayImportButton = true;
     }
 

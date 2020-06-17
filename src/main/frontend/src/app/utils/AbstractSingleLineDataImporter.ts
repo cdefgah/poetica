@@ -1,10 +1,23 @@
 export abstract class AbstractSingleLineDataImporter {
-  protected normalizedSourceString: string;
+  protected _normalizedSourceString: string;
+  protected _foundErrors: string[] = [];
 
   constructor(rawSourceText: string) {
-    this.normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(
+    this._normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(
       rawSourceText
     );
+  }
+
+  public get foundErrors(): string[] {
+    return this._foundErrors;
+  }
+
+  public get errorsPresent(): boolean {
+    return this._foundErrors.length > 0;
+  }
+
+  protected registerError(errorMessage: string): void {
+    this._foundErrors.push(errorMessage);
   }
 
   /**
