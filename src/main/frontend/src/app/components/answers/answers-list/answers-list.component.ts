@@ -6,7 +6,6 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
 
 @Component({
   selector: "app-answers-list",
@@ -47,35 +46,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     "numbersOfAnsweredQuestions",
   ];
 
-  loadEmailModelConstraints() {
-    const url: string = "/emails/model-constraints";
-    this.http.get(url).subscribe(
-      (data: Map<string, string>) => (this.emailModelConstraints = data),
-      (error) => this.reportServerError(error)
-    );
-  }
-
-  loadAnswerModelConstraints() {
-    const url: string = "/answers/model-constraints";
-    this.http.get(url).subscribe(
-      (data: Map<string, string>) => (this.answerModelConstraints = data),
-      (error) => this.reportServerError(error)
-    );
-  }
-
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
 
-    this.teamShallowValidationService = new TeamShallowValidationService(http);
-    if (!this.teamShallowValidationService.isInternalStateCorrect()) {
-      this.displayMessage(
-        this.teamShallowValidationService.brokenStateDescription
-      );
-      return;
-    }
-
-    this.loadEmailModelConstraints();
-    this.loadAnswerModelConstraints();
     this.loadTeamsList();
     this.loadAnswersList();
   }
@@ -122,10 +95,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   private importAnswers() {
-    const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData(
-      this.emailModelConstraints,
-      this.answerModelConstraints
-    );
+    const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData();
     var dialogRef = this.dialog.open(
       AnswersListImporterComponent,
       importDialogConfig

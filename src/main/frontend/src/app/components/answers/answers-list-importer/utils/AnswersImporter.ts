@@ -37,10 +37,6 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
       parameters.emailSubject
     );
     this.emailBody = AnswersImporter.normalizeString(parameters.emailBody);
-
-    this.emailModelConstraints = parameters.emailModelConstraints;
-    this.answerModelConstraints = parameters.answerModelConstraints;
-
     this.http = parameters.http;
 
     // проверяем корректность по размерам для письма

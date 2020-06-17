@@ -19,16 +19,6 @@ import { AbstractInteractiveComponentModel } from "src/app/components/core/base/
 export class AnswersListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
-  //#region ConstraintInfo
-  private static readonly CONSTRAINTS_ALL = "all-constraints";
-  private static readonly CONSTRAINTS_EMAIL = "email-constraints";
-  private static readonly CONSTRAINTS_ANSWER = "answer-constraints";
-
-  answerConstraints: Map<string, number>;
-  emailConstraints: Map<string, number>;
-  teamConstraints: Map<string, number>;
-  //#endregion
-
   //#region TemplateFields
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
@@ -62,29 +52,12 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region StaticMethodForDialogs
-  static getDialogConfigWithData(
-    emailModelConstraints: Map<string, string>,
-    answerModelConstraints: Map<string, string>
-  ): MatDialogConfig {
+  static getDialogConfigWithData(): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.width = "62%";
-
-    dialogConfig.data = new Map<string, any>();
-    var constraints = new Map<string, Map<string, number>>();
-
-    constraints[
-      AnswersListImporterComponent.CONSTRAINTS_EMAIL
-    ] = emailModelConstraints;
-    constraints[
-      AnswersListImporterComponent.CONSTRAINTS_ANSWER
-    ] = answerModelConstraints;
-
-    dialogConfig.data[
-      AnswersListImporterComponent.CONSTRAINTS_ALL
-    ] = constraints;
 
     return dialogConfig;
   }
@@ -99,22 +72,7 @@ export class AnswersListImporterComponent
   ) {
     super();
 
-    if (!dialogData) {
-      return;
-    }
-
     this.initializeDateHourAndMinuteSelectors();
-
-    var allConstraints =
-      dialogData[AnswersListImporterComponent.CONSTRAINTS_ALL];
-
-    this.emailConstraints = AnswersListImporterComponent.convertMap(
-      allConstraints[AnswersListImporterComponent.CONSTRAINTS_EMAIL]
-    );
-
-    this.answerConstraints = AnswersListImporterComponent.convertMap(
-      allConstraints[AnswersListImporterComponent.CONSTRAINTS_ANSWER]
-    );
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -171,8 +129,6 @@ export class AnswersListImporterComponent
     parameters.http = this.http; // нужно для проверок в базе через REST API
     parameters.emailSubject = this.emailSubject;
     parameters.emailBody = this.emailBody;
-    parameters.emailModelConstraints = this.emailConstraints;
-    parameters.answerModelConstraints = this.answerConstraints;
 
     var answersImporter: AnswersImporter = new AnswersImporter(parameters);
 
