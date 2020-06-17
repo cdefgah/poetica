@@ -7,9 +7,6 @@ import { debugString } from "src/app/utils/Config";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 
 export class AnswersImporter extends AbstractMultiLineDataImporter {
-  private emailModelConstraints: Map<string, number>;
-  private answerModelConstraints: Map<string, number>;
-
   private roundNumber: string;
 
   private emailSubject: string;
@@ -22,14 +19,6 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
 
   private http: HttpClient;
 
-  // обёртка вокруг Promise, гарантирующая (на самом деле - нихуя не гарантирующая),
-  // что Promise будет всегда будет в состоянии resolved().
-  // даже при ошибке.
-  private sureThing = (promise: Promise<any>) =>
-    promise
-      .then((data) => ({ ok: true, data }))
-      .catch((error) => Promise.resolve({ ok: false, error }));
-
   constructor(parameters: AnswersImporterParameters) {
     super(parameters.emailBody);
 
@@ -40,21 +29,21 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
     this.http = parameters.http;
 
     // проверяем корректность по размерам для письма
-    this.validateEmailConstraints();
+    //this.validateEmailConstraints();
   }
 
   public async parse() {
     debugString("Parsing process started");
 
-    const subjectParsingResult = await this.sureThing(this.parseEmailSubject());
-    if (subjectParsingResult.ok) {
-      debugString("Subject parsed ok. Parsing email body");
-      // const emailParsingResult;
-    } else {
-      var errorMessage = subjectParsingResult["error"];
-      debugString(`Subject parsed failed. Error message: ${errorMessage}`);
-      throw new Error(errorMessage);
-    }
+    //const subjectParsingResult = await this.sureThing(this.parseEmailSubject());
+    //if (subjectParsingResult.ok) {
+    //      debugString("Subject parsed ok. Parsing email body");
+    // const emailParsingResult;
+    //    } else {
+    //var errorMessage = subjectParsingResult["error"];
+    //debugString(`Subject parsed failed. Error message: ${errorMessage}`);
+    //throw new Error(errorMessage);
+    //}
 
     // await this.parseEmailBodyAsync();
   }
@@ -416,11 +405,11 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
     });
 
     console.log(" ========== validating data ==========");
-    this.validateTeamInfoCongruenceBetweenSubjectAndBody();
-    this.validateAnswerConstraints();
+    // this.validateTeamInfoCongruenceBetweenSubjectAndBody();
+    // this.validateAnswerConstraints();
 
-    await this.validateMaxQuestionNumberAsync(maxQuestionNumber);
-    await this.validateTeamDataCorrectnessAsync();
+    //  await this.validateMaxQuestionNumberAsync(maxQuestionNumber);
+    //  await this.validateTeamDataCorrectnessAsync();
 
     console.log(" ====== body parsing results block end =====");
 
@@ -463,121 +452,5 @@ export class AnswersImporter extends AbstractMultiLineDataImporter {
       wholeComment.reset();
     }
     // =====================================================================================================
-  }
-
-  private validateTeamInfoCongruenceBetweenSubjectAndBody() {
-    if (
-      this.teamInfoFromEmailSubject &&
-      this.teamInfoFromEmailSubject.number != this.teamInfoFromEmailBody.number
-    ) {
-      throw new Error(
-        `Номер команды в теме письма: ${this.teamInfoFromEmailSubject.number} не совпадает с номером команды в содержании письма: 
-        ${this.teamInfoFromEmailBody.number}`
-      );
-    }
-  }
-
-  private async validateMaxQuestionNumberAsync(
-    maxQuestionNumberInAnswers: number
-  ) {
-    const url: string = "/questions/max-number";
-    this.http.get(url).subscribe(
-      (maxNumberOfRegisteredQuestion: number) => {
-        if (maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers) {
-          throw new Error(`Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
-          Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`);
-        }
-      },
-      (error) => {
-        throw new Error(
-          `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
-          Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
-        );
-      }
-    );
-  }
-
-  private async validateTeamDataCorrectnessAsync() {
-    const url: string = `/teams/numbers/${this.teamInfoFromEmailBody.number}`;
-    var importingTeamTitle = this.teamInfoFromEmailBody.title;
-    this.http.get(url).subscribe(
-      (data: Map<string, any>) => {
-        var loadedTeamTitle: string = data["title"];
-        if (
-          loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
-        ) {
-          throw new Error(
-            `В базе данных команда с номером: ${this.teamInfoFromEmailBody.number} записана как '${loadedTeamTitle}'. 
-            А в письме передано название команды: '${importingTeamTitle}'`
-          );
-        }
-      },
-      (error) => {
-        const NOT_FOUND_STATUS: number = 404;
-        var errorMessage: string;
-        if (error.status == NOT_FOUND_STATUS) {
-          errorMessage = `Не удалось найти в базе данных команду с номером: ${this.teamInfoFromEmailBody.number}`;
-        } else {
-          errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${this.teamInfoFromEmailBody.number}.
-            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
-        }
-
-        throw new Error(errorMessage);
-      }
-    );
-  }
-
-  private validateAnswerConstraints(): void {
-    const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
-    const KEY_MAX_COMMENT_LENGTH: string = "MAX_COMMENT_LENGTH";
-
-    const MAX_BODY_LENGTH: number = this.answerModelConstraints[
-      KEY_MAX_BODY_LENGTH
-    ];
-
-    const MAX_COMMENT_LENGTH: number = this.answerModelConstraints[
-      KEY_MAX_COMMENT_LENGTH
-    ];
-
-    this.answers.forEach((oneAnswer) => {
-      if (oneAnswer.body && oneAnswer.body.length > MAX_BODY_LENGTH) {
-        throw new Error(
-          `Длина строки ответа на бескрылку с номером: ${oneAnswer.questionNumber} (${oneAnswer.body.length}) 
-          превышает максимально разрешённый размер в ${MAX_BODY_LENGTH} символов`
-        );
-      }
-
-      if (oneAnswer.comment && oneAnswer.comment.length > MAX_COMMENT_LENGTH) {
-        throw new Error(
-          `Длина строки с комментарием к ответу на бескрылку с номером: ${oneAnswer.questionNumber} (${oneAnswer.comment.length}) 
-          превышает максимально разрешённый размер в ${MAX_COMMENT_LENGTH} символов`
-        );
-      }
-    });
-  }
-
-  private validateEmailConstraints(): void {
-    const KEY_MAX_SUBJECT_LENGTH: string = "MAX_SUBJECT_LENGTH";
-    const KEY_MAX_BODY_LENGTH: string = "MAX_BODY_LENGTH";
-
-    const MAX_SUBJECT_LENGTH: number = this.emailModelConstraints[
-      KEY_MAX_SUBJECT_LENGTH
-    ];
-
-    const MAX_BODY_LENGTH: number = this.emailModelConstraints[
-      KEY_MAX_BODY_LENGTH
-    ];
-
-    if (this.emailSubject && this.emailSubject.length > MAX_SUBJECT_LENGTH) {
-      throw new Error(
-        `Длина строки с темой письма (${this.emailSubject.length}) превышает максимально разрешенный размер в ${MAX_SUBJECT_LENGTH} символов`
-      );
-    }
-
-    if (this.emailBody && this.emailBody.length > MAX_BODY_LENGTH) {
-      throw new Error(
-        `Длина содержимого письма (${this.emailBody.length}) превышает максимально разрешенный размер в ${MAX_BODY_LENGTH} символов`
-      );
-    }
   }
 }
