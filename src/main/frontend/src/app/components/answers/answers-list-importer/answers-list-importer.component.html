@@ -251,15 +251,15 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
 </mat-dialog-content>
 <mat-dialog-actions>
   <span class="fill-remaining-space"></span>
-  <ng-template [ngIf]="displayImportButton">
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="uploadProcessedDataToTheServer()"
-    >
-      Импортировать ответы
-    </button>
-  </ng-template>
+  <button
+    *ngIf="displayImportButton"
+    mat-raised-button
+    color="primary"
+    (click)="uploadProcessedDataToTheServer()"
+  >
+    Импортировать ответы
+  </button>
+
   <button mat-raised-button color="accent" (click)="cancelDialog()">
     Отмена
   </button>

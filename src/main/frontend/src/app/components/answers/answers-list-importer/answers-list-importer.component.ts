@@ -14,6 +14,7 @@ import { EmailShallowValidationService } from "../../core/validators/EmailShallo
 import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
 import { AnswerShallowValidationService } from "../../core/validators/AnswerShallowValidationService";
 import { RemoteDataValidationService } from "../../core/validators/RemoteDataValidationService";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -236,33 +237,72 @@ export class AnswersListImporterComponent
   }
 
   async onStepChange(event: any) {
+    // если перешли на нулевой шаг с любого
+    if (event.selectedIndex == 0) {
+      // сбрасываем состояние всех контролирующих переменных
+      // и выходим
+      this.resetStepperVariables(event);
+      return;
+    }
+
+    // пересчитываем признак, по которому мы определяем
+    // показывать или нет кнопку импорта ответов
+    this.updateDisplayImportButton(event);
+
     if (event.previouslySelectedIndex == 0) {
-      this.foundErrors = [];
-      this.displayImportButton = false;
-
-      try {
-        await this.processEmailSourceText();
-      } catch (Error) {
-        console.log("========== EXCEPTION IN processEmailSourceText() ****");
-        console.dir(Error);
-        console.log(
-          "================================================================="
-        );
-
-        this.foundErrors.push(Error.message);
-      }
+      // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
     } else if (event.previouslySelectedIndex == 1) {
-      this.processRoundNumberAndEmailDateTime();
-      this.displayImportButton = true;
+      // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
     }
 
-    if (this.foundErrors.length == 0) {
-      console.log("******** NO IMPORT ERRORS FOUND **************");
-    } else {
-      console.log("******** IMPORT ERRORS FOUND START **************");
-      this.foundErrors.map((element) => console.log(element));
-      console.log("******** IMPORT ERRORS FOUND END **************");
-    }
+    // if (event.previouslySelectedIndex == 0) {
+    //   debugString("Previous Step Index: 0");
+
+    //   this.foundErrors = [];
+    //   this.displayImportButton = false;
+
+    //   try {
+    //     await this.processEmailSourceText();
+    //   } catch (Error) {
+    //     console.log("========== EXCEPTION IN processEmailSourceText() ****");
+    //     console.dir(Error);
+    //     console.log(
+    //       "================================================================="
+    //     );
+
+    //     this.foundErrors.push(Error.message);
+    //   }
+    // } else if (event.previouslySelectedIndex == 1) {
+    //   debugString("Previous Step Index: 1");
+
+    //   this.processRoundNumberAndEmailDateTime();
+    //   this.displayImportButton = true;
+    // } else {
+    //   debugString(
+    //     "ELSE PART: Previous Step Index: " + event.previouslySelectedIndex
+    //   );
+    // }
+
+    // if (this.foundErrors.length == 0) {
+    //   console.log("******** NO IMPORT ERRORS FOUND **************");
+    // } else {
+    //   console.log("******** IMPORT ERRORS FOUND START **************");
+    //   this.foundErrors.map((element) => console.log(element));
+    //   console.log("******** IMPORT ERRORS FOUND END **************");
+    // }
+  }
+
+  private resetStepperVariables(stepChangeEvent: any): void {
+    this.foundErrors = [];
+    this.updateDisplayImportButton(stepChangeEvent);
+  }
+
+  private updateDisplayImportButton(stepChangeEvent: any) {
+    // последний шаг в степпере имеет индекс 2 (0, 1, 2)
+    // кнопку показываем в том случае, если мы пришли на последний шаг
+    // и у нас всё в порядке, то есть нет ошибок.
+    this.displayImportButton =
+      stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk;
   }
 
   uploadProcessedDataToTheServer() {}
