@@ -228,7 +228,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
           >Предварительный просмотр и импорт</ng-template
         >
         <div
-          *ngIf="errorsPresent; then processedDataBlock; else errorsBlock"
+          *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"
         ></div>
 
         <ng-template #processedDataBlock>
@@ -236,9 +236,13 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
         </ng-template>
 
         <ng-template #errorsBlock>
+          <span>Обнаруженны следующие ошибки:</span>
+          <hr />
           <div>
             {{ foundErrors }}
           </div>
+          <hr />
+          <span>Пожалуйста устраните их, чтобы импортировать ответы.</span>
         </ng-template>
 
         <div>

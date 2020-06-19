@@ -251,6 +251,7 @@ export class AnswersListImporterComponent
 
     if (event.previouslySelectedIndex == 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
+      await this.processEmailSourceText();
     } else if (event.previouslySelectedIndex == 1) {
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
     }
