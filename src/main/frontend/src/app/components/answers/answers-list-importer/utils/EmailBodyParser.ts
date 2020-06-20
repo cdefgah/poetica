@@ -64,9 +64,23 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var teamInfoCalculationResult = this.getTeamFromTheFirstLineOfTheAnswersBlock(
       firstLineFromAnswersBlock
     );
+    debugString(
+      "teamInfoCalculationResult.errorPresent: " +
+        teamInfoCalculationResult.errorsPresent
+    );
+
+    debugString(
+      "teamInfoCalculationResult.errorMessage: " +
+        teamInfoCalculationResult.errorMessage
+    );
+
+    debugObject(teamInfoCalculationResult.result);
+
     if (teamInfoCalculationResult.errorsPresent) {
       this.registerError(teamInfoCalculationResult.errorMessage);
       return;
+    } else {
+      this._team = teamInfoCalculationResult.result;
     }
 
     this.parseAnswersBlock();
@@ -121,6 +135,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     foundTeamTitle = EmailBodyParser.removeDoubleQuotations(foundTeamTitle);
+    if (foundTeamTitle.length == 0) {
+      errorMessage = "В содержании письма не указано название команды";
+      return new CalculationResult(null, errorMessage);
+    }
 
     if (this._teamFromEmailSubject) {
       // совпадение названия команды из темы письма с названием в содержании - не проверяем.
@@ -132,10 +150,23 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       }
     }
 
+    debugString("** STARTING Validation foundTeamNumber: " + foundTeamNumber);
+    var teamNumberValidationMessage: string = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
+      foundTeamNumber
+    );
+
+    debugString("Validation result: " + teamNumberValidationMessage);
+    if (teamNumberValidationMessage.length > 0) {
+      return new CalculationResult(null, teamNumberValidationMessage);
+    }
+
     var team: TeamDataModel = TeamDataModel.createTeamByNumberAndTitle(
       foundTeamNumber,
       foundTeamTitle
     );
+
+    debugString("Composed object below");
+    debugObject(team);
 
     return new CalculationResult(team, null);
   }

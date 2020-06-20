@@ -16,7 +16,7 @@ public final class Team {
 
     private static class ModelConstraints {
         static final int REQUIRED_NUMBER_LENGTH = 3;
-        static final String NUMBER_VALIDATION_REGEXP = "\\d\\d\\d";
+        static final String NUMBER_VALIDATION_REGEXP = "^\\d{3}$";
         static final int MAX_TITLE_LENGTH = 256;
     }
 
