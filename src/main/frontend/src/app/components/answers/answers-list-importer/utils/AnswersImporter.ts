@@ -1,10 +1,11 @@
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
-import { HttpClient } from "@angular/common/http";
 import { EmailSubjectParser } from "./EmailSubjectParser";
+import { EmailBodyParser } from "./EmailBodyParser";
 
 export class AnswersImporter {
-  private _emailSubjectParser: EmailSubjectParser;
+  private readonly _emailSubjectParser: EmailSubjectParser;
+  private readonly _emailBodyParser: EmailBodyParser;
 
   private _foundErrors: string[];
 
@@ -17,6 +18,20 @@ export class AnswersImporter {
 
     if (this._emailSubjectParser.errorsPresent) {
       this.registerFoundErrors(this._emailSubjectParser.foundErrors);
+      return;
+    }
+
+    this._emailBodyParser = new EmailBodyParser(
+      parameters.emailBody,
+      parameters.emailShallowValidationService,
+      parameters.teamShallowValidationService,
+      this._emailSubjectParser.team,
+      parameters.http
+    );
+
+    if (this._emailBodyParser.errorsPresent) {
+      this.registerFoundErrors(this._emailBodyParser.foundErrors);
+      return;
     }
   }
 
@@ -38,6 +53,11 @@ export class AnswersImporter {
 
   public async parse() {
     this._emailSubjectParser.parseEmailSubject();
+    if (this.errorsPresent) {
+      return;
+    }
+
+    this._emailBodyParser.parseEmailBody();
     if (this.errorsPresent) {
       return;
     }

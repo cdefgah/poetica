@@ -176,6 +176,10 @@ export class AnswersListImporterComponent
     }
 
     answersImporter.parse();
+    if (answersImporter.errorsPresent) {
+      this.registerFoundErrors(answersImporter.foundErrors);
+      return;
+    }
 
     this.selectedRoundNumber = answersImporter.getRoundNumber();
   }

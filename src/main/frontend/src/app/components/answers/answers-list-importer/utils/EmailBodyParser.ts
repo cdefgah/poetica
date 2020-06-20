@@ -4,9 +4,9 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { CalculationResult } from "./CalculationResult";
 import { EmailShallowValidationService } from "src/app/components/core/validators/EmailShallowValidationService";
 import { TeamShallowValidationService } from "src/app/components/core/validators/TeamShallowValidationService";
-import { ParsedTeamInfoFromEmailSubject } from "./ParsedTeamInfoFromEmailSubject";
 import { HttpClient } from "@angular/common/http";
 import { StringBuilder } from "./StringBuilder";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answers: AnswerDataModel[];
@@ -15,7 +15,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _emailValidationService: EmailShallowValidationService;
   private _teamValidationService: TeamShallowValidationService;
 
-  private _teamInfoFromSubjectLine: ParsedTeamInfoFromEmailSubject;
+  private _teamFromEmailSubject: TeamDataModel;
 
   private _httpClient: HttpClient;
 
@@ -23,11 +23,11 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     emailBody: string,
     emailValidationService: EmailShallowValidationService,
     teamValidationService: TeamShallowValidationService,
-    teamInfoFromSubjectLine: ParsedTeamInfoFromEmailSubject,
+    teamFromEmailSubject: TeamDataModel,
     httpClient: HttpClient
   ) {
     super(emailBody);
-    this._teamInfoFromSubjectLine = teamInfoFromSubjectLine;
+    this._teamFromEmailSubject = teamFromEmailSubject;
     this._emailValidationService = emailValidationService;
     this._teamValidationService = teamValidationService;
     this._httpClient = httpClient;
@@ -50,9 +50,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   }
 
   public async parseEmailBody(): Promise<void> {
-    if (this._answers.length > 0) {
-      this._answers = [];
-    }
+    this._answers = [];
 
     var firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
     if (firstLineOfAnswersBlockCalcResult.errorsPresent) {
@@ -70,6 +68,18 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       this.registerError(teamInfoCalculationResult.errorMessage);
       return;
     }
+
+    this.parseAnswersBlock();
+
+    console.log(" ================ PARSING RESULT START==============");
+    this.answers.forEach((oneAnswer) => {
+      console.log("-----------------------------------");
+      console.log("Номер бескрылки: " + oneAnswer.questionNumber);
+      console.log("Тело ответа: " + oneAnswer.body);
+      console.log("Комментарий: " + oneAnswer.comment);
+      console.log("-----------------------------------");
+    });
+    console.log(" ================ PARSING RESULT: END ==============");
   }
 
   /**
@@ -112,12 +122,12 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
     foundTeamTitle = EmailBodyParser.removeDoubleQuotations(foundTeamTitle);
 
-    if (!this._teamInfoFromSubjectLine.isEmpty) {
+    if (this._teamFromEmailSubject) {
       // совпадение названия команды из темы письма с названием в содержании - не проверяем.
       // так как в теме письма может быть транслит, а в содержании - кириллица.
       // проверяем только номер.
-      if (foundTeamNumber != this._teamInfoFromSubjectLine.team.number) {
-        errorMessage = `Номер команды в теме письма: ${this._teamInfoFromSubjectLine.team.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
+      if (foundTeamNumber != this._teamFromEmailSubject.number) {
+        errorMessage = `Номер команды в теме письма: ${this._teamFromEmailSubject.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
         return new CalculationResult(null, errorMessage);
       }
     }

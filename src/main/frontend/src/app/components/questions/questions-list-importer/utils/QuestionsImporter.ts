@@ -36,8 +36,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private loadGradedQuestionsQty(): number {
     const prefix = "#G:";
 
-    if (this.sourceTextLinesIterator.hasNextLine()) {
-      var gradedQuestionsLine: string = this.sourceTextLinesIterator.nextLine();
+    if (this._sourceTextLinesIterator.hasNextLine()) {
+      var gradedQuestionsLine: string = this._sourceTextLinesIterator.nextLine();
       if (gradedQuestionsLine.startsWith(prefix)) {
         var amountString: string = gradedQuestionsLine
           .substring(prefix.length)
@@ -65,11 +65,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   private nextQuestion(): QuestionDataModel {
-    if (!this.sourceTextLinesIterator.hasNextLine()) {
+    if (!this._sourceTextLinesIterator.hasNextLine()) {
       return null;
     }
 
-    var firstQuestionLine: string = this.sourceTextLinesIterator.nextLine();
+    var firstQuestionLine: string = this._sourceTextLinesIterator.nextLine();
     var questionNumber: number = this.extractQuestionNumber(firstQuestionLine);
 
     if (questionNumber != this.expectedQuestionNumber) {
@@ -86,15 +86,16 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     var nextSegmentDetected: boolean = false;
 
     // загружаем непосредственный текст задания
-    while (this.sourceTextLinesIterator.hasNextLine()) {
-      processingLine = this.sourceTextLinesIterator.nextLine();
+    while (this._sourceTextLinesIterator.hasNextLine()) {
+      processingLine = this._sourceTextLinesIterator.nextLine();
       if (QuestionsImporter.hasControlPrefix(processingLine)) {
         nextSegmentDetected = true;
         break;
       }
 
+      // TODO переделать на StringBuilder()
       questionBody =
-        questionBody + QuestionsImporter.newLineSurrogate + processingLine;
+        questionBody + QuestionsImporter._newLineSurrogate + processingLine;
     }
 
     var rtfmMessage: string =
@@ -118,8 +119,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
     // загружаем информацию об источнике для задания
     nextSegmentDetected = false;
-    while (this.sourceTextLinesIterator.hasNextLine()) {
-      processingLine = this.sourceTextLinesIterator.nextLine();
+    while (this._sourceTextLinesIterator.hasNextLine()) {
+      processingLine = this._sourceTextLinesIterator.nextLine();
 
       if (QuestionsImporter.hasControlPrefix(processingLine)) {
         nextSegmentDetected = true;
@@ -128,7 +129,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
       questionSourceBody =
         questionSourceBody +
-        QuestionsImporter.newLineSurrogate +
+        QuestionsImporter._newLineSurrogate +
         processingLine;
     }
 
@@ -143,8 +144,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
         // загружаем тело комментариев к заданию
         var textBlockContinuesFurther: boolean = false;
-        while (this.sourceTextLinesIterator.hasNextLine()) {
-          processingLine = this.sourceTextLinesIterator.nextLine();
+        while (this._sourceTextLinesIterator.hasNextLine()) {
+          processingLine = this._sourceTextLinesIterator.nextLine();
 
           if (QuestionsImporter.hasControlPrefix(processingLine)) {
             textBlockContinuesFurther = true;
@@ -153,21 +154,21 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
           questionCommentNoteBody =
             questionCommentNoteBody +
-            QuestionsImporter.newLineSurrogate +
+            QuestionsImporter._newLineSurrogate +
             processingLine;
         }
 
         // отматываем номер строки на одну строку назад,
         // так как мы зацепили следующий вопрос
         if (textBlockContinuesFurther) {
-          this.sourceTextLinesIterator.stepIndexBack();
+          this._sourceTextLinesIterator.stepIndexBack();
         }
       } else {
         // следующий вопрос
 
         // отматываем номер строки на одну строку назад,
         // так как мы зацепили следующий вопрос
-        this.sourceTextLinesIterator.stepIndexBack();
+        this._sourceTextLinesIterator.stepIndexBack();
       }
     }
 
