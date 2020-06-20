@@ -36,7 +36,12 @@ export class AnswersImporter {
     return this._foundErrors;
   }
 
-  public async parse() {}
+  public async parse() {
+    this._emailSubjectParser.parseEmailSubject();
+    if (this.errorsPresent) {
+      return;
+    }
+  }
 
   public getRoundNumber(): string {
     return this._emailSubjectParser.roundNumber;

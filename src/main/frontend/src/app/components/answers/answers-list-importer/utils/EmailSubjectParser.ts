@@ -25,13 +25,12 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       normalizedEmailSubject.length > emailValidationService.maxSubjectLength
     ) {
       this.registerError(
-        `Длина строки с темой письма (${normalizedEmailSubject.length}) больше, чем максимально разрешённая для обработки: ${emailValidationService.maxSubjectLength}`
+        `Количество символов в теме письма (${normalizedEmailSubject.length}) больше, чем максимально разрешённое для обработки: ${emailValidationService.maxSubjectLength}`
       );
       return;
     }
 
     this._teamValidationService = teamValidationService;
-    this.parseEmailSubject();
   }
 
   get team(): TeamDataModel {
@@ -46,7 +45,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     return this._isEmpty;
   }
 
-  private parseEmailSubject() {
+  public parseEmailSubject() {
     // если тема письма не задана, просто выходим,
     // не генерируя ошибки. Нужная информация может быть в теле письма.
     if (this._normalizedSourceString.length == 0) {

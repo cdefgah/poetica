@@ -2,14 +2,14 @@ import { StringLinesIterator } from "./StringLinesIterator";
 import { AbstractSingleLineDataImporter } from "./AbstractSinglelineDataImporter";
 
 export abstract class AbstractMultiLineDataImporter extends AbstractSingleLineDataImporter {
-  protected static readonly newLineSurrogate: string = " // ";
+  protected static readonly _newLineSurrogate: string = " // ";
 
-  protected readonly sourceTextLinesIterator: StringLinesIterator;
+  protected readonly _sourceTextLinesIterator: StringLinesIterator;
 
   constructor(sourceString: string) {
     super(sourceString);
 
-    this.sourceTextLinesIterator = new StringLinesIterator(
+    this._sourceTextLinesIterator = new StringLinesIterator(
       this._normalizedSourceString
     );
   }
@@ -21,7 +21,7 @@ export abstract class AbstractMultiLineDataImporter extends AbstractSingleLineDa
 
     return sourceString.replace(
       /\n/g,
-      AbstractMultiLineDataImporter.newLineSurrogate
+      AbstractMultiLineDataImporter._newLineSurrogate
     );
   }
 
