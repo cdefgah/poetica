@@ -4,9 +4,10 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { CalculationResult } from "./CalculationResult";
 import { EmailShallowValidationService } from "src/app/components/core/validators/EmailShallowValidationService";
 import { TeamShallowValidationService } from "src/app/components/core/validators/TeamShallowValidationService";
-import { HttpClient } from "@angular/common/http";
 import { StringBuilder } from "./StringBuilder";
-import { debugString, debugObject } from "src/app/utils/Config";
+import { AnswerShallowValidationService } from "src/app/components/core/validators/AnswerShallowValidationService";
+import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
+import { HttpClient } from "@angular/common/http";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answers: AnswerDataModel[];
@@ -14,28 +15,29 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
   private _emailValidationService: EmailShallowValidationService;
   private _teamValidationService: TeamShallowValidationService;
+  private _answerValidationService: AnswerShallowValidationService;
 
   private _teamFromEmailSubject: TeamDataModel;
 
   private _httpClient: HttpClient;
+  private _roundNumber: string;
 
-  constructor(
-    emailBody: string,
-    emailValidationService: EmailShallowValidationService,
-    teamValidationService: TeamShallowValidationService,
-    teamFromEmailSubject: TeamDataModel,
-    httpClient: HttpClient
-  ) {
-    super(emailBody);
-    this._teamFromEmailSubject = teamFromEmailSubject;
-    this._emailValidationService = emailValidationService;
-    this._teamValidationService = teamValidationService;
-    this._httpClient = httpClient;
+  constructor(parameters: EmailBodyParserParameters) {
+    super(parameters.emailBody);
+    this._teamFromEmailSubject = parameters.emailSubjectParser.team;
+    this._roundNumber = parameters.emailSubjectParser.roundNumber;
+
+    this._emailValidationService = parameters.emailValidationService;
+    this._teamValidationService = parameters.teamValidationService;
+    this._answerValidationService = parameters.answerValidationService;
+    this._httpClient = parameters.httpClient;
 
     var normalizedEmailBody = this._normalizedSourceString;
-    if (normalizedEmailBody.length > emailValidationService.maxBodyLength) {
+    if (
+      normalizedEmailBody.length > this._emailValidationService.maxBodyLength
+    ) {
       this.registerError(
-        `Количество символов в содержании письма (${normalizedEmailBody.length}) больше, чем максимально разрешённое для обработки: ${emailValidationService.maxBodyLength}`
+        `Количество символов в содержании письма (${normalizedEmailBody.length}) больше, чем максимально разрешённое для обработки: ${this._emailValidationService.maxBodyLength}`
       );
       return;
     }
@@ -259,7 +261,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       );
       return;
     }
-
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: EmailBodyParser) {
       if (processedQuestionNumbers.has(questionNumber)) {
@@ -287,13 +288,44 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       // но не быть ответа (placeholder для читабельности),
       // в таком случае пустой ответ не регистрируем а пропускаем
       if (wholeAnswer.length() > 0) {
-        currentObjectReference.answers.push(
-          new AnswerDataModel(
-            questionNumber,
-            wholeAnswer.toString(),
-            wholeComment.toString()
-          )
+        var answerBody: string = wholeAnswer.toString();
+        if (
+          answerBody.length >
+          currentObjectReference._answerValidationService.maxBodyLength
+        ) {
+          currentObjectReference.registerError(
+            `Тело ответа #${questionNumber} содержит больше символов (${answerBody.length}), чем может быть обработано для одного ответа: ${currentObjectReference._answerValidationService.maxBodyLength}`
+          );
+          return;
+        }
+
+        var answerComment: string = wholeComment.toString();
+        if (
+          answerComment.length >
+          currentObjectReference._answerValidationService.maxCommentLength
+        ) {
+          currentObjectReference.registerError(
+            `Комментарий к ответу #${questionNumber} содержит больше символов (${answerComment.length}), чем может быть обработано для комментария к ответу: ${currentObjectReference._answerValidationService.maxCommentLength}`
+          );
+          return;
+        }
+
+        var answerRecord: AnswerDataModel = new AnswerDataModel(
+          questionNumber,
+          answerBody,
+          answerComment
         );
+
+        if (
+          currentObjectReference._roundNumber &&
+          currentObjectReference._roundNumber.length > 0
+        ) {
+          answerRecord.roundNumber = parseInt(
+            currentObjectReference._roundNumber
+          );
+        }
+
+        currentObjectReference.answers.push(answerRecord);
       }
 
       questionNumber = "";

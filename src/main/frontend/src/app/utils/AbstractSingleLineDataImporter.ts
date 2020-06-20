@@ -20,7 +20,7 @@ export abstract class AbstractSingleLineDataImporter {
     }
   }
 
-  protected registerError(errorMessage: string): void {
+  public registerError(errorMessage: string): void {
     if (!this._foundErrors) {
       this._foundErrors = [];
     }

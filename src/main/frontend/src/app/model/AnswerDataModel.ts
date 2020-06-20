@@ -32,4 +32,13 @@ export class AnswerDataModel {
     this.body = body;
     this.comment = comment;
   }
+
+  public toString(): string {
+    return `emailId: ${this.emailId}
+questionId: ${this.questionNumber}
+roundNumber: ${this.roundNumber}
+questionNumber: ${this.questionNumber}
+body: ${this.body}
+comment: ${this.comment}`;
+  }
 }

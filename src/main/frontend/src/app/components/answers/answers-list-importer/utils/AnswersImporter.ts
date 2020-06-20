@@ -3,6 +3,7 @@ import { AnswersImporterParameters } from "./AnswersImporterParameters";
 import { EmailSubjectParser } from "./EmailSubjectParser";
 import { EmailBodyParser } from "./EmailBodyParser";
 import { debugString } from "src/app/utils/Config";
+import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
 
 export class AnswersImporter {
   private readonly _emailSubjectParser: EmailSubjectParser;
@@ -32,13 +33,19 @@ export class AnswersImporter {
     }
 
     debugString("AnswersImporter. Constructing _emailBodyParser: start");
-    this._emailBodyParser = new EmailBodyParser(
-      parameters.emailBody,
-      parameters.emailShallowValidationService,
-      parameters.teamShallowValidationService,
-      this._emailSubjectParser.team,
-      parameters.http
-    );
+    var emailBodyParserParameters = new EmailBodyParserParameters();
+    emailBodyParserParameters.emailBody = parameters.emailBody;
+    emailBodyParserParameters.emailValidationService =
+      parameters.emailShallowValidationService;
+    emailBodyParserParameters.teamValidationService =
+      parameters.teamShallowValidationService;
+    emailBodyParserParameters.answerValidationService =
+      parameters.answerShallowValidationService;
+    emailBodyParserParameters.httpClient = parameters.httpClient;
+
+    emailBodyParserParameters.emailSubjectParser = this._emailSubjectParser;
+
+    this._emailBodyParser = new EmailBodyParser(emailBodyParserParameters);
     debugString(
       `AnswersImporter. Constructing _emailBodyParser: end. Errors present? ${this._emailBodyParser.errorsPresent}`
     );

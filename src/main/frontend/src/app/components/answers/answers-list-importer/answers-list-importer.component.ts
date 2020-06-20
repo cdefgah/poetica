@@ -13,7 +13,6 @@ import { AbstractInteractiveComponentModel } from "src/app/components/core/base/
 import { EmailShallowValidationService } from "../../core/validators/EmailShallowValidationService";
 import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
 import { AnswerShallowValidationService } from "../../core/validators/AnswerShallowValidationService";
-import { RemoteDataValidationService } from "../../core/validators/RemoteDataValidationService";
 import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
@@ -28,7 +27,6 @@ export class AnswersListImporterComponent
   emailShallowValidationService: EmailShallowValidationService;
   teamShallowValidationService: TeamShallowValidationService;
   answerShallowValidationService: AnswerShallowValidationService;
-  remoteDataValidationService: RemoteDataValidationService;
   //#endregion
 
   //#region TemplateFields
@@ -85,7 +83,7 @@ export class AnswersListImporterComponent
   //#region ConstructorAndInitializers
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    private http: HttpClient,
+    private httpClient: HttpClient,
     public dialog: MatDialogRef<AnswersListImporterComponent>,
     public otherDialog: MatDialog
   ) {
@@ -93,7 +91,7 @@ export class AnswersListImporterComponent
     this.initializeDateHourAndMinuteSelectors();
 
     this.emailShallowValidationService = new EmailShallowValidationService(
-      http
+      this.httpClient
     );
 
     if (!this.emailShallowValidationService.isInternalStateCorrect) {
@@ -103,7 +101,9 @@ export class AnswersListImporterComponent
       return;
     }
 
-    this.teamShallowValidationService = new TeamShallowValidationService(http);
+    this.teamShallowValidationService = new TeamShallowValidationService(
+      this.httpClient
+    );
     if (!this.teamShallowValidationService.isInternalStateCorrect) {
       this.displayMessage(
         this.teamShallowValidationService.brokenStateDescription
@@ -112,7 +112,7 @@ export class AnswersListImporterComponent
     }
 
     this.answerShallowValidationService = new AnswerShallowValidationService(
-      http
+      this.httpClient
     );
     if (!this.answerShallowValidationService.isInternalStateCorrect) {
       this.displayMessage(
@@ -120,8 +120,6 @@ export class AnswersListImporterComponent
       );
       return;
     }
-
-    this.remoteDataValidationService = new RemoteDataValidationService(http);
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -160,14 +158,13 @@ export class AnswersListImporterComponent
 
   private async processEmailSourceText() {
     var parameters: AnswersImporterParameters = new AnswersImporterParameters();
-    parameters.http = this.http; // нужно для проверок в базе через REST API
+    parameters.httpClient = this.httpClient; // нужно для проверок в базе через REST API
     parameters.emailSubject = this.emailSubject;
     parameters.emailBody = this.emailBody;
 
     parameters.emailShallowValidationService = this.emailShallowValidationService;
     parameters.teamShallowValidationService = this.teamShallowValidationService;
     parameters.answerShallowValidationService = this.answerShallowValidationService;
-    parameters.remoteDataValidationService = this.remoteDataValidationService;
 
     var answersImporter: AnswersImporter = new AnswersImporter(parameters);
     if (answersImporter.errorsPresent) {
@@ -267,42 +264,6 @@ export class AnswersListImporterComponent
     } else if (event.previouslySelectedIndex == 1) {
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
     }
-
-    // if (event.previouslySelectedIndex == 0) {
-    //   debugString("Previous Step Index: 0");
-
-    //   this.foundErrors = [];
-    //   this.displayImportButton = false;
-
-    //   try {
-    //     await this.processEmailSourceText();
-    //   } catch (Error) {
-    //     console.log("========== EXCEPTION IN processEmailSourceText() ****");
-    //     console.dir(Error);
-    //     console.log(
-    //       "================================================================="
-    //     );
-
-    //     this.foundErrors.push(Error.message);
-    //   }
-    // } else if (event.previouslySelectedIndex == 1) {
-    //   debugString("Previous Step Index: 1");
-
-    //   this.processRoundNumberAndEmailDateTime();
-    //   this.displayImportButton = true;
-    // } else {
-    //   debugString(
-    //     "ELSE PART: Previous Step Index: " + event.previouslySelectedIndex
-    //   );
-    // }
-
-    // if (this.foundErrors.length == 0) {
-    //   console.log("******** NO IMPORT ERRORS FOUND **************");
-    // } else {
-    //   console.log("******** IMPORT ERRORS FOUND START **************");
-    //   this.foundErrors.map((element) => console.log(element));
-    //   console.log("******** IMPORT ERRORS FOUND END **************");
-    // }
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {
