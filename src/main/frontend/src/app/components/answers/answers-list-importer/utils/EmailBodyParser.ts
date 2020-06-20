@@ -64,17 +64,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var teamInfoCalculationResult = this.getTeamFromTheFirstLineOfTheAnswersBlock(
       firstLineFromAnswersBlock
     );
-    debugString(
-      "teamInfoCalculationResult.errorPresent: " +
-        teamInfoCalculationResult.errorsPresent
-    );
-
-    debugString(
-      "teamInfoCalculationResult.errorMessage: " +
-        teamInfoCalculationResult.errorMessage
-    );
-
-    debugObject(teamInfoCalculationResult.result);
 
     if (teamInfoCalculationResult.errorsPresent) {
       this.registerError(teamInfoCalculationResult.errorMessage);
@@ -84,6 +73,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     this.parseAnswersBlock();
+    if (this.errorsPresent) {
+      return;
+    }
 
     console.log(" ================ PARSING RESULT START==============");
     this.answers.forEach((oneAnswer) => {

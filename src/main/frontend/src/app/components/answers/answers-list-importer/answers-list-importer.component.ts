@@ -175,11 +175,19 @@ export class AnswersListImporterComponent
       return;
     }
 
+    debugString("before parse in component");
     answersImporter.parse();
+    debugString(
+      "after parse in component. answersImporter.errorsPresent = " +
+        answersImporter.errorsPresent
+    );
     if (answersImporter.errorsPresent) {
       this.registerFoundErrors(answersImporter.foundErrors);
+      debugString("Component: allThingsAreOk = " + this.allThingsAreOk);
+
       return;
     }
+    debugString("after checking in component");
 
     this.selectedRoundNumber = answersImporter.getRoundNumber();
   }
