@@ -150,12 +150,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       }
     }
 
-    debugString("** STARTING Validation foundTeamNumber: " + foundTeamNumber);
     var teamNumberValidationMessage: string = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
       foundTeamNumber
     );
-
-    debugString("Validation result: " + teamNumberValidationMessage);
     if (teamNumberValidationMessage.length > 0) {
       return new CalculationResult(null, teamNumberValidationMessage);
     }
@@ -164,9 +161,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       foundTeamNumber,
       foundTeamTitle
     );
-
-    debugString("Composed object below");
-    debugObject(team);
 
     return new CalculationResult(team, null);
   }
@@ -193,16 +187,20 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         // сохраняем ранее сформированный ответ и комментарий к нему
         if (questionNumber.length > 0) {
           registerAnswer(this);
+
+          if (this.errorsPresent) {
+            return;
+          }
         }
 
         var dotLocation: number = currentLine.indexOf(".");
         if (dotLocation !== -1) {
           questionNumber = currentLine.substring(1, dotLocation).trim();
           if (!EmailBodyParser.isPositiveInteger(questionNumber)) {
-            throw new Error(
-              `Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. 
-              Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`
-            );
+            this
+              .registerError(`Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. 
+            Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`);
+            return;
           }
 
           var firstLineOfTheAnswer: string = currentLine
@@ -225,9 +223,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
           wholeAnswer.addString(firstLineOfTheAnswer);
         } else {
-          throw new Error(
+          this.registerError(
             `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
           );
+          return;
         }
       } else {
         if (!currentLine.startsWith("***")) {
@@ -263,23 +262,28 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     if (this.answers.length == 0) {
-      throw new Error("В содержании письма не представлено ни одного ответа.");
+      this.registerError(
+        "В содержании письма не представлено ни одного ответа."
+      );
+      return;
     }
 
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: EmailBodyParser) {
       if (processedQuestionNumbers.has(questionNumber)) {
-        throw new Error(
+        currentObjectReference.registerError(
           `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
         );
+        return;
       }
 
       if (previousQuestionNumber != -1) {
         if (Number(questionNumber) <= previousQuestionNumber) {
-          throw new Error(
+          currentObjectReference.registerError(
             `Номера бескрылок в блоке ответов должны идти в порядке возрастания. 
             А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
           );
+          return;
         }
 
         processedQuestionNumbers.add(questionNumber);
