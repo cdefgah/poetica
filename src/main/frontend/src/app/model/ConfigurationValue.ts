@@ -1,3 +1,3 @@
 export class ConfigurationValue {
-    value: string;
+  value: string;
 }

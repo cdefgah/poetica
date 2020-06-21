@@ -155,6 +155,11 @@ export class AnswersListImporterComponent
   ImportAnswers() {}
 
   onStepChange(event: any) {
+    debugString(
+      "Importing answers. Event parameter is provided below. onStepChange:: start"
+    );
+    debugObject(event);
+
     // пересчитываем признак, по которому мы определяем
     // показывать или нет кнопку импорта ответов
     this.updateDisplayImportButton(event);
