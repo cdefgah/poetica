@@ -37,12 +37,15 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     this._httpClient = parameters.httpClient;
   }
 
-  public async parseEmailBody(): Promise<void> {
+  public parse(): void {
     this._answers = [];
 
     var firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
     if (firstLineOfAnswersBlockCalcResult.errorsPresent) {
-      //  this.registerError(firstLineOfAnswersBlockCalcResult.errorMessage);
+      this._onFailure(
+        this._parentComponentObject,
+        firstLineOfAnswersBlockCalcResult.errorMessage
+      );
       return;
     }
 
@@ -54,12 +57,16 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     );
 
     if (teamInfoCalculationResult.errorsPresent) {
-      //  this.registerError(teamInfoCalculationResult.errorMessage);
+      this._onFailure(
+        this._parentComponentObject,
+        teamInfoCalculationResult.errorMessage
+      );
       return;
     } else {
       this._team = teamInfoCalculationResult.result;
     }
 
+    // TODO - вот тут остановились и идём спать :)
     this.parseAnswersBlock();
     // if (this.errorsPresent) {
     //   return;
