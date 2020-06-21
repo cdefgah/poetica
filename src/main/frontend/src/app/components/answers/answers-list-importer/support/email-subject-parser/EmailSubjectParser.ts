@@ -2,33 +2,24 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSinglelineDataImporter";
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
-import { debugString } from "src/app/utils/Config";
 import { EmailSubjectParserParameters } from "./EmailSubjectParserParameters";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
-  private _parentComponentObject: any;
-
   private _emailValidationService: EmailValidationService;
   private _teamValidationService: TeamValidationService;
 
   private _team: TeamDataModel;
   private _roundNumber: string;
 
-  private _onSuccess: Function;
-  private _onFailure: Function;
-
   constructor(
     parameters: EmailSubjectParserParameters,
     onSuccess: Function,
     onFailure: Function
   ) {
-    super(parameters.emailSubject);
+    super(parameters.emailSubject, onSuccess, onFailure);
     this._parentComponentObject = parameters.parentComponentObject;
     this._emailValidationService = parameters.emailValidationService;
     this._teamValidationService = parameters.teamValidationService;
-
-    this._onSuccess = onSuccess;
-    this._onFailure = onFailure;
   }
 
   public parse() {

@@ -5,6 +5,8 @@ import { HttpClient } from "@angular/common/http";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 
 export class EmailBodyParserParameters {
+  parentComponentObject: any;
+
   emailBody: string;
   emailValidationService: EmailValidationService;
   teamValidationService: TeamValidationService;

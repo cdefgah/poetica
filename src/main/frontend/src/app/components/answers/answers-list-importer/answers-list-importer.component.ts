@@ -210,7 +210,12 @@ export class AnswersListImporterComponent
     debugString("processEmailSubjectAndBody: entering to the method.");
 
     var emailSubjectParserParameters = new EmailSubjectParserParameters();
+
+    // сохраняем ссылку на этот компонент и передаём её в парсер.
+    // парсер затем передаст её в вызываемые функции onSuccess и onFailure.
+    // это нужно, чтобы внутри этих функций можно было сослаться на свойства этого компонента.
     emailSubjectParserParameters.parentComponentObject = this;
+
     emailSubjectParserParameters.emailSubject = this.emailSubject;
     emailSubjectParserParameters.emailValidationService = this.emailValidationService;
     emailSubjectParserParameters.teamValidationService = this.teamValidationService;
@@ -227,6 +232,13 @@ export class AnswersListImporterComponent
     emailSubjectParser.parse();
   }
 
+  /**
+   * При передаче ссылки на эту функцию в парсер, мы передаём ссылку на этот компонент.
+   * Это нужно для корректных ссылок на свойства текущего компонента,
+   * @param parentComponentObject ссылка на этот компонент, хранится в парсере и пробрасывается в вызов этого метода.
+   * @param teamObjectFromEmailSubject сформированный объект команды, на базе информации из темы письма.
+   * @param roundNumber номер раунда.
+   */
   private onSuccessfullyEmailSubjectParse(
     parentComponentObject: any,
     teamObjectFromEmailSubject: TeamDataModel,
@@ -247,6 +259,13 @@ export class AnswersListImporterComponent
     );
   }
 
+  /**
+   * При передаче ссылки на функцию в парсер, мы передаём ссылку на этот компонент.
+   * Это нужно для корректных ссылок на свойства текущего компонента,
+   * ибо this в контексте выполнения этого метода будет другим.
+   * @param parentComponentObject ссылка на этот компонент, хранится в парсере и пробрасывается в вызов этого метода.
+   * @param errorMessage сообщение об ошибке.
+   */
   private onParsingFailure(parentComponentObject: any, errorMessage: string) {
     debugString(`Email subject parser failed. Error message: ${errorMessage}`);
     parentComponentObject.foundError = errorMessage;

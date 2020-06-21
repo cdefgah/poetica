@@ -1,10 +1,18 @@
 export abstract class AbstractSingleLineDataImporter {
+  protected _parentComponentObject: any;
+
   private _normalizedSourceString: string;
 
-  constructor(rawSourceText: string) {
+  protected _onSuccess: Function;
+  protected _onFailure: Function;
+
+  constructor(rawSourceText: string, onSuccess: Function, onFailure: Function) {
     this._normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(
       rawSourceText
     );
+
+    this._onSuccess = onSuccess;
+    this._onFailure = onFailure;
   }
 
   protected get normalizedSourceString(): string {

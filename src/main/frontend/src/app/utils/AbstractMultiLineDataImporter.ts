@@ -6,8 +6,8 @@ export abstract class AbstractMultiLineDataImporter extends AbstractSingleLineDa
 
   protected readonly _sourceTextLinesIterator: StringLinesIterator;
 
-  constructor(sourceString: string) {
-    super(sourceString);
+  constructor(sourceString: string, onSuccess: Function, onFailure: Function) {
+    super(sourceString, onSuccess, onFailure);
 
     this._sourceTextLinesIterator = new StringLinesIterator(
       this.normalizedSourceString

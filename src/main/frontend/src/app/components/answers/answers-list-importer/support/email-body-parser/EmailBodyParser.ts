@@ -18,12 +18,16 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answerValidationService: AnswerValidationService;
 
   private _teamFromEmailSubject: TeamDataModel;
-
-  private _httpClient: HttpClient;
   private _roundNumber: string;
 
-  constructor(parameters: EmailBodyParserParameters) {
-    super(parameters.emailBody);
+  private _httpClient: HttpClient;
+
+  constructor(
+    parameters: EmailBodyParserParameters,
+    onSuccess: Function,
+    onFailure: Function
+  ) {
+    super(parameters.emailBody, onSuccess, onFailure);
     this._teamFromEmailSubject = parameters.teamFromEmailSubject;
     this._roundNumber = parameters.roundNumber;
 
@@ -31,14 +35,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     this._teamValidationService = parameters.teamValidationService;
     this._answerValidationService = parameters.answerValidationService;
     this._httpClient = parameters.httpClient;
-  }
-
-  get answers() {
-    return this._answers;
-  }
-
-  get team() {
-    return this._team;
   }
 
   public async parseEmailBody(): Promise<void> {
@@ -70,7 +66,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     // }
 
     console.log(" ================ PARSING RESULT START==============");
-    this.answers.forEach((oneAnswer) => {
+    this._answers.forEach((oneAnswer) => {
       console.log("-----------------------------------");
       console.log("Номер бескрылки: " + oneAnswer.questionNumber);
       console.log("Тело ответа: " + oneAnswer.body);
@@ -245,7 +241,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       registerAnswer(this);
     }
 
-    if (this.answers.length == 0) {
+    if (this._answers.length == 0) {
       // this.registerError(
       //   "В содержании письма не представлено ни одного ответа."
       // );
@@ -315,7 +311,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           );
         }
 
-        currentObjectReference.answers.push(answerRecord);
+        currentObjectReference._answers.push(answerRecord);
       }
 
       questionNumber = "";
