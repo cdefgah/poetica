@@ -1,9 +1,9 @@
-import { TeamDataModel } from "../support/email-subject-parser/node_modules/src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { AnswersImporterParameters } from "./AnswersImporterParameters";
-import { EmailSubjectParser } from "../support/email-subject-parser/EmailSubjectParser";
-import { EmailBodyParser } from "../support/email-body-parser/EmailBodyParser";
-import { debugString } from "../support/email-subject-parser/node_modules/src/app/utils/Config";
-import { EmailBodyParserParameters } from "../support/email-body-parser/EmailBodyParserParameters";
+import { EmailSubjectParser } from "../email-subject-parser/EmailSubjectParser";
+import { EmailBodyParser } from "../email-body-parser/EmailBodyParser";
+import { debugString } from "src/app/utils/Config";
+import { EmailBodyParserParameters } from "../email-body-parser/EmailBodyParserParameters";
 
 export class AnswersImporter {
   private readonly _emailSubjectParser: EmailSubjectParser;
@@ -20,10 +20,10 @@ export class AnswersImporter {
       parameters.teamValidationService
     );
 
-    if (this._emailSubjectParser.errorsPresent) {
-      this.registerFoundErrors(this._emailSubjectParser.foundErrors);
-      return;
-    }
+    // if (this._emailSubjectParser.errorsPresent) {
+    //   this.registerFoundErrors(this._emailSubjectParser.foundErrors);
+    //   return;
+    // }
 
     var emailBodyParserParameters = new EmailBodyParserParameters();
     emailBodyParserParameters.emailBody = parameters.emailBody;
@@ -39,26 +39,26 @@ export class AnswersImporter {
 
     this._emailBodyParser = new EmailBodyParser(emailBodyParserParameters);
 
-    if (this._emailBodyParser.errorsPresent) {
-      this.registerFoundErrors(this._emailBodyParser.foundErrors);
-      return;
-    }
+    // if (this._emailBodyParser.errorsPresent) {
+    //   this.registerFoundErrors(this._emailBodyParser.foundErrors);
+    //   return;
+    // }
   }
 
   public async parse() {
     this._emailSubjectParser.parseEmailSubject();
 
-    if (this._emailSubjectParser.errorsPresent) {
-      this.registerFoundErrors(this._emailSubjectParser.foundErrors);
-      return;
-    }
+    // if (this._emailSubjectParser.errorsPresent) {
+    //   this.registerFoundErrors(this._emailSubjectParser.foundErrors);
+    //   return;
+    // }
 
     this._emailBodyParser.parseEmailBody();
 
-    if (this._emailBodyParser.errorsPresent) {
-      this.registerFoundErrors(this._emailBodyParser.foundErrors);
-      return;
-    }
+    // if (this._emailBodyParser.errorsPresent) {
+    //   this.registerFoundErrors(this._emailBodyParser.foundErrors);
+    //   return;
+    // }
   }
 
   public getRoundNumber(): string {

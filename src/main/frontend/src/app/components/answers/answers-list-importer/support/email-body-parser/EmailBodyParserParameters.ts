@@ -1,7 +1,7 @@
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
-import { EmailSubjectParser } from "./EmailSubjectParser";
+import { EmailSubjectParser } from "../email-subject-parser/EmailSubjectParser";
 import { HttpClient } from "@angular/common/http";
 
 export class EmailBodyParserParameters {

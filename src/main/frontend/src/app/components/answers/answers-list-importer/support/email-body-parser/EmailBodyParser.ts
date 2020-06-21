@@ -1,13 +1,13 @@
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
-import { CalculationResult } from "./CalculationResult";
-import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
-import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
-import { StringBuilder } from "./StringBuilder";
-import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
 import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
 import { HttpClient } from "@angular/common/http";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
+import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
+import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
+import { CalculationResult } from "../CalculationResult";
+import { StringBuilder } from "../StringBuilder";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answers: AnswerDataModel[];
@@ -31,16 +31,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     this._teamValidationService = parameters.teamValidationService;
     this._answerValidationService = parameters.answerValidationService;
     this._httpClient = parameters.httpClient;
-
-    var normalizedEmailBody = this._normalizedSourceString;
-    if (
-      normalizedEmailBody.length > this._emailValidationService.maxBodyLength
-    ) {
-      this.registerError(
-        `Количество символов в содержании письма (${normalizedEmailBody.length}) больше, чем максимально разрешённое для обработки: ${this._emailValidationService.maxBodyLength}`
-      );
-      return;
-    }
   }
 
   get answers() {
@@ -56,7 +46,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
     var firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
     if (firstLineOfAnswersBlockCalcResult.errorsPresent) {
-      this.registerError(firstLineOfAnswersBlockCalcResult.errorMessage);
+      //  this.registerError(firstLineOfAnswersBlockCalcResult.errorMessage);
       return;
     }
 
@@ -68,16 +58,16 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     );
 
     if (teamInfoCalculationResult.errorsPresent) {
-      this.registerError(teamInfoCalculationResult.errorMessage);
+      //  this.registerError(teamInfoCalculationResult.errorMessage);
       return;
     } else {
       this._team = teamInfoCalculationResult.result;
     }
 
     this.parseAnswersBlock();
-    if (this.errorsPresent) {
-      return;
-    }
+    // if (this.errorsPresent) {
+    //   return;
+    // }
 
     console.log(" ================ PARSING RESULT START==============");
     this.answers.forEach((oneAnswer) => {
@@ -182,18 +172,18 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         if (questionNumber.length > 0) {
           registerAnswer(this);
 
-          if (this.errorsPresent) {
-            return;
-          }
+          // if (this.errorsPresent) {
+          //   return;
+          // }
         }
 
         var dotLocation: number = currentLine.indexOf(".");
         if (dotLocation !== -1) {
           questionNumber = currentLine.substring(1, dotLocation).trim();
           if (!EmailBodyParser.isPositiveInteger(questionNumber)) {
-            this
-              .registerError(`Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. 
-            Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`);
+            // this
+            //   .registerError(`Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки.
+            // Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`);
             return;
           }
 
@@ -217,9 +207,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
           wholeAnswer.addString(firstLineOfTheAnswer);
         } else {
-          this.registerError(
-            `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
-          );
+          // this.registerError(
+          //   `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
+          // );
           return;
         }
       } else {
@@ -256,26 +246,26 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     if (this.answers.length == 0) {
-      this.registerError(
-        "В содержании письма не представлено ни одного ответа."
-      );
+      // this.registerError(
+      //   "В содержании письма не представлено ни одного ответа."
+      // );
       return;
     }
     // ================================ Локальные функции ==============================
     function registerAnswer(currentObjectReference: EmailBodyParser) {
       if (processedQuestionNumbers.has(questionNumber)) {
-        currentObjectReference.registerError(
-          `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
-        );
+        // currentObjectReference.registerError(
+        //   `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
+        // );
         return;
       }
 
       if (previousQuestionNumber != -1) {
         if (Number(questionNumber) <= previousQuestionNumber) {
-          currentObjectReference.registerError(
-            `Номера бескрылок в блоке ответов должны идти в порядке возрастания. 
-            А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
-          );
+          // currentObjectReference.registerError(
+          //   `Номера бескрылок в блоке ответов должны идти в порядке возрастания.
+          //   А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
+          // );
           return;
         }
 
@@ -293,9 +283,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           answerBody.length >
           currentObjectReference._answerValidationService.maxBodyLength
         ) {
-          currentObjectReference.registerError(
-            `Тело ответа #${questionNumber} содержит больше символов (${answerBody.length}), чем может быть обработано для одного ответа: ${currentObjectReference._answerValidationService.maxBodyLength}`
-          );
+          // currentObjectReference.registerError(
+          //   `Тело ответа #${questionNumber} содержит больше символов (${answerBody.length}), чем может быть обработано для одного ответа: ${currentObjectReference._answerValidationService.maxBodyLength}`
+          // );
           return;
         }
 
@@ -304,9 +294,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           answerComment.length >
           currentObjectReference._answerValidationService.maxCommentLength
         ) {
-          currentObjectReference.registerError(
-            `Комментарий к ответу #${questionNumber} содержит больше символов (${answerComment.length}), чем может быть обработано для комментария к ответу: ${currentObjectReference._answerValidationService.maxCommentLength}`
-          );
+          // currentObjectReference.registerError(
+          //   `Комментарий к ответу #${questionNumber} содержит больше символов (${answerComment.length}), чем может быть обработано для комментария к ответу: ${currentObjectReference._answerValidationService.maxCommentLength}`
+          // );
           return;
         }
 

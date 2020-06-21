@@ -5,6 +5,7 @@ import { EmailValidationService } from "src/app/components/core/validators/Email
 import { debugString } from "src/app/utils/Config";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
+  private _emailValidationService: EmailValidationService;
   private _teamValidationService: TeamValidationService;
 
   private _team: TeamDataModel;
@@ -18,18 +19,8 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     teamValidationService: TeamValidationService
   ) {
     super(emailSubject);
-    var normalizedEmailSubject: string = this._normalizedSourceString;
-    debugString("normalizedEmailSubject: " + normalizedEmailSubject);
 
-    if (
-      normalizedEmailSubject.length > emailValidationService.maxSubjectLength
-    ) {
-      this.registerError(
-        `Количество символов в теме письма (${normalizedEmailSubject.length}) больше, чем максимально разрешённое для обработки: ${emailValidationService.maxSubjectLength}`
-      );
-      return;
-    }
-
+    this._emailValidationService = emailValidationService;
     this._teamValidationService = teamValidationService;
   }
 
@@ -42,27 +33,24 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
   }
 
   get isEmpty(): boolean {
-    return this._isEmpty;
+    return this.normalizedSourceString.length == 0;
   }
 
   public parseEmailSubject() {
     // если тема письма не задана, просто выходим,
     // не генерируя ошибки. Нужная информация может быть в теле письма.
-    if (this._normalizedSourceString.length == 0) {
-      this._isEmpty = true;
+    if (this.normalizedSourceString.length == 0) {
       return;
     }
 
     // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
     var processedSubject: string = EmailSubjectParser.extractSignificantPartFromTheEmailSubject(
-      this._normalizedSourceString
+      this.normalizedSourceString
     );
-
-    debugString(`processedSubject: ${processedSubject}`);
 
     var commaPosition = processedSubject.indexOf(",");
     if (commaPosition == -1) {
-      this.registerError("Некорректный формат темы письма. Нет запятой.");
+      // this.registerError("Некорректный формат темы письма. Нет запятой.");
       return;
     }
 
@@ -70,11 +58,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       processedSubject.substring(0, commaPosition)
     );
 
-    debugString(`teamTitle: ${teamTitle}`);
-
     var afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
-
-    debugString(`afterCommaSubjectPart: ${afterCommaSubjectPart}`);
 
     let {
       foundTeamNumber,
@@ -84,14 +68,10 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     // фиксируем номер раунда
     this._roundNumber = foundRoundNumber;
 
-    debugString(`foundRoundNumber: ${foundRoundNumber}`);
-
     // проверяем корректность номера команды и получаем сообщение, если номер некорректный
     var teamNumberValidationMessage = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
       foundTeamNumber
     );
-
-    debugString(`teamNumberValidationMessage: ${teamNumberValidationMessage}`);
 
     if (teamNumberValidationMessage.length == 0) {
       // если нет ошибок валидации номера команды
@@ -99,17 +79,11 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
         foundTeamNumber,
         teamTitle
       );
-
-      debugString(`Team data from subject:${this._team.toString()}`);
     } else {
       // если ошибка была, фиксируем её
-      debugString(
-        `Team number from email subject validation failed. Error message: ${teamNumberValidationMessage}`
-      );
-
-      this.registerError(
-        `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
-      );
+      // this.registerError(
+      //   `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
+      // );
     }
   }
 
