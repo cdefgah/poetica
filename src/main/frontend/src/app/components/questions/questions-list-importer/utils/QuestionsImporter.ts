@@ -1,6 +1,6 @@
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
-import { QuestionShallowValidationService } from "src/app/components/core/validators/QuestionShallowValidationService";
+import { QuestionShallowValidationService } from "src/app/components/core/validators/QuestionValidationService";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";

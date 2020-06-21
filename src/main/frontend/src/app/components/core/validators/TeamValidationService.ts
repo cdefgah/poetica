@@ -1,7 +1,7 @@
 import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
 import { HttpClient } from "@angular/common/http";
 
-export class TeamShallowValidationService extends AbstractModelValidationService {
+export class TeamValidationService extends AbstractModelValidationService {
   private _numberRegExValidator: RegExp;
 
   private _maxTeamTitleLength: number;

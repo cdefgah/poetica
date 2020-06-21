@@ -9,114 +9,56 @@ export class AnswersImporter {
   private readonly _emailSubjectParser: EmailSubjectParser;
   private readonly _emailBodyParser: EmailBodyParser;
 
-  private _foundErrors: string[];
-
-  constructor(parameters: AnswersImporterParameters) {
-    debugString("AnswersImporter constructor:: Start");
-
-    debugString("AnswersImporter. Constructing _emailSubjectParser: start");
+  constructor(
+    parameters: AnswersImporterParameters,
+    onSuccess: Function,
+    onFailure: Function
+  ) {
     this._emailSubjectParser = new EmailSubjectParser(
       parameters.emailSubject,
-      parameters.emailShallowValidationService,
-      parameters.teamShallowValidationService
-    );
-    debugString(
-      `AnswersImporter. Constructing _emailSubjectParser: end. Errors present? ${this._emailSubjectParser.errorsPresent}`
+      parameters.emailValidationService,
+      parameters.teamValidationService
     );
 
     if (this._emailSubjectParser.errorsPresent) {
-      debugString(
-        `AnswersImporter. Registering _emailSubjectParser errors: ${this._emailSubjectParser.foundErrors} and exiting.`
-      );
       this.registerFoundErrors(this._emailSubjectParser.foundErrors);
       return;
     }
 
-    debugString("AnswersImporter. Constructing _emailBodyParser: start");
     var emailBodyParserParameters = new EmailBodyParserParameters();
     emailBodyParserParameters.emailBody = parameters.emailBody;
     emailBodyParserParameters.emailValidationService =
-      parameters.emailShallowValidationService;
+      parameters.emailValidationService;
     emailBodyParserParameters.teamValidationService =
-      parameters.teamShallowValidationService;
+      parameters.teamValidationService;
     emailBodyParserParameters.answerValidationService =
-      parameters.answerShallowValidationService;
+      parameters.answerValidationService;
     emailBodyParserParameters.httpClient = parameters.httpClient;
 
     emailBodyParserParameters.emailSubjectParser = this._emailSubjectParser;
 
     this._emailBodyParser = new EmailBodyParser(emailBodyParserParameters);
-    debugString(
-      `AnswersImporter. Constructing _emailBodyParser: end. Errors present? ${this._emailBodyParser.errorsPresent}`
-    );
 
     if (this._emailBodyParser.errorsPresent) {
-      debugString(
-        `AnswersImporter. Registering _emailBodyParser errors: ${this._emailBodyParser.foundErrors} and exiting.`
-      );
       this.registerFoundErrors(this._emailBodyParser.foundErrors);
       return;
     }
-
-    debugString("AnswersImporter constructor:: correct END");
-  }
-
-  private registerFoundErrors(foundErrorsArray: string[]) {
-    if (this._foundErrors) {
-      this._foundErrors = this._foundErrors.concat(foundErrorsArray);
-    } else {
-      this._foundErrors = foundErrorsArray;
-    }
-  }
-
-  get errorsPresent(): boolean {
-    if (this._foundErrors) {
-      return this._foundErrors.length > 0;
-    } else {
-      return false;
-    }
-  }
-
-  get foundErrors(): string[] {
-    return this._foundErrors;
   }
 
   public async parse() {
-    debugString("AnswersImporter parse() method:: Start");
-
-    debugString(
-      "AnswersImporter parse() method, calling this._emailSubjectParser.parseEmailSubject()"
-    );
     this._emailSubjectParser.parseEmailSubject();
 
-    debugString(
-      `AnswersImporter parse() method, after calling this._emailSubjectParser.parseEmailSubject(), errorsPresent? ${this._emailSubjectParser.errorsPresent}`
-    );
     if (this._emailSubjectParser.errorsPresent) {
-      debugString(
-        `AnswersImporter parse() method, after calling this._emailSubjectParser.parseEmailSubject() registering errors: ${this._emailSubjectParser.foundErrors}`
-      );
       this.registerFoundErrors(this._emailSubjectParser.foundErrors);
       return;
     }
 
-    debugString(
-      "AnswersImporter parse() method, calling this._emailSubjectParser.parseEmailBody()"
-    );
     this._emailBodyParser.parseEmailBody();
-    debugString(
-      `AnswersImporter parse() method, after calling this._emailSubjectParser.parseEmailBody() errorsPresent? ${this._emailBodyParser.errorsPresent}`
-    );
 
     if (this._emailBodyParser.errorsPresent) {
-      debugString(
-        `AnswersImporter parse() method, after calling this._emailSubjectParser.parseEmailBody() registering errors ${this._emailBodyParser.foundErrors}`
-      );
       this.registerFoundErrors(this._emailBodyParser.foundErrors);
       return;
     }
-
-    debugString("AnswersImporter parse() method:: Correct END");
   }
 
   public getRoundNumber(): string {

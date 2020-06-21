@@ -5,7 +5,7 @@ import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-questions-list",

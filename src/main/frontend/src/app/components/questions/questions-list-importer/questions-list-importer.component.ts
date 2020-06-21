@@ -10,7 +10,7 @@ import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-questions-list-importer",

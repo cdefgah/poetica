@@ -8,7 +8,7 @@ import {
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionShallowValidationService";
+import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-question-details",

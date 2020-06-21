@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { MatDialog } from "@angular/material/dialog";
 import { TeamDetailsComponent } from "../team-details/team-details.component";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
+import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 
 @Component({
@@ -15,7 +15,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   implements OnInit {
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
-    this.teamValidationService = new TeamShallowValidationService(http);
+    this.teamValidationService = new TeamValidationService(http);
     if (!this.teamValidationService.isInternalStateCorrect()) {
       this.displayMessage(this.teamValidationService.brokenStateDescription);
       return;
@@ -24,7 +24,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     this.loadTeamsList();
   }
 
-  private teamValidationService: TeamShallowValidationService;
+  private teamValidationService: TeamValidationService;
 
   ngOnInit() {}
 

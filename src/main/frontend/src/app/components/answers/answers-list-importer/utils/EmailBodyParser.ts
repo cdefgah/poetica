@@ -2,10 +2,10 @@ import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDa
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { CalculationResult } from "./CalculationResult";
-import { EmailShallowValidationService } from "src/app/components/core/validators/EmailShallowValidationService";
-import { TeamShallowValidationService } from "src/app/components/core/validators/TeamShallowValidationService";
+import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
+import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { StringBuilder } from "./StringBuilder";
-import { AnswerShallowValidationService } from "src/app/components/core/validators/AnswerShallowValidationService";
+import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
 import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
 import { HttpClient } from "@angular/common/http";
 
@@ -13,9 +13,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answers: AnswerDataModel[];
   private _team: TeamDataModel;
 
-  private _emailValidationService: EmailShallowValidationService;
-  private _teamValidationService: TeamShallowValidationService;
-  private _answerValidationService: AnswerShallowValidationService;
+  private _emailValidationService: EmailValidationService;
+  private _teamValidationService: TeamValidationService;
+  private _answerValidationService: AnswerValidationService;
 
   private _teamFromEmailSubject: TeamDataModel;
 

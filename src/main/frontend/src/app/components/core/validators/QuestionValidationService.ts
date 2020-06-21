@@ -1,7 +1,7 @@
 import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
 import { HttpClient } from "@angular/common/http";
 
-export class QuestionShallowValidationService extends AbstractModelValidationService {
+export class QuestionValidationService extends AbstractModelValidationService {
   private _maxBodyLength: number;
   private _maxSourceLength: number;
   private _maxCommentlength: number;

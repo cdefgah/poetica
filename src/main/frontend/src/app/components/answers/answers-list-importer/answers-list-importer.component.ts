@@ -10,9 +10,9 @@ import { AnswersImporter } from "./utils/AnswersImporter";
 import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { EmailShallowValidationService } from "../../core/validators/EmailShallowValidationService";
-import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
-import { AnswerShallowValidationService } from "../../core/validators/AnswerShallowValidationService";
+import { EmailValidationService } from "../../core/validators/EmailValidationService";
+import { TeamValidationService } from "../../core/validators/TeamValidationService";
+import { AnswerValidationService } from "../../core/validators/AnswerValidationService";
 import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
@@ -24,9 +24,9 @@ export class AnswersListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
   //#region ValidatorServices
-  emailShallowValidationService: EmailShallowValidationService;
-  teamShallowValidationService: TeamShallowValidationService;
-  answerShallowValidationService: AnswerShallowValidationService;
+  emailValidationService: EmailValidationService;
+  teamValidationService: TeamValidationService;
+  answerValidationService: AnswerValidationService;
   //#endregion
 
   //#region TemplateFields
@@ -56,15 +56,17 @@ export class AnswersListImporterComponent
   displayImportButton: boolean = false;
   //#endregion
 
-  //#region ErrorsCollection
-  foundErrors: string[];
+  //#region Errors handling
+  foundError: string;
 
-  get errorsPresent(): boolean {
-    return this.foundErrors && this.foundErrors.length > 0;
+  get errorPresent(): boolean {
+    if (this.foundError) {
+      return this.foundError.length > 0;
+    }
   }
 
   get allThingsAreOk(): boolean {
-    return !this.errorsPresent;
+    return !this.errorPresent;
   }
   //#endregion
 
@@ -90,34 +92,22 @@ export class AnswersListImporterComponent
     super();
     this.initializeDateHourAndMinuteSelectors();
 
-    this.emailShallowValidationService = new EmailShallowValidationService(
-      this.httpClient
-    );
+    this.emailValidationService = new EmailValidationService(this.httpClient);
 
-    if (!this.emailShallowValidationService.isInternalStateCorrect) {
-      this.displayMessage(
-        this.emailShallowValidationService.brokenStateDescription
-      );
+    if (!this.emailValidationService.isInternalStateCorrect) {
+      this.displayMessage(this.emailValidationService.brokenStateDescription);
       return;
     }
 
-    this.teamShallowValidationService = new TeamShallowValidationService(
-      this.httpClient
-    );
-    if (!this.teamShallowValidationService.isInternalStateCorrect) {
-      this.displayMessage(
-        this.teamShallowValidationService.brokenStateDescription
-      );
+    this.teamValidationService = new TeamValidationService(this.httpClient);
+    if (!this.teamValidationService.isInternalStateCorrect) {
+      this.displayMessage(this.teamValidationService.brokenStateDescription);
       return;
     }
 
-    this.answerShallowValidationService = new AnswerShallowValidationService(
-      this.httpClient
-    );
-    if (!this.answerShallowValidationService.isInternalStateCorrect) {
-      this.displayMessage(
-        this.answerShallowValidationService.brokenStateDescription
-      );
+    this.answerValidationService = new AnswerValidationService(this.httpClient);
+    if (!this.answerValidationService.isInternalStateCorrect) {
+      this.displayMessage(this.answerValidationService.brokenStateDescription);
       return;
     }
   }
@@ -156,15 +146,17 @@ export class AnswersListImporterComponent
 
   ImportAnswers() {}
 
-  private async processEmailSourceText() {
+  private processEmailSubjectAndBody(onSucceed: Function, onFailed: Function) {}
+
+  private processEmailSourceText() {
     var parameters: AnswersImporterParameters = new AnswersImporterParameters();
     parameters.httpClient = this.httpClient; // нужно для проверок в базе через REST API
     parameters.emailSubject = this.emailSubject;
     parameters.emailBody = this.emailBody;
 
-    parameters.emailShallowValidationService = this.emailShallowValidationService;
-    parameters.teamShallowValidationService = this.teamShallowValidationService;
-    parameters.answerShallowValidationService = this.answerShallowValidationService;
+    parameters.emailValidationService = this.emailValidationService;
+    parameters.teamValidationService = this.teamValidationService;
+    parameters.answerValidationService = this.answerValidationService;
 
     var answersImporter: AnswersImporter = new AnswersImporter(parameters);
     if (answersImporter.errorsPresent) {

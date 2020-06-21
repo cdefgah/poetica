@@ -1,11 +1,11 @@
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSinglelineDataImporter";
-import { TeamShallowValidationService } from "src/app/components/core/validators/TeamShallowValidationService";
-import { EmailShallowValidationService } from "src/app/components/core/validators/EmailShallowValidationService";
+import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
+import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
 import { debugString } from "src/app/utils/Config";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
-  private _teamValidationService: TeamShallowValidationService;
+  private _teamValidationService: TeamValidationService;
 
   private _team: TeamDataModel;
   private _roundNumber: string;
@@ -14,8 +14,8 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
 
   constructor(
     emailSubject: string,
-    emailValidationService: EmailShallowValidationService,
-    teamValidationService: TeamShallowValidationService
+    emailValidationService: EmailValidationService,
+    teamValidationService: TeamValidationService
   ) {
     super(emailSubject);
     var normalizedEmailSubject: string = this._normalizedSourceString;

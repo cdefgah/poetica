@@ -1,21 +1,21 @@
 import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
 import { HttpClient } from "@angular/common/http";
 
-export class EmailShallowValidationService extends AbstractModelValidationService {
-  private _maxSubjectLength: number;
+export class AnswerValidationService extends AbstractModelValidationService {
   private _maxBodyLength: number;
+  private _maxCommentLength: number;
 
   constructor(httpClient: HttpClient) {
     super();
 
-    const url: string = "/emails/model-constraints";
+    const url: string = "/answers/model-constraints";
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._maxSubjectLength = parseInt(data["MAX_SUBJECT_LENGTH"]);
         this._maxBodyLength = parseInt(data["MAX_BODY_LENGTH"]);
+        this._maxCommentLength = parseInt(data["MAX_COMMENT_LENGTH"]);
       },
       (error) => {
-        var errorMessage: string = `$Ошибка при получении model-constraints для Email. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+        var errorMessage: string = `$Ошибка при получении model-constraints для Answer. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
         this.setBrokenInternalState(errorMessage);
       }
     );
@@ -25,7 +25,7 @@ export class EmailShallowValidationService extends AbstractModelValidationServic
     return this._maxBodyLength;
   }
 
-  get maxSubjectLength(): number {
-    return this._maxSubjectLength;
+  get maxCommentLength(): number {
+    return this._maxCommentLength;
   }
 }

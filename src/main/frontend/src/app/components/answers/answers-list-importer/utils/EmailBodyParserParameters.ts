@@ -1,14 +1,14 @@
-import { EmailShallowValidationService } from "src/app/components/core/validators/EmailShallowValidationService";
-import { TeamShallowValidationService } from "src/app/components/core/validators/TeamShallowValidationService";
-import { AnswerShallowValidationService } from "src/app/components/core/validators/AnswerShallowValidationService";
+import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
+import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
+import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
 import { EmailSubjectParser } from "./EmailSubjectParser";
 import { HttpClient } from "@angular/common/http";
 
 export class EmailBodyParserParameters {
   emailBody: string;
-  emailValidationService: EmailShallowValidationService;
-  teamValidationService: TeamShallowValidationService;
-  answerValidationService: AnswerShallowValidationService;
+  emailValidationService: EmailValidationService;
+  teamValidationService: TeamValidationService;
+  answerValidationService: AnswerValidationService;
   emailSubjectParser: EmailSubjectParser;
   httpClient: HttpClient;
 }

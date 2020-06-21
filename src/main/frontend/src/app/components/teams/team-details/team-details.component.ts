@@ -8,7 +8,7 @@ import {
 } from "@angular/material";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamShallowValidationService } from "../../core/validators/TeamShallowValidationService";
+import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
@@ -26,7 +26,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   public static readonly DIALOG_RESULT_DECLINED: number = 2;
   public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
 
-  private readonly _modelValidatorService: TeamShallowValidationService;
+  private readonly _modelValidatorService: TeamValidationService;
 
   dialogTitle: string;
 
@@ -41,7 +41,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   isExistingRecord: boolean;
 
   static getDialogConfigWithData(
-    modelValidatorService: TeamShallowValidationService,
+    modelValidatorService: TeamValidationService,
     row?: any
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -192,7 +192,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     });
   }
 
-  get modelValidatorService(): TeamShallowValidationService {
+  get modelValidatorService(): TeamValidationService {
     return this._modelValidatorService;
   }
 
