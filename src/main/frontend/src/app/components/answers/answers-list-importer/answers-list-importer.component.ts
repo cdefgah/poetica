@@ -36,6 +36,8 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region TemplateFields
+  isActiveProcessRunning: boolean = false;
+
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
 
@@ -63,7 +65,7 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region Errors handling
-  foundError: string;
+  foundError: string = "";
 
   get errorPresent(): boolean {
     if (this.foundError) {
@@ -168,17 +170,25 @@ export class AnswersListImporterComponent
     if (event.selectedIndex == 0) {
       // сбрасываем состояние всех контролирующих переменных
       // и выходим
+      debugString("Switched to the first step. Resetting vars and exiting.");
       this.resetStepperVariables(event);
       return;
     }
 
     if (event.previouslySelectedIndex == 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
+      debugString(
+        "Moving from the first step. Processing email subject and body."
+      );
       this.processEmailSubjectAndBody(
         this.onSuccessfullyEmailSubjectParse,
         this.onParsingFailure
       );
     } else if (event.previouslySelectedIndex == 1) {
+      debugString(
+        "Moving from the second step. Processing email date/time and round number"
+      );
+
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
     }
   }
@@ -187,10 +197,16 @@ export class AnswersListImporterComponent
     onSuccess: Function,
     onFailure: Function
   ): void {
+    this.isActiveProcessRunning = true;
+    debugString("processEmailSubjectAndBody: entering to the method.");
+
     var emailSubjectParserParameters = new EmailSubjectParserParameters();
+    emailSubjectParserParameters.parentComponentObject = this;
     emailSubjectParserParameters.emailSubject = this.emailSubject;
     emailSubjectParserParameters.emailValidationService = this.emailValidationService;
     emailSubjectParserParameters.teamValidationService = this.teamValidationService;
+
+    debugString("Initializing the emailSubjectParser object");
 
     var emailSubjectParser = new EmailSubjectParser(
       emailSubjectParserParameters,
@@ -198,19 +214,38 @@ export class AnswersListImporterComponent
       this.onParsingFailure
     );
 
+    debugString("Launching the email subject parser to do its job");
     emailSubjectParser.parse();
   }
 
   private onSuccessfullyEmailSubjectParse(
+    parentComponentObject: any,
     teamObjectFromEmailSubject: TeamDataModel,
     roundNumber: string
   ) {
-    this.teamFromEmailSubject = teamObjectFromEmailSubject;
-    this.selectedRoundNumber = roundNumber;
+    debugString(
+      "Email subject parser completed parsing successfully. Team object from the subject line is below."
+    );
+    debugObject(teamObjectFromEmailSubject);
+    debugString(`Round number from the email subject is :${roundNumber}`);
+
+    parentComponentObject.teamFromEmailSubject = teamObjectFromEmailSubject;
+    parentComponentObject.selectedRoundNumber = roundNumber;
+
+    parentComponentObject.isActiveProcessRunning = false;
+    debugString(
+      `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
+    );
   }
 
-  private onParsingFailure(errorMessage: string) {
-    this.foundError = errorMessage;
+  private onParsingFailure(parentComponentObject: any, errorMessage: string) {
+    debugString(`Email subject parser failed. Error message: ${errorMessage}`);
+    parentComponentObject.foundError = errorMessage;
+
+    parentComponentObject.isActiveProcessRunning = false;
+    debugString(
+      `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
+    );
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {

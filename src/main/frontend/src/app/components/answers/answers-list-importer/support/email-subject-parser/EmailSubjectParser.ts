@@ -6,6 +6,8 @@ import { debugString } from "src/app/utils/Config";
 import { EmailSubjectParserParameters } from "./EmailSubjectParserParameters";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
+  private _parentComponentObject: any;
+
   private _emailValidationService: EmailValidationService;
   private _teamValidationService: TeamValidationService;
 
@@ -21,6 +23,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     onFailure: Function
   ) {
     super(parameters.emailSubject);
+    this._parentComponentObject = parameters.parentComponentObject;
     this._emailValidationService = parameters.emailValidationService;
     this._teamValidationService = parameters.teamValidationService;
 
@@ -32,7 +35,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     // если тема письма не задана, просто выходим,
     // не генерируя ошибки. Нужная информация может быть в теле письма.
     if (this.normalizedSourceString.length == 0) {
-      this._onSuccess();
+      this._onSuccess(this._parentComponentObject, null, null);
       return;
     }
 
@@ -40,7 +43,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       this.normalizedSourceString
     );
     if (subjectValidationMessage.length > 0) {
-      this._onFailure(subjectValidationMessage);
+      this._onFailure(this._parentComponentObject, subjectValidationMessage);
       return;
     }
 
@@ -51,7 +54,10 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
 
     var commaPosition = processedSubject.indexOf(",");
     if (commaPosition == -1) {
-      this._onFailure("Некорректный формат темы письма. Нет запятой.");
+      this._onFailure(
+        this._parentComponentObject,
+        "Некорректный формат темы письма. Нет запятой."
+      );
       return;
     }
 
@@ -76,6 +82,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
 
     if (teamNumberValidationMessage.length > 0) {
       this._onFailure(
+        this._parentComponentObject,
         `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
       );
       return;
@@ -86,7 +93,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       teamTitle
     );
 
-    this._onSuccess(this._team, this._roundNumber);
+    this._onSuccess(this._parentComponentObject, this._team, this._roundNumber);
   }
 
   /**
