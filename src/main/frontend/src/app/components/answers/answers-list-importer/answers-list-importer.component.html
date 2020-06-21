@@ -236,17 +236,13 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
         </ng-template>
 
         <ng-template #errorsBlock>
-          <span>Обнаруженны следующие ошибки:</span>
+          <span>Обнаруженна ошибка:</span>
           <hr />
           <div>
-            <ul>
-              <li *ngFor="let oneErrorMessage of foundErrors">
-                {{ oneErrorMessage }}
-              </li>
-            </ul>
+            {{ foundError }}
           </div>
           <hr />
-          <span>Пожалуйста устраните их, чтобы импортировать ответы.</span>
+          <span>Пожалуйста устраните её, чтобы импортировать ответы.</span>
         </ng-template>
 
         <div>

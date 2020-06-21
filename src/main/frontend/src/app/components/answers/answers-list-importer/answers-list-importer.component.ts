@@ -6,14 +6,15 @@ import {
   MatDialogRef,
   MatDialog,
 } from "@angular/material/dialog";
-import { AnswersImporter } from "./utils/AnswersImporter";
-import { AnswersImporterParameters } from "./utils/AnswersImporterParameters";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { EmailValidationService } from "../../core/validators/EmailValidationService";
 import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { AnswerValidationService } from "../../core/validators/AnswerValidationService";
 import { debugString, debugObject } from "src/app/utils/Config";
+import { EmailSubjectParserParameters } from "./support/email-subject-parser/EmailSubjectParserParameters";
+import { EmailSubjectParser } from "./support/email-subject-parser/EmailSubjectParser";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -27,6 +28,11 @@ export class AnswersListImporterComponent
   emailValidationService: EmailValidationService;
   teamValidationService: TeamValidationService;
   answerValidationService: AnswerValidationService;
+  //#endregion
+
+  //#region DataFields
+  private teamFromEmailSubject: TeamDataModel;
+
   //#endregion
 
   //#region TemplateFields
@@ -62,6 +68,8 @@ export class AnswersListImporterComponent
   get errorPresent(): boolean {
     if (this.foundError) {
       return this.foundError.length > 0;
+    } else {
+      return false;
     }
   }
 
@@ -146,98 +154,11 @@ export class AnswersListImporterComponent
 
   ImportAnswers() {}
 
-  private processEmailSubjectAndBody(onSucceed: Function, onFailed: Function) {}
+  onStepChange(event: any) {
+    // пересчитываем признак, по которому мы определяем
+    // показывать или нет кнопку импорта ответов
+    this.updateDisplayImportButton(event);
 
-  private processEmailSourceText() {
-    var parameters: AnswersImporterParameters = new AnswersImporterParameters();
-    parameters.httpClient = this.httpClient; // нужно для проверок в базе через REST API
-    parameters.emailSubject = this.emailSubject;
-    parameters.emailBody = this.emailBody;
-
-    parameters.emailValidationService = this.emailValidationService;
-    parameters.teamValidationService = this.teamValidationService;
-    parameters.answerValidationService = this.answerValidationService;
-
-    var answersImporter: AnswersImporter = new AnswersImporter(parameters);
-    if (answersImporter.errorsPresent) {
-      this.registerFoundErrors(answersImporter.foundErrors);
-      return;
-    }
-
-    debugString("before parse in component");
-    answersImporter.parse();
-    debugString(
-      "after parse in component. answersImporter.errorsPresent = " +
-        answersImporter.errorsPresent
-    );
-    if (answersImporter.errorsPresent) {
-      this.registerFoundErrors(answersImporter.foundErrors);
-      debugString("Component: allThingsAreOk = " + this.allThingsAreOk);
-
-      return;
-    }
-    debugString("after checking in component");
-
-    this.selectedRoundNumber = answersImporter.getRoundNumber();
-  }
-
-  private registerFoundErrors(foundErrorsArray: string[]) {
-    if (this.foundErrors) {
-      this.foundErrors = this.foundErrors.concat(foundErrorsArray);
-    } else {
-      this.foundErrors = foundErrorsArray;
-    }
-  }
-
-  private processRoundNumberAndEmailDateTime() {
-    console.log("*** PROCESSING ROUND NUMBER AND DATE TIME **********");
-    if (this.selectedRoundNumber) {
-      console.log("ROUND NUMBER: " + this.selectedRoundNumber);
-    } else {
-      console.log("**** ERROR: Round number is not specified!");
-      this.foundErrors.push(
-        "Не указано на какой раунд (тур) прислано письмо. Предварительный или основной."
-      );
-    }
-
-    if (this.emailSentOnDate) {
-      console.log("this.emailSentOnDate = " + this.emailSentOnDate);
-
-      var day = this.emailSentOnDate.getDate();
-      var month = this.emailSentOnDate.getMonth();
-      var year = this.emailSentOnDate.getFullYear();
-
-      if (!this.emailSentOnHour) {
-        this.emailSentOnHour = "0";
-      }
-
-      if (!this.emailSentOnMinute) {
-        this.emailSentOnMinute = "0";
-      }
-
-      var compoundDate = new Date(
-        year,
-        month,
-        day,
-        parseInt(this.emailSentOnHour),
-        parseInt(this.emailSentOnMinute),
-        0,
-        0
-      );
-
-      // отправляем compoundDate на сервер и строим там java-Date
-      // new Date(compoundDate);
-      console.log("**********************");
-      console.log("compound date: " + compoundDate.getTime());
-      console.log("**********************");
-    } else {
-      console.log("ERROR: EMAIL DATE IS NOT SET");
-      this.foundErrors.push("Не указана дата отправки письма");
-    }
-    console.log("***************************************************");
-  }
-
-  async onStepChange(event: any) {
     // если перешли на нулевой шаг с любого
     if (event.selectedIndex == 0) {
       // сбрасываем состояние всех контролирующих переменных
@@ -246,20 +167,49 @@ export class AnswersListImporterComponent
       return;
     }
 
-    // пересчитываем признак, по которому мы определяем
-    // показывать или нет кнопку импорта ответов
-    this.updateDisplayImportButton(event);
-
     if (event.previouslySelectedIndex == 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
-      await this.processEmailSourceText();
+      this.processEmailSubjectAndBody(
+        this.onSuccessfullyEmailSubjectParse,
+        this.onParsingFailure
+      );
     } else if (event.previouslySelectedIndex == 1) {
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
     }
   }
 
+  private processEmailSubjectAndBody(
+    onSuccess: Function,
+    onFailure: Function
+  ): void {
+    var emailSubjectParserParameters = new EmailSubjectParserParameters();
+    emailSubjectParserParameters.emailSubject = this.emailSubject;
+    emailSubjectParserParameters.emailValidationService = this.emailValidationService;
+    emailSubjectParserParameters.teamValidationService = this.teamValidationService;
+
+    var emailSubjectParser = new EmailSubjectParser(
+      emailSubjectParserParameters,
+      this.onSuccessfullyEmailSubjectParse,
+      this.onParsingFailure
+    );
+
+    emailSubjectParser.parse();
+  }
+
+  private onSuccessfullyEmailSubjectParse(
+    teamObjectFromEmailSubject: TeamDataModel,
+    roundNumber: string
+  ) {
+    this.teamFromEmailSubject = teamObjectFromEmailSubject;
+    this.selectedRoundNumber = roundNumber;
+  }
+
+  private onParsingFailure(errorMessage: string) {
+    this.foundError = errorMessage;
+  }
+
   private resetStepperVariables(stepChangeEvent: any): void {
-    this.foundErrors = [];
+    this.foundError = "";
     this.updateDisplayImportButton(stepChangeEvent);
   }
 

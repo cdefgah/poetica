@@ -1,6 +1,6 @@
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
-import { QuestionShallowValidationService } from "src/app/components/core/validators/QuestionValidationService";
+import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
@@ -12,11 +12,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   questions: QuestionDataModel[];
 
-  private questionModelValidatorService: QuestionShallowValidationService;
+  private questionModelValidatorService: QuestionValidationService;
 
   constructor(
     sourceText: string,
-    questionModelValidatorService: QuestionShallowValidationService
+    questionModelValidatorService: QuestionValidationService
   ) {
     super(sourceText);
     this.expectedQuestionNumber = 1;

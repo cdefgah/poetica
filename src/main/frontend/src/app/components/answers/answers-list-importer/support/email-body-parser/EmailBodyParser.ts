@@ -7,7 +7,7 @@ import { EmailValidationService } from "src/app/components/core/validators/Email
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
 import { CalculationResult } from "../CalculationResult";
-import { StringBuilder } from "../StringBuilder";
+import { StringBuilder } from "../../../../../utils/StringBuilder";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _answers: AnswerDataModel[];
@@ -24,8 +24,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
   constructor(parameters: EmailBodyParserParameters) {
     super(parameters.emailBody);
-    this._teamFromEmailSubject = parameters.emailSubjectParser.team;
-    this._roundNumber = parameters.emailSubjectParser.roundNumber;
+    this._teamFromEmailSubject = parameters.teamFromEmailSubject;
+    this._roundNumber = parameters.roundNumber;
 
     this._emailValidationService = parameters.emailValidationService;
     this._teamValidationService = parameters.teamValidationService;

@@ -3,6 +3,7 @@ import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSingleline
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
 import { debugString } from "src/app/utils/Config";
+import { EmailSubjectParserParameters } from "./EmailSubjectParserParameters";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
   private _emailValidationService: EmailValidationService;
@@ -11,35 +12,35 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
   private _team: TeamDataModel;
   private _roundNumber: string;
 
-  private _isEmpty: boolean = false;
+  private _onSuccess: Function;
+  private _onFailure: Function;
 
   constructor(
-    emailSubject: string,
-    emailValidationService: EmailValidationService,
-    teamValidationService: TeamValidationService
+    parameters: EmailSubjectParserParameters,
+    onSuccess: Function,
+    onFailure: Function
   ) {
-    super(emailSubject);
+    super(parameters.emailSubject);
+    this._emailValidationService = parameters.emailValidationService;
+    this._teamValidationService = parameters.teamValidationService;
 
-    this._emailValidationService = emailValidationService;
-    this._teamValidationService = teamValidationService;
+    this._onSuccess = onSuccess;
+    this._onFailure = onFailure;
   }
 
-  get team(): TeamDataModel {
-    return this._team;
-  }
-
-  get roundNumber(): string {
-    return this._roundNumber;
-  }
-
-  get isEmpty(): boolean {
-    return this.normalizedSourceString.length == 0;
-  }
-
-  public parseEmailSubject() {
+  public parse() {
     // если тема письма не задана, просто выходим,
     // не генерируя ошибки. Нужная информация может быть в теле письма.
     if (this.normalizedSourceString.length == 0) {
+      this._onSuccess();
+      return;
+    }
+
+    var subjectValidationMessage = this._emailValidationService.validateEmailSubject(
+      this.normalizedSourceString
+    );
+    if (subjectValidationMessage.length > 0) {
+      this._onFailure(subjectValidationMessage);
       return;
     }
 
@@ -50,7 +51,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
 
     var commaPosition = processedSubject.indexOf(",");
     if (commaPosition == -1) {
-      // this.registerError("Некорректный формат темы письма. Нет запятой.");
+      this._onFailure("Некорректный формат темы письма. Нет запятой.");
       return;
     }
 
@@ -73,18 +74,19 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       foundTeamNumber
     );
 
-    if (teamNumberValidationMessage.length == 0) {
-      // если нет ошибок валидации номера команды
-      this._team = TeamDataModel.createTeamByNumberAndTitle(
-        foundTeamNumber,
-        teamTitle
+    if (teamNumberValidationMessage.length > 0) {
+      this._onFailure(
+        `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
       );
-    } else {
-      // если ошибка была, фиксируем её
-      // this.registerError(
-      //   `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
-      // );
+      return;
     }
+
+    this._team = TeamDataModel.createTeamByNumberAndTitle(
+      foundTeamNumber,
+      teamTitle
+    );
+
+    this._onSuccess(this._team, this._roundNumber);
   }
 
   /**

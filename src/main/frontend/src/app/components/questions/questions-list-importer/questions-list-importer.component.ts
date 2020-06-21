@@ -10,7 +10,7 @@ import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
+import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-questions-list-importer",
@@ -41,10 +41,10 @@ export class QuestionsListImporterComponent
   private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE =
     "questionModelValidatorService";
 
-  private questionValidationService: QuestionShallowValidationService;
+  private questionValidationService: QuestionValidationService;
 
   static getDialogConfigWithData(
-    questionValidationService: QuestionShallowValidationService
+    questionValidationService: QuestionValidationService
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 

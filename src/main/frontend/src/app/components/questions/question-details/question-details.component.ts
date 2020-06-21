@@ -8,7 +8,7 @@ import {
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
+import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-question-details",
@@ -26,7 +26,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   question: QuestionDataModel;
   questionCopy: QuestionDataModel; // используется для сравнения, были-ли изменения при редактировании
 
-  questionValidationService: QuestionShallowValidationService;
+  questionValidationService: QuestionValidationService;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -74,7 +74,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   static getDialogConfigWithData(
-    questionValidationService: QuestionShallowValidationService,
+    questionValidationService: QuestionValidationService,
     row?: any
   ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
