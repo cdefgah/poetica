@@ -224,9 +224,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
     </mat-step>
     <mat-step>
       <form>
-        <ng-template matStepLabel
-          >Предварительный просмотр и импорт</ng-template
-        >
+        <ng-template matStepLabel>{{ lastStepTitle }}</ng-template>
         <div
           *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"
         ></div>

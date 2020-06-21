@@ -78,6 +78,15 @@ export class AnswersListImporterComponent
   get allThingsAreOk(): boolean {
     return !this.errorPresent;
   }
+
+  get lastStepTitle(): string {
+    if (this.allThingsAreOk) {
+      return "Предварительный просмотр и импорт";
+    } else {
+      return "Информация об ошибках";
+    }
+  }
+
   //#endregion
 
   //#region StaticMethodForDialogs
