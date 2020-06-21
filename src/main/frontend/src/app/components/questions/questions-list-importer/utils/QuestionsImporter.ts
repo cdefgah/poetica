@@ -18,7 +18,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     sourceText: string,
     questionModelValidatorService: QuestionValidationService
   ) {
-    super(sourceText);
+    // TODO - потом переделать на onSuccess и onFailure по аналогии с импортом ответов
+    super(sourceText, null, null);
     this.expectedQuestionNumber = 1;
     this.questionModelValidatorService = questionModelValidatorService;
   }
