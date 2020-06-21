@@ -5,7 +5,7 @@ import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionShallowValidationService } from "../../core/validators/QuestionValidationService";
+import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
 
 @Component({
   selector: "app-questions-list",
@@ -36,7 +36,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   selectedRowIndex: number;
 
-  private questionValidationService: QuestionShallowValidationService;
+  private questionValidationService: QuestionValidationService;
 
   constructor(
     private http: HttpClient,
@@ -44,7 +44,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
     public otherDialog: MatDialog
   ) {
     super();
-    this.questionValidationService = new QuestionShallowValidationService(http);
+    this.questionValidationService = new QuestionValidationService(http);
     if (!this.questionValidationService.isInternalStateCorrect) {
       this.displayMessage(
         this.questionValidationService.brokenStateDescription

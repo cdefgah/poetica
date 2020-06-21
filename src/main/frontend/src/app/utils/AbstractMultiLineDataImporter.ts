@@ -10,7 +10,7 @@ export abstract class AbstractMultiLineDataImporter extends AbstractSingleLineDa
     super(sourceString);
 
     this._sourceTextLinesIterator = new StringLinesIterator(
-      this._normalizedSourceString
+      this.normalizedSourceString
     );
   }
 
