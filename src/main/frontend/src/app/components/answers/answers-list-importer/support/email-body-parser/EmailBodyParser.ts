@@ -10,7 +10,6 @@ import { CalculationResult } from "../CalculationResult";
 import { StringBuilder } from "../../../../../utils/StringBuilder";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
-  private _answers: AnswerDataModel[];
   private _team: TeamDataModel;
 
   private _emailValidationService: EmailValidationService;
@@ -38,7 +37,13 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   }
 
   public parse(): void {
-    this._answers = [];
+    var emailBodyValidationResult: string = this._emailValidationService.validateEmailBody(
+      this.normalizedSourceString
+    );
+    if (emailBodyValidationResult.length > 0) {
+      this._onFailure(this._parentComponentObject, emailBodyValidationResult);
+      return;
+    }
 
     var firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
     if (firstLineOfAnswersBlockCalcResult.errorsPresent) {
@@ -64,23 +69,25 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       return;
     } else {
       this._team = teamInfoCalculationResult.result;
+
+      if (this._teamFromEmailSubject) {
+        if (this._teamFromEmailSubject.number != this._team.number) {
+          this._onFailure(
+            this._parentComponentObject,
+            `Номер команды в содержимом письма ${this._team.number} отличается от номера команды в теме письма: ${this._teamFromEmailSubject.number}`
+          );
+          return;
+        }
+      }
     }
 
-    // TODO - вот тут остановились и идём спать :)
-    this.parseAnswersBlock();
-    // if (this.errorsPresent) {
-    //   return;
-    // }
+    var parsingResult: CalculationResult = this.parseAnswersBlock();
+    if (parsingResult.errorsPresent) {
+      this._onFailure(this._parentComponentObject, parsingResult.errorMessage);
+      return;
+    }
 
-    console.log(" ================ PARSING RESULT START==============");
-    this._answers.forEach((oneAnswer) => {
-      console.log("-----------------------------------");
-      console.log("Номер бескрылки: " + oneAnswer.questionNumber);
-      console.log("Тело ответа: " + oneAnswer.body);
-      console.log("Комментарий: " + oneAnswer.comment);
-      console.log("-----------------------------------");
-    });
-    console.log(" ================ PARSING RESULT: END ==============");
+    // тут запускаем асинхронную валидацию данных
   }
 
   /**
@@ -152,7 +159,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     return new CalculationResult(team, null);
   }
 
-  private parseAnswersBlock(): void {
+  private parseAnswersBlock(): CalculationResult {
+    var answers: AnswerDataModel[] = [];
+
     var wholeAnswer: StringBuilder = new StringBuilder();
     var wholeComment: StringBuilder = new StringBuilder();
 
@@ -162,6 +171,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var processedQuestionNumbers = new Set();
     var previousQuestionNumber: number = -1;
     var continueProcessingLines: boolean = true;
+    var answerRegistrationResult: CalculationResult;
 
     while (
       this._sourceTextLinesIterator.hasNextLine() &&
@@ -173,11 +183,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         // если строка начинается с символа, который знаменует начало ответа
         // сохраняем ранее сформированный ответ и комментарий к нему
         if (questionNumber.length > 0) {
-          registerAnswer(this);
-
-          // if (this.errorsPresent) {
-          //   return;
-          // }
+          answerRegistrationResult = registerAnswer(this);
+          if (answerRegistrationResult.errorsPresent) {
+            return answerRegistrationResult;
+          }
         }
 
         var dotLocation: number = currentLine.indexOf(".");
@@ -210,10 +219,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
           wholeAnswer.addString(firstLineOfTheAnswer);
         } else {
-          // this.registerError(
-          //   `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
-          // );
-          return;
+          return new CalculationResult(
+            null,
+            `Неверный формат блока ответов. Нет ожидаемой точки при наличии символа # в строке: '${currentLine}'`
+          );
         }
       } else {
         if (!currentLine.startsWith("***")) {
@@ -245,31 +254,43 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     if (questionNumber.length > 0) {
-      registerAnswer(this);
+      answerRegistrationResult = registerAnswer(this);
+      if (answerRegistrationResult.errorsPresent) {
+        return answerRegistrationResult;
+      }
     }
 
-    if (this._answers.length == 0) {
-      // this.registerError(
-      //   "В содержании письма не представлено ни одного ответа."
-      // );
-      return;
+    if (answers.length == 0) {
+      return new CalculationResult(
+        null,
+        "В содержании письма не представлено ни одного ответа."
+      );
     }
+
+    // возвращаем список ответов
+    return new CalculationResult(answers, "");
+
     // ================================ Локальные функции ==============================
-    function registerAnswer(currentObjectReference: EmailBodyParser) {
+    /**
+     * Регистрирует ответ.
+     * @param currentObjectReference ссылка на текущий объект парсера.
+     */
+    function registerAnswer(
+      currentObjectReference: EmailBodyParser
+    ): CalculationResult {
       if (processedQuestionNumbers.has(questionNumber)) {
-        // currentObjectReference.registerError(
-        //   `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
-        // );
-        return;
+        return new CalculationResult(
+          null,
+          `Повторяющийся номер бескрылки в блоке ответов: ${questionNumber}`
+        );
       }
 
       if (previousQuestionNumber != -1) {
         if (Number(questionNumber) <= previousQuestionNumber) {
-          // currentObjectReference.registerError(
-          //   `Номера бескрылок в блоке ответов должны идти в порядке возрастания.
-          //   А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
-          // );
-          return;
+          return new CalculationResult(
+            null,
+            `Номера бескрылок в блоке ответов должны идти в порядке возрастания. А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
+          );
         }
 
         processedQuestionNumbers.add(questionNumber);
@@ -282,25 +303,21 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       // в таком случае пустой ответ не регистрируем а пропускаем
       if (wholeAnswer.length() > 0) {
         var answerBody: string = wholeAnswer.toString();
-        if (
-          answerBody.length >
-          currentObjectReference._answerValidationService.maxBodyLength
-        ) {
-          // currentObjectReference.registerError(
-          //   `Тело ответа #${questionNumber} содержит больше символов (${answerBody.length}), чем может быть обработано для одного ответа: ${currentObjectReference._answerValidationService.maxBodyLength}`
-          // );
-          return;
+        var answerBodyValidationMessage: string = currentObjectReference._answerValidationService.validateAnswerBody(
+          answerBody,
+          questionNumber
+        );
+        if (answerBodyValidationMessage.length > 0) {
+          return new CalculationResult(null, answerBodyValidationMessage);
         }
 
         var answerComment: string = wholeComment.toString();
-        if (
-          answerComment.length >
-          currentObjectReference._answerValidationService.maxCommentLength
-        ) {
-          // currentObjectReference.registerError(
-          //   `Комментарий к ответу #${questionNumber} содержит больше символов (${answerComment.length}), чем может быть обработано для комментария к ответу: ${currentObjectReference._answerValidationService.maxCommentLength}`
-          // );
-          return;
+        var answerCommentValidationMessage: string = currentObjectReference._answerValidationService.validateAnswerComment(
+          answerComment,
+          questionNumber
+        );
+        if (answerCommentValidationMessage.length > 0) {
+          return new CalculationResult(null, answerCommentValidationMessage);
         }
 
         var answerRecord: AnswerDataModel = new AnswerDataModel(
@@ -318,7 +335,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           );
         }
 
-        currentObjectReference._answers.push(answerRecord);
+        answers.push(answerRecord);
+        return new CalculationResult(answerRecord, "");
       }
 
       questionNumber = "";
