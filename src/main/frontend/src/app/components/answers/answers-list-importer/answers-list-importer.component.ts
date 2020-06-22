@@ -15,6 +15,7 @@ import { debugString, debugObject } from "src/app/utils/Config";
 import { EmailSubjectParserParameters } from "./support/email-subject-parser/EmailSubjectParserParameters";
 import { EmailSubjectParser } from "./support/email-subject-parser/EmailSubjectParser";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { EmailBodyParsingResult } from "./support/email-body-parser/EmailBodyParsingResult";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -258,6 +259,11 @@ export class AnswersListImporterComponent
       `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
     );
   }
+
+  private onSuccessfullyEmailBodyParse(
+    parentComponentObject: any,
+    parsingResult: EmailBodyParsingResult
+  ) {}
 
   /**
    * При передаче ссылки на функцию в парсер, мы передаём ссылку на этот компонент.

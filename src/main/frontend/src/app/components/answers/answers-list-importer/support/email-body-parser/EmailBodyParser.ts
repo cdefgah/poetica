@@ -8,6 +8,7 @@ import { TeamValidationService } from "src/app/components/core/validators/TeamVa
 import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
 import { CalculationResult } from "../CalculationResult";
 import { StringBuilder } from "../../../../../utils/StringBuilder";
+import { EmailBodyParsingResult } from "./EmailBodyParsingResult";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _team: TeamDataModel;
@@ -88,6 +89,94 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     }
 
     // тут запускаем асинхронную валидацию данных
+    this.doAsyncValidations(this, parsingResult.result);
+  }
+
+  private doAsyncValidations(
+    parserObjectReference: EmailBodyParser,
+    loadedAnswers: AnswerDataModel[]
+  ) {
+    // сперва проверяем корректность названия команды из письма
+    var teamNumber: string = parserObjectReference._team.number;
+    const teamValidationUrl: string = `/teams/numbers/${teamNumber}`;
+    var importingTeamTitle = parserObjectReference._team.title;
+    parserObjectReference._httpClient.get(teamValidationUrl).subscribe(
+      (data: Map<string, any>) => {
+        var loadedTeamTitle: string = data["title"];
+        if (
+          loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
+        ) {
+          parserObjectReference._onFailure(
+            parserObjectReference._parentComponentObject,
+            `В базе данных команда с номером: ${teamNumber} записана как '${loadedTeamTitle}'. 
+            А в письме передано название команды: '${importingTeamTitle}'`
+          );
+          return;
+        } else {
+          // название команды в письме и в базе совпало.
+
+          var maxQuestionNumberInAnswers: number = parseInt(
+            loadedAnswers[loadedAnswers.length - 1].questionNumber
+          );
+
+          // теперь проверяем корректность максимального номера в ответах
+          const maxQuestionNumberValidationUrl: string =
+            "/questions/max-number";
+          parserObjectReference._httpClient
+            .get(maxQuestionNumberValidationUrl)
+            .subscribe(
+              (maxNumberOfRegisteredQuestion: number) => {
+                if (
+                  maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers
+                ) {
+                  parserObjectReference._onFailure(
+                    parserObjectReference._parentComponentObject,
+                    `Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
+                Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`
+                  );
+                  return;
+                } else {
+                  // все проверки пройдены, ура!
+                  var emailBodyParsingResult: EmailBodyParsingResult = new EmailBodyParsingResult(
+                    parserObjectReference._team,
+                    loadedAnswers
+                  );
+
+                  parserObjectReference._onSuccess(
+                    parserObjectReference._parentComponentObject,
+                    emailBodyParsingResult
+                  );
+                  return;
+                }
+              },
+              (error) => {
+                parserObjectReference._onFailure(
+                  parserObjectReference._parentComponentObject,
+                  `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
+                Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
+                );
+                return;
+              }
+            );
+        }
+      },
+      (error) => {
+        const NOT_FOUND_STATUS: number = 404;
+        var errorMessage: string;
+        if (error.status == NOT_FOUND_STATUS) {
+          errorMessage = `Не удалось найти в базе данных команду с номером: ${teamNumber}`;
+        } else {
+          errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${teamNumber}.
+            Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
+        }
+
+        parserObjectReference._onFailure(
+          parserObjectReference._parentComponentObject,
+          errorMessage
+        );
+        return;
+      }
+    );
   }
 
   /**
