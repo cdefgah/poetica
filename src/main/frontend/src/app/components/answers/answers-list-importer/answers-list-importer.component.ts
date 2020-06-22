@@ -16,6 +16,8 @@ import { EmailSubjectParserParameters } from "./support/email-subject-parser/Ema
 import { EmailSubjectParser } from "./support/email-subject-parser/EmailSubjectParser";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailBodyParsingResult } from "./support/email-body-parser/EmailBodyParsingResult";
+import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBodyParserParameters";
+import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -37,8 +39,6 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region TemplateFields
-  isActiveProcessRunning: boolean = false;
-
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
 
@@ -207,7 +207,6 @@ export class AnswersListImporterComponent
     onSuccess: Function,
     onFailure: Function
   ): void {
-    this.isActiveProcessRunning = true;
     debugString("processEmailSubjectAndBody: entering to the method.");
 
     var emailSubjectParserParameters = new EmailSubjectParserParameters();
@@ -229,7 +228,9 @@ export class AnswersListImporterComponent
       this.onParsingFailure
     );
 
-    debugString("Launching the email subject parser to do its job");
+    debugString(
+      "Launching the email subject parser to do its job. If it succeed, it will continue parsing email body"
+    );
     emailSubjectParser.parse();
   }
 
@@ -241,7 +242,7 @@ export class AnswersListImporterComponent
    * @param roundNumber номер раунда.
    */
   private onSuccessfullyEmailSubjectParse(
-    parentComponentObject: any,
+    parentComponentObject: AnswersListImporterComponent,
     teamObjectFromEmailSubject: TeamDataModel,
     roundNumber: string
   ) {
@@ -254,16 +255,52 @@ export class AnswersListImporterComponent
     parentComponentObject.teamFromEmailSubject = teamObjectFromEmailSubject;
     parentComponentObject.selectedRoundNumber = roundNumber;
 
-    parentComponentObject.isActiveProcessRunning = false;
     debugString(
       `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
     );
+
+    debugString("Preparing email body parser for launch...");
+
+    var emailBodyParserParameters: EmailBodyParserParameters = new EmailBodyParserParameters();
+    emailBodyParserParameters.parentComponentObject = parentComponentObject;
+    emailBodyParserParameters.emailBody = parentComponentObject.emailBody;
+    emailBodyParserParameters.emailValidationService =
+      parentComponentObject.emailValidationService;
+    emailBodyParserParameters.teamValidationService =
+      parentComponentObject.teamValidationService;
+    emailBodyParserParameters.answerValidationService =
+      parentComponentObject.answerValidationService;
+
+    emailBodyParserParameters.teamFromEmailSubject =
+      parentComponentObject.teamFromEmailSubject;
+    emailBodyParserParameters.roundNumber =
+      parentComponentObject.selectedRoundNumber;
+
+    emailBodyParserParameters.httpClient = parentComponentObject.httpClient;
+
+    debugString("Creating emailBodyParser object");
+    var emailBodyParser: EmailBodyParser = new EmailBodyParser(
+      emailBodyParserParameters,
+      parentComponentObject.onSuccessfullyEmailBodyParse,
+      parentComponentObject.onParsingFailure
+    );
+
+    debugString("Launching email body parsing ...");
+    emailBodyParser.parse();
   }
 
   private onSuccessfullyEmailBodyParse(
     parentComponentObject: any,
     parsingResult: EmailBodyParsingResult
-  ) {}
+  ) {
+    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
+    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
+    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
+    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
+    Тут надо будет сделать загрузку успешно импортированных данных
+
+
+  }
 
   /**
    * При передаче ссылки на функцию в парсер, мы передаём ссылку на этот компонент.
