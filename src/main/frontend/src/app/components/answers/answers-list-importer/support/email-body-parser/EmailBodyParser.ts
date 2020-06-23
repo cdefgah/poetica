@@ -28,6 +28,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     onFailure: Function
   ) {
     super(parameters.emailBody, onSuccess, onFailure);
+    this._parentComponentObject = parameters.parentComponentObject;
     this._teamFromEmailSubject = parameters.teamFromEmailSubject;
     this._roundNumber = parameters.roundNumber;
 

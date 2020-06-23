@@ -18,6 +18,7 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailBodyParsingResult } from "./support/email-body-parser/EmailBodyParsingResult";
 import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBodyParserParameters";
 import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
+import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -36,6 +37,8 @@ export class AnswersListImporterComponent
   //#region DataFields
   private teamFromEmailSubject: TeamDataModel;
 
+  teamFromEmailBody: TeamDataModel;
+  answers: AnswerDataModel[];
   //#endregion
 
   //#region TemplateFields
@@ -87,7 +90,6 @@ export class AnswersListImporterComponent
       return "Информация об ошибках";
     }
   }
-
   //#endregion
 
   //#region StaticMethodForDialogs
@@ -293,13 +295,13 @@ export class AnswersListImporterComponent
     parentComponentObject: any,
     parsingResult: EmailBodyParsingResult
   ) {
-    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
-    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
-    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
-    ВОТ ТУТ ОСТАНОВИЛИСЬ И ПОШЛИ СПАТЬ :)
-    Тут надо будет сделать загрузку успешно импортированных данных
+    parentComponentObject.answers = parsingResult.answers;
+    parentComponentObject.teamFromEmailBody = parsingResult.team;
 
-
+    debugString("Email body parsed successfully");
+    debugString(`team: ${parentComponentObject.teamFromEmailBody.toString()}`);
+    debugString("Answers listed below");
+    debugObject(parentComponentObject.answers);
   }
 
   /**
