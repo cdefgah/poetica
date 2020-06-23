@@ -9,6 +9,7 @@ import { AnswerValidationService } from "src/app/components/core/validators/Answ
 import { CalculationResult } from "../CalculationResult";
 import { StringBuilder } from "../../../../../utils/StringBuilder";
 import { EmailBodyParsingResult } from "./EmailBodyParsingResult";
+import { debugString } from "src/app/utils/Config";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _team: TeamDataModel;
@@ -283,10 +284,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         if (dotLocation !== -1) {
           questionNumber = currentLine.substring(1, dotLocation).trim();
           if (!EmailBodyParser.isPositiveInteger(questionNumber)) {
-            // this
-            //   .registerError(`Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки.
-            // Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`);
-            return;
+            return new CalculationResult(
+              null,
+              `Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`
+            );
           }
 
           var firstLineOfTheAnswer: string = currentLine
@@ -386,6 +387,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         processedQuestionNumbers.add(questionNumber);
       }
 
+      var answerRecord: AnswerDataModel = AnswerDataModel.emptyAnswer;
       previousQuestionNumber = Number(questionNumber);
 
       // в ответе может быть просто номер с точкой
@@ -410,7 +412,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           return new CalculationResult(null, answerCommentValidationMessage);
         }
 
-        var answerRecord: AnswerDataModel = new AnswerDataModel(
+        answerRecord = new AnswerDataModel(
           questionNumber,
           answerBody,
           answerComment
@@ -426,12 +428,19 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         }
 
         answers.push(answerRecord);
-        return new CalculationResult(answerRecord, "");
       }
 
       questionNumber = "";
+
+      debugString("Whole answer before reset: " + wholeAnswer.toString());
       wholeAnswer.reset();
+      debugString("Whole answer after reset: " + wholeAnswer.toString());
+
+      debugString("Whole comment before reset: " + wholeComment.toString());
       wholeComment.reset();
+      debugString("Whole comment after reset: " + wholeComment.toString());
+
+      return new CalculationResult(answerRecord, "");
     }
     // =====================================================================================================
   }

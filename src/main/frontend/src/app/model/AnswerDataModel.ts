@@ -2,6 +2,16 @@
  * Модель данных ответа на вопрос (бескрылку).
  */
 export class AnswerDataModel {
+  /**
+   * Используется в случаях, когда нет информации об ответе.
+   * чтобы не создавать новых экземпляров класса.
+   */
+  public static readonly emptyAnswer: AnswerDataModel = new AnswerDataModel(
+    "",
+    "",
+    ""
+  );
+
   emailId: number;
   questionId: number;
   roundNumber: number;
