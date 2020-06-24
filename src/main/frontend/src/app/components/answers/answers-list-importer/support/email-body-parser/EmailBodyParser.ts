@@ -104,7 +104,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var importingTeamTitle = parserObjectReference._team.title;
     parserObjectReference._httpClient.get(teamValidationUrl).subscribe(
       (data: Map<string, any>) => {
-        var loadedTeamTitle: string = data["title"];
+        var teamObjectfromTheServer: TeamDataModel = TeamDataModel.createTeamByMapOfValues(
+          data
+        );
+        var loadedTeamTitle: string = teamObjectfromTheServer.title;
         if (
           loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
         ) {
@@ -115,8 +118,12 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           );
           return;
         } else {
-          // название команды в письме и в базе совпало.
+          // название команды в письме и в базе совпало
 
+          // теперь прописываем полученный идентификатор команды в соответствующий объект
+          parserObjectReference._team.id = teamObjectfromTheServer.id;
+
+          // получаем максимальный номер загружаемого ответа
           var maxQuestionNumberInAnswers: number = parseInt(
             loadedAnswers[loadedAnswers.length - 1].questionNumber
           );

@@ -12,9 +12,25 @@ export class AnswerDataModel {
     ""
   );
 
+  /**
+   * Идентификатор почтового сообщения.
+   */
   emailId: number;
-  questionId: number;
+
+  /**
+   * Идентификатор команды в базе.
+   */
+  teamId: number;
+
+  /**
+   * Номер тура.
+   */
   roundNumber: number;
+
+  /**
+   * Идентификатор вопроса в базе данных.
+   */
+  questionId: number;
 
   /**
    * Уникальный номер вопроса (бескрылки).

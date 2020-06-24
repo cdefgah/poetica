@@ -485,10 +485,28 @@ export class AnswersListImporterComponent
     });
   }
 
+  /**
+   * Дополняет информацию в ответах (id-команды, раунд) перед загрузкой на сервер.
+   */
+  private prepareDataToImport(): void {
+    this.answers.forEach((oneAnswer) => {
+      oneAnswer.teamId = this.teamFromEmailBody.id;
+      oneAnswer.roundNumber = parseInt(this.selectedRoundNumber);
+    });
+    debugString("Answers after import preparation (check below):");
+    debugObject(this.answers);
+  }
+
   doImportAnswers(): void {
+    debugString("Confirming the answers import action");
     this.confirmationDialog("Импортировать ответы?", () => {
       // если диалог был принят (accepted)
-      // импортируем задания
+      // подготавливаем ответы для импорта
+      debugString("Answers import action confirmed. Preparing data ...");
+      this.prepareDataToImport();
+
+      debugString("Data prepared. Sending the request to the server...");
+      // импортируем ответы
       const headers = new HttpHeaders().set(
         "Content-Type",
         "application/json; charset=utf-8"
@@ -498,9 +516,14 @@ export class AnswersListImporterComponent
         .post("/answers/import", this.answers, { headers: headers })
         .subscribe(
           (data) => {
+            debugString("Request succeed. Closing the import dialog.");
             this.dialog.close(true);
           },
-          (error) => this.reportServerError(error, "Сбой при импорте ответов.")
+          (error) => {
+            debugString("Request failed. Error is below:");
+            debugObject(error);
+            this.reportServerError(error, "Сбой при импорте ответов.");
+          }
         );
     });
   }
