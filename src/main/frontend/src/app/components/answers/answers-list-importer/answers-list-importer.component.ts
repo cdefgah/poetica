@@ -37,23 +37,35 @@ export class AnswersListImporterComponent
   //#region DataFields
   private teamFromEmailSubject: TeamDataModel;
 
-  teamFromEmailBody: TeamDataModel;
-  answers: AnswerDataModel[];
+  // инициализируем пустыми значениями, чтобы связанные компоненты отображались корректно до того, как это поле получит реальное значение
+  teamFromEmailBody: TeamDataModel = TeamDataModel.emptyTeam;
+  answers: AnswerDataModel[] = [];
   //#endregion
 
   //#region TemplateFields
   selectedRoundNumber: string; // используется для хранения выбранного варианта
   roundAliasOption: string; // используется для формирования списка вариантов
 
-  emailSentOnDate: any;
-  emailSentOnHour: string;
-  emailSentOnMinute: string;
+  emailSentOnDate: any; // содержит только дату отправки письма
+  emailSentOnHour: string; // час отправки письма
+  emailSentOnMinute: string; // минута отправки письма
+
+  compoundEmailSentOnDate: any; // содержит и дату и время отправки письма
 
   emailSubject: string;
   emailBody: string;
 
   allRoundAliases: string[] = ["1", "2"];
   allRoundTitles: string[] = ["Предварительный тур", "Окончательный тур"];
+
+  get selectedRoundTitle(): string {
+    if (this.selectedRoundNumber) {
+      var index = parseInt(this.selectedRoundNumber) - 1;
+      return this.allRoundTitles[index];
+    } else {
+      return "???";
+    }
+  }
 
   private static readonly MAX_HOURS: number = 23;
   private static readonly MAX_MINUTES: number = 59;
@@ -66,6 +78,9 @@ export class AnswersListImporterComponent
   );
 
   displayImportButton: boolean = false;
+
+  displayedAnswerColumns: string[] = ["number", "body", "comment"];
+
   //#endregion
 
   //#region Errors handling
@@ -211,10 +226,6 @@ export class AnswersListImporterComponent
     );
     debugObject(event);
 
-    // пересчитываем признак, по которому мы определяем
-    // показывать или нет кнопку импорта ответов
-    this.updateDisplayImportButton(event);
-
     // если перешли на нулевой шаг с любого
     if (event.selectedIndex == 0) {
       // сбрасываем состояние всех контролирующих переменных
@@ -240,6 +251,10 @@ export class AnswersListImporterComponent
       );
       this.processSpecifiedRoundNumberAndEmailDateTime();
     }
+
+    // пересчитываем признак, по которому мы определяем
+    // показывать или нет кнопку импорта ответов
+    this.updateDisplayImportButton(event);
   }
 
   private processEmailSubjectAndBody(
@@ -393,7 +408,7 @@ export class AnswersListImporterComponent
         this.emailSentOnMinute = "0";
       }
 
-      var compoundDate = new Date(
+      this.compoundEmailSentOnDate = new Date(
         year,
         month,
         day,
@@ -405,7 +420,9 @@ export class AnswersListImporterComponent
 
       // отправляем compoundDate на сервер и строим там java-Date
       // new Date(compoundDate);
-      debugString(`Compound long-format date: ${compoundDate.getTime()}`);
+      debugString(
+        `Compound long-format date: ${this.compoundEmailSentOnDate.getTime()}`
+      );
       this.secondStepErrorMessage = ""; // нет никаких ошибок
     } else {
       debugString("Date when email has been sent is not specified");
@@ -420,11 +437,37 @@ export class AnswersListImporterComponent
   }
 
   private updateDisplayImportButton(stepChangeEvent: any) {
+    debugString(
+      "*****************************************************************"
+    );
+    debugString(
+      "*****************************************************************"
+    );
+    debugString(
+      "*****************************************************************"
+    );
     // последний шаг в степпере имеет индекс 2 (0, 1, 2)
     // кнопку показываем в том случае, если мы пришли на последний шаг
     // и у нас всё в порядке, то есть нет ошибок.
     this.displayImportButton =
       stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk;
+
+    debugString(
+      `stepChangeEvent.selectedIndex == ${stepChangeEvent.selectedIndex}`
+    );
+    debugString(`this.allThingsAreOk == ${this.allThingsAreOk}`);
+    debugString(
+      `*** stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk ===? ${this.displayImportButton}`
+    );
+    debugString(
+      "*****************************************************************"
+    );
+    debugString(
+      "*****************************************************************"
+    );
+    debugString(
+      "*****************************************************************"
+    );
   }
 
   uploadProcessedDataToTheServer() {}

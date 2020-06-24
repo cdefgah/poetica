@@ -233,7 +233,53 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
         ></div>
 
         <ng-template #processedDataBlock>
-          <div class="table-container"></div>
+          <div class="table-container">
+            <table>
+              <tr>
+                <td>Номер команды:</td>
+                <td>{{ teamFromEmailBody.number }}</td>
+              </tr>
+              <tr>
+                <td>Название команды:</td>
+                <td>{{ teamFromEmailBody.title }}</td>
+              </tr>
+              <tr>
+                <td>На какой тур присланы ответы:</td>
+                <td>{{ selectedRoundTitle }}</td>
+              </tr>
+              <tr>
+                <td>Дата и время отправки письма:</td>
+                <td>{{ compoundEmailSentOnDate }}</td>
+              </tr>
+            </table>
+            <p>&nbsp;</p>
+            <p>Ответы к загрузке</p>
+            <table mat-table [dataSource]="answers">
+              <ng-container matColumnDef="number">
+                <th mat-header-cell *matHeaderCellDef>Номер</th>
+                <td mat-cell *matCellDef="let answer">
+                  {{ answer.questionNumber }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="body">
+                <th mat-header-cell *matHeaderCellDef>Содержание</th>
+                <td mat-cell *matCellDef="let answer">{{ answer.body }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="comment">
+                <th mat-header-cell *matHeaderCellDef>Комментарий</th>
+                <td mat-cell *matCellDef="let answer">
+                  {{ answer.comment }}
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: displayedAnswerColumns"
+              ></tr>
+            </table>
+          </div>
         </ng-template>
 
         <ng-template #errorsBlock>
