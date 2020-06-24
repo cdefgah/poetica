@@ -124,9 +124,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           parserObjectReference._team.id = teamObjectfromTheServer.id;
 
           // получаем максимальный номер загружаемого ответа
-          var maxQuestionNumberInAnswers: number = parseInt(
-            loadedAnswers[loadedAnswers.length - 1].questionNumber
-          );
+          var maxQuestionNumberInAnswers: number =
+            loadedAnswers[loadedAnswers.length - 1].questionNumber;
 
           // теперь проверяем корректность максимального номера в ответах
           const maxQuestionNumberValidationUrl: string =
@@ -420,7 +419,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         }
 
         answerRecord = new AnswerDataModel(
-          questionNumber,
+          parseInt(questionNumber),
           answerBody,
           answerComment
         );

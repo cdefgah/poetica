@@ -7,7 +7,7 @@ export class AnswerDataModel {
    * чтобы не создавать новых экземпляров класса.
    */
   public static readonly emptyAnswer: AnswerDataModel = new AnswerDataModel(
-    "",
+    undefined,
     "",
     ""
   );
@@ -35,7 +35,7 @@ export class AnswerDataModel {
   /**
    * Уникальный номер вопроса (бескрылки).
    */
-  questionNumber: string = "";
+  questionNumber: number;
 
   /**
    * Содержание ответа.
@@ -53,7 +53,7 @@ export class AnswerDataModel {
    * @param body содержимое ответа.
    * @param comment необязательный комментарий.
    */
-  constructor(questionNumber: string, body: string, comment: string) {
+  constructor(questionNumber: number, body: string, comment: string) {
     this.questionNumber = questionNumber;
     this.body = body;
     this.comment = comment;

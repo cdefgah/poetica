@@ -52,6 +52,9 @@ public final class Answer {
     @Column(nullable = false)
     private Long questionId;
 
+    @Column(nullable = false)
+    private int questionNumber;
+
     /**
      * Идентификатор сохранённого сообщения электронной почты с ответами.
      * Отсутствие значения для этого поля означает, что ответ добавлен вручную, через кнопку "Добавить ответ".
@@ -142,5 +145,13 @@ public final class Answer {
 
     public void setGrade(Grade grade) {
         this.grade = grade;
+    }
+
+    public int getQuestionNumber() {
+        return questionNumber;
+    }
+
+    public void setQuestionNumber(int questionNumber) {
+        this.questionNumber = questionNumber;
     }
 }
