@@ -27,17 +27,21 @@ export class StringLinesIterator {
       return processedString;
     }
 
-    if (sourceText == null || sourceText.length == 0) {
-      throw new Error("Исходный текст для обработки не задан");
-    }
-
-    var normalizedString = normalizeString(sourceText);
-    this.sourceTextLines = normalizedString.trim().split(this.newLine);
     this.sourceTextLinesIndex = -1;
+    if (sourceText) {
+      if (sourceText.length > 0) {
+        var normalizedString = normalizeString(sourceText);
+        this.sourceTextLines = normalizedString.trim().split(this.newLine);
+      }
+    }
   }
 
   public hasNextLine(): boolean {
-    return this.sourceTextLinesIndex + 1 < this.sourceTextLines.length;
+    if (this.sourceTextLines) {
+      return this.sourceTextLinesIndex + 1 < this.sourceTextLines.length;
+    } else {
+      return false;
+    }
   }
 
   public nextLine(): string {

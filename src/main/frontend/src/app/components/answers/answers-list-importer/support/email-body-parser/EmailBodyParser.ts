@@ -90,11 +90,11 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       return;
     }
 
-    // и в финале всего запускаем асинхронную валидацию данных
-    this.doAsyncValidations(this, parsingResult.result);
+    // и в финале всего запускаем проверку корректности данных на основе ответа сервера
+    this.doValidationWithServerData(this, parsingResult.result);
   }
 
-  private doAsyncValidations(
+  private doValidationWithServerData(
     parserObjectReference: EmailBodyParser,
     loadedAnswers: AnswerDataModel[]
   ) {

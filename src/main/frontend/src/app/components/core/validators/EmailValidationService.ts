@@ -15,7 +15,7 @@ export class EmailValidationService extends AbstractModelValidationService {
         this._maxBodyLength = parseInt(data["MAX_BODY_LENGTH"]);
       },
       (error) => {
-        var errorMessage: string = `$Ошибка при получении model-constraints для Email. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+        var errorMessage: string = `$Ошибка при получении model-constraints для Email. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'.`;
         this.setBrokenInternalState(errorMessage);
       }
     );
@@ -27,7 +27,7 @@ export class EmailValidationService extends AbstractModelValidationService {
    */
   public validateEmailSubject(emailSubject: string): string {
     if (emailSubject.length > this._maxSubjectLength) {
-      return `Количество символов в теме письма (${emailSubject.length}) больше, чем максимально разрешённое для обработки: ${this._maxSubjectLength}`;
+      return `Количество символов в теме письма (${emailSubject.length}) больше, чем максимально разрешённое для обработки: ${this._maxSubjectLength}.`;
     } else {
       return "";
     }
@@ -38,8 +38,12 @@ export class EmailValidationService extends AbstractModelValidationService {
    * @param emailBody содержание письма для проверки.
    */
   public validateEmailBody(emailBody: string): string {
+    if (emailBody.length == 0) {
+      return `Содержательная часть письма отсутствует.`;
+    }
+
     if (emailBody.length > this._maxBodyLength) {
-      return `Количество символов в содержании письма (${emailBody.length}) больше, чем максимально разрешённое для обработки: ${this._maxBodyLength}`;
+      return `Количество символов в содержании письма (${emailBody.length}) больше, чем максимально разрешённое для обработки: ${this._maxBodyLength}.`;
     } else {
       return "";
     }

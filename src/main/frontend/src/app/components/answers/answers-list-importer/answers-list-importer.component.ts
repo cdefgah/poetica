@@ -69,18 +69,55 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region Errors handling
-  foundError: string = "";
+
+  _firstStepErrorMessage: string;
+  _secondStepErrorMessage: string;
+
+  get firstStepErrorMessage(): string {
+    if (this._firstStepErrorMessage) {
+      return this._firstStepErrorMessage;
+    } else {
+      return "";
+    }
+  }
+
+  set firstStepErrorMessage(value: string) {
+    this._firstStepErrorMessage = value ? value : "";
+  }
+
+  get secondStepErrorMessage(): string {
+    if (this._secondStepErrorMessage) {
+      return this._secondStepErrorMessage;
+    } else {
+      return "";
+    }
+  }
+
+  set secondStepErrorMessage(value: string) {
+    this._secondStepErrorMessage = value ? value : "";
+  }
+
+  get IsFirstStepOk(): boolean {
+    return this.firstStepErrorMessage.length == 0;
+  }
+
+  get IsSecondStepOk(): boolean {
+    return this.secondStepErrorMessage.length == 0;
+  }
 
   get errorPresent(): boolean {
-    if (this.foundError) {
-      return this.foundError.length > 0;
-    } else {
-      return false;
-    }
+    return !this.IsFirstStepOk || !this.IsSecondStepOk;
   }
 
   get allThingsAreOk(): boolean {
     return !this.errorPresent;
+  }
+
+  get errorsFound(): string {
+    return this.firstStepErrorMessage
+      .concat(" ")
+      .concat(this.secondStepErrorMessage)
+      .trim();
   }
 
   get lastStepTitle(): string {
@@ -194,14 +231,14 @@ export class AnswersListImporterComponent
       );
       this.processEmailSubjectAndBody(
         this.onSuccessfullyEmailSubjectParse,
-        this.onParsingFailure
+        this.onEmailParsingFailure
       );
     } else if (event.previouslySelectedIndex == 1) {
+      // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
       debugString(
         "Moving from the second step. Processing email date/time and round number"
       );
-
-      // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
+      this.processSpecifiedRoundNumberAndEmailDateTime();
     }
   }
 
@@ -226,8 +263,8 @@ export class AnswersListImporterComponent
 
     var emailSubjectParser = new EmailSubjectParser(
       emailSubjectParserParameters,
-      this.onSuccessfullyEmailSubjectParse,
-      this.onParsingFailure
+      onSuccess,
+      onFailure
     );
 
     debugString(
@@ -284,7 +321,7 @@ export class AnswersListImporterComponent
     var emailBodyParser: EmailBodyParser = new EmailBodyParser(
       emailBodyParserParameters,
       parentComponentObject.onSuccessfullyEmailBodyParse,
-      parentComponentObject.onParsingFailure
+      parentComponentObject.onEmailParsingFailure
     );
 
     debugString("Launching email body parsing ...");
@@ -297,6 +334,8 @@ export class AnswersListImporterComponent
   ) {
     parentComponentObject.answers = parsingResult.answers;
     parentComponentObject.teamFromEmailBody = parsingResult.team;
+
+    parentComponentObject.firstStepErrorMessage = ""; // нет ошибок
 
     debugString("Email body parsed successfully");
     debugString(`team: ${parentComponentObject.teamFromEmailBody.toString()}`);
@@ -311,18 +350,72 @@ export class AnswersListImporterComponent
    * @param parentComponentObject ссылка на этот компонент, хранится в парсере и пробрасывается в вызов этого метода.
    * @param errorMessage сообщение об ошибке.
    */
-  private onParsingFailure(parentComponentObject: any, errorMessage: string) {
-    debugString(`Email subject parser failed. Error message: ${errorMessage}`);
-    parentComponentObject.foundError = errorMessage;
+  private onEmailParsingFailure(
+    parentComponentObject: AnswersListImporterComponent,
+    errorMessage: string
+  ) {
+    debugString(`Email parser failed. Error message: ${errorMessage}`);
 
-    parentComponentObject.isActiveProcessRunning = false;
+    parentComponentObject.firstStepErrorMessage = errorMessage;
+
+    debugString(
+      `parentComponentObject.firstStepErrorMessage = ${parentComponentObject.firstStepErrorMessage}`
+    );
     debugString(
       `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
     );
   }
 
+  private processSpecifiedRoundNumberAndEmailDateTime(): void {
+    debugString("Processing specified round number and email date/time");
+    if (this.selectedRoundNumber) {
+      debugString(`Round number: ${this.selectedRoundNumber}`);
+    } else {
+      debugString("Round number is not specified");
+      this.secondStepErrorMessage =
+        "Не указано на какой раунд (тур) прислано письмо. Предварительный или основной.";
+      return;
+    }
+
+    debugString("Processing email date/time");
+    if (this.emailSentOnDate) {
+      debugString(`this.emailSentOnDate = ${this.emailSentOnDate}`);
+
+      var day = this.emailSentOnDate.getDate();
+      var month = this.emailSentOnDate.getMonth();
+      var year = this.emailSentOnDate.getFullYear();
+
+      if (!this.emailSentOnHour) {
+        this.emailSentOnHour = "0";
+      }
+
+      if (!this.emailSentOnMinute) {
+        this.emailSentOnMinute = "0";
+      }
+
+      var compoundDate = new Date(
+        year,
+        month,
+        day,
+        parseInt(this.emailSentOnHour),
+        parseInt(this.emailSentOnMinute),
+        0,
+        0
+      );
+
+      // отправляем compoundDate на сервер и строим там java-Date
+      // new Date(compoundDate);
+      debugString(`Compound long-format date: ${compoundDate.getTime()}`);
+      this.secondStepErrorMessage = ""; // нет никаких ошибок
+    } else {
+      debugString("Date when email has been sent is not specified");
+      this.secondStepErrorMessage = "Не указана дата отправки письма";
+    }
+  }
+
   private resetStepperVariables(stepChangeEvent: any): void {
-    this.foundError = "";
+    this.firstStepErrorMessage = "";
+    this.secondStepErrorMessage = "";
     this.updateDisplayImportButton(stepChangeEvent);
   }
 

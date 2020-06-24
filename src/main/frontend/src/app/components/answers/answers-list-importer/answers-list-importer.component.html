@@ -135,7 +135,10 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
       </mat-tab-group>
     </mat-step>
 
-    <mat-step *ngIf="allThingsAreOk">
+    <!--TODO сделать и встроить свойство IsActiveProcessRunning, чтобы не отображался второй шаг, пока выполняется первый -->
+    <!--TODO а то он показывает воторой шаг, но при возникновении ошибки (ответ асинхронного процесса), резко его скрывает -->
+    <!--TODO это некрасиво и так быть не должно -->
+    <mat-step *ngIf="IsFirstStepOk">
       <form>
         <ng-template matStepLabel>Тур и время отправки</ng-template>
         <table>
@@ -234,10 +237,10 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
         </ng-template>
 
         <ng-template #errorsBlock>
-          <span>Обнаруженна ошибка:</span>
+          <span>Обнаружена ошибка:</span>
           <hr />
           <div>
-            {{ foundError }}
+            {{ errorsFound }}
           </div>
           <hr />
           <span>Пожалуйста устраните её, чтобы импортировать ответы.</span>
