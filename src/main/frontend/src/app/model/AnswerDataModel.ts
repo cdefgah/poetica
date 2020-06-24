@@ -61,10 +61,11 @@ export class AnswerDataModel {
 
   public toString(): string {
     return `emailId: ${this.emailId}
-questionId: ${this.questionNumber}
-roundNumber: ${this.roundNumber}
-questionNumber: ${this.questionNumber}
-body: ${this.body}
-comment: ${this.comment}`;
+    teamId: ${this.teamId}
+    questionId: ${this.questionNumber}
+    roundNumber: ${this.roundNumber}
+    questionNumber: ${this.questionNumber}
+    body: ${this.body}
+    comment: ${this.comment}`;
   }
 }

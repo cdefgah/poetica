@@ -19,6 +19,7 @@ import { EmailBodyParsingResult } from "./support/email-body-parser/EmailBodyPar
 import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBodyParserParameters";
 import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
+import { EmailDataModel } from "src/app/model/EmailDataModel";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -486,12 +487,17 @@ export class AnswersListImporterComponent
   }
 
   /**
-   * Дополняет информацию в ответах (id-команды, раунд) перед загрузкой на сервер.
+   * Дополняет информацию в ответах (id-письма, id-команды, раунд) перед загрузкой на сервер.
    */
-  private prepareDataToImport(): void {
+  private prepareAnswersToImport(emailId: number): void {
     this.answers.forEach((oneAnswer) => {
+      oneAnswer.emailId = emailId;
       oneAnswer.teamId = this.teamFromEmailBody.id;
-      oneAnswer.roundNumber = parseInt(this.selectedRoundNumber);
+      if (!oneAnswer.roundNumber) {
+        // если раунд не прописан при разборе письма (в теме может быть задан)
+        // проставляем его явно
+        oneAnswer.roundNumber = parseInt(this.selectedRoundNumber);
+      }
     });
     debugString("Answers after import preparation (check below):");
     debugObject(this.answers);
@@ -501,28 +507,64 @@ export class AnswersListImporterComponent
     debugString("Confirming the answers import action");
     this.confirmationDialog("Импортировать ответы?", () => {
       // если диалог был принят (accepted)
-      // подготавливаем ответы для импорта
-      debugString("Answers import action confirmed. Preparing data ...");
-      this.prepareDataToImport();
 
-      debugString("Data prepared. Sending the request to the server...");
-      // импортируем ответы
+      debugString("Action confirmed. Preparing email to save in database ...");
+
+      // сперва отправляем присланный email в базу
+      var email2Import = new EmailDataModel();
+      email2Import.teamId = this.teamFromEmailBody.id;
+      email2Import.subject = this.emailSubject;
+      email2Import.body = this.emailBody;
+      email2Import.roundNumber = parseInt(this.selectedRoundNumber);
+      email2Import.sentOn = this.compoundEmailSentOnDate.getTime();
+      email2Import.importedOn = new Date().getTime();
+
+      debugString("Prepared email object looks like that (check below)");
+      debugObject(email2Import);
+
+      // импортируем email
       const headers = new HttpHeaders().set(
         "Content-Type",
         "application/json; charset=utf-8"
       );
 
+      debugString("Sending request to save email in database ...");
       this.httpClient
-        .post("/answers/import", this.answers, { headers: headers })
+        .post("/emails/import", email2Import, { headers: headers })
         .subscribe(
-          (data) => {
-            debugString("Request succeed. Closing the import dialog.");
-            this.dialog.close(true);
+          (receivedEmailId) => {
+            debugString(
+              `Email import request succeed. Now getting the id of saved email. It is: ${receivedEmailId}`
+            );
+
+            var emailId: number = parseInt(receivedEmailId.toString());
+            this.prepareAnswersToImport(emailId);
+
+            debugString(
+              "Answers data prepared. Sending the request to the server..."
+            );
+            // импортируем ответы
+            this.httpClient
+              .post("/answers/import", this.answers, { headers: headers })
+              .subscribe(
+                (data) => {
+                  debugString("Request succeed. Closing the import dialog.");
+                  this.dialog.close(true);
+                },
+                (error) => {
+                  debugString("Request failed. Error is below:");
+                  debugObject(error);
+                  this.reportServerError(error, "Сбой при импорте ответов.");
+                }
+              );
           },
           (error) => {
-            debugString("Request failed. Error is below:");
+            debugString("Email import request failed. Error is below:");
             debugObject(error);
-            this.reportServerError(error, "Сбой при импорте ответов.");
+            this.reportServerError(
+              error,
+              "Сбой при импорте присланного письма."
+            );
           }
         );
     });

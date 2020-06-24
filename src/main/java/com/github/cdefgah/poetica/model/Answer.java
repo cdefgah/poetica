@@ -57,7 +57,7 @@ public final class Answer {
      * Отсутствие значения для этого поля означает, что ответ добавлен вручную, через кнопку "Добавить ответ".
      * Иначе - ответ загружен из письма с ответами.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Long emailId;
 
     /**
@@ -65,7 +65,7 @@ public final class Answer {
      * то в поле хранится true. Иначе - false.
      */
     @Column(nullable = false)
-    private boolean isFirstRoundAnswer = false;
+    private int roundNumber;
 
     /**
      * Содержимое ответа.
@@ -112,12 +112,12 @@ public final class Answer {
         this.emailId = emailId;
     }
 
-    public boolean isFirstRoundAnswer() {
-        return isFirstRoundAnswer;
+    public int getRoundNumber() {
+        return roundNumber;
     }
 
-    public void setFirstRoundAnswer(boolean firstRoundAnswer) {
-        isFirstRoundAnswer = firstRoundAnswer;
+    public void setRoundNumber(int roundNumber) {
+        this.roundNumber = roundNumber;
     }
 
     public String getBody() {

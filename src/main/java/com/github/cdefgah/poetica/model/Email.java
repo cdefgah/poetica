@@ -40,19 +40,15 @@ public class Email {
     private long id;
 
     /**
-     * Если письмо отправлено в первом раунде (первый день) тура,
-     * то в поле хранится true. Иначе - false.
+     * Уникальный идентификатор команды, приславшей письмо.
      */
     @Column(nullable = false)
-    private boolean isFirstRoundEmail = false;
+    private Long teamId;
 
-    /**
-     * Время отправки письма.
-     */
     @Column(nullable = false)
-    private long sentOn;
+    private int roundNumber;
 
-    @Column(length = ModelConstraints.MAX_SUBJECT_LENGTH, nullable = false)
+    @Column(length = ModelConstraints.MAX_SUBJECT_LENGTH)
     @Size(max = ModelConstraints.MAX_SUBJECT_LENGTH)
     private String subject;
 
@@ -63,14 +59,14 @@ public class Email {
     @Size(max = ModelConstraints.MAX_BODY_LENGTH)
     private String body;
 
+    /**
+     * Время отправки письма.
+     */
+    @Column(nullable = false)
+    private long sentOn;
 
-    public boolean isFirstRoundEmail() {
-        return isFirstRoundEmail;
-    }
-
-    public void setFirstRoundEmail(boolean firstRoundEmail) {
-        isFirstRoundEmail = firstRoundEmail;
-    }
+    @Column(nullable = false)
+    private long importedOn;
 
     public long getSentOn() {
         return sentOn;
@@ -94,5 +90,50 @@ public class Email {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public void setRoundNumber(int roundNumber) {
+        this.roundNumber = roundNumber;
+    }
+
+    public long getImportedOn() {
+        return importedOn;
+    }
+
+    public void setImportedOn(long importedOn) {
+        this.importedOn = importedOn;
+    }
+
+    public Long getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Email{" +
+                "id=" + id +
+                ", teamId=" + teamId +
+                ", roundNumber=" + roundNumber +
+                ", subject='" + subject + '\'' +
+                ", body='" + body + '\'' +
+                ", sentOn=" + sentOn +
+                ", importedOn=" + importedOn +
+                '}';
     }
 }
