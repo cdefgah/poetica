@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
@@ -217,8 +217,6 @@ export class AnswersListImporterComponent
 
   ngOnInit(): void {}
   //#endregion
-
-  ImportAnswers() {}
 
   onStepChange(event: any) {
     debugString(
@@ -470,8 +468,6 @@ export class AnswersListImporterComponent
     );
   }
 
-  uploadProcessedDataToTheServer() {}
-
   cancelDialog() {
     var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
       "Прервать импорт ответов?"
@@ -486,6 +482,26 @@ export class AnswersListImporterComponent
         // если диалог был принят (accepted)
         this.dialog.close(false);
       }
+    });
+  }
+
+  doImportAnswers(): void {
+    this.confirmationDialog("Импортировать ответы?", () => {
+      // если диалог был принят (accepted)
+      // импортируем задания
+      const headers = new HttpHeaders().set(
+        "Content-Type",
+        "application/json; charset=utf-8"
+      );
+
+      this.httpClient
+        .post("/answers/import", this.answers, { headers: headers })
+        .subscribe(
+          (data) => {
+            this.dialog.close(true);
+          },
+          (error) => this.reportServerError(error, "Сбой при импорте ответов.")
+        );
     });
   }
 }
