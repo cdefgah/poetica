@@ -20,7 +20,6 @@ import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBody
 import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
-import { DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -165,8 +164,7 @@ export class AnswersListImporterComponent
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpClient: HttpClient,
     public dialog: MatDialogRef<AnswersListImporterComponent>,
-    public otherDialog: MatDialog,
-    private datePipe: DatePipe
+    public otherDialog: MatDialog
   ) {
     super();
     this.initializeDateHourAndMinuteSelectors();
