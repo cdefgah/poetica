@@ -13,6 +13,7 @@ import java.util.Map;
 @Table(name = "Emails")
 public class Email {
 
+
     private static class ModelConstraints {
         static final int MAX_SUBJECT_LENGTH = 256;
         static final int MAX_BODY_LENGTH = 32768;
@@ -43,7 +44,7 @@ public class Email {
      * Уникальный идентификатор команды, приславшей письмо.
      */
     @Column(nullable = false)
-    private Long teamId;
+    private long teamId;
 
     @Column(nullable = false)
     private int roundNumber;
@@ -58,6 +59,9 @@ public class Email {
     @Column(length = ModelConstraints.MAX_BODY_LENGTH, nullable = false)
     @Size(max = ModelConstraints.MAX_BODY_LENGTH)
     private String body;
+
+    @Column(nullable = false)
+    private String questionNumbersSequence;
 
     /**
      * Время отправки письма.
@@ -124,6 +128,14 @@ public class Email {
         this.id = id;
     }
 
+    public String getQuestionNumbersSequence() {
+        return questionNumbersSequence;
+    }
+
+    public void setQuestionNumbersSequence(String questionNumbersSequence) {
+        this.questionNumbersSequence = questionNumbersSequence;
+    }
+
     @Override
     public String toString() {
         return "Email{" +
@@ -132,6 +144,7 @@ public class Email {
                 ", roundNumber=" + roundNumber +
                 ", subject='" + subject + '\'' +
                 ", body='" + body + '\'' +
+                ", questionNumbersSequence='" + questionNumbersSequence + '\'' +
                 ", sentOn=" + sentOn +
                 ", importedOn=" + importedOn +
                 '}';

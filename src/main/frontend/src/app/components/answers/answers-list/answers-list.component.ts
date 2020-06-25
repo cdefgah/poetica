@@ -1,11 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import { MatRadioChange, MatDialog } from "@angular/material";
+import { MatRadioChange, MatDialog, MatSelectChange } from "@angular/material";
 import { HttpClient } from "@angular/common/http";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
   selector: "app-answers-list",
@@ -42,8 +43,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   displayedEmailColumns: string[] = [
     "sentOn",
-    "processedOn",
-    "numbersOfAnsweredQuestions",
+    "importedOn",
+    "questionNumbersSequence",
   ];
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
@@ -141,14 +142,22 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       error => this.reportServerError(error)
     );
   }
-
-  actualRoundChanged(event: MatRadioChange) {
-    var receivedRoundAlias = event.value;
-    if (this.selectedRoundAlias != receivedRoundAlias) {
-      this.selectedRoundAlias = receivedRoundAlias;
-      this.loadAnswersList();
-    }
      */
+  }
+
+  loadAllDisplayedLists() {
+    this.loadEmailsList();
+  }
+
+  loadEmailsList() {
+    var url: string = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+
+    this.http.get(url).subscribe(
+      (data: EmailDataModel[]) => {
+        this.emailsDataSource = data;
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -159,7 +168,15 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     var receivedRoundAlias = event.value;
     if (this.selectedRoundAlias != receivedRoundAlias) {
       this.selectedRoundAlias = receivedRoundAlias;
-      this.loadAnswersList();
+      this.loadAllDisplayedLists();
+    }
+  }
+
+  actualTeamChanged(event: MatSelectChange) {
+    var receivedTeamId: number = event.value;
+    if (this.selectedTeamId != receivedTeamId) {
+      this.selectedTeamId = receivedTeamId;
+      this.loadAllDisplayedLists();
     }
   }
 

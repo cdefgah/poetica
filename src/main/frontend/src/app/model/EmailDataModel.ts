@@ -1,3 +1,5 @@
+import { debugString } from "../utils/Config";
+
 export class EmailDataModel {
   id: any;
   teamId: number;
@@ -6,4 +8,5 @@ export class EmailDataModel {
   body: string;
   sentOn: any;
   importedOn: any;
+  questionNumbersSequence: string;
 }

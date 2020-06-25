@@ -20,6 +20,7 @@ import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBody
 import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
+import { DatePipe } from "@angular/common";
 
 @Component({
   selector: "app-answers-list-importer",
@@ -41,6 +42,8 @@ export class AnswersListImporterComponent
   // инициализируем пустыми значениями, чтобы связанные компоненты отображались корректно до того, как это поле получит реальное значение
   teamFromEmailBody: TeamDataModel = TeamDataModel.emptyTeam;
   answers: AnswerDataModel[] = [];
+  questionNumbersSequence: string = ""; // номера заданий, на которые даны ответы в импортируемом письме (через запятую)
+
   //#endregion
 
   //#region TemplateFields
@@ -52,6 +55,7 @@ export class AnswersListImporterComponent
   emailSentOnMinute: string; // минута отправки письма
 
   compoundEmailSentOnDate: any; // содержит и дату и время отправки письма
+  compoundEmailSentOnDateString: string; // дата и время отправки письма для отображения на экране
 
   emailSubject: string;
   emailBody: string;
@@ -162,7 +166,8 @@ export class AnswersListImporterComponent
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpClient: HttpClient,
     public dialog: MatDialogRef<AnswersListImporterComponent>,
-    public otherDialog: MatDialog
+    public otherDialog: MatDialog,
+    private datePipe: DatePipe
   ) {
     super();
     this.initializeDateHourAndMinuteSelectors();
@@ -348,6 +353,8 @@ export class AnswersListImporterComponent
   ) {
     parentComponentObject.answers = parsingResult.answers;
     parentComponentObject.teamFromEmailBody = parsingResult.team;
+    parentComponentObject.questionNumbersSequence =
+      parsingResult.questionNumbersSequenceString;
 
     parentComponentObject.firstStepErrorMessage = ""; // нет ошибок
 
@@ -417,6 +424,11 @@ export class AnswersListImporterComponent
         0
       );
 
+      this.compoundEmailSentOnDateString = this.datePipe.transform(
+        this.compoundEmailSentOnDate,
+        "dd-MM-yyyy HH:mm"
+      );
+
       // отправляем compoundDate на сервер и строим там java-Date
       // new Date(compoundDate);
       debugString(
@@ -436,37 +448,11 @@ export class AnswersListImporterComponent
   }
 
   private updateDisplayImportButton(stepChangeEvent: any) {
-    debugString(
-      "*****************************************************************"
-    );
-    debugString(
-      "*****************************************************************"
-    );
-    debugString(
-      "*****************************************************************"
-    );
     // последний шаг в степпере имеет индекс 2 (0, 1, 2)
     // кнопку показываем в том случае, если мы пришли на последний шаг
     // и у нас всё в порядке, то есть нет ошибок.
     this.displayImportButton =
       stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk;
-
-    debugString(
-      `stepChangeEvent.selectedIndex == ${stepChangeEvent.selectedIndex}`
-    );
-    debugString(`this.allThingsAreOk == ${this.allThingsAreOk}`);
-    debugString(
-      `*** stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk ===? ${this.displayImportButton}`
-    );
-    debugString(
-      "*****************************************************************"
-    );
-    debugString(
-      "*****************************************************************"
-    );
-    debugString(
-      "*****************************************************************"
-    );
   }
 
   cancelDialog() {
@@ -518,6 +504,7 @@ export class AnswersListImporterComponent
       email2Import.roundNumber = parseInt(this.selectedRoundNumber);
       email2Import.sentOn = this.compoundEmailSentOnDate.getTime();
       email2Import.importedOn = new Date().getTime();
+      email2Import.questionNumbersSequence = this.questionNumbersSequence;
 
       debugString("Prepared email object looks like that (check below)");
       debugObject(email2Import);

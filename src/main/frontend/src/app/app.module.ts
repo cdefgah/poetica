@@ -39,6 +39,7 @@ import { QuestionsListImporterComponent } from "./components/questions/questions
 import { QuestionDetailsComponent } from "./components/questions/question-details/question-details.component";
 import { TeamDetailsComponent } from "./components/teams/team-details/team-details.component";
 import { TeamsListComponent } from "./components/teams/teams-list/teams-list.component";
+import { DatePipe } from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -93,6 +94,7 @@ import { TeamsListComponent } from "./components/teams/teams-list/teams-list.com
   providers: [
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
     { provide: MAT_DATE_LOCALE, useValue: "ru" },
+    DatePipe,
   ],
   bootstrap: [AppComponent],
 })

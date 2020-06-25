@@ -437,14 +437,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       }
 
       questionNumber = "";
-
-      debugString("Whole answer before reset: " + wholeAnswer.toString());
       wholeAnswer.reset();
-      debugString("Whole answer after reset: " + wholeAnswer.toString());
-
-      debugString("Whole comment before reset: " + wholeComment.toString());
       wholeComment.reset();
-      debugString("Whole comment after reset: " + wholeComment.toString());
 
       return new CalculationResult(answerRecord, "");
     }
