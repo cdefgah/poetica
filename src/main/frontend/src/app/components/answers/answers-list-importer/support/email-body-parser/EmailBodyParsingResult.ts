@@ -15,6 +15,6 @@ export class EmailBodyParsingResult {
       questionNumbersArray.push(oneAnswer.questionNumber)
     );
 
-    this.questionNumbersSequenceString = questionNumbersArray.join(",");
+    this.questionNumbersSequenceString = questionNumbersArray.join(", ");
   }
 }
