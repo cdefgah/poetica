@@ -250,7 +250,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
               <tr>
                 <td>Дата и время отправки письма:</td>
                 <td>
-                  {{ compoundEmailSentOnDateString }}
+                  {{ compoundEmailSentOnDate | date: "dd-MM-yyyy HH:mm" }}
                 </td>
               </tr>
             </table>

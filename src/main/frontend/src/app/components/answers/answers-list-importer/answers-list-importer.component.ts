@@ -55,7 +55,6 @@ export class AnswersListImporterComponent
   emailSentOnMinute: string; // минута отправки письма
 
   compoundEmailSentOnDate: any; // содержит и дату и время отправки письма
-  compoundEmailSentOnDateString: string; // дата и время отправки письма для отображения на экране
 
   emailSubject: string;
   emailBody: string;
@@ -422,11 +421,6 @@ export class AnswersListImporterComponent
         parseInt(this.emailSentOnMinute),
         0,
         0
-      );
-
-      this.compoundEmailSentOnDateString = this.datePipe.transform(
-        this.compoundEmailSentOnDate,
-        "dd-MM-yyyy HH:mm"
       );
 
       // отправляем compoundDate на сервер и строим там java-Date

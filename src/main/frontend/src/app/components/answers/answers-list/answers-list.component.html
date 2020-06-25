@@ -115,7 +115,7 @@
         <ng-container matColumnDef="sentOn">
           <th mat-header-cell *matHeaderCellDef>&nbsp;Отправлено&nbsp;</th>
           <td mat-cell *matCellDef="let email">
-            {{ email.sentOnDisplayString }}
+            {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
         <ng-container matColumnDef="importedOn">
@@ -123,7 +123,7 @@
             &nbsp;Загружено в систему&nbsp;
           </th>
           <td mat-cell *matCellDef="let email">
-            {{ email.importedOnDisplayString }}
+            {{ email.importedOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
         <ng-container matColumnDef="questionNumbersSequence">
