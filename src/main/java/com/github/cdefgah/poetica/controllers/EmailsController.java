@@ -2,6 +2,7 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Email;
+import com.github.cdefgah.poetica.model.EmailsCountDigest;
 import com.github.cdefgah.poetica.model.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,4 +65,10 @@ public class EmailsController extends AbstractController {
 
         return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
+
+    @RequestMapping(path = "/emails/digest/{teamId}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<EmailsCountDigest>> getEmailsDigestForTeam(@PathVariable long teamId) {
+
+    }
+
 }

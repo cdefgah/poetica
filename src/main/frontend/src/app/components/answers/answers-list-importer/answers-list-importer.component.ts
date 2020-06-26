@@ -465,11 +465,12 @@ export class AnswersListImporterComponent
   }
 
   /**
-   * Дополняет информацию в ответах (id-письма, id-команды, раунд) перед загрузкой на сервер.
+   * Дополняет информацию в ответах (id-письма, время отправки письма с ответом, id-команды, раунд) перед загрузкой на сервер.
    */
-  private prepareAnswersToImport(emailId: number): void {
+  private prepareAnswersToImport(emailId: number, emailSentOn: number): void {
     this.answers.forEach((oneAnswer) => {
       oneAnswer.emailId = emailId;
+      oneAnswer.emailSentOn = emailSentOn;
       oneAnswer.teamId = this.teamFromEmailBody.id;
       if (!oneAnswer.roundNumber) {
         // если раунд не прописан при разборе письма (в теме может быть задан)
@@ -517,7 +518,7 @@ export class AnswersListImporterComponent
             );
 
             var emailId: number = parseInt(receivedEmailId.toString());
-            this.prepareAnswersToImport(emailId);
+            this.prepareAnswersToImport(emailId, email2Import.sentOn);
 
             debugString(
               "Answers data prepared. Sending the request to the server..."

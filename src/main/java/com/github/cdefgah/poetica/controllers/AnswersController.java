@@ -1,19 +1,16 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
-import com.github.cdefgah.poetica.model.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,8 +60,37 @@ public class AnswersController extends AbstractController {
             return Optional.of(query.getSingleResult());
 
         } catch(NoResultException noResultException) {
-            // сюда управление в принципе своём не может быть передано, но мы обрабатываем всё равно
+            // сюда управление в принципе не может быть передано, но мы обрабатываем всё равно
             return Optional.empty();
         }
+    }
+
+
+    /**
+     * Отдаёт все ответы для указанной команды и раунда.
+     * @param teamId идентификатор команды.
+     * @param roundOption номер раунда. Если передан 0 - то забираем всё.
+     * @return список ответов.
+     */
+    @RequestMapping(path = "/answers/{teamId}/{roundOption}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<Answer>> getAnswers(@PathVariable long teamId, @PathVariable int roundOption) {
+        TypedQuery<Answer> query;
+
+
+        if (roundOption == 0) {
+            // нужны все ответы
+            query = entityManager.createQuery("select answer from Answer answer where answer.teamId=:teamId",
+                    Answer.class);
+            query.setParameter("teamId", teamId);
+        } else {
+            // нужны ответы на определенный тур (раунд)
+            query = entityManager.createQuery("select answer from Answer answer where " +
+                                                            "answer.teamId=:teamId and answer.roundNumber=:roundNumber",
+                    Answer.class);
+            query.setParameter("teamId", teamId);
+            query.setParameter("roundNumber", roundOption);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
 }

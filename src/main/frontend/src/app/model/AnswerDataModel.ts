@@ -1,3 +1,5 @@
+import { logging } from "protractor";
+
 /**
  * Модель данных ответа на вопрос (бескрылку).
  */
@@ -11,6 +13,8 @@ export class AnswerDataModel {
     "",
     ""
   );
+
+  public static readonly GradeNone: string = "None";
 
   /**
    * Идентификатор почтового сообщения.
@@ -48,6 +52,16 @@ export class AnswerDataModel {
   comment: string = "";
 
   /**
+   * Отметка об оценке
+   */
+  grade: string = AnswerDataModel.GradeNone;
+
+  /**
+   * Дата отправки письма с ответом.
+   */
+  emailSentOn: number;
+
+  /**
    * Конструктор класса.
    * @param questionNumber уникальный номер задания (бескрылки).
    * @param body содержимое ответа.
@@ -66,6 +80,8 @@ export class AnswerDataModel {
     roundNumber: ${this.roundNumber}
     questionNumber: ${this.questionNumber}
     body: ${this.body}
-    comment: ${this.comment}`;
+    comment: ${this.comment}
+    grade: ${this.grade}
+    emailSentOn: ${this.emailSentOn}`;
   }
 }

@@ -91,6 +91,11 @@ public final class Answer {
     @Enumerated(EnumType.STRING)
     private Grade grade = Grade.None;
 
+    /**
+     * Время отправки письма с этим ответом.
+     */
+    private long emailSentOn;
+
     public Long getTeamId() {
         return teamId;
     }
@@ -153,5 +158,13 @@ public final class Answer {
 
     public void setQuestionNumber(int questionNumber) {
         this.questionNumber = questionNumber;
+    }
+
+    public long getEmailSentOn() {
+        return emailSentOn;
+    }
+
+    public void setEmailSentOn(long emailSentOn) {
+        this.emailSentOn = emailSentOn;
     }
 }

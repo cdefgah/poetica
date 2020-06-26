@@ -8,14 +8,14 @@ import java.util.Optional;
  * Оценка ответа.
  */
 public enum Grade {
-    None("?"), // если оценка вообще не проставлена
-    NotAccepted("-"), //  если ответ не принят
-    Accepted("+"); // если ответ принят
+    None("None"), // если оценка вообще не проставлена
+    NotAccepted("NotAccepted"), //  если ответ не принят
+    Accepted("Accepted"); // если ответ принят
 
     /**
-     * Символ оценки.
+     * Значение оценки.
      */
-    private final String gradeSymbol;
+    private final String gradeValue;
 
     /**
      * Для конверсии строки с символом оценки в значение enum.
@@ -31,21 +31,21 @@ public enum Grade {
 
     /**
      * Конструктор.
-     * @param gradeSymbol символ с оценкой.
+     * @param gradeValue строковое значение оценки.
      */
-    Grade(String gradeSymbol) {
-        this.gradeSymbol = gradeSymbol;
+    Grade(String gradeValue) {
+        this.gradeValue = gradeValue;
     }
 
     /**
      * Формирует значение enum из строки с символом оценки.
-     * @param gradeSymbol строка с символом оценки.
+     * @param gradeValue строка c оценкой.
      * @return Optional со значением enum, если конверсия успешна,
      * иначе возвращает Optional.empty().
      */
-    public static Optional<Grade> fromGradeSymbol(final String gradeSymbol) {
-        if (stringToEnum.containsKey(gradeSymbol)) {
-            return Optional.of(stringToEnum.get(gradeSymbol));
+    public static Optional<Grade> fromGradeValue(final String gradeValue) {
+        if (stringToEnum.containsKey(gradeValue)) {
+            return Optional.of(stringToEnum.get(gradeValue));
         } else {
             return Optional.empty();
         }
@@ -57,6 +57,6 @@ public enum Grade {
      */
     @Override
     public String toString() {
-        return this.gradeSymbol;
+        return this.gradeValue;
     }
 }

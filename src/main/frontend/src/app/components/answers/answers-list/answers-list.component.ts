@@ -36,6 +36,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   displayedAnswerColumns: string[] = [
     "number",
+    "emailSentOn",
     "body",
     "roundNumber",
     "comment",
@@ -50,8 +51,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
 
-    this.loadTeamsList();
-    this.loadAnswersList();
+    this.loadTeamsList(this.loadAllDisplayedLists, this);
   }
 
   ngOnInit() {}
@@ -104,13 +104,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
-        // обновляем таблицу со списком вопросов
-        this.loadAnswersList();
+        // обновляем страницу со списками
+        this.loadAllDisplayedLists(this);
       }
     });
   }
 
-  loadTeamsList() {
+  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent) {
     const url: string = "/teams/all";
 
     this.http.get(url).subscribe(
@@ -124,39 +124,76 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
         });
 
         this.selectedTeamId = this.allTeamIds[0];
+
+        // если есть хоть одна команда - работаем дальше
+        // иначе - ничего не грузим больше, нет смысла
+        if (this.selectedTeamId) {
+          onSuccess(componentReference);
+        }
       },
       (error) => this.reportServerError(error)
     );
   }
 
-  loadAnswersList() {
-    /**
+  loadAllDisplayedLists(componentReference: AnswersListComponent) {
+    componentReference.loadAnswersList(componentReference);
+    componentReference.loadEmailsList(componentReference);
+  }
 
-    var urlBase: string = "/answers/";
-    var url = urlBase;
+  loadAnswersList(componentReference: AnswersListComponent) {
+    var url: string = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
-    this.http.get(url).subscribe(
-      (data: Answer[]) => {
-        this.dataSource = data;
+    componentReference.http.get(url).subscribe(
+      (loadedAnswers: AnswerDataModel[]) => {
+        componentReference.separateAndSortLoadedAnswers(
+          loadedAnswers,
+          componentReference
+        );
       },
-      error => this.reportServerError(error)
+      (error) => componentReference.reportServerError(error)
     );
   }
-     */
+
+  private separateAndSortLoadedAnswers(
+    loadedAnswers: AnswerDataModel[],
+    componentReference: AnswersListComponent
+  ) {
+    componentReference.answersDataSource = [];
+    componentReference.answersWithoutGradesDataSource = [];
+
+    loadedAnswers.forEach((oneLoadedAnswer) => {
+      componentReference.answersDataSource.push(oneLoadedAnswer);
+      if (oneLoadedAnswer.grade == AnswerDataModel.GradeNone) {
+        componentReference.answersWithoutGradesDataSource.push(oneLoadedAnswer);
+      }
+    });
+
+    componentReference.answersDataSource.sort(compareAnswers);
+    componentReference.answersWithoutGradesDataSource.sort(compareAnswers);
+
+    // --- локальная функция ---
+    function compareAnswers(
+      oneAnswer: AnswerDataModel,
+      anotherAnswer: AnswerDataModel
+    ) {
+      if (oneAnswer.questionNumber < anotherAnswer.questionNumber) {
+        return -1;
+      } else if (oneAnswer.questionNumber < anotherAnswer.questionNumber) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   }
 
-  loadAllDisplayedLists() {
-    this.loadEmailsList();
-  }
-
-  loadEmailsList() {
+  loadEmailsList(componentReference: AnswersListComponent) {
     var url: string = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
-    this.http.get(url).subscribe(
+    componentReference.http.get(url).subscribe(
       (data: EmailDataModel[]) => {
-        this.emailsDataSource = data;
+        componentReference.emailsDataSource = data;
       },
-      (error) => this.reportServerError(error)
+      (error) => componentReference.reportServerError(error)
     );
   }
 
@@ -165,19 +202,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   actualRoundChanged(event: MatRadioChange) {
-    var receivedRoundAlias = event.value;
-    if (this.selectedRoundAlias != receivedRoundAlias) {
-      this.selectedRoundAlias = receivedRoundAlias;
-      this.loadAllDisplayedLists();
-    }
+    this.selectedRoundAlias = event.value;
+    this.loadAllDisplayedLists(this);
   }
 
   actualTeamChanged(event: MatSelectChange) {
-    var receivedTeamId: number = event.value;
-    if (this.selectedTeamId != receivedTeamId) {
-      this.selectedTeamId = receivedTeamId;
-      this.loadAllDisplayedLists();
-    }
+    this.selectedTeamId = event.value;
+    this.loadAllDisplayedLists(this);
   }
 
   onAnswerRowClicked(row: any) {
