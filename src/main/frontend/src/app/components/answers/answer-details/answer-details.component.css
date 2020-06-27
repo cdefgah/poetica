@@ -1,0 +1,5 @@
+.answer-body {
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-wrap;
+}

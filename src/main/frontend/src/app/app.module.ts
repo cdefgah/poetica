@@ -41,6 +41,7 @@ import { TeamDetailsComponent } from "./components/teams/team-details/team-detai
 import { TeamsListComponent } from "./components/teams/teams-list/teams-list.component";
 import { EmailDetailsComponent } from "./components/answers/email-details/email-details.component";
 import { DatePipe } from "@angular/common";
+import { DisplayRoundPipe } from "./components/answers/support/display-round-pipe/display-round.pipe";
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { DatePipe } from "@angular/common";
     ReportsComponent,
     EmailDetailsComponent,
     AboutComponent,
+    DisplayRoundPipe,
   ],
   imports: [
     FormsModule,
@@ -98,6 +100,7 @@ import { DatePipe } from "@angular/common";
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: false } },
     { provide: MAT_DATE_LOCALE, useValue: "ru" },
     DatePipe,
+    DisplayRoundPipe,
   ],
   bootstrap: [AppComponent],
 })

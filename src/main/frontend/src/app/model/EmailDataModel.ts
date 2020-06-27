@@ -18,7 +18,7 @@ export class EmailDataModel {
     return email;
   }
 
-  id: any;
+  id: number;
   teamId: number;
   roundNumber: number;
   subject: string;
@@ -26,4 +26,8 @@ export class EmailDataModel {
   sentOn: any;
   importedOn: any;
   questionNumbersSequence: string;
+
+  get isSubjectPresent(): boolean {
+    return this.subject && this.subject.length > 0;
+  }
 }

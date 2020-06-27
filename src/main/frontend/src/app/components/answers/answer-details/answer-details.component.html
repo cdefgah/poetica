@@ -8,7 +8,7 @@
             Получен:
           </td>
           <td>
-            [Дата и время получения]
+            {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </tr>
         <tr>
@@ -29,14 +29,14 @@
         </tr>
         <tr>
           <td>
-            Номер тура:
+            Тур:
           </td>
           <td>
-            {{ answer.roundNumber }}
+            {{ answer.roundNumber | displayRound }}
           </td>
         </tr>
         <tr>
-          <td>Задание ({{ question.number }}):</td>
+          <td>Задание (#{{ question.number }}):</td>
           <td>
             <div>
               <!-- Текст задания в диве фикс. высоты -->
@@ -49,13 +49,13 @@
             Присланный ответ:
           </td>
           <td>
-            <div>
+            <div class="answer-body">
               <!-- Текст ответа в диве фикс. высоты -->
               {{ answer.body }}
             </div>
           </td>
         </tr>
-        <tr>
+        <tr *ngIf="answer.isCommentPresent">
           <td>
             Комментарий к ответу:
           </td>
@@ -71,12 +71,39 @@
             Оценка ответа:
           </td>
           <td>
-            Принят/Не принят/Без оценки
+            {{ answer.answerGrade2Display }}
           </td>
         </tr>
       </table>
     </mat-tab>
-    <mat-tab label="Письмо с этим ответом"> </mat-tab>
+    <mat-tab label="Письмо с этим ответом">
+      <table>
+        <tr>
+          <td>
+            Отправлено:
+          </td>
+          <td>
+            {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
+          </td>
+        </tr>
+        <tr *ngIf="email.isSubjectPresent">
+          <td>
+            Тема письма:
+          </td>
+          <td>
+            {{ email.subject }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Содержание:
+          </td>
+          <td>
+            {{ email.body }}
+          </td>
+        </tr>
+      </table>
+    </mat-tab>
   </mat-tab-group>
 </mat-dialog-content>
 
@@ -87,6 +114,9 @@
   <button mat-raised-button color="accent" (click)="declineAnswer()">
     Отклонить ответ
   </button>
+
+  <span class="fill-remaining-space"></span>
+
   <button mat-raised-button color="primary" (click)="justCloseDialog()">
     Просто закрыть диалог
   </button>

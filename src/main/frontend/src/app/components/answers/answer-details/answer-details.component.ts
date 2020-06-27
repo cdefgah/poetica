@@ -6,7 +6,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef,
 } from "@angular/material";
-import { debugString } from "src/app/utils/Config";
+import { debugString, debugObject } from "src/app/utils/Config";
 import { HttpClient } from "@angular/common/http";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
@@ -29,8 +29,6 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   email: EmailDataModel = EmailDataModel.emptyEmail;
   team: TeamDataModel = TeamDataModel.emptyTeam;
   question: QuestionDataModel = QuestionDataModel.emptyQuestion;
-
-  dialogTitle: string;
 
   static getDialogConfigWithData(row: any): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -64,7 +62,12 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
+    debugString("Loading answerId in the dialog ...");
     var answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
+
+    debugString(`answerId = ${this.answer.id}`);
+    debugString("dialogData is below:");
+    debugObject(dialogData);
 
     // получаем объект answer
     const answerDetailsUrl: string = `/answers/${answerId}`;
@@ -113,18 +116,26 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
 
   ngOnInit(): void {}
 
+  get dialogTitle(): string {
+    return `Ответ (${this.answer.answerGrade2Display})`;
+  }
+
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
   }
 
   acceptAnswer() {
-    debugString("Answer has accepted");
-    this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+    this.confirmationDialog("Принять ответ?", () => {
+      debugString("Answer has accepted");
+      this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+    });
   }
 
   declineAnswer() {
-    debugString("Answer has not accepted");
-    this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+    this.confirmationDialog("Отклонить ответ?", () => {
+      debugString("Answer has not accepted");
+      this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+    });
   }
 
   justCloseDialog() {

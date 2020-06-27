@@ -12,5 +12,6 @@ export function debugString(debugMessage: string) {
 export function debugObject(object2Debug: any) {
   if (GlobalConfig.debugMode) {
     console.dir(object2Debug);
+    console.table(object2Debug);
   }
 }

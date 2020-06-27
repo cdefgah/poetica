@@ -72,7 +72,9 @@
 
         <ng-container matColumnDef="roundNumber">
           <th mat-header-cell *matHeaderCellDef>&nbsp;Тур&nbsp;</th>
-          <td mat-cell *matCellDef="let answer">{{ answer.roundNumber }}</td>
+          <td mat-cell *matCellDef="let answer">
+            {{ answer.roundNumber | displayRound }}
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
@@ -113,7 +115,9 @@
 
         <ng-container matColumnDef="roundNumber">
           <th mat-header-cell *matHeaderCellDef>&nbsp;Тур&nbsp;</th>
-          <td mat-cell *matCellDef="let answer">{{ answer.roundNumber }}</td>
+          <td mat-cell *matCellDef="let answer">
+            {{ answer.roundNumber | displayRound }}
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>

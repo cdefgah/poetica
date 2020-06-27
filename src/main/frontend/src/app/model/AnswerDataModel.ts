@@ -1,4 +1,5 @@
 import { logging } from "protractor";
+import { debugString } from "../utils/Config";
 
 /**
  * Модель данных ответа на вопрос (бескрылку).
@@ -15,6 +16,11 @@ export class AnswerDataModel {
   );
 
   public static readonly GradeNone: string = "None";
+
+  /**
+   * Уникальный идентификатор ответа в базе данных.
+   */
+  id: number;
 
   /**
    * Идентификатор почтового сообщения.
@@ -69,6 +75,7 @@ export class AnswerDataModel {
     var comment: string = mapWithValues["comment"];
 
     var answer = new AnswerDataModel(questionNumber, body, comment);
+    answer.id = mapWithValues["id"];
     answer.emailId = mapWithValues["emailId"];
     answer.teamId = mapWithValues["teamId"];
     answer.roundNumber = mapWithValues["roundNumber"];
@@ -101,5 +108,28 @@ export class AnswerDataModel {
     comment: ${this.comment}
     grade: ${this.grade}
     emailSentOn: ${this.emailSentOn}`;
+  }
+
+  public get answerGrade2Display() {
+    var result: string = "???";
+    switch (this.grade) {
+      case "None":
+        result = "без оценки";
+        break;
+
+      case "Accepted":
+        result = "принят";
+        break;
+
+      case "NotAccepted":
+        result = "отклонён";
+        break;
+    }
+
+    return result;
+  }
+
+  public get isCommentPresent(): boolean {
+    return this.comment && this.comment.length > 0;
   }
 }
