@@ -125,6 +125,30 @@
       </table>
     </mat-tab>
     <mat-tab label="Загруженные письма">
+      <table class="email-digest-table">
+        <tr>
+          <td colspan="2" class="email-digest-table-title">
+            Загружено писем
+          </td>
+        </tr>
+        <tr>
+          <td class="email-digest-table-prompt-cell">
+            На предварительный тур:
+          </td>
+          <td class="email-digest-table-value-cell">
+            {{ emailsCountDigest.emailsQtyForTheFirstRound }}
+          </td>
+        </tr>
+        <tr>
+          <td class="email-digest-table-prompt-cell">
+            На окончательный тур:
+          </td>
+          <td class="email-digest-table-value-cell">
+            {{ emailsCountDigest.emailsQtyForTheSecondRound }}
+          </td>
+        </tr>
+      </table>
+      &nbsp;
       <table mat-table [dataSource]="emailsDataSource" class="mat-elevation-z8">
         <ng-container matColumnDef="sentOn">
           <th mat-header-cell *matHeaderCellDef>&nbsp;Отправлено&nbsp;</th>

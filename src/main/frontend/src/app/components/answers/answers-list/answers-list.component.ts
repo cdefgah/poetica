@@ -6,7 +6,7 @@ import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { debugString, debugObject } from "src/app/utils/Config";
+import { EmailsCountDigest } from "./support/EmailsCountDigest";
 
 @Component({
   selector: "app-answers-list",
@@ -33,6 +33,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   answersWithoutGradesDataSource: AnswerDataModel[];
 
   emailsDataSource: EmailDataModel[];
+
+  /**
+   * Инициализируем пустым дайджестом, чтобы не сломались компоненты, привязанные к этому свойству.
+   */
+  emailsCountDigest: EmailsCountDigest = EmailsCountDigest.emptyDigest;
 
   displayedAnswerColumns: string[] = [
     "number",
@@ -141,6 +146,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadAnswersList(componentReference: AnswersListComponent) {
+    // Если команд нет в системе, просто выходим, нечего загружать
+    // письма (и ответы) без команд не импортируются
+    // а удалить команду, при наличии ответов нельзя
+    if (!this.selectedTeamId) {
+      return;
+    }
+
     var url: string = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
     componentReference.http.get(url).subscribe(
@@ -187,11 +199,26 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadEmailsList(componentReference: AnswersListComponent) {
-    var url: string = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+    // Если команд нет в системе, просто выходим, нечего загружать
+    // письма (и ответы) без команд не импортируются
+    // а удалить команду, при наличии ответов нельзя
+    if (!this.selectedTeamId) {
+      return;
+    }
 
-    componentReference.http.get(url).subscribe(
-      (data: EmailDataModel[]) => {
-        componentReference.emailsDataSource = data;
+    var emailsUrl: string = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+
+    componentReference.http.get(emailsUrl).subscribe(
+      (loadedEmailsList: EmailDataModel[]) => {
+        componentReference.emailsDataSource = loadedEmailsList;
+
+        var digestUrl: string = `/emails/digest/${this.selectedTeamId}`;
+        componentReference.http.get(digestUrl).subscribe(
+          (emailsCountDigest: EmailsCountDigest) => {
+            componentReference.emailsCountDigest = emailsCountDigest;
+          },
+          (error) => componentReference.reportServerError(error)
+        );
       },
       (error) => componentReference.reportServerError(error)
     );

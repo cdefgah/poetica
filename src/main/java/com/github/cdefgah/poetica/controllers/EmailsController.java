@@ -67,8 +67,28 @@ public class EmailsController extends AbstractController {
     }
 
     @RequestMapping(path = "/emails/digest/{teamId}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<EmailsCountDigest>> getEmailsDigestForTeam(@PathVariable long teamId) {
+    public ResponseEntity<EmailsCountDigest> getEmailsDigestForTeam(@PathVariable long teamId) {
+        TypedQuery<Long> totalEmailsQuery =
+                entityManager.createQuery("select count(*) FROM Email email where email.teamId=:teamId",
+                        Long.class);
 
+        totalEmailsQuery.setParameter("teamId", teamId);
+        long totalEmailsCount = totalEmailsQuery.getSingleResult();
+
+        TypedQuery<Long> firstRoundEmailsQuery =
+                entityManager.createQuery("select count(*) FROM Email email " +
+                                "where email.teamId=:teamId and email.roundNumber=:roundNumber",
+                                                                                Long.class);
+
+        firstRoundEmailsQuery.setParameter("teamId", teamId);
+        firstRoundEmailsQuery.setParameter("roundNumber", 1);
+
+        long firstRoundEmailsCount = firstRoundEmailsQuery.getSingleResult();
+        long secondRoundEmailsCount = totalEmailsCount - firstRoundEmailsCount;
+
+        EmailsCountDigest emailsCountDigest = new EmailsCountDigest(firstRoundEmailsCount, secondRoundEmailsCount);
+
+        return new ResponseEntity<>(emailsCountDigest, HttpStatus.OK);
     }
 
 }

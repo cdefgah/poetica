@@ -5,19 +5,19 @@ package com.github.cdefgah.poetica.model;
  */
 public class EmailsCountDigest {
 
-    private final int emailsQtyForTheFirstRound;
-    private final int emailsQtyForTheSecondRound;
+    private final long emailsQtyForTheFirstRound;
+    private final long emailsQtyForTheSecondRound;
 
-    public EmailsCountDigest(int emailsQtyForTheFirstRound, int emailsQtyForTheSecondRound) {
+    public EmailsCountDigest(long emailsQtyForTheFirstRound, long emailsQtyForTheSecondRound) {
         this.emailsQtyForTheFirstRound = emailsQtyForTheFirstRound;
         this.emailsQtyForTheSecondRound = emailsQtyForTheSecondRound;
     }
 
-    public int getEmailsQtyForTheFirstRound() {
+    public long getEmailsQtyForTheFirstRound() {
         return emailsQtyForTheFirstRound;
     }
 
-    public int getEmailsQtyForTheSecondRound() {
+    public long getEmailsQtyForTheSecondRound() {
         return emailsQtyForTheSecondRound;
     }
 }
