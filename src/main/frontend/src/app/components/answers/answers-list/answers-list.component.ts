@@ -8,6 +8,7 @@ import { AnswersListImporterComponent } from "../answers-list-importer/answers-l
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { EmailsCountDigest } from "./support/EmailsCountDigest";
 import { AnswerDetailsComponent } from "../answer-details/answer-details.component";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
   selector: "app-answers-list",
@@ -254,6 +255,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onAnswerRowClicked(row: any) {
+    debugString("Answer row clicked. Selected row is below.");
+    debugObject(row);
+
     this.openAnswerDetailsDialog(row);
   }
 

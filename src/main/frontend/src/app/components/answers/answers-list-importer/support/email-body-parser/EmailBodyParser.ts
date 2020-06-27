@@ -104,7 +104,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var importingTeamTitle = parserObjectReference._team.title;
     parserObjectReference._httpClient.get(teamValidationUrl).subscribe(
       (data: Map<string, any>) => {
-        var teamObjectfromTheServer: TeamDataModel = TeamDataModel.createTeamByMapOfValues(
+        var teamObjectfromTheServer: TeamDataModel = TeamDataModel.createTeamFromMap(
           data
         );
         var loadedTeamTitle: string = teamObjectfromTheServer.title;

@@ -30,6 +30,8 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   team: TeamDataModel = TeamDataModel.emptyTeam;
   question: QuestionDataModel = QuestionDataModel.emptyQuestion;
 
+  dialogTitle: string;
+
   static getDialogConfigWithData(row: any): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
@@ -68,15 +70,39 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     const answerDetailsUrl: string = `/answers/${answerId}`;
     this.httpClient.get(answerDetailsUrl).subscribe(
       (answerDetailsData: Map<string, any>) => {
-        this.answer = AnswerDataModel.createAnswerFromMapOfValues(
-          answerDetailsData
-        );
+        // получили, строим объект
+        this.answer = AnswerDataModel.createAnswerFromMap(answerDetailsData);
 
         // получаем объект email
         const emailRequestUrl: string = `/emails/${this.answer.emailId}`;
         this.httpClient.get(emailRequestUrl).subscribe(
           (emailDetailsData: Map<string, any>) => {
-            // получили
+            // получили, строим объект
+            this.email = EmailDataModel.createEmailFromMap(emailDetailsData);
+
+            // получаем объект question
+            const questionRequestUrl: string = `/questions/${this.answer.questionId}`;
+            this.httpClient.get(questionRequestUrl).subscribe(
+              (questionDetailData: Map<string, any>) => {
+                // получили, строим объект
+                this.question = QuestionDataModel.createQuestionFromMap(
+                  questionDetailData
+                );
+
+                // получаем объект team
+                const teamRequestUrl: string = `/teams/${this.answer.teamId}`;
+                this.httpClient.get(teamRequestUrl).subscribe(
+                  (teamDetailsData: Map<string, any>) => {
+                    // получили, строим объект
+                    this.team = TeamDataModel.createTeamFromMap(
+                      teamDetailsData
+                    );
+                  },
+                  (error) => this.reportServerError(error)
+                );
+              },
+              (error) => this.reportServerError(error)
+            );
           },
           (error) => this.reportServerError(error)
         );
