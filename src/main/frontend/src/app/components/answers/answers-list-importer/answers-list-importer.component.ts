@@ -447,8 +447,11 @@ export class AnswersListImporterComponent
 
   private validateEmailUniqueness(onEmailUniquenessCheckFailure: Function) {
     var thisComponentReference: AnswersListImporterComponent = this;
+    var teamId: number = this.teamFromEmailBody.id;
+    var roundNumber: string = this.selectedRoundNumber;
+    var emailSentOn: number = this.compoundEmailSentOnDate;
 
-    const emailUniquenessCheckUrl: string = "";
+    const emailUniquenessCheckUrl: string = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
       (resultFlag: string) => {
         const emailIsUnique: string = "1";

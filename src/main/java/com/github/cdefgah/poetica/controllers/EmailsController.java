@@ -91,4 +91,21 @@ public class EmailsController extends AbstractController {
         return new ResponseEntity<>(emailsCountDigest, HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/emails/is-unique/{teamId}/{roundNumber}/{emailSentOn}",
+                                                            method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> checkEmailUniqueness(@PathVariable long teamId,
+                                                       @PathVariable int roundNumber,
+                                                       @PathVariable long emailSentOn) {
+
+        TypedQuery<Email> query = entityManager.createQuery("select email from Email email " +
+                        "where email.teamId=:teamId and email.roundNumber=:roundNumber and email.sentOn=:emailSentOn",
+                        Email.class);
+
+        boolean isEmailUnique = query.getResultList().size() == 0;
+        final String emailIsUniqueFlag = "1";
+        final String emailIsNotUniqueFlag = "-1";
+
+        final String flagToReturn = isEmailUnique ? emailIsUniqueFlag : emailIsNotUniqueFlag;
+        return new ResponseEntity<>(flagToReturn, HttpStatus.OK);
+    }
 }
