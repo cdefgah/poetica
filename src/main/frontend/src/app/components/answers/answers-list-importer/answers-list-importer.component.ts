@@ -250,7 +250,9 @@ export class AnswersListImporterComponent
       debugString(
         "Moving from the second step. Processing email date/time and round number"
       );
-      this.processSpecifiedRoundNumberAndEmailDateTime();
+      this.processSpecifiedRoundNumberAndEmailDateTime(
+        this.emailUniquenessCheckFailed
+      );
     }
 
     // пересчитываем признак, по которому мы определяем
@@ -384,7 +386,14 @@ export class AnswersListImporterComponent
     );
   }
 
-  private processSpecifiedRoundNumberAndEmailDateTime(): void {
+  /**
+   * Обрабатывает номер раунда и время отправки письма.
+   * Проверяет, чтобы в базе не было письма от этой-же команды, с этим-же временем отправки, и на этот-же раунд.
+   * @param onEmailUniquenessCheckFailure функция, которая будет вызвана в случае ошибки в коде проверки уникальности присланного письма.
+   */
+  private processSpecifiedRoundNumberAndEmailDateTime(
+    onEmailUniquenessCheckFailure: Function
+  ): void {
     debugString("Processing specified round number and email date/time");
     if (this.selectedRoundNumber) {
       debugString(`Round number: ${this.selectedRoundNumber}`);
@@ -427,10 +436,44 @@ export class AnswersListImporterComponent
         `Compound long-format date: ${this.compoundEmailSentOnDate.getTime()}`
       );
       this.secondStepErrorMessage = ""; // нет никаких ошибок
+
+      debugString("Checking email uniqueness...");
+      this.validateEmailUniqueness(onEmailUniquenessCheckFailure);
     } else {
       debugString("Date when email has been sent is not specified");
       this.secondStepErrorMessage = "Не указана дата отправки письма";
     }
+  }
+
+  private validateEmailUniqueness(onEmailUniquenessCheckFailure: Function) {
+    var thisComponentReference: AnswersListImporterComponent = this;
+
+    const emailUniquenessCheckUrl: string = "";
+    thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
+      (resultFlag: string) => {
+        const emailIsUnique: string = "1";
+        if (resultFlag == emailIsUnique) {
+        } else {
+          var errorMessage: string =
+            "В базе данных уже есть загруженное письмо с ответами от этой команды на этот раунд и на это-же время. Проверьте всё ещё раз, пожалуйста.";
+          onEmailUniquenessCheckFailure(thisComponentReference, errorMessage);
+        }
+      },
+      (error) => {
+        thisComponentReference.reportServerError(error);
+        onEmailUniquenessCheckFailure(thisComponentReference, error.message);
+      }
+    );
+  }
+
+  private emailUniquenessCheckFailed(
+    thisComponentReference: AnswersListImporterComponent,
+    errorMessage: string
+  ) {
+    debugString(
+      `Email uniqueness check failed. Error message: ${errorMessage}`
+    );
+    thisComponentReference.secondStepErrorMessage = errorMessage;
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {
