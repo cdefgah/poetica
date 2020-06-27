@@ -7,6 +7,7 @@ import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { EmailsCountDigest } from "./support/EmailsCountDigest";
+import { AnswerDetailsComponent } from "../answer-details/answer-details.component";
 
 @Component({
   selector: "app-answers-list",
@@ -253,7 +254,24 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onAnswerRowClicked(row: any) {
-    // this.openDetailsDialog(row);
+    this.openAnswerDetailsDialog(row);
+  }
+
+  openAnswerDetailsDialog(selectedRow: any) {
+    const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
+      selectedRow
+    );
+    var dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == AnswerDetailsComponent.DIALOG_GRADE_SET) {
+        // если оценка была поставлена, то получаем заново таблицы
+        // TODO очень неоптимальный код тут.
+        // Из-за одной оценки грузить заново все ответы выбранной команды.
+        // Надо упростить.
+        this.loadAnswersList(this);
+      }
+    });
   }
 
   onEmailRowClicked(row: any) {

@@ -39,6 +39,7 @@ import { QuestionsListImporterComponent } from "./components/questions/questions
 import { QuestionDetailsComponent } from "./components/questions/question-details/question-details.component";
 import { TeamDetailsComponent } from "./components/teams/team-details/team-details.component";
 import { TeamsListComponent } from "./components/teams/teams-list/teams-list.component";
+import { EmailDetailsComponent } from "./components/answers/email-details/email-details.component";
 import { DatePipe } from "@angular/common";
 
 @NgModule({
@@ -55,6 +56,7 @@ import { DatePipe } from "@angular/common";
     AnswersListComponent,
     AnswerDetailsComponent,
     ReportsComponent,
+    EmailDetailsComponent,
     AboutComponent,
   ],
   imports: [
@@ -87,6 +89,7 @@ import { DatePipe } from "@angular/common";
     AnswerDetailsComponent,
     MessageBoxComponent,
     TeamDetailsComponent,
+    EmailDetailsComponent,
     QuestionsListImporterComponent,
     AnswersListImporterComponent,
   ],

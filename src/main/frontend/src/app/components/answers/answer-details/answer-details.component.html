@@ -1,1 +1,92 @@
-<p>answer-details works!</p>
+<p mat-dialog-title>Ответ (принят/не принят/без оценки)</p>
+<mat-dialog-content>
+  <mat-tab-group>
+    <mat-tab label="Ответ (принят/не принят/без оценки)">
+      <table>
+        <tr>
+          <td>
+            Получен:
+          </td>
+          <td>
+            [Дата и время получения]
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Команда:
+          </td>
+          <td>
+            [Название команды]
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Код команды:
+          </td>
+          <td>
+            [Код команды]
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Номер тура:
+          </td>
+          <td>
+            [Номер тура]
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Задание (номер в скобках):
+          </td>
+          <td>
+            <div>
+              Текст задания в диве фикс. высоты
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Присланный ответ:
+          </td>
+          <td>
+            <div>
+              Текст ответа в диве фикс. высоты
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Комментарий к ответу:
+          </td>
+          <td>
+            <div>
+              Текст комментария к ответу в диве фикс. высоты
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Оценка ответа:
+          </td>
+          <td>
+            Принят/Не принят/Без оценки
+          </td>
+        </tr>
+      </table>
+    </mat-tab>
+    <mat-tab label="Письмо с этим ответом"> </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="acceptAnswer()">
+    Принять ответ
+  </button>
+  <button mat-raised-button color="accent" (click)="declineAnswer()">
+    Отклонить ответ
+  </button>
+  <button mat-raised-button color="primary" (click)="justCloseDialog()">
+    Просто закрыть диалог
+  </button>
+</mat-dialog-actions>
