@@ -449,7 +449,7 @@ export class AnswersListImporterComponent
     var thisComponentReference: AnswersListImporterComponent = this;
     var teamId: number = this.teamFromEmailBody.id;
     var roundNumber: string = this.selectedRoundNumber;
-    var emailSentOn: number = this.compoundEmailSentOnDate;
+    var emailSentOn: number = this.compoundEmailSentOnDate.getTime();
 
     const emailUniquenessCheckUrl: string = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(

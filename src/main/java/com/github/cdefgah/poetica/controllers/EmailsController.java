@@ -101,6 +101,10 @@ public class EmailsController extends AbstractController {
                         "where email.teamId=:teamId and email.roundNumber=:roundNumber and email.sentOn=:emailSentOn",
                         Email.class);
 
+        query.setParameter("teamId", teamId);
+        query.setParameter("roundNumber", roundNumber);
+        query.setParameter("emailSentOn", emailSentOn);
+
         boolean isEmailUnique = query.getResultList().size() == 0;
         final String emailIsUniqueFlag = "1";
         final String emailIsNotUniqueFlag = "-1";
