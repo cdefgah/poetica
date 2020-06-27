@@ -7,7 +7,7 @@ import {
   MatDialogRef,
 } from "@angular/material";
 import { debugString, debugObject } from "src/app/utils/Config";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { AnswerDataModel } from "src/app/model/AnswerDataModel";
 import { EmailDataModel } from "src/app/model/EmailDataModel";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
@@ -127,14 +127,38 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   acceptAnswer() {
     this.confirmationDialog("Принять ответ?", () => {
       debugString("Answer has accepted");
-      this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+      var requestUrl = "/answers/accept";
+      const payload = new HttpParams().set(
+        "answerId",
+        this.answer.id.toString()
+      );
+
+      this.httpClient.put(requestUrl, payload).subscribe(
+        () => {
+          debugString("Answer has accepted ... request done successfully");
+          this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+        },
+        (error) => this.reportServerError(error)
+      );
     });
   }
 
   declineAnswer() {
     this.confirmationDialog("Отклонить ответ?", () => {
-      debugString("Answer has not accepted");
-      this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+      debugString("Answer has declined");
+      var requestUrl = "/answers/decline";
+      const payload = new HttpParams().set(
+        "answerId",
+        this.answer.id.toString()
+      );
+
+      this.httpClient.put(requestUrl, payload).subscribe(
+        () => {
+          debugString("Answer has declined ... request done successfully");
+          this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+        },
+        (error) => this.reportServerError(error)
+      );
     });
   }
 

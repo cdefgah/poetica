@@ -1,6 +1,7 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
+import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -103,5 +104,33 @@ public class AnswersController extends AbstractController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @RequestMapping(path = "/answers/accept", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<String> acceptAnswer(@RequestParam("answerId") long answerId) {
+        Answer answer = entityManager.find(Answer.class, answerId);
+        if (answer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                    body("Не удалось найти ответ " +
+                            "с указанным идентификатором:  " + answerId);
+        }
+
+        answer.setGrade(Grade.Accepted);
+        entityManager.persist(answer);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(path = "/answers/decline", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity declineAnswer(@RequestParam("answerId") long answerId) {
+        Answer answer = entityManager.find(Answer.class, answerId);
+        if (answer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                    body("Не удалось найти ответ " +
+                            "с указанным идентификатором:  " + answerId);
+        }
+
+        answer.setGrade(Grade.NotAccepted);
+        entityManager.persist(answer);
+        return ResponseEntity.ok().build();
     }
 }

@@ -281,7 +281,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   onEmailRowClicked(row: any) {
     // this.openDetailsDialog(row);
     this.displayMessage(
-      "Пока не готово. Будет диалог с информацией о письме + возможность удалить письмо со всеми ответами."
+      "Пока не готово. Будет диалог с информацией о письме + возможность удалить письмо со всеми ответами, сгенерированными на основании этого письма."
     );
   }
 }
