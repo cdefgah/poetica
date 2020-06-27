@@ -1,6 +1,7 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
+import com.github.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,5 +93,15 @@ public class AnswersController extends AbstractController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
+    }
+
+    @RequestMapping(path = "/answers/{answerId}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Answer> getAnswerById(@PathVariable long answerId) {
+        Answer answer = entityManager.find(Answer.class, answerId);
+        if (answer != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(answer);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

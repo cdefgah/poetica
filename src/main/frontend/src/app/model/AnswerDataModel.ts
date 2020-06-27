@@ -61,6 +61,24 @@ export class AnswerDataModel {
    */
   emailSentOn: number;
 
+  public static createAnswerFromMap(
+    mapWithValues: Map<string, any>
+  ): AnswerDataModel {
+    var questionNumber: number = mapWithValues["questionNumber"];
+    var body: string = mapWithValues["body"];
+    var comment: string = mapWithValues["comment"];
+
+    var answer = new AnswerDataModel(questionNumber, body, comment);
+    answer.emailId = mapWithValues["emailId"];
+    answer.teamId = mapWithValues["teamId"];
+    answer.roundNumber = mapWithValues["roundNumber"];
+    answer.questionId = mapWithValues["questionId"];
+    answer.grade = mapWithValues["grade"];
+    answer.emailSentOn = mapWithValues["emailSentOn"];
+
+    return answer;
+  }
+
   /**
    * Конструктор класса.
    * @param questionNumber уникальный номер задания (бескрылки).

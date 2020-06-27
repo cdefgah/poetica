@@ -48,7 +48,7 @@ export class QuestionDataModel {
     return new QuestionDataModel();
   }
 
-  public static createTeamByMapOfValues(
+  public static createQuestionFromMap(
     mapWithValues: Map<string, any>
   ): QuestionDataModel {
     var question = new QuestionDataModel();

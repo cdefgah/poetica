@@ -8,6 +8,10 @@ import {
 } from "@angular/material";
 import { debugString } from "src/app/utils/Config";
 import { HttpClient } from "@angular/common/http";
+import { AnswerDataModel } from "src/app/model/AnswerDataModel";
+import { EmailDataModel } from "src/app/model/EmailDataModel";
+import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 
 @Component({
   selector: "app-answer-details",
@@ -19,6 +23,12 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   private static readonly KEY_DIALOG_ID = "id";
 
   public static readonly DIALOG_GRADE_SET: number = 1;
+
+  // инициализация пустыми объектами, чтобы связанные со свойствами этих объектов компоненты отрисовались корректно
+  answer: AnswerDataModel = AnswerDataModel.emptyAnswer;
+  email: EmailDataModel = EmailDataModel.emptyEmail;
+  team: TeamDataModel = TeamDataModel.emptyTeam;
+  question: QuestionDataModel = QuestionDataModel.emptyQuestion;
 
   static getDialogConfigWithData(row: any): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -51,6 +61,28 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     public otherDialog: MatDialog
   ) {
     super();
+
+    var answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
+
+    // получаем объект answer
+    const answerDetailsUrl: string = `/answers/${answerId}`;
+    this.httpClient.get(answerDetailsUrl).subscribe(
+      (answerDetailsData: Map<string, any>) => {
+        this.answer = AnswerDataModel.createAnswerFromMapOfValues(
+          answerDetailsData
+        );
+
+        // получаем объект email
+        const emailRequestUrl: string = `/emails/${this.answer.emailId}`;
+        this.httpClient.get(emailRequestUrl).subscribe(
+          (emailDetailsData: Map<string, any>) => {
+            // получили
+          },
+          (error) => this.reportServerError(error)
+        );
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 
   ngOnInit(): void {}

@@ -55,8 +55,8 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
       const url: string = `/questions/${questionId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.question = QuestionDataModel.createTeamByMapOfValues(data);
-          this.questionCopy = QuestionDataModel.createTeamByMapOfValues(data);
+          this.question = QuestionDataModel.createQuestionFromMap(data);
+          this.questionCopy = QuestionDataModel.createQuestionFromMap(data);
 
           this.dialogTitle = this.getDialogTitle(this.question);
         },

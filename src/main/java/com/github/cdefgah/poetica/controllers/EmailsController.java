@@ -1,9 +1,7 @@
 package com.github.cdefgah.poetica.controllers;
 
-import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Email;
 import com.github.cdefgah.poetica.model.EmailsCountDigest;
-import com.github.cdefgah.poetica.model.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -111,5 +109,15 @@ public class EmailsController extends AbstractController {
 
         final String flagToReturn = isEmailUnique ? emailIsUniqueFlag : emailIsNotUniqueFlag;
         return new ResponseEntity<>(flagToReturn, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/emails/{emailId}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Email> getEmailById(@PathVariable long emailId) {
+        Email email = entityManager.find(Email.class, emailId);
+        if (email != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(email);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

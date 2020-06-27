@@ -106,8 +106,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       const url: string = `/teams/${teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.team = TeamDataModel.createTeamByMapOfValues(data);
-          this.teamCopy = TeamDataModel.createTeamByMapOfValues(data);
+          this.team = TeamDataModel.createTeamFromMap(data);
+          this.teamCopy = TeamDataModel.createTeamFromMap(data);
 
           this.dialogTitle = this.getDialogTitle(this.team);
         },

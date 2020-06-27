@@ -36,7 +36,7 @@ export class TeamDataModel {
     return new TeamDataModel(number, title);
   }
 
-  public static createTeamByMapOfValues(
+  public static createTeamFromMap(
     mapWithValues: Map<string, any>
   ): TeamDataModel {
     var team = new TeamDataModel();
