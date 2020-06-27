@@ -183,7 +183,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     componentReference.answersDataSource.sort(compareAnswers);
     componentReference.answersWithoutGradesDataSource.sort(compareAnswers);
 
-    // --- локальная функция ---
+    // --- локальные функции ---
     function compareAnswers(
       oneAnswer: AnswerDataModel,
       anotherAnswer: AnswerDataModel
@@ -193,9 +193,23 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       } else if (oneAnswer.questionNumber < anotherAnswer.questionNumber) {
         return 1;
       } else {
+        return compareEmailSentOnInTheAnswers(oneAnswer, anotherAnswer);
+      }
+    }
+
+    function compareEmailSentOnInTheAnswers(
+      oneAnswer: AnswerDataModel,
+      anotherAnswer: AnswerDataModel
+    ) {
+      if (oneAnswer.emailSentOn < anotherAnswer.emailSentOn) {
+        return -1;
+      } else if (oneAnswer.emailSentOn < anotherAnswer.emailSentOn) {
+        return 1;
+      } else {
         return 0;
       }
     }
+    // ---------------------------------------------
   }
 
   loadEmailsList(componentReference: AnswersListComponent) {
