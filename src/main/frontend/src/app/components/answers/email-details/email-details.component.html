@@ -1,1 +1,47 @@
-<p>email-details works!</p>
+<p mat-dialog-title>Импортированное письмо</p>
+<mat-dialog-content>
+  <table>
+    <tr>
+      <td>
+        Отправлено:
+      </td>
+      <td>
+        {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Тур:
+      </td>
+      <td>
+        {{ answer.roundNumber | displayRound }}
+      </td>
+    </tr>
+    <tr *ngIf="email.isSubjectPresent">
+      <td>
+        Тема письма:
+      </td>
+      <td>
+        {{ email.subject }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Содержание:
+      </td>
+      <td>
+        {{ email.body }}
+      </td>
+    </tr>
+  </table>
+</mat-dialog-content>
+mat-dialog-actions>
+<button mat-raised-button color="primary" (click)="justCloseDialog()">
+    Просто закрыть диалог
+  </button>
+
+  <span class="fill-remaining-space"></span>
+  <button mat-raised-button color="accent" (click)="deleteEmailAndImportedAnswers()">
+    Удалить письмо вместе с импортированными из него ответами
+  </button>
+</mat-dialog-actions>

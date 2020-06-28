@@ -1,15 +1,94 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from "@angular/core";
+import {
+  MatDialogConfig,
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialog,
+} from "@angular/material/dialog";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
+import { EmailDataModel } from "src/app/model/EmailDataModel";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 @Component({
-  selector: 'app-email-details',
-  templateUrl: './email-details.component.html',
-  styleUrls: ['./email-details.component.css']
+  selector: "app-email-details",
+  templateUrl: "./email-details.component.html",
+  styleUrls: ["./email-details.component.css"],
 })
-export class EmailDetailsComponent implements OnInit {
+export class EmailDetailsComponent extends AbstractInteractiveComponentModel
+  implements OnInit {
+  private static readonly KEY_DIALOG_ID = "id";
 
-  constructor() { }
+  email: EmailDataModel = EmailDataModel.emptyEmail;
 
-  ngOnInit(): void {
+  static getDialogConfigWithData(row: any): MatDialogConfig {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = "62%";
+
+    dialogConfig.data = new Map<string, any>();
+
+    if (row) {
+      // идентификатор письма (из строки списка с письмами)
+      dialogConfig.data[EmailDetailsComponent.KEY_DIALOG_ID] =
+        row[EmailDetailsComponent.KEY_DIALOG_ID];
+    }
+
+    return dialogConfig;
   }
 
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public dialogData: any,
+    private httpClient: HttpClient,
+    public dialog: MatDialogRef<EmailDetailsComponent>,
+    public otherDialog: MatDialog
+  ) {
+    super();
+
+    debugString("Loading emailId in the dialog ...");
+    var emailId = dialogData[EmailDetailsComponent.KEY_DIALOG_ID];
+
+    debugString(`emailId = ${this.email.id}`);
+    debugString("dialogData is below:");
+    debugObject(dialogData);
+
+    // получаем объект email
+    const emailRequestUrl: string = `/emails/${emailId}`;
+    this.httpClient.get(emailRequestUrl).subscribe(
+      (emailDetailsData: Map<string, any>) => {
+        // получили, строим объект
+        this.email = EmailDataModel.createEmailFromMap(emailDetailsData);
+      },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  ngOnInit(): void {}
+
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
+  }
+
+  declineAnswer() {
+    this.confirmationDialog("Отклонить ответ?", () => {
+      debugString("Email is going to be deleted ...");
+      var requestUrl = "/emails/delete";
+      const payload = new HttpParams().set("emailId", this.email.id.toString());
+
+      this.httpClient.put(requestUrl, payload).subscribe(
+        () => {
+          debugString("Email has been deleted ... request done successfully");
+          this.dialog.close(true); // true означает, что были изменения
+        },
+        (error) => this.reportServerError(error)
+      );
+    });
+  }
+
+  justCloseDialog() {
+    debugString("Just closing dialog without affecting email");
+    this.dialog.close(false); // false означает, что изменений не было (письма не удаляли)
+  }
 }

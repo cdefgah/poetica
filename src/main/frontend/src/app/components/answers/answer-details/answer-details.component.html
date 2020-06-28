@@ -86,6 +86,14 @@
             {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </tr>
+        <tr>
+          <td>
+            Тур:
+          </td>
+          <td>
+            {{ answer.roundNumber | displayRound }}
+          </td>
+        </tr>
         <tr *ngIf="email.isSubjectPresent">
           <td>
             Тема письма:
