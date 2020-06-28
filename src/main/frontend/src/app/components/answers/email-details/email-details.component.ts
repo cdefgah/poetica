@@ -71,14 +71,14 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
     return this.otherDialog;
   }
 
-  declineAnswer() {
-    this.confirmationDialog("Отклонить ответ?", () => {
-      debugString("Email is going to be deleted ...");
-      var requestUrl = "/emails/delete";
-      const payload = new HttpParams().set("emailId", this.email.id.toString());
+  deleteEmailWithAllImportedAnswers() {
+    var confirmationMessage: string = `Удалить это письмо и все импортированные из него ответы ?`;
 
-      this.httpClient.put(requestUrl, payload).subscribe(
-        () => {
+    this.confirmationDialog(confirmationMessage, () => {
+      // если диалог был принят (accepted)
+      var requestUrl = `/emails/delete/${this.email.id.toString()}`;
+      this.httpClient.delete(requestUrl).subscribe(
+        (data: any) => {
           debugString("Email has been deleted ... request done successfully");
           this.dialog.close(true); // true означает, что были изменения
         },

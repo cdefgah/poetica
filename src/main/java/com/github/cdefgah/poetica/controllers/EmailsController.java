@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +119,24 @@ public class EmailsController extends AbstractController {
             return ResponseEntity.status(HttpStatus.OK).body(email);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @RequestMapping(path = "/emails/delete/{emailId}", method = RequestMethod.DELETE, produces = "application/json")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<String> deleteEmailAndAnswers(@PathVariable  long emailId) {
+
+        Query answersDeletionQuery = entityManager.createQuery("delete from Answer answer " +
+                                                                                       "where answer.emailId=:emailId");
+        answersDeletionQuery.setParameter("emailId", emailId).executeUpdate();
+
+        Query emailDeletionQuery = entityManager.createQuery("delete from Email email where email.id=:emailId");
+        final int deletedEmailsCount = emailDeletionQuery.setParameter("emailId", emailId).executeUpdate();
+        if (deletedEmailsCount > 0) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return new ResponseEntity<>("Не удалось удалить письмо с идентификатором: " + emailId,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

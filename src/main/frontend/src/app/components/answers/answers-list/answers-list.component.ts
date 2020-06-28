@@ -9,6 +9,7 @@ import { AbstractInteractiveComponentModel } from "src/app/components/core/base/
 import { EmailsCountDigest } from "./support/EmailsCountDigest";
 import { AnswerDetailsComponent } from "../answer-details/answer-details.component";
 import { debugString, debugObject } from "src/app/utils/Config";
+import { EmailDetailsComponent } from "../email-details/email-details.component";
 
 @Component({
   selector: "app-answers-list",
@@ -254,14 +255,10 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.loadAllDisplayedLists(this);
   }
 
-  onAnswerRowClicked(row: any) {
+  onAnswerRowClicked(selectedRow: any) {
     debugString("Answer row clicked. Selected row is below.");
-    debugObject(row);
+    debugObject(selectedRow);
 
-    this.openAnswerDetailsDialog(row);
-  }
-
-  openAnswerDetailsDialog(selectedRow: any) {
     const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
@@ -278,10 +275,22 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     });
   }
 
-  onEmailRowClicked(row: any) {
-    // this.openDetailsDialog(row);
-    this.displayMessage(
-      "Пока не готово. Будет диалог с информацией о письме + возможность удалить письмо со всеми ответами, сгенерированными на основании этого письма."
+  onEmailRowClicked(selectedRow: any) {
+    debugString("Email row clicked. Selected row is below.");
+    debugObject(selectedRow);
+
+    const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
+      selectedRow
     );
+    var dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если письмо было удалено (+ все ответы из него)
+        // загружаем ответы заново и письма
+        this.loadAnswersList(this);
+        this.loadEmailsList(this);
+      }
+    });
   }
 }

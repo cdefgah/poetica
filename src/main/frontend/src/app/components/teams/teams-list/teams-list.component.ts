@@ -64,4 +64,8 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
       (error) => this.reportServerError(error)
     );
   }
+
+  importTeams() {
+    this.displayMessage("Пока не реализовано. Будет сделано позже.");
+  }
 }
