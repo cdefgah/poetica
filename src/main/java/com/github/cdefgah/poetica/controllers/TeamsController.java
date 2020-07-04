@@ -161,7 +161,7 @@ public class TeamsController extends AbstractController {
         }
     }
 
-    @RequestMapping(path = "/answers/import", method = RequestMethod.POST,
+    @RequestMapping(path = "/teams/validate", method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
     public ResponseEntity<String> validateTeamNumberAndTitle(@RequestBody Team[] teamsToImport) {

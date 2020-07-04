@@ -67,7 +67,9 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   }
 
   importTeams() {
-    const importDialogConfig = TeamsListImporterComponent.getDialogConfigWithData();
+    const importDialogConfig = TeamsListImporterComponent.getDialogConfigWithData(
+      this.teamValidationService
+    );
     var dialogRef = this.dialog.open(
       TeamsListImporterComponent,
       importDialogConfig

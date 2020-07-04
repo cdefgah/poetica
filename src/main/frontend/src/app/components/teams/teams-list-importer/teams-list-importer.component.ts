@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject, ViewChild } from "@angular/core";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 import {
   MAT_DIALOG_DATA,
@@ -9,8 +9,10 @@ import {
 import { HttpClient } from "@angular/common/http";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
-import { debugString } from "src/app/utils/Config";
+import { debugString, debugObject } from "src/app/utils/Config";
 import { TeamValidationService } from "../../core/validators/TeamValidationService";
+import { TeamsListParserParameters } from "./support/TeamsListParserParameters";
+import { TeamsListParser } from "./support/TeamsListParser";
 
 @Component({
   selector: "app-teams-list-importer",
@@ -20,25 +22,37 @@ import { TeamValidationService } from "../../core/validators/TeamValidationServi
 export class TeamsListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
+    "modelValidatorService";
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpClient: HttpClient,
     public dialog: MatDialogRef<TeamsListImporterComponent>,
-    public otherDialog: MatDialog,
-    teamValidationService: TeamValidationService
+    public otherDialog: MatDialog
   ) {
     super();
-    this._teamValidationService = teamValidationService;
+
+    this._teamValidationService =
+      dialogData[TeamsListImporterComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
   }
 
   private _teamValidationService: TeamValidationService;
 
-  static getDialogConfigWithData(): MatDialogConfig {
+  static getDialogConfigWithData(
+    teamValidationService: TeamValidationService
+  ): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.width = "62%";
+
+    dialogConfig.data = new Map<string, any>();
+
+    dialogConfig.data[
+      TeamsListImporterComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
+    ] = teamValidationService;
 
     return dialogConfig;
   }
@@ -51,7 +65,7 @@ export class TeamsListImporterComponent
 
   ngOnInit(): void {}
 
-  teams: TeamDataModel[];
+  teams: TeamDataModel[] = [];
 
   firstStepErrorMessage: string = "";
 
@@ -100,12 +114,31 @@ export class TeamsListImporterComponent
     });
   }
 
-  processTextWithTeamsList(onSuccess: Function, onFailure: Function) {}
+  processTextWithTeamsList(onSuccess: Function, onFailure: Function) {
+    var teamsListParserParameters: TeamsListParserParameters = new TeamsListParserParameters();
+    teamsListParserParameters.parentComponentObject = this;
+    teamsListParserParameters.teamValidationService = this._teamValidationService;
+    teamsListParserParameters.httpClient = this.httpClient;
+    teamsListParserParameters.textWithTeamsList = this.textWithTeamsList;
+
+    var parser: TeamsListParser = new TeamsListParser(
+      teamsListParserParameters,
+      onSuccess,
+      onFailure
+    );
+
+    parser.processText();
+  }
 
   textWithTeamsListProcessedOk(
     currentComponentReference: TeamsListImporterComponent,
     teams2Import: TeamDataModel[]
   ) {
+    debugString(
+      "Teams are processed successfully. Object is displayed below..."
+    );
+    debugObject(teams2Import);
+
     currentComponentReference.teams = teams2Import;
     currentComponentReference.firstStepErrorMessage = ""; // нет ошибок
   }
@@ -114,6 +147,7 @@ export class TeamsListImporterComponent
     currentComponentReference: TeamsListImporterComponent,
     errorMessage: string
   ) {
+    debugString(`Teams processing failed. Error message: ${errorMessage}`);
     currentComponentReference.firstStepErrorMessage = errorMessage;
   }
 

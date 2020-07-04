@@ -70,16 +70,22 @@
         <ng-template #processedDataBlock>
           <div class="table-container">
             <p>Команды к загрузке</p>
+            <p>Общее количество команд к загрузке: {{ teams.length }}</p>
+            <p>&nbsp;</p>
             <table mat-table [dataSource]="teams">
               <ng-container matColumnDef="number">
-                <th mat-header-cell *matHeaderCellDef>Номер</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  Номер
+                </th>
                 <td mat-cell *matCellDef="let team">
                   {{ team.number }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="title">
-                <th mat-header-cell *matHeaderCellDef>Название</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  Название
+                </th>
                 <td mat-cell *matCellDef="let team">{{ team.title }}</td>
               </ng-container>
 

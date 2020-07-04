@@ -1,11 +1,11 @@
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { TeamsListParserParameters } from "./TeamsListParserParameters";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
-import { HttpParams, HttpHeaders } from "@angular/common/http";
+import { HttpHeaders } from "@angular/common/http";
 
 export class TeamsListParser extends AbstractMultiLineDataImporter {
   private _parameters: TeamsListParserParameters;
-  teams: TeamDataModel[];
+  private _teams: TeamDataModel[];
 
   constructor(
     parameters: TeamsListParserParameters,
@@ -17,7 +17,10 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
   }
 
   processText() {
-    this.teams = [];
+    var processedTeamNumbers: Set<string> = new Set();
+    var processedTeamTitles: Set<string> = new Set();
+
+    this._teams = [];
     while (this._sourceTextLinesIterator.hasNextLine()) {
       var lineWithTeamNumberAndTitle: string = this._sourceTextLinesIterator.nextLine();
       var teamNumberAndTitleArray: string[] = lineWithTeamNumberAndTitle.split(
@@ -61,10 +64,35 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
         );
         return;
       }
+
+      if (processedTeamNumbers.has(teamNumber)) {
+        this._onFailure(
+          this._parameters.parentComponentObject,
+          `В строке: '${lineWithTeamNumberAndTitle}' указан повторяющийся номер команды. Он уже есть у другой команды выше в списке.`
+        );
+        return;
+      }
+
+      processedTeamNumbers.add(teamNumber);
+
+      var teamTitleInLowerCase: string = teamTitle.toLowerCase();
+      if (processedTeamNumbers.has(teamTitleInLowerCase)) {
+        this._onFailure(
+          this._parameters.parentComponentObject,
+          `В строке: '${lineWithTeamNumberAndTitle}' указано повторяющееся название команды. Это название уже есть у другой команды выше в списке.`
+        );
+        return;
+      }
+
+      processedTeamTitles.add(teamTitleInLowerCase);
+
+      this._teams.push(
+        TeamDataModel.createTeamByNumberAndTitle(teamNumber, teamTitle)
+      );
     }
 
     // и в финале всего запускаем проверку корректности данных на основе ответа сервера
-    this.doValidationWithServerData(this, this.teams);
+    this.doValidationWithServerData(this, this._teams);
   }
 
   private doValidationWithServerData(
