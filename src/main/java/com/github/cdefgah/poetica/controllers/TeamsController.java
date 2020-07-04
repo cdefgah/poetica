@@ -161,6 +161,34 @@ public class TeamsController extends AbstractController {
         }
     }
 
+    @RequestMapping(path = "/answers/import", method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public ResponseEntity<String> validateTeamNumberAndTitle(@RequestBody Team[] teamsToImport) {
+        StringBuilder sb = new StringBuilder();
+        for (Team team: teamsToImport) {
+            if (!isNumberUnique(team.getNumber())) {
+                if (sb.length() > 0) {
+                    sb.append("\n");
+                }
+
+                sb.append("В базе уже есть команда с номером: ").append(team.getNumber());
+            }
+
+            if (!isTitleUnique(team.getTitle())) {
+                if (sb.length() > 0) {
+                    sb.append("\n");
+                }
+
+                sb.append("В базе уже есть команда с названием: ").append(team.getNumber());
+            }
+        }
+
+        // если всё в порядке, вернётся пустая строка
+        return ResponseEntity.status(HttpStatus.OK).body(sb.toString());
+    }
+
+
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<String> deleteTeam(@PathVariable long teamId) {
         if (thisTeamHasNoAnswers(teamId)) {

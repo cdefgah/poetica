@@ -41,4 +41,12 @@ export class TeamValidationService extends AbstractModelValidationService {
       return "";
     }
   }
+
+  public checkTeamTitleAndGetValidationMessage(teamTitle: string): string {
+    if (teamTitle && teamTitle.length > this._maxTeamTitleLength) {
+      return `Длина строки с названием команды не должна превышать ${this._maxTeamTitleLength} символов, а она составляет: ${teamTitle.length} символов`;
+    } else {
+      return "";
+    }
+  }
 }
