@@ -5,6 +5,7 @@ import { TeamDetailsComponent } from "../team-details/team-details.component";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamsListImporterComponent } from "../teams-list-importer/teams-list-importer.component";
 
 @Component({
   selector: "app-teams-list",
@@ -66,6 +67,17 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   }
 
   importTeams() {
-    this.displayMessage("Пока не реализовано. Будет сделано позже.");
+    const importDialogConfig = TeamsListImporterComponent.getDialogConfigWithData();
+    var dialogRef = this.dialog.open(
+      TeamsListImporterComponent,
+      importDialogConfig
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если диалог был принят (accepted)
+        // обновляем страницу со списками
+        // this.loadAllDisplayedLists(this);
+      }
+    });
   }
 }

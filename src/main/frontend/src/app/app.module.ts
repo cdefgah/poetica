@@ -42,6 +42,7 @@ import { TeamsListComponent } from "./components/teams/teams-list/teams-list.com
 import { EmailDetailsComponent } from "./components/answers/email-details/email-details.component";
 import { DatePipe } from "@angular/common";
 import { DisplayRoundPipe } from "./components/answers/support/display-round-pipe/display-round.pipe";
+import { TeamsListImporterComponent } from "./components/teams/teams-list-importer/teams-list-importer.component";
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { DisplayRoundPipe } from "./components/answers/support/display-round-pip
     EmailDetailsComponent,
     AboutComponent,
     DisplayRoundPipe,
+    TeamsListImporterComponent,
   ],
   imports: [
     FormsModule,
@@ -94,6 +96,7 @@ import { DisplayRoundPipe } from "./components/answers/support/display-round-pip
     EmailDetailsComponent,
     QuestionsListImporterComponent,
     AnswersListImporterComponent,
+    TeamsListImporterComponent,
   ],
 
   providers: [
