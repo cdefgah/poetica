@@ -25,43 +25,10 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   public doImport() {
-    this.amountOfGradedQuestions = this.loadGradedQuestionsQty();
-
     this.questions = [];
     var question: QuestionDataModel;
     while ((question = this.nextQuestion()) != null) {
       this.questions.push(question);
-    }
-  }
-
-  private loadGradedQuestionsQty(): number {
-    const prefix = "#G:";
-
-    if (this._sourceTextLinesIterator.hasNextLine()) {
-      var gradedQuestionsLine: string = this._sourceTextLinesIterator.nextLine();
-      if (gradedQuestionsLine.startsWith(prefix)) {
-        var amountString: string = gradedQuestionsLine
-          .substring(prefix.length)
-          .trim();
-        if (QuestionsImporter.isPositiveInteger(amountString)) {
-          return Number(amountString);
-        } else {
-          var additionalMessage: string =
-            amountString.length > 0
-              ? `А вы передаёте: "${amountString}"`
-              : "Но вы не передали никакого значения.";
-
-          throw new Error(
-            `Количество зачётных заданий должно быть целым положительным числом. ${additionalMessage}`
-          );
-        }
-      } else {
-        throw new Error(
-          "Первая не пустая строка текста должна содержать информацию о количестве зачётных заданий."
-        );
-      }
-    } else {
-      throw new Error("Не найдена информация о количестве зачётных заданий.");
     }
   }
 
@@ -254,11 +221,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       colonSymbolPosition
     );
 
-    if (QuestionsImporter.isPositiveInteger(numberString)) {
+    if (QuestionsImporter.isZeroOrPositiveInteger(numberString)) {
       return Number(numberString);
     } else {
       throw new Error(
-        `Номер задания должен быть целым положительным числом, а вы передали: ${numberString} в строке: ${sourceStringLine}`
+        `Номер задания может быть нулём либо целым положительным числом, а вы передали: ${numberString} в строке: ${sourceStringLine}`
       );
     }
   }

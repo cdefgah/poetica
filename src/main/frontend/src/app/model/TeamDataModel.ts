@@ -25,7 +25,7 @@ export class TeamDataModel {
   number: string = "";
 
   /**
-   * Название команды.
+   * Уникальное название команды.
    */
   title: string = "";
 

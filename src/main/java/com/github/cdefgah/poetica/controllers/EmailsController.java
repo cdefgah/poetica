@@ -135,7 +135,8 @@ public class EmailsController extends AbstractController {
         if (deletedEmailsCount > 0) {
             return ResponseEntity.noContent().build();
         } else {
-            return new ResponseEntity<>("Не удалось удалить письмо с идентификатором: " + emailId,
+            return new ResponseEntity<>(composeErrorMessage("Не удалось удалить письмо с идентификатором: "
+                        + emailId),
                         HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

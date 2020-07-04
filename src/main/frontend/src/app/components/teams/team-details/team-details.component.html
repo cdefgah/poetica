@@ -7,12 +7,10 @@
         matInput
         required
         placeholder="Номер команды"
-        maxlength="{{ modelValidatorService.requiredTeamNumberLength }}"
         [(ngModel)]="team.number"
       />
       <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect"
-        >Ожидается {{ modelValidatorService.requiredTeamNumberLength }}-значное
-        число</mat-hint
+        >Ожидается ноль или положительное целое число</mat-hint
       >
     </mat-form-field>
     <mat-form-field appearance="outline">

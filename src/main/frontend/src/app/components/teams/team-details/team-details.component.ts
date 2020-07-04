@@ -133,8 +133,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       if (!this.team.id) {
         // добавляем новую запись
         const payload = new HttpParams()
-          .set("teamNumber", this.team.number)
-          .set("teamTitle", this.team.title);
+          .set("teamNumber", this.team.number.trim())
+          .set("teamTitle", this.team.title.trim());
 
         this.http.post("/teams", payload).subscribe(
           (data) => {

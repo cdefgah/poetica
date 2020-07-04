@@ -1,5 +1,7 @@
 package com.github.cdefgah.poetica.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Collections;
@@ -15,8 +17,6 @@ import java.util.Objects;
 public final class Team {
 
     private static class ModelConstraints {
-        static final int REQUIRED_NUMBER_LENGTH = 3;
-        static final String NUMBER_VALIDATION_REGEXP = "^\\d{3}$";
         static final int MAX_TITLE_LENGTH = 256;
     }
 
@@ -25,8 +25,6 @@ public final class Team {
     static
     {
         final Map<String, String> localConstraintsMap = new HashMap<>();
-        localConstraintsMap.put("REQUIRED_NUMBER_LENGTH", String.valueOf(Team.ModelConstraints.REQUIRED_NUMBER_LENGTH));
-        localConstraintsMap.put("NUMBER_VALIDATION_REGEXP", Team.ModelConstraints.NUMBER_VALIDATION_REGEXP);
         localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(Team.ModelConstraints.MAX_TITLE_LENGTH));
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
@@ -41,15 +39,22 @@ public final class Team {
     /**
      * Номер команды.
      */
-    @Column(length = 3, nullable = true)
-    @Size(min = 3, max = 3)
+    @Column(nullable = false, unique = true)
     private String number;
 
     /**
      * Название команды.
      */
-    @Column(length = 96, nullable = false, unique=true)
+    @Column(length = 64, nullable = false, unique=true)
     private String title;
+
+    /**
+     * Название команды в нижнем регистре, для поиска.
+     * Это поле нужно, так как SQLite не поддерживает LOWER для unicode-строк, а только для латиинницы.
+     */
+    @JsonIgnore
+    @Column(length = 64, nullable = false, unique=true)
+    private String titleInLowerCase;
 
     public Team() {
 
@@ -127,5 +132,13 @@ public final class Team {
 
     public static Map<String, String> getModelConstraintsMap() {
         return modelConstraintsMap;
+    }
+
+    public String getTitleInLowerCase() {
+        return titleInLowerCase;
+    }
+
+    public void setTitleInLowerCase(String titleInLowerCase) {
+        this.titleInLowerCase = titleInLowerCase;
     }
 }

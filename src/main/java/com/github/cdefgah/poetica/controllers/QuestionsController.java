@@ -61,8 +61,8 @@ public class QuestionsController extends AbstractController {
 
         } catch(NoResultException noResultException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                    body("Не удалось найти вопрос (бескрылку) " +
-                            "с указанным номером:  " + questionNumber);
+                    body(composeErrorMessage("Не удалось найти задание " +
+                            "с указанным номером:  " + questionNumber));
         }
     }
 
@@ -115,15 +115,15 @@ public class QuestionsController extends AbstractController {
         if (!updateBody && !updateSource && !updateComment) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                    body("Судя по переданным параметрам, ни одно из разрешённых " +
-                    "к обновлению свойств вопроса не обновляется.");
+                    body(composeErrorMessage("Судя по переданным параметрам, ни одно из разрешённых " +
+                    "к обновлению свойств вопроса не обновляется."));
         }
 
         Question question = entityManager.find(Question.class, questionId);
         if (question == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                    body("Не удалось найти вопрос (бескрылку) " +
-                            "с указанным идентификатором:  " + questionId);
+                    body(composeErrorMessage("Не удалось найти задание " +
+                            "с указанным идентификатором:  " + questionId));
         }
 
         if (updateBody) {
@@ -199,9 +199,9 @@ public class QuestionsController extends AbstractController {
         if (questionsList != null && !questionsList.isEmpty()) {
             for (Question question : questionsList) {
                 if (thisQuestionIsAnswered(question.getId())) {
-                    return new ResponseEntity<>("Нельзя удалить все вопросы," +
+                    return new ResponseEntity<>(composeErrorMessage("Нельзя удалить все вопросы," +
                             " так есть как минимум один вопрос (номер вопроса: " + question.getNumber()
-                            +"), на который внесены ответы.",
+                            +"), на который внесены ответы."),
                             HttpStatus.BAD_REQUEST);
                 }
             }

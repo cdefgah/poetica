@@ -2,10 +2,7 @@ import { AbstractModelValidationService } from "../base/AbstractModelValidationS
 import { HttpClient } from "@angular/common/http";
 
 export class TeamValidationService extends AbstractModelValidationService {
-  private _numberRegExValidator: RegExp;
-
   private _maxTeamTitleLength: number;
-  private _requiredTeamNumberLength: number;
 
   constructor(httpClient: HttpClient) {
     super();
@@ -13,12 +10,6 @@ export class TeamValidationService extends AbstractModelValidationService {
     const url: string = "/teams/model-constraints";
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._numberRegExValidator = new RegExp(
-          data["NUMBER_VALIDATION_REGEXP"]
-        );
-        this._requiredTeamNumberLength = parseInt(
-          data["REQUIRED_NUMBER_LENGTH"]
-        );
         this._maxTeamTitleLength = parseInt(data["MAX_TITLE_LENGTH"]);
       },
       (error) => {
@@ -32,12 +23,10 @@ export class TeamValidationService extends AbstractModelValidationService {
     return this._maxTeamTitleLength;
   }
 
-  get requiredTeamNumberLength(): number {
-    return this._requiredTeamNumberLength;
-  }
-
   public isTeamNumberCorrect(teamNumber: string): boolean {
-    return this._numberRegExValidator.test(teamNumber);
+    return (
+      TeamValidationService.isNumber(teamNumber) && Number(teamNumber) >= 0
+    );
   }
 
   /**
@@ -47,7 +36,7 @@ export class TeamValidationService extends AbstractModelValidationService {
    */
   public checkTeamNumberAndGetValidationMessage(teamNumber: string): string {
     if (!this.isTeamNumberCorrect(teamNumber)) {
-      return `Номер команды должен быть ${this._requiredTeamNumberLength}-значным положительным целым числом. А вы указали: ${teamNumber}`;
+      return `Номер команды может быть нулём или положительным целым числом. А вы указали: ${teamNumber}`;
     } else {
       return "";
     }

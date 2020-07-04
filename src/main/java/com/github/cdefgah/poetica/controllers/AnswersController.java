@@ -43,8 +43,8 @@ public class AnswersController extends AbstractController {
                 oneAnswer.setQuestionId(questionIdInfo.get());
                 entityManager.persist(oneAnswer);
             } else {
-                return new ResponseEntity<>("В базе данных не удалось найти вопрос с номером: " +
-                                                            oneAnswer.getQuestionNumber(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(composeErrorMessage("В базе данных не удалось найти вопрос с номером: " +
+                                                            oneAnswer.getQuestionNumber()), HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -111,8 +111,8 @@ public class AnswersController extends AbstractController {
         Answer answer = entityManager.find(Answer.class, answerId);
         if (answer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                    body("Не удалось найти ответ " +
-                            "с указанным идентификатором:  " + answerId);
+                    body(composeErrorMessage("Не удалось найти ответ " +
+                            "с указанным идентификатором:  " + answerId));
         }
 
         answer.setGrade(Grade.Accepted);
@@ -125,8 +125,8 @@ public class AnswersController extends AbstractController {
         Answer answer = entityManager.find(Answer.class, answerId);
         if (answer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                    body("Не удалось найти ответ " +
-                            "с указанным идентификатором:  " + answerId);
+                    body(composeErrorMessage("Не удалось найти ответ " +
+                            "с указанным идентификатором:  " + answerId));
         }
 
         answer.setGrade(Grade.NotAccepted);

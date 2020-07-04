@@ -42,18 +42,24 @@ export abstract class AbstractSingleLineDataImporter {
     return processedString;
   }
 
-  protected static isPositiveInteger(sourceString: string): boolean {
-    function isNumber(value: string | number): boolean {
-      return value != null && value !== "" && !isNaN(Number(value.toString()));
-    }
+  private static isNumber(value: string | number): boolean {
+    return value != null && value !== "" && !isNaN(Number(value.toString()));
+  }
 
-    for (let character of sourceString) {
-      if (!isNumber(character)) {
-        return false;
-      }
-    }
+  protected static isZeroOrPositiveInteger(sourceString: string): boolean {
+    // нормализация нужна, чтобы исключить случаи, когда перед нулём дали символ минуса или плюса
+    // или дали два или более нулей в качестве исходной строки.
+    var normalizedString: string = AbstractSingleLineDataImporter.isNumber(
+      sourceString
+    )
+      ? Number(sourceString).toString()
+      : "";
 
-    return Number(sourceString) > 0;
+    if (normalizedString.length > 0 && normalizedString == sourceString) {
+      return Number(sourceString) >= 0;
+    } else {
+      return false;
+    }
   }
 
   /**

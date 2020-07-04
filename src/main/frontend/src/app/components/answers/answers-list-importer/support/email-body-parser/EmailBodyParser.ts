@@ -9,7 +9,6 @@ import { AnswerValidationService } from "src/app/components/core/validators/Answ
 import { CalculationResult } from "../CalculationResult";
 import { StringBuilder } from "../../../../../utils/StringBuilder";
 import { EmailBodyParsingResult } from "./EmailBodyParsingResult";
-import { debugString } from "src/app/utils/Config";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private _team: TeamDataModel;
@@ -289,10 +288,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         var dotLocation: number = currentLine.indexOf(".");
         if (dotLocation !== -1) {
           questionNumber = currentLine.substring(1, dotLocation).trim();
-          if (!EmailBodyParser.isPositiveInteger(questionNumber)) {
+          if (!EmailBodyParser.isZeroOrPositiveInteger(questionNumber)) {
             return new CalculationResult(
               null,
-              `Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки должен быть положительным целым числом, а вместо это вот это: '${questionNumber}'`
+              `Ошибка в формате блока ответов. Возможно пропущена точка после номера бескрылки. Номер бескрылки может быть нулём либо положительным целым числом, а вместо это вот это: '${questionNumber}'`
             );
           }
 

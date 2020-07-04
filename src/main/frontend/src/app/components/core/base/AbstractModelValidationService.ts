@@ -22,4 +22,8 @@ export abstract class AbstractModelValidationService {
   get brokenStateDescription(): string {
     return this._brokenStateDescription;
   }
+
+  protected static isNumber(value: string | number): boolean {
+    return value != null && value !== "" && !isNaN(Number(value.toString()));
+  }
 }
