@@ -10,7 +10,18 @@
   </button>
 </mat-toolbar>
 <hr />
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<table class="teams-digest-table">
+  <tr>
+    <td class="teams-digest-table-prompt-cell">
+      Всего команд:
+    </td>
+    <td class="teams-digest-table-value-cell">
+      {{ allTeamsList.length }}
+    </td>
+  </tr>
+</table>
+&nbsp;
+<table mat-table [dataSource]="allTeamsList" class="mat-elevation-z8">
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef>&nbsp;Номер&nbsp;</th>
     <td mat-cell *matCellDef="let team">{{ team.number }}</td>

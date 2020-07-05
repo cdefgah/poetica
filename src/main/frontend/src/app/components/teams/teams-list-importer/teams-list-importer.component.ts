@@ -6,7 +6,7 @@ import {
   MatDialog,
   MatDialogConfig,
 } from "@angular/material/dialog";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { debugString, debugObject } from "src/app/utils/Config";
@@ -70,7 +70,7 @@ export class TeamsListImporterComponent
   firstStepErrorMessage: string = "";
 
   get IsFirstStepOk(): boolean {
-    return this.firstStepErrorMessage.length == 0;
+    return this.firstStepErrorMessage.trim().length == 0;
   }
 
   get errorPresent(): boolean {
@@ -138,9 +138,11 @@ export class TeamsListImporterComponent
       "Teams are processed successfully. Object is displayed below..."
     );
     debugObject(teams2Import);
-
-    currentComponentReference.teams = teams2Import;
     currentComponentReference.firstStepErrorMessage = ""; // нет ошибок
+    currentComponentReference.teams = teams2Import;
+
+    // второй шаг имеет индекс == 1
+    currentComponentReference.updateDisplayImportButton(1);
   }
 
   processingTextWithTeamsListFailed(
@@ -149,6 +151,9 @@ export class TeamsListImporterComponent
   ) {
     debugString(`Teams processing failed. Error message: ${errorMessage}`);
     currentComponentReference.firstStepErrorMessage = errorMessage;
+
+    // второй шаг имеет индекс == 1
+    currentComponentReference.updateDisplayImportButton(1);
   }
 
   onStepChange(event: any) {
@@ -174,21 +179,44 @@ export class TeamsListImporterComponent
 
     // пересчитываем признак, по которому мы определяем
     // показывать или нет кнопку импорта ответов
-    this.updateDisplayImportButton(event);
+    this.updateDisplayImportButton(event.selectedIndex);
   }
 
-  doImportTeams() {}
+  doImportTeams() {
+    this.confirmationDialog("Импортировать команды?", () => {
+      // если диалог был принят (accepted)
+
+      const headers = new HttpHeaders().set(
+        "Content-Type",
+        "application/json; charset=utf-8"
+      );
+
+      // импортируем команды
+      this.httpClient
+        .post("/teams/import", this.teams, { headers: headers })
+        .subscribe(
+          (data) => {
+            debugString("Request succeed. Closing the import dialog.");
+            this.dialog.close(true);
+          },
+          (error) => {
+            debugString("Request failed. Error is below:");
+            debugObject(error);
+            this.reportServerError(error, "Сбой при импорте команд.");
+          }
+        );
+    });
+  }
 
   private resetStepperVariables(stepChangeEvent: any): void {
     this.firstStepErrorMessage = "";
     this.updateDisplayImportButton(stepChangeEvent);
   }
 
-  private updateDisplayImportButton(stepChangeEvent: any) {
-    // последний шаг в степпере имеет индекс 2 (0, 1, 2)
+  private updateDisplayImportButton(stepNumber: number) {
+    // последний шаг в степпере имеет индекс 1 (0, 1)
     // кнопку показываем в том случае, если мы пришли на последний шаг
     // и у нас всё в порядке, то есть нет ошибок.
-    this.displayImportButton =
-      stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk;
+    this.displayImportButton = stepNumber == 1 && this.allThingsAreOk;
   }
 }

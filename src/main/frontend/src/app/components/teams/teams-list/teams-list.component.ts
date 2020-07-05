@@ -31,7 +31,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   displayedColumns: string[] = ["number", "title"];
 
-  dataSource: TeamDataModel[];
+  allTeamsList: TeamDataModel[] = [];
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
@@ -60,7 +60,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     const url: string = "/teams/all";
     this.http.get(url).subscribe(
       (data: TeamDataModel[]) => {
-        this.dataSource = data;
+        this.allTeamsList = data;
       },
       (error) => this.reportServerError(error)
     );
@@ -78,7 +78,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
       if (result) {
         // если диалог был принят (accepted)
         // обновляем страницу со списками
-        // this.loadAllDisplayedLists(this);
+        this.loadTeamsList();
       }
     });
   }

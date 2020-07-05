@@ -2,6 +2,7 @@ import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDa
 import { TeamsListParserParameters } from "./TeamsListParserParameters";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { HttpHeaders } from "@angular/common/http";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 export class TeamsListParser extends AbstractMultiLineDataImporter {
   private _parameters: TeamsListParserParameters;
@@ -99,6 +100,11 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
     parserObjectReference: TeamsListParser,
     loadedTeams: TeamDataModel[]
   ) {
+    debugString(
+      "Validating teams using server-side data. Teams list is below:"
+    );
+    debugObject(loadedTeams);
+
     const headers = new HttpHeaders().set(
       "Content-Type",
       "application/json; charset=utf-8"
@@ -108,16 +114,22 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
     parserObjectReference._parameters.httpClient
       .post(validationUrl, loadedTeams, { headers: headers })
       .subscribe(
-        (validationResultString: string) => {
-          if (validationResultString && validationResultString.length > 0) {
+        (validationErrors: string[]) => {
+          debugString("Server reponse received.");
+
+          if (validationErrors && validationErrors.length > 0) {
             // что-то с валидацией не то
+            debugString("There are some validation issues listed below");
+            debugObject(validationErrors);
+
             parserObjectReference._onFailure(
-              parserObjectReference._parentComponentObject,
-              validationResultString
+              parserObjectReference._parameters.parentComponentObject,
+              validationErrors.join("\n")
             );
             return;
           } else {
             // валидация прошла успешно
+            debugString("Server-side validation passed ok");
             parserObjectReference._onSuccess(
               parserObjectReference._parameters.parentComponentObject,
               loadedTeams
@@ -126,6 +138,15 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
           }
         },
         (error) => {
+          debugString("Validation failed. Error object is below");
+          debugObject(error);
+          debugString("parserObjectReference object is below:");
+          debugObject(parserObjectReference);
+          debugString(
+            "parserObjectReference._parentComponentObject object is below:"
+          );
+          debugObject(parserObjectReference._parentComponentObject);
+
           parserObjectReference._onFailure(
             parserObjectReference._parentComponentObject,
             `Не удалось получить информацию из базы данных о приемлемости номера и названия для команды. 

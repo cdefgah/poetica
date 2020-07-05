@@ -13,3 +13,7 @@
   font-style: italic;
   font-weight: bold;
 }
+
+.errors-block {
+  white-space: pre-line;
+}

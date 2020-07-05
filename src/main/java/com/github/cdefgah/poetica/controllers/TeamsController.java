@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -164,28 +165,32 @@ public class TeamsController extends AbstractController {
     @RequestMapping(path = "/teams/validate", method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
-    public ResponseEntity<String> validateTeamNumberAndTitle(@RequestBody Team[] teamsToImport) {
-        StringBuilder sb = new StringBuilder();
+    public ResponseEntity<List<String>> validateTeamNumberAndTitle(@RequestBody Team[] teamsToImport) {
+        List<String> validationErrors = new ArrayList<>();
         for (Team team: teamsToImport) {
             if (!isNumberUnique(team.getNumber())) {
-                if (sb.length() > 0) {
-                    sb.append("\n");
-                }
-
-                sb.append("В базе уже есть команда с номером: ").append(team.getNumber());
+                validationErrors.add("В базе уже есть команда с номером: " + team.getNumber());
             }
 
             if (!isTitleUnique(team.getTitle())) {
-                if (sb.length() > 0) {
-                    sb.append("\n");
-                }
-
-                sb.append("В базе уже есть команда с названием: ").append(team.getNumber());
+                validationErrors.add("В базе уже есть команда с названием: " + team.getTitle());
             }
         }
 
         // если всё в порядке, вернётся пустая строка
-        return ResponseEntity.status(HttpStatus.OK).body(sb.toString());
+        return ResponseEntity.status(HttpStatus.OK).body(validationErrors);
+    }
+
+    @RequestMapping(path = "/teams/import", method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public ResponseEntity<String> importTeams(@RequestBody Team[] teamsToImport) {
+       for (Team team: teamsToImport) {
+           team.setTitleInLowerCase(team.getTitle().toLowerCase());
+           entityManager.persist(team);
+       }
+
+       return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
 
