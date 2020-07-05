@@ -1,4 +1,5 @@
 export class StringBuilder {
+  private static readonly newline = "\n";
   private contentLines: string[] = [];
 
   public addString(string: string) {
@@ -8,7 +9,7 @@ export class StringBuilder {
   }
 
   public length(): number {
-    return this.contentLines.length;
+    return this.toString().length;
   }
 
   public reset(): void {
@@ -16,7 +17,6 @@ export class StringBuilder {
   }
 
   public toString(): string {
-    const delimiter = " // ";
-    return this.contentLines.join(delimiter);
+    return this.contentLines.join(StringBuilder.newline);
   }
 }

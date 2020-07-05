@@ -1,6 +1,7 @@
 import { QuestionDataModel } from "src/app/model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
+import { StringBuilder } from "src/app/utils/StringBuilder";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
@@ -49,7 +50,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     this.expectedQuestionNumber = this.expectedQuestionNumber + 1;
     var numberPrefix: string = `#${questionNumber}:`;
     var numberPrefixLength: number = numberPrefix.length;
-    var questionBody: string = firstQuestionLine.substring(numberPrefixLength);
+
+    var questionBodyBuilder: StringBuilder = new StringBuilder();
+    questionBodyBuilder.addString(
+      firstQuestionLine.substring(numberPrefixLength)
+    );
     var processingLine: string;
     var nextSegmentDetected: boolean = false;
 
@@ -61,9 +66,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
         break;
       }
 
-      // TODO переделать на StringBuilder()
-      questionBody =
-        questionBody + QuestionsImporter._newLineSurrogate + processingLine;
+      questionBodyBuilder.addString(processingLine);
     }
 
     var rtfmMessage: string =
@@ -96,9 +99,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       }
 
       questionSourceBody =
-        questionSourceBody +
-        QuestionsImporter._newLineSurrogate +
-        processingLine;
+        questionSourceBody + QuestionsImporter.newline + processingLine;
     }
 
     var questionCommentNoteBody: string = "";
@@ -122,7 +123,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
           questionCommentNoteBody =
             questionCommentNoteBody +
-            QuestionsImporter._newLineSurrogate +
+            QuestionsImporter.newline +
             processingLine;
         }
 
@@ -143,10 +144,13 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     // проверяем ограничения на длину полей
 
     if (
-      questionBody.length > this.questionModelValidatorService.maxBodyLength
+      questionBodyBuilder.length() >
+      this.questionModelValidatorService.maxBodyLength
     ) {
       throw new Error(
-        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxBodyLength} символов`
+        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBodyBuilder.length()} символов и превышает максимальный разрешённый размер в ${
+          this.questionModelValidatorService.maxBodyLength
+        } символов`
       );
     }
 
@@ -172,7 +176,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     var question: QuestionDataModel = QuestionDataModel.createQuestion();
     question.number = questionNumber;
     question.graded = questionNumber <= this.amountOfGradedQuestions;
-    question.body = questionBody;
+    question.body = questionBodyBuilder.toString();
     question.source = questionSourceBody;
     question.comment = questionCommentNoteBody;
 
