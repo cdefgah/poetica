@@ -14,6 +14,7 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MAT_DATE_LOCALE,
+  MatSortModule,
 } from "@angular/material";
 import { MatButtonModule } from "@angular/material";
 import { MatToolbarModule } from "@angular/material/toolbar";
@@ -84,6 +85,7 @@ import { TeamsListImporterComponent } from "./components/teams/teams-list-import
     MatStepperModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatSortModule,
   ],
 
   entryComponents: [

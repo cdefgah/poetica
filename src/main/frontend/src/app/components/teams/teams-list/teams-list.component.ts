@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog } from "@angular/material/dialog";
 import { TeamDetailsComponent } from "../team-details/team-details.component";
@@ -6,6 +6,7 @@ import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInter
 import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { TeamsListImporterComponent } from "../teams-list-importer/teams-list-importer.component";
+import { MatTableDataSource, MatSort } from "@angular/material";
 
 @Component({
   selector: "app-teams-list",
@@ -27,11 +28,13 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   private teamValidationService: TeamValidationService;
 
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+
   ngOnInit() {}
 
   displayedColumns: string[] = ["number", "title"];
 
-  allTeamsList: TeamDataModel[] = [];
+  teamsListDataSource: any = new MatTableDataSource([]);
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
@@ -59,8 +62,9 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   loadTeamsList() {
     const url: string = "/teams/all";
     this.http.get(url).subscribe(
-      (data: TeamDataModel[]) => {
-        this.allTeamsList = data;
+      (teamsList: TeamDataModel[]) => {
+        this.teamsListDataSource = new MatTableDataSource(teamsList);
+        this.teamsListDataSource.sort = this.sort;
       },
       (error) => this.reportServerError(error)
     );
