@@ -92,6 +92,14 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       );
     }
 
+    if (this._teams.length == 0) {
+      this._onFailure(
+        this._parameters.parentComponentObject,
+        "Забыли задать текст со списком команд."
+      );
+      return;
+    }
+
     // и в финале всего запускаем проверку корректности данных на основе ответа сервера
     this.doValidationWithServerData(this, this._teams);
   }
