@@ -34,7 +34,9 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   displayedColumns: string[] = ["number", "title"];
 
-  teamsListDataSource: any = new MatTableDataSource([]);
+  teamsListDataSource: MatTableDataSource<
+    TeamDataModel
+  > = new MatTableDataSource([]);
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
