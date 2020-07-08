@@ -1,0 +1,2 @@
+java -jar poetica
+pause
