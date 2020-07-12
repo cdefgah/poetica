@@ -2,6 +2,7 @@ import { AbstractModelValidationService } from "../base/AbstractModelValidationS
 import { HttpClient } from "@angular/common/http";
 
 export class QuestionValidationService extends AbstractModelValidationService {
+  private _maxTitleLength: number;
   private _maxBodyLength: number;
   private _maxSourceLength: number;
   private _maxCommentlength: number;
@@ -12,6 +13,7 @@ export class QuestionValidationService extends AbstractModelValidationService {
     const url: string = "/questions/model-constraints";
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
+        this._maxTitleLength = parseInt(data["MAX_TITLE_LENGTH"]);
         this._maxBodyLength = parseInt(data["MAX_BODY_LENGTH"]);
         this._maxSourceLength = parseInt(data["MAX_SOURCE_LENGTH"]);
         this._maxCommentlength = parseInt(data["MAX_COMMENT_LENGTH"]);
@@ -21,6 +23,10 @@ export class QuestionValidationService extends AbstractModelValidationService {
         this.setBrokenInternalState(errorMessage);
       }
     );
+  }
+
+  get maxTitleLength(): number {
+    return this._maxTitleLength;
   }
 
   get maxBodyLength(): number {

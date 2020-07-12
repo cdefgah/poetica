@@ -25,8 +25,9 @@ export class QuestionsListImporterComponent
   dataSource: QuestionDataModel[] = [];
 
   displayedColumns: string[] = [
-    "number",
+    "externalNumber",
     "graded",
+    "title",
     "body",
     "source",
     "comment",

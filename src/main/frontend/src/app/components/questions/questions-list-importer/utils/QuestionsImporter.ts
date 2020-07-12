@@ -7,10 +7,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
   private static readonly commentNotePrefix: string = "#N:";
 
-  amountOfGradedQuestions: number;
-
-  expectedQuestionNumber: number;
-
   questions: QuestionDataModel[];
 
   private questionModelValidatorService: QuestionValidationService;
@@ -21,7 +17,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   ) {
     // TODO - потом переделать на onSuccess и onFailure по аналогии с импортом ответов
     super(sourceText, null, null);
-    this.expectedQuestionNumber = 1;
     this.questionModelValidatorService = questionModelValidatorService;
   }
 
@@ -41,13 +36,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     var firstQuestionLine: string = this._sourceTextLinesIterator.nextLine();
     var questionNumber: number = this.extractQuestionNumber(firstQuestionLine);
 
-    if (questionNumber != this.expectedQuestionNumber) {
-      throw new Error(
-        `Ожидался номер задания: ${this.expectedQuestionNumber}, но передан: ${questionNumber} в строке "${firstQuestionLine}"`
-      );
-    }
-
-    this.expectedQuestionNumber = this.expectedQuestionNumber + 1;
     var numberPrefix: string = `#${questionNumber}:`;
     var numberPrefixLength: number = numberPrefix.length;
 
@@ -176,7 +164,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     var question: QuestionDataModel = QuestionDataModel.createQuestion();
     // TODO XXX
     //  question.number = questionNumber;
-    question.graded = questionNumber <= this.amountOfGradedQuestions;
+    //  question.graded = questionNumber <= this.amountOfGradedQuestions;
     question.body = questionBodyBuilder.toString();
     question.source = questionSourceBody;
     question.comment = questionCommentNoteBody;

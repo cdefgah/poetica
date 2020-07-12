@@ -2,6 +2,19 @@
 <mat-dialog-content>
   <div style="display: flex; flex-direction: column;">
     <mat-form-field appearance="outline">
+      <mat-label>Заголовок</mat-label>
+      <input
+        matInput
+        required
+        placeholder="Заголовок задания"
+        maxlength="{{ modelValidatorService.maxTitleLength }}"
+        [(ngModel)]="question.title"
+      />
+      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect"
+        >Обязательное поле</mat-hint
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Содержание</mat-label>
       <textarea
         matInput

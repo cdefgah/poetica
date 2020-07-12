@@ -372,10 +372,10 @@
         <ng-template #processedDataBlock>
           <div class="table-container">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-              <ng-container matColumnDef="number">
+              <ng-container matColumnDef="externalNumber">
                 <th mat-header-cell *matHeaderCellDef>Номер</th>
                 <td mat-cell *matCellDef="let oneQuestion">
-                  {{ oneQuestion.number }}
+                  {{ oneQuestion.externalNumber }}
                 </td>
               </ng-container>
 
@@ -386,8 +386,15 @@
                 </td>
               </ng-container>
 
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Заголовок</th>
+                <td mat-cell *matCellDef="let oneQuestion">
+                  {{ oneQuestion.title }}
+                </td>
+              </ng-container>
+
               <ng-container matColumnDef="body">
-                <th mat-header-cell *matHeaderCellDef>ФФСодержание</th>
+                <th mat-header-cell *matHeaderCellDef>Содержание</th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.body }}
                 </td>
