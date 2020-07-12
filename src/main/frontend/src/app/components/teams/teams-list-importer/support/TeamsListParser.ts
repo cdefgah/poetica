@@ -1,6 +1,6 @@
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { TeamsListParserParameters } from "./TeamsListParserParameters";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import { HttpHeaders } from "@angular/common/http";
 import { debugString, debugObject } from "src/app/utils/Config";
 

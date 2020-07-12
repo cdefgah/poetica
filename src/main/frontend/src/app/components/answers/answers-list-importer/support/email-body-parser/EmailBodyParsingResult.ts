@@ -1,5 +1,5 @@
-import { AnswerDataModel } from "src/app/model/AnswerDataModel";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 
 export class EmailBodyParsingResult {
   team: TeamDataModel;

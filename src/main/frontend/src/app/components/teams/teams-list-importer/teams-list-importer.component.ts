@@ -8,7 +8,7 @@ import {
 } from "@angular/material/dialog";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import { debugString, debugObject } from "src/app/utils/Config";
 import { TeamValidationService } from "../../core/validators/TeamValidationService";
 import { TeamsListParserParameters } from "./support/TeamsListParserParameters";

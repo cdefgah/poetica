@@ -8,10 +8,10 @@ import {
 } from "@angular/material";
 import { debugString, debugObject } from "src/app/utils/Config";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { AnswerDataModel } from "src/app/model/AnswerDataModel";
-import { EmailDataModel } from "src/app/model/EmailDataModel";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
-import { QuestionDataModel } from "src/app/model/QuestionDataModel";
+import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
+import { EmailDataModel } from "src/app/data-model/EmailDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
+import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 
 @Component({
   selector: "app-answer-details",

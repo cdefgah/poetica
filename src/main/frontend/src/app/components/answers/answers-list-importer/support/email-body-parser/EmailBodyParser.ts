@@ -1,8 +1,8 @@
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
-import { AnswerDataModel } from "src/app/model/AnswerDataModel";
+import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
 import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
 import { HttpClient } from "@angular/common/http";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";

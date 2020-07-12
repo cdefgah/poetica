@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from "@angular/core";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,

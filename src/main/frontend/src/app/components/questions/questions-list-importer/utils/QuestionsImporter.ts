@@ -1,4 +1,4 @@
-import { QuestionDataModel } from "src/app/model/QuestionDataModel";
+import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
 import { StringBuilder } from "src/app/utils/StringBuilder";
@@ -174,7 +174,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
     // формируем вопрос
     var question: QuestionDataModel = QuestionDataModel.createQuestion();
-    question.number = questionNumber;
+    // TODO XXX
+    //  question.number = questionNumber;
     question.graded = questionNumber <= this.amountOfGradedQuestions;
     question.body = questionBodyBuilder.toString();
     question.source = questionSourceBody;

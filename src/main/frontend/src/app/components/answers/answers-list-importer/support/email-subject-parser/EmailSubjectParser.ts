@@ -1,4 +1,4 @@
-import { TeamDataModel } from "src/app/model/TeamDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSinglelineDataImporter";
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";

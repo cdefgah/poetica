@@ -9,8 +9,9 @@ export class QuestionDataModel {
    */
 
   /**
-   * Используется в случаях, когда нет информации о задании,
-   * чтобы не создавать новых экземпляров класса.
+   * Используется для инициализации в случаях, когда пока ещё нет информации о задании,
+   * чтобы не создавать новых экземпляров класса и позволить отобразить компоненты,
+   * которые завязаны на поля модели.
    */
   public static readonly emptyQuestion: QuestionDataModel = new QuestionDataModel();
 
@@ -20,9 +21,28 @@ export class QuestionDataModel {
   id: number;
 
   /**
-   * Уникальный номер задания.
+   * Номер задания для отображения на экране.
+   * Содержит либо один номер (0 либо целое положительное число),
+   * либо цепочку номеров. Например 8-9 для двукрылок.
    */
-  number: number;
+  externalNumber: string;
+
+  /**
+   * Номера бескрылок, инкапсулированные в задании.
+   * Для однокрылки - это будет один номер.
+   * Номер, собственно, задания.
+   * Для многокрылок (двух и более крылок) -
+   * будут содержаться номера, которые указаны через дефис при импорте.
+   * Например, если при импорте указаны номера 8-9 для двукрылки,
+   * то в этом поле будет массив из двух элементов со значениями
+   * 8 и 9.
+   */
+  internalNumbers: number[];
+
+  /**
+   * Заголовок задания.
+   */
+  title: string;
 
   /**
    * Содержание задания.
@@ -58,7 +78,9 @@ export class QuestionDataModel {
 
   private constructor() {
     this.id = 0;
-    this.number = 0;
+    this.externalNumber = "";
+    this.internalNumbers = [];
+    this.title = "";
     this.body = "";
     this.source = "";
     this.comment = "";
@@ -67,14 +89,12 @@ export class QuestionDataModel {
 
   private setValuesFromMap(initialMap: Map<string, any>) {
     this.id = initialMap["id"];
-    this.number = initialMap["number"];
+    this.externalNumber = initialMap["externalNumber"];
+    this.internalNumbers = initialMap["internalNumbers"];
+    this.title = initialMap["title"];
     this.body = initialMap["body"];
-    this.comment = initialMap["comment"];
     this.source = initialMap["source"];
+    this.comment = initialMap["comment"];
     this.graded = initialMap["graded"];
-  }
-
-  toString(): string {
-    return `id:${this.id}\nnumber:${this.number}\ngraded:${this.graded}\nbody:${this.body}\nsource:${this.source}\ncomment:${this.comment}\n`;
   }
 }

@@ -2,10 +2,7 @@ package com.github.cdefgah.poetica.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -16,6 +13,7 @@ import java.util.Objects;
 public final class Question {
 
     private static class ModelConstraints {
+        static final int MAX_TITLE_LENGTH = 128;
         static final int MAX_BODY_LENGTH = 1024;
         static final int MAX_SOURCE_LENGTH = 256;
         static final int MAX_COMMENT_LENGTH = 1024;
@@ -26,6 +24,7 @@ public final class Question {
     static
     {
         final Map<String, String> localConstraintsMap = new HashMap<>();
+        localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(ModelConstraints.MAX_TITLE_LENGTH));
         localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
         localConstraintsMap.put("MAX_SOURCE_LENGTH", String.valueOf(ModelConstraints.MAX_SOURCE_LENGTH));
         localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
@@ -40,11 +39,33 @@ public final class Question {
     private long id;
 
     /**
-     * Уникальный номер бескрылки, видим участниками состязания.
-     * Представляет собой трёхзначное целое положительное числое.
+     * Отображаемый номер бескрылки.
+     * Для однокрылок - одно число, 0 или любое положительное целое.
+     * Для многокрылок, все номера перечислены через -.
+     * Например для двукрылок, оцениваемых по одному очку за крыло: 8-9
      */
     @Column(nullable = false)
-    private int number;
+    private String externalNumber;
+
+    /**
+     * Номера бескрылок, инкапсулированные в задании.
+     * Для однокрылки - это будет один номер.
+     * Номер, собственно, задания.
+     * Для многокрылок (двух и более крылок) -
+     * будут содержаться номера, которые указаны через дефис при импорте.
+     * Например, если при импорте указаны номера 8-9 для двукрылки,
+     * то в этом поле будет массив из двух элементов со значениями
+     * 8 и 9.
+     */
+    @Column(nullable = false)
+    private int[] internalNumbers;
+
+    /**
+     * Содержание вопроса (бескрылки).
+     */
+    @Column(length = ModelConstraints.MAX_TITLE_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_TITLE_LENGTH)
+    private String title;
 
     /**
      * Содержание вопроса (бескрылки).
@@ -76,20 +97,36 @@ public final class Question {
         return modelConstraintsMap;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
-    
-    public int getNumber() {
-        return number;
+
+    public String getExternalNumber() {
+        return externalNumber;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setExternalNumber(String externalNumber) {
+        this.externalNumber = externalNumber;
+    }
+
+    public int[] getInternalNumbers() {
+        return internalNumbers;
+    }
+
+    public void setInternalNumbers(int[] internalNumbers) {
+        this.internalNumbers = internalNumbers;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getBody() {
@@ -116,10 +153,6 @@ public final class Question {
         this.comment = comment;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public boolean isGraded() {
         return graded;
     }
@@ -143,10 +176,15 @@ public final class Question {
 
     @Override
     public String toString() {
-        return "#" + this.number + "\n" +
-                "graded: " + this.graded + "\n" +
-                "body: " + this.body + "\n" +
-                "source: " + this.source + "\n" +
-                "comment: " + this.comment;
+        return "Question{" +
+                "id=" + id +
+                ", externalNumber='" + externalNumber + '\'' +
+                ", internalNumbers=" + Arrays.toString(internalNumbers) +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", source='" + source + '\'' +
+                ", comment='" + comment + '\'' +
+                ", graded=" + graded +
+                '}';
     }
 }

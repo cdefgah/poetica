@@ -14,12 +14,12 @@ import { AnswerValidationService } from "../../core/validators/AnswerValidationS
 import { debugString, debugObject } from "src/app/utils/Config";
 import { EmailSubjectParserParameters } from "./support/email-subject-parser/EmailSubjectParserParameters";
 import { EmailSubjectParser } from "./support/email-subject-parser/EmailSubjectParser";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
 import { EmailBodyParsingResult } from "./support/email-body-parser/EmailBodyParsingResult";
 import { EmailBodyParserParameters } from "./support/email-body-parser/EmailBodyParserParameters";
 import { EmailBodyParser } from "./support/email-body-parser/EmailBodyParser";
-import { AnswerDataModel } from "src/app/model/AnswerDataModel";
-import { EmailDataModel } from "src/app/model/EmailDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
+import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
+import { EmailDataModel } from "src/app/data-model/EmailDataModel";
 
 @Component({
   selector: "app-answers-list-importer",

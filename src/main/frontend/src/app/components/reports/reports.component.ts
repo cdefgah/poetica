@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog } from "@angular/material/dialog";
-import { ConfigurationValue } from "src/app/model/ConfigurationValue";
+import { ConfigurationValue } from "src/app/data-model/ConfigurationValue";
 import { AbstractInteractiveComponentModel } from "../core/base/AbstractInteractiveComponentModel";
 
 @Component({

@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { MatRadioChange, MatDialog, MatSelectChange } from "@angular/material";
 import { HttpClient } from "@angular/common/http";
-import { AnswerDataModel } from "src/app/model/AnswerDataModel";
-import { TeamDataModel } from "src/app/model/TeamDataModel";
-import { EmailDataModel } from "src/app/model/EmailDataModel";
+import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
+import { TeamDataModel } from "src/app/data-model/TeamDataModel";
+import { EmailDataModel } from "src/app/data-model/EmailDataModel";
 import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { EmailsCountDigest } from "./support/EmailsCountDigest";

@@ -2,7 +2,6 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
-import com.github.cdefgah.poetica.model.config.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Обрабатывает все запросы относительно непосредственной работы с вопросами (бескрылками).
@@ -30,9 +28,6 @@ public class QuestionsController extends AbstractController {
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private Configuration configuration;
-
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
@@ -46,14 +41,14 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/questions/id-by-number/{questionNumber}",
+    @RequestMapping(path = "/questions/id-by-external-number/{questionNumber}",
                                         method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getQuestionIdByQuestionNumber(@PathVariable int questionNumber) {
+    public ResponseEntity<String> getQuestionIdByExternalQuestionNumber(@PathVariable String externalQuestionNumber) {
         TypedQuery<Long> query =
                 entityManager.createQuery("select id FROM Question question WHERE " +
-                        "question.number=:requestedQuestionNumber", Long.class);
+                        "question.externalNumber=:externalQuestionNumber", Long.class);
 
-        query.setParameter("requestedQuestionNumber", questionNumber);
+        query.setParameter("externalQuestionNumber", externalQuestionNumber);
 
         try {
             long foundId = query.getSingleResult();
@@ -62,7 +57,7 @@ public class QuestionsController extends AbstractController {
         } catch(NoResultException noResultException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
                     body(composeErrorMessage("Не удалось найти задание " +
-                            "с указанным номером:  " + questionNumber));
+                            "с указанным номером:  " + externalQuestionNumber));
         }
     }
 
@@ -78,19 +73,6 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-    private Optional<Question> getLastQuestion() {
-        final TypedQuery<Question> questionNumberQuery =
-                entityManager.createQuery("select question from " +
-                        "Question question order by question.number desc", Question.class);
-
-        final List<Question> existingQuestions = questionNumberQuery.getResultList();
-        if (!existingQuestions.isEmpty()) {
-            return Optional.of(existingQuestions.get(0));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     /**
      * Обновляет содержимое вопроса (бескрылки).
      * Номер вопроса и признак 'зачётный/незачётный вопрос' обновлению не подлежат.
@@ -104,16 +86,18 @@ public class QuestionsController extends AbstractController {
      */
     @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateQuestion(@PathVariable long questionId,
+                                                 @RequestParam("newQuestionTitle") String newQuestionTitle,
                                                  @RequestParam("newQuestionBody") String newQuestionBody,
                                                  @RequestParam("newQuestionSource") String newQuestionSource,
                                                  @RequestParam("updateComment") boolean updateComment,
                                                  @RequestParam("newQuestionComment") String newQuestionComment) {
 
+        boolean updateTitle = !isStringEmpty(newQuestionTitle);
         boolean updateBody = !isStringEmpty(newQuestionBody);
         boolean updateSource = !isStringEmpty(newQuestionSource);
+        boolean updateHasRequested = updateTitle || updateBody || updateSource || updateComment;
 
-        if (!updateBody && !updateSource && !updateComment) {
-
+        if (!updateHasRequested) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
                     body(composeErrorMessage("Судя по переданным параметрам, ни одно из разрешённых " +
                     "к обновлению свойств вопроса не обновляется."));
@@ -124,6 +108,10 @@ public class QuestionsController extends AbstractController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
                     body(composeErrorMessage("Не удалось найти задание " +
                             "с указанным идентификатором:  " + questionId));
+        }
+
+        if (updateTitle) {
+            question.setTitle(newQuestionTitle);
         }
 
         if (updateBody) {
@@ -200,7 +188,7 @@ public class QuestionsController extends AbstractController {
             for (Question question : questionsList) {
                 if (thisQuestionIsAnswered(question.getId())) {
                     return new ResponseEntity<>(composeErrorMessage("Нельзя удалить все вопросы," +
-                            " так есть как минимум один вопрос (номер вопроса: " + question.getNumber()
+                            " так есть как минимум один вопрос (номер вопроса: " + question.getExternalNumber()
                             +"), на который внесены ответы."),
                             HttpStatus.BAD_REQUEST);
                 }

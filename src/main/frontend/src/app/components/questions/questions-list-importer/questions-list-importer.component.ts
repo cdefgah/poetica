@@ -7,7 +7,7 @@ import {
 } from "@angular/material/dialog";
 
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
-import { QuestionDataModel } from "src/app/model/QuestionDataModel";
+import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 import { QuestionsImporter } from "./utils/QuestionsImporter";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 import { QuestionValidationService } from "../../core/validators/QuestionValidationService";

@@ -6,7 +6,7 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { QuestionDataModel } from "src/app/model/QuestionDataModel";
+import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
 
@@ -107,78 +107,68 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   ngOnInit() {}
 
   private getDialogTitle(questionObject: QuestionDataModel): string {
-    if (questionObject.number === 0) {
+    if (questionObject.externalNumber.length == 0) {
       return "Новое задание";
     } else {
       var isGradedString = questionObject.graded
         ? " (Зачётное)"
         : " (Внезачётное)";
 
-      return `Задание №${String(questionObject.number)}${isGradedString}`;
+      return `Задание №${String(
+        questionObject.externalNumber
+      )}${isGradedString}`;
     }
   }
 
   acceptDialog() {
     this.resetValidationFlags();
     if (this.validateFields()) {
-      if (this.question.number === 0) {
-        // добавляем новую запись
-        const payload = new HttpParams()
-          .set("questionBody", this.question.body)
-          .set("questionSource", this.question.source)
-          .set("questionComment", this.question.comment);
+      // обновляем существующую запись
+      var newQuestionTitle: string =
+        this.questionCopy.title != this.question.title
+          ? this.question.title
+          : "";
 
-        this.http.post("/questions", payload).subscribe(
-          (data) => {
-            this.serverResponse = data;
+      var newQuestionBody: string =
+        this.questionCopy.body != this.question.body ? this.question.body : "";
+
+      var newQuestionSource: string =
+        this.questionCopy.source != this.question.source
+          ? this.question.source
+          : "";
+
+      var newQuestionComment: string =
+        this.questionCopy.comment != this.question.comment
+          ? this.question.comment
+          : "";
+
+      var updateComment: boolean =
+        this.questionCopy.comment != this.question.comment;
+
+      if (
+        newQuestionBody.length > 0 ||
+        newQuestionSource.length > 0 ||
+        updateComment
+      ) {
+        // данные изменились, обновляем их на сервере
+        var requestUrl = `/questions/${this.question.id}`;
+        const payload = new HttpParams()
+          .set("newQuestionTitle", newQuestionTitle)
+          .set("newQuestionBody", newQuestionBody)
+          .set("newQuestionSource", newQuestionSource)
+          .set("updateComment", String(updateComment))
+          .set("newQuestionComment", newQuestionComment);
+
+        this.http.put(requestUrl, payload).subscribe(
+          () => {
             this.dialog.close(true);
           },
           (error) => this.reportServerError(error)
         );
       } else {
-        // обновляем существующую запись
-        var newQuestionBody: string =
-          this.questionCopy.body != this.question.body
-            ? this.question.body
-            : "";
-
-        var newQuestionSource: string =
-          this.questionCopy.source != this.question.source
-            ? this.question.source
-            : "";
-
-        var newQuestionComment: string =
-          this.questionCopy.comment != this.question.comment
-            ? this.question.comment
-            : "";
-
-        var updateComment: boolean =
-          this.questionCopy.comment != this.question.comment;
-
-        if (
-          newQuestionBody.length > 0 ||
-          newQuestionSource.length > 0 ||
-          updateComment
-        ) {
-          // данные изменились, обновляем их на сервере
-          var requestUrl = `/questions/${this.question.id}`;
-          const payload = new HttpParams()
-            .set("newQuestionBody", newQuestionBody)
-            .set("newQuestionSource", newQuestionSource)
-            .set("updateComment", String(updateComment))
-            .set("newQuestionComment", newQuestionComment);
-
-          this.http.put(requestUrl, payload).subscribe(
-            () => {
-              this.dialog.close(true);
-            },
-            (error) => this.reportServerError(error)
-          );
-        } else {
-          // никаких изменений не было
-          // закрываем и не делаем лишнего запроса для обновления данных с сервера
-          this.dialog.close(false);
-        }
+        // никаких изменений не было
+        // закрываем и не делаем лишнего запроса для обновления данных с сервера
+        this.dialog.close(false);
       }
     }
   }
