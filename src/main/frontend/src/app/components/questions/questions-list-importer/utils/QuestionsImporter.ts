@@ -12,6 +12,15 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   private _questionModelValidatorService: QuestionValidationService;
 
+  // TODO Все задания зачётные по умолчанию.
+  // Для внезачётных заданий номер берется в круглые скобки (без символа #).
+  // То есть
+  // #4: - зачётное задание
+  // #(4): - внезачётное задание
+  // Зачётная двукрылка с оценкой по очку за каждое крыло, выглядит вот так:
+  // #4-5:
+  // Внезачётная двукрылка с оценками по очку за каждое крыло, выглядит вот так:
+  // #(4-5):
   constructor(
     importerComponentReference: QuestionsListImporterComponent,
     sourceText: string,
