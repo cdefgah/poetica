@@ -11,7 +11,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   questions: QuestionDataModel[];
 
   private _questionModelValidatorService: QuestionValidationService;
-  private _importerComponentReference: QuestionsListImporterComponent;
 
   constructor(
     importerComponentReference: QuestionsListImporterComponent,
@@ -22,7 +21,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   ) {
     super(sourceText, onSuccess, onFailure);
     this._questionModelValidatorService = questionModelValidatorService;
-    this._importerComponentReference = importerComponentReference;
+    this._parentComponentObject = importerComponentReference;
   }
 
   public doImport() {
