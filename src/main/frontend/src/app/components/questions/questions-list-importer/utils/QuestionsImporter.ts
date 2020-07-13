@@ -2,6 +2,7 @@ import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
 import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
 import { StringBuilder } from "src/app/utils/StringBuilder";
+import { QuestionsListImporterComponent } from "../questions-list-importer.component";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
@@ -9,15 +10,19 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   questions: QuestionDataModel[];
 
-  private questionModelValidatorService: QuestionValidationService;
+  private _questionModelValidatorService: QuestionValidationService;
+  private _importerComponentReference: QuestionsListImporterComponent;
 
   constructor(
+    importerComponentReference: QuestionsListImporterComponent,
     sourceText: string,
-    questionModelValidatorService: QuestionValidationService
+    questionModelValidatorService: QuestionValidationService,
+    onSuccess: Function,
+    onFailure: Function
   ) {
-    // TODO - потом переделать на onSuccess и onFailure по аналогии с импортом ответов
-    super(sourceText, null, null);
-    this.questionModelValidatorService = questionModelValidatorService;
+    super(sourceText, onSuccess, onFailure);
+    this._questionModelValidatorService = questionModelValidatorService;
+    this._importerComponentReference = importerComponentReference;
   }
 
   public doImport() {
@@ -61,15 +66,19 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       "Ознакомьтесь, пожалуйста, с требованиями к формату текста.";
 
     if (!nextSegmentDetected) {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился. ${rtfmMessage}`
       );
+      return;
     }
 
     if (!QuestionsImporter.isQuestionSourceLine(processingLine)) {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но вместо него оказалась вот эта строка: ${processingLine}. ${rtfmMessage}`
       );
+      return;
     }
 
     var questionSourceBody: string = processingLine.substring(
@@ -130,34 +139,39 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     // проверяем ограничения на длину полей
-
     if (
       questionBodyBuilder.length() >
-      this.questionModelValidatorService.maxBodyLength
+      this._questionModelValidatorService.maxBodyLength
     ) {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBodyBuilder.length()} символов и превышает максимальный разрешённый размер в ${
-          this.questionModelValidatorService.maxBodyLength
+          this._questionModelValidatorService.maxBodyLength
         } символов`
       );
+      return;
     }
 
     if (
       questionSourceBody.length >
-      this.questionModelValidatorService.maxSourceLength
+      this._questionModelValidatorService.maxSourceLength
     ) {
-      throw new Error(
-        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxSourceLength} символов`
+      this._onFailure(
+        this._parentComponentObject,
+        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxSourceLength} символов`
       );
+      return;
     }
 
     if (
       questionCommentNoteBody.length >
-      this.questionModelValidatorService.maxCommentLength
+      this._questionModelValidatorService.maxCommentLength
     ) {
-      throw new Error(
-        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this.questionModelValidatorService.maxCommentLength} символов`
+      this._onFailure(
+        this._parentComponentObject,
+        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxCommentLength} символов`
       );
+      return;
     }
 
     // формируем вопрос
@@ -196,17 +210,21 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
    */
   private extractQuestionNumber(sourceStringLine: string): number {
     if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `Первым символом строки ожидался символ #. Строка: ${sourceStringLine}`
       );
+      return;
     }
 
     var colonSymbolPosition: number = sourceStringLine.indexOf(":");
 
     if (colonSymbolPosition == -1) {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`
       );
+      return;
     }
 
     var numberString: string = sourceStringLine.substring(
@@ -217,9 +235,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     if (QuestionsImporter.isZeroOrPositiveInteger(numberString)) {
       return Number(numberString);
     } else {
-      throw new Error(
+      this._onFailure(
+        this._parentComponentObject,
         `Номер задания может быть нулём либо целым положительным числом, а вы передали: ${numberString} в строке: ${sourceStringLine}`
       );
+      return;
     }
   }
 }

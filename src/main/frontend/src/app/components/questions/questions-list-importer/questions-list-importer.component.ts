@@ -106,17 +106,28 @@ export class QuestionsListImporterComponent
   }
 
   private processSourceText(): void {
-    try {
-      var questionsImporter = new QuestionsImporter(
-        this.sourceText,
-        this.questionValidationService
-      );
-      questionsImporter.doImport();
+    var questionsImporter = new QuestionsImporter(
+      this,
+      this.sourceText,
+      this.questionValidationService,
+      this.onQuestionsImportSuccess,
+      this.onQuestionImportFailure
+    );
+    questionsImporter.doImport();
+  }
 
-      this.dataSource = questionsImporter.questions;
-    } catch (Error) {
-      this.foundError = Error.message;
-    }
+  private onQuestionsImportSuccess(
+    importerComponent: QuestionsListImporterComponent,
+    questionsList: QuestionDataModel[]
+  ) {
+    importerComponent.dataSource = questionsList;
+  }
+
+  private onQuestionImportFailure(
+    importerComponent: QuestionsListImporterComponent,
+    errorMessage: string
+  ) {
+    importerComponent.foundError = errorMessage;
   }
 
   onRowClicked(row: any) {}
