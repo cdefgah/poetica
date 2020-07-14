@@ -42,7 +42,7 @@ export class QuestionsListImporterComponent
   private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE =
     "questionModelValidatorService";
 
-  private questionValidationService: QuestionValidationService;
+  questionValidationService: QuestionValidationService;
 
   static getDialogConfigWithData(
     questionValidationService: QuestionValidationService
