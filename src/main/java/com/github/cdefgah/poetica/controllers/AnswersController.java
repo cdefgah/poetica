@@ -2,7 +2,6 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
-import com.github.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +53,7 @@ public class AnswersController extends AbstractController {
     private Optional<Long> getQuestionIdByQuestionNumber(int questionNumber) {
         TypedQuery<Long> query =
                 entityManager.createQuery("select id FROM Question question WHERE " +
-                        "question.lowestInternalNumber=<:requestedQuestionNumber OR " +
+                        "question.lowestInternalNumber<=:requestedQuestionNumber OR " +
                         "question.highestInternalNumber>=:requestedQuestionNumber", Long.class);
 
         query.setParameter("requestedQuestionNumber", questionNumber);

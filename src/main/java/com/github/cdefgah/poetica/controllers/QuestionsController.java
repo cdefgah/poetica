@@ -36,30 +36,34 @@ public class QuestionsController extends AbstractController {
     @RequestMapping(path = "/questions/max-number", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Integer> getMaxQuestionNumber() {
         TypedQuery<Integer> query =
-                entityManager.createQuery("select max(number) FROM Question question", Integer.class);
+                entityManager.createQuery("select max(highestInternalNumber) " +
+                                                                            "FROM Question question", Integer.class);
 
         return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/questions/id-by-external-number/{questionNumber}",
-                                        method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getQuestionIdByExternalQuestionNumber(@PathVariable String externalQuestionNumber) {
-        TypedQuery<Long> query =
-                entityManager.createQuery("select id FROM Question question WHERE " +
-                        "question.externalNumber=:externalQuestionNumber", Long.class);
+    /**
+     *
+     @RequestMapping(path = "/questions/id-by-external-number/{questionNumber}",
+     method = RequestMethod.GET, produces = "application/json")
+     public ResponseEntity<String> getQuestionIdByExternalQuestionNumber(@PathVariable String externalQuestionNumber) {
+     TypedQuery<Long> query =
+     entityManager.createQuery("select id FROM Question question WHERE " +
+     "question.externalNumber=:externalQuestionNumber", Long.class);
 
-        query.setParameter("externalQuestionNumber", externalQuestionNumber);
+     query.setParameter("externalQuestionNumber", externalQuestionNumber);
 
-        try {
-            long foundId = query.getSingleResult();
-            return new ResponseEntity<>(String.valueOf(foundId), HttpStatus.OK);
+     try {
+     long foundId = query.getSingleResult();
+     return new ResponseEntity<>(String.valueOf(foundId), HttpStatus.OK);
 
-        } catch(NoResultException noResultException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                    body(composeErrorMessage("Не удалось найти задание " +
-                            "с указанным номером:  " + externalQuestionNumber));
-        }
-    }
+     } catch(NoResultException noResultException) {
+     return ResponseEntity.status(HttpStatus.NOT_FOUND).
+     body(composeErrorMessage("Не удалось найти задание " +
+     "с указанным номером:  " + externalQuestionNumber));
+     }
+     }
+     */
 
     @RequestMapping(path = "/questions/import", method = RequestMethod.POST,
             consumes = "application/json",
