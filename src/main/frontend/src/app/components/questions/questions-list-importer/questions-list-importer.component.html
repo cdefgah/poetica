@@ -215,42 +215,54 @@
           <div class="table-container">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
               <ng-container matColumnDef="externalNumber">
-                <th mat-header-cell *matHeaderCellDef>Номер</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Номер&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.externalNumber }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="graded">
-                <th mat-header-cell *matHeaderCellDef>Зачётное?</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Зачётное?&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.graded ? "Зачётное" : "Внезачётное" }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="title">
-                <th mat-header-cell *matHeaderCellDef>Заголовок</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Заголовок&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.title }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="body">
-                <th mat-header-cell *matHeaderCellDef>Содержание</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Содержание&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.body }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="source">
-                <th mat-header-cell *matHeaderCellDef>Источник</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Источник&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.source }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="comment">
-                <th mat-header-cell *matHeaderCellDef>Комментарий</th>
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Комментарий&nbsp;&nbsp;
+                </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.comment }}
                 </td>

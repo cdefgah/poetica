@@ -48,17 +48,14 @@ public final class Question {
     private String externalNumber;
 
     /**
-     * Номера бескрылок, инкапсулированные в задании.
-     * Для однокрылки - это будет один номер.
-     * Номер, собственно, задания.
-     * Для многокрылок (двух и более крылок) -
-     * будут содержаться номера, которые указаны через дефис при импорте.
-     * Например, если при импорте указаны номера 8-9 для двукрылки,
-     * то в этом поле будет массив из двух элементов со значениями
-     * 8 и 9.
+     * Если задание содержит несколько номеров, то наименьший.
      */
-    @Column(nullable = false)
-    private int[] internalNumbers;
+    private int lowestInternalNumber;
+
+    /**
+     * Если задание содержит несколько номеров, то наибольший.
+     */
+    private int highestInternalNumber;
 
     /**
      * Содержание вопроса (бескрылки).
@@ -113,12 +110,20 @@ public final class Question {
         this.externalNumber = externalNumber;
     }
 
-    public int[] getInternalNumbers() {
-        return internalNumbers;
+    public int getLowestInternalNumber() {
+        return lowestInternalNumber;
     }
 
-    public void setInternalNumbers(int[] internalNumbers) {
-        this.internalNumbers = internalNumbers;
+    public void setLowestInternalNumber(int lowestInternalNumber) {
+        this.lowestInternalNumber = lowestInternalNumber;
+    }
+
+    public int getHighestInternalNumber() {
+        return highestInternalNumber;
+    }
+
+    public void setHighestInternalNumber(int highestInternalNumber) {
+        this.highestInternalNumber = highestInternalNumber;
     }
 
     public String getTitle() {
@@ -179,7 +184,8 @@ public final class Question {
         return "Question{" +
                 "id=" + id +
                 ", externalNumber='" + externalNumber + '\'' +
-                ", internalNumbers=" + Arrays.toString(internalNumbers) +
+                ", lowestInternalNumber=" + lowestInternalNumber +
+                ", highestInternalNumber=" + highestInternalNumber +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
                 ", source='" + source + '\'' +

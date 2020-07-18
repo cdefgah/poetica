@@ -3,12 +3,18 @@ import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDa
 import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
 import { StringBuilder } from "src/app/utils/StringBuilder";
 import { QuestionsListImporterComponent } from "../questions-list-importer.component";
+import { FirstQuestionLineParsingResults } from "./FirstQuestionLineParsingResults";
+import { debugString } from "src/app/utils/Config";
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private static readonly sourcePrefix: string = "#S:";
   private static readonly commentNotePrefix: string = "#N:";
 
   questions: QuestionDataModel[];
+
+  private _allThingsOk: boolean;
+
+  private _expectedQuestionNumber: number;
 
   private _questionModelValidatorService: QuestionValidationService;
 
@@ -34,10 +40,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   public doImport() {
+    this._allThingsOk = true;
     this.questions = [];
+    this._expectedQuestionNumber = -1;
+
     var question: QuestionDataModel;
     while ((question = this.nextQuestion()) != null) {
       this.questions.push(question);
+    }
+
+    if (this._allThingsOk) {
+      this._onSuccess(this._parentComponentObject, this.questions);
     }
   }
 
@@ -47,15 +60,16 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     var firstQuestionLine: string = this._sourceTextLinesIterator.nextLine();
-    var questionNumber: number = this.extractQuestionNumber(firstQuestionLine);
 
-    var numberPrefix: string = `#${questionNumber}:`;
-    var numberPrefixLength: number = numberPrefix.length;
+    var firstQuestionLineParsingResults: FirstQuestionLineParsingResults = this.parseFirstQuestionLine(
+      firstQuestionLine
+    );
+
+    if (firstQuestionLineParsingResults == null) {
+      return null;
+    }
 
     var questionBodyBuilder: StringBuilder = new StringBuilder();
-    questionBodyBuilder.addString(
-      firstQuestionLine.substring(numberPrefixLength)
-    );
     var processingLine: string;
     var nextSegmentDetected: boolean = false;
 
@@ -74,17 +88,19 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       "Ознакомьтесь, пожалуйста, с требованиями к формату текста.";
 
     if (!nextSegmentDetected) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
-        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился. ${rtfmMessage}`
+        `После блока с текстом задания номер ${firstQuestionLineParsingResults.externalNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился. ${rtfmMessage}`
       );
       return;
     }
 
     if (!QuestionsImporter.isQuestionSourceLine(processingLine)) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
-        `После блока с текстом задания номер ${questionNumber} ожидался блок с информацией об источнике для этого задания. Но вместо него оказалась вот эта строка: ${processingLine}. ${rtfmMessage}`
+        `После блока с текстом задания номер ${firstQuestionLineParsingResults.externalNumber} ожидался блок с информацией об источнике для этого задания. Но вместо него оказалась вот эта строка: ${processingLine}. ${rtfmMessage}`
       );
       return;
     }
@@ -146,14 +162,26 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       }
     }
 
+    if (questionBodyBuilder.length() == 0) {
+      this._allThingsOk = false;
+      this._onFailure(
+        this._parentComponentObject,
+        `Содержимое не указано для задания с номером ${firstQuestionLineParsingResults.externalNumber}.`
+      );
+      return;
+    }
+
     // проверяем ограничения на длину полей
     if (
       questionBodyBuilder.length() >
       this._questionModelValidatorService.maxBodyLength
     ) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
-        `Размер блока текста с содержанием задания ${questionNumber} составляет ${questionBodyBuilder.length()} символов и превышает максимальный разрешённый размер в ${
+        `Размер блока текста с содержанием задания ${
+          firstQuestionLineParsingResults.externalNumber
+        } составляет ${questionBodyBuilder.length()} символов и превышает максимальный разрешённый размер в ${
           this._questionModelValidatorService.maxBodyLength
         } символов`
       );
@@ -164,9 +192,10 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       questionSourceBody.length >
       this._questionModelValidatorService.maxSourceLength
     ) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
-        `Размер блока текста с информацией об источнике задания ${questionNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxSourceLength} символов`
+        `Размер блока текста с информацией об источнике задания ${firstQuestionLineParsingResults.externalNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxSourceLength} символов`
       );
       return;
     }
@@ -175,18 +204,24 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       questionCommentNoteBody.length >
       this._questionModelValidatorService.maxCommentLength
     ) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
-        `Размер блока текста с комментарием к заданию с номером ${questionNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxCommentLength} символов`
+        `Размер блока текста с комментарием к заданию с номером ${firstQuestionLineParsingResults.externalNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxCommentLength} символов`
       );
       return;
     }
 
     // формируем вопрос
     var question: QuestionDataModel = QuestionDataModel.createQuestion();
-    // TODO XXX
-    //  question.number = questionNumber;
-    //  question.graded = questionNumber <= this.amountOfGradedQuestions;
+    question.externalNumber = firstQuestionLineParsingResults.externalNumber;
+    question.title = firstQuestionLineParsingResults.questionTitle;
+    question.lowestInternalNumber =
+      firstQuestionLineParsingResults.lowestInternalNumber;
+    question.highestInternalNumber =
+      firstQuestionLineParsingResults.highestInternalNumber;
+    question.graded = firstQuestionLineParsingResults.isGraded;
+
     question.body = questionBodyBuilder.toString();
     question.source = questionSourceBody;
     question.comment = questionCommentNoteBody;
@@ -204,20 +239,27 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   private static isQuestionSourceLine(sourceStringLine: string): boolean {
-    return sourceStringLine.startsWith(QuestionsImporter.sourcePrefix);
+    return sourceStringLine
+      .toUpperCase()
+      .startsWith(QuestionsImporter.sourcePrefix);
   }
 
   private static isQuestionCommentNoteLine(sourceStringLine: string): boolean {
-    return sourceStringLine.startsWith(QuestionsImporter.commentNotePrefix);
+    return sourceStringLine
+      .toUpperCase()
+      .startsWith(QuestionsImporter.commentNotePrefix);
   }
 
   /**
    * Извлекает номер задания из строки.
    * @param sourceStringLine строка для обработки.
-   * @returns номер задания.
+   * @returns блок данных с информацией о номере, зачётности задания, и заголовок задания.
    */
-  private extractQuestionNumber(sourceStringLine: string): number {
+  private parseFirstQuestionLine(
+    sourceStringLine: string
+  ): FirstQuestionLineParsingResults {
     if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
         `Первым символом строки ожидался символ #. Строка: ${sourceStringLine}`
@@ -228,26 +270,121 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     var colonSymbolPosition: number = sourceStringLine.indexOf(":");
 
     if (colonSymbolPosition == -1) {
+      this._allThingsOk = false;
       this._onFailure(
         this._parentComponentObject,
         `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`
       );
-      return;
+      return null;
     }
 
-    var numberString: string = sourceStringLine.substring(
-      1,
-      colonSymbolPosition
-    );
+    var parsingResult: FirstQuestionLineParsingResults = new FirstQuestionLineParsingResults();
+    parsingResult.isGraded = true;
 
-    if (QuestionsImporter.isZeroOrPositiveInteger(numberString)) {
-      return Number(numberString);
-    } else {
-      this._onFailure(
-        this._parentComponentObject,
-        `Номер задания может быть нулём либо целым положительным числом, а вы передали: ${numberString} в строке: ${sourceStringLine}`
+    var numberBodyString: string = sourceStringLine
+      .substring(1, colonSymbolPosition)
+      .trim();
+
+    var openingParenPosition = numberBodyString.indexOf("(");
+    if (openingParenPosition !== -1) {
+      // внезачётное задание
+      parsingResult.isGraded = false;
+
+      var closingParenPosition = numberBodyString.indexOf(
+        ")",
+        openingParenPosition
       );
-      return;
+
+      if (closingParenPosition === -1) {
+        this._allThingsOk = false;
+        this._onFailure(
+          this._parentComponentObject,
+          `В строке представлена открывающая скобка, но нет закрывающей для неё. Строка: ${sourceStringLine}`
+        );
+        return null;
+      }
+
+      numberBodyString = numberBodyString.substring(
+        openingParenPosition + 1,
+        closingParenPosition
+      );
     }
+
+    parsingResult.externalNumber = numberBodyString;
+
+    debugString("numberBodyString = " + numberBodyString);
+
+    const hypen: string = "-";
+    if (numberBodyString.indexOf(hypen) === -1) {
+      // одиночный номер
+
+      // валидация номера
+      if (!QuestionsImporter.isZeroOrPositiveInteger(numberBodyString)) {
+        this._allThingsOk = false;
+        this._onFailure(
+          this._parentComponentObject,
+          `Номер задания может быть либо нулём, либо положительным целым числом. Строка: ${sourceStringLine}`
+        );
+        return null;
+      }
+
+      parsingResult.lowestInternalNumber = parseInt(numberBodyString);
+      parsingResult.highestInternalNumber = parsingResult.lowestInternalNumber;
+    } else {
+      // составной номер
+      var internalNumberParts: string[] = numberBodyString.split("-");
+      var expectedInternalNumber: number = -1;
+      for (var oneInternalNumber of internalNumberParts) {
+        // валидация номера на формат
+        if (!QuestionsImporter.isZeroOrPositiveInteger(oneInternalNumber)) {
+          this._allThingsOk = false;
+          this._onFailure(
+            this._parentComponentObject,
+            `Номер задания может быть либо нулём, либо положительным целым числом. Но вы передали значение ${oneInternalNumber} в составном номере ${numberBodyString}. Строка: ${sourceStringLine}`
+          );
+          return null;
+        }
+
+        if (expectedInternalNumber !== -1) {
+          // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию
+          if (parseInt(oneInternalNumber) !== expectedInternalNumber) {
+            this._allThingsOk = false;
+            this._onFailure(
+              this._parentComponentObject,
+              `Внутри составного номера номера должны идти друг за другом по возрастанию. Это правило не соблюдается для составного номера ${numberBodyString}. Строка: ${sourceStringLine}`
+            );
+            return null;
+          }
+        }
+
+        // формируем следующий ожидаемый номер внутри составного номера
+        expectedInternalNumber = parseInt(oneInternalNumber) + 1;
+      }
+
+      parsingResult.lowestInternalNumber = parseInt(internalNumberParts[0]);
+      parsingResult.highestInternalNumber = parseInt(
+        internalNumberParts[internalNumberParts.length - 1]
+      );
+    }
+
+    if (this._expectedQuestionNumber !== -1) {
+      // если это не первый вопрос, проверяем порядок следования номеров заданий
+      if (parsingResult.lowestInternalNumber !== this._expectedQuestionNumber) {
+        this._allThingsOk = false;
+        this._onFailure(
+          this._parentComponentObject,
+          `Номера заданий должны идти в порядке возрастания друг за другом. Но это правило нарушено на строке: ${sourceStringLine}`
+        );
+        return null;
+      }
+    }
+
+    this._expectedQuestionNumber = parsingResult.highestInternalNumber + 1;
+
+    parsingResult.questionTitle = sourceStringLine
+      .substring(colonSymbolPosition + 1)
+      .trim();
+
+    return parsingResult;
   }
 }

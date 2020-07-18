@@ -30,7 +30,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
 
-  displayedColumns: string[] = ["number", "body", "source", "comment"];
+  displayedColumns: string[] = ["number", "title", "body", "source", "comment"];
 
   dataSource: QuestionDataModel[];
 

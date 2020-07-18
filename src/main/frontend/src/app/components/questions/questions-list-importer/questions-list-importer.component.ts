@@ -121,6 +121,20 @@ export class QuestionsListImporterComponent
     questionsList: QuestionDataModel[]
   ) {
     importerComponent.dataSource = questionsList;
+
+    console.log(
+      "=================== QUESTIONS TO IMPORT ======================"
+    );
+
+    questionsList.forEach((oneQuestion) => {
+      console.log("+++++++++++");
+      console.log(oneQuestion);
+      console.log("+++++++++++");
+    });
+
+    console.log(
+      "=============================================================="
+    );
   }
 
   private onQuestionImportFailure(

@@ -146,6 +146,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
         this.questionCopy.comment != this.question.comment;
 
       if (
+        newQuestionTitle.length > 0 ||
         newQuestionBody.length > 0 ||
         newQuestionSource.length > 0 ||
         updateComment

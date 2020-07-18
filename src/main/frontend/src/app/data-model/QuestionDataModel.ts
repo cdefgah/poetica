@@ -28,16 +28,14 @@ export class QuestionDataModel {
   externalNumber: string;
 
   /**
-   * Номера бескрылок, инкапсулированные в задании.
-   * Для однокрылки - это будет один номер.
-   * Номер, собственно, задания.
-   * Для многокрылок (двух и более крылок) -
-   * будут содержаться номера, которые указаны через дефис при импорте.
-   * Например, если при импорте указаны номера 8-9 для двукрылки,
-   * то в этом поле будет массив из двух элементов со значениями
-   * 8 и 9.
+   * Если задание содержит несколько номеров, то наименьший.
    */
-  internalNumbers: number[];
+  lowestInternalNumber: number;
+
+  /**
+   * Если задание содержит несколько номеров, то наибольший.
+   */
+  highestInternalNumber: number;
 
   /**
    * Заголовок задания.
@@ -79,7 +77,8 @@ export class QuestionDataModel {
   private constructor() {
     this.id = 0;
     this.externalNumber = "";
-    this.internalNumbers = [];
+    this.lowestInternalNumber = -1;
+    this.highestInternalNumber = -1;
     this.title = "";
     this.body = "";
     this.source = "";
@@ -90,7 +89,8 @@ export class QuestionDataModel {
   private setValuesFromMap(initialMap: Map<string, any>) {
     this.id = initialMap["id"];
     this.externalNumber = initialMap["externalNumber"];
-    this.internalNumbers = initialMap["internalNumbers"];
+    this.lowestInternalNumber = initialMap["lowestInternalNumber"];
+    this.highestInternalNumber = initialMap["highestInternalNumber"];
     this.title = initialMap["title"];
     this.body = initialMap["body"];
     this.source = initialMap["source"];
