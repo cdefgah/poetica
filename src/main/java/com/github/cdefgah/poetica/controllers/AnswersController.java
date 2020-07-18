@@ -53,7 +53,7 @@ public class AnswersController extends AbstractController {
     private Optional<Long> getQuestionIdByQuestionNumber(int questionNumber) {
         TypedQuery<Long> query =
                 entityManager.createQuery("select id FROM Question question WHERE " +
-                        "question.lowestInternalNumber<=:requestedQuestionNumber OR " +
+                        "question.lowestInternalNumber<=:requestedQuestionNumber AND " +
                         "question.highestInternalNumber>=:requestedQuestionNumber", Long.class);
 
         query.setParameter("requestedQuestionNumber", questionNumber);
