@@ -1,6 +1,17 @@
 <p mat-dialog-title>{{ dialogTitle }}</p>
 <mat-dialog-content>
   <div style="display: flex; flex-direction: column;">
+    <mat-radio-group [(ngModel)]="selectedGradeStateAlias">
+      <mat-radio-button
+        class="grade-state-selection-radio-button"
+        *ngFor="let selectedGradeStateAlias of allGradeStateAliases; index as i"
+        [value]="selectedGradeStateAlias"
+        (change)="gradedStateChanged($event)"
+      >
+        {{ allGradeStates[i] }}
+      </mat-radio-button>
+    </mat-radio-group>
+
     <mat-form-field appearance="outline">
       <mat-label>Заголовок</mat-label>
       <input
@@ -10,6 +21,7 @@
         [(ngModel)]="question.title"
       />
     </mat-form-field>
+
     <mat-form-field appearance="outline">
       <mat-label>Содержание</mat-label>
       <textarea

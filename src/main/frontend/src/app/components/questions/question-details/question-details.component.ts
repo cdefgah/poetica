@@ -9,6 +9,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
 import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-question-details",
@@ -27,6 +28,17 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   questionCopy: QuestionDataModel; // используется для сравнения, были-ли изменения при редактировании
 
   questionValidationService: QuestionValidationService;
+
+  selectedGradeStateAlias: string = QuestionDetailsComponent.KEY_ALIAS_GRADED;
+
+  private static KEY_ALIAS_GRADED = "1";
+  private static KEY_ALIAS_NOT_GRADED = "0";
+
+  allGradeStateAliases: string[] = [
+    QuestionDetailsComponent.KEY_ALIAS_GRADED,
+    QuestionDetailsComponent.KEY_ALIAS_NOT_GRADED,
+  ];
+  allGradeStates: string[] = ["Зачётное", "Внезачётное"];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -59,6 +71,11 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
           this.questionCopy = QuestionDataModel.createQuestionFromMap(data);
 
           this.dialogTitle = this.getDialogTitle(this.question);
+
+          if (!this.question.graded) {
+            this.selectedGradeStateAlias =
+              QuestionDetailsComponent.KEY_ALIAS_NOT_GRADED;
+          }
         },
         (error) => this.reportServerError(error)
       );
@@ -129,6 +146,8 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
           ? this.question.title
           : "";
 
+      var updateGradedState = this.question.graded != this.questionCopy.graded;
+
       var newQuestionBody: string =
         this.questionCopy.body != this.question.body ? this.question.body : "";
 
@@ -147,6 +166,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
 
       if (
         newQuestionTitle.length > 0 ||
+        updateGradedState ||
         newQuestionBody.length > 0 ||
         newQuestionSource.length > 0 ||
         updateComment
@@ -155,6 +175,8 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
         var requestUrl = `/questions/${this.question.id}`;
         const payload = new HttpParams()
           .set("newQuestionTitle", newQuestionTitle)
+          .set("updateGradedState", String(updateGradedState))
+          .set("newGradedState", String(this.question.graded))
           .set("newQuestionBody", newQuestionBody)
           .set("newQuestionSource", newQuestionSource)
           .set("updateComment", String(updateComment))
@@ -201,5 +223,10 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
     }
 
     return !(this.questionBodyIsIncorrect || this.questionSourceIsIncorrect);
+  }
+
+  gradedStateChanged(event: MatRadioChange) {
+    this.question.graded =
+      event.value == QuestionDetailsComponent.KEY_ALIAS_GRADED;
   }
 }

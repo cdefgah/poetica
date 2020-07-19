@@ -91,6 +91,8 @@ public class QuestionsController extends AbstractController {
     @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateQuestion(@PathVariable long questionId,
                                                  @RequestParam("newQuestionTitle") String newQuestionTitle,
+                                                 @RequestParam("updateGradedState") boolean updateGradedState,
+                                                 @RequestParam("newGradedState") boolean newGradedState,
                                                  @RequestParam("newQuestionBody") String newQuestionBody,
                                                  @RequestParam("newQuestionSource") String newQuestionSource,
                                                  @RequestParam("updateComment") boolean updateComment,
@@ -99,7 +101,7 @@ public class QuestionsController extends AbstractController {
         boolean updateTitle = !isStringEmpty(newQuestionTitle);
         boolean updateBody = !isStringEmpty(newQuestionBody);
         boolean updateSource = !isStringEmpty(newQuestionSource);
-        boolean updateHasRequested = updateTitle || updateBody || updateSource || updateComment;
+        boolean updateHasRequested = updateTitle || updateGradedState || updateBody || updateSource || updateComment;
 
         if (!updateHasRequested) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
@@ -116,6 +118,10 @@ public class QuestionsController extends AbstractController {
 
         if (updateTitle) {
             question.setTitle(newQuestionTitle);
+        }
+
+        if (updateGradedState) {
+            question.setGraded(newGradedState);
         }
 
         if (updateBody) {

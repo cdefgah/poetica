@@ -114,6 +114,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
         // если диалог был принят (accepted)
         // обновляем страницу со списками
         this.loadAllDisplayedLists(this);
+
+        debugString("Reloaded answers listed below:");
+        debugObject(this.answersDataSource);
       }
     });
   }

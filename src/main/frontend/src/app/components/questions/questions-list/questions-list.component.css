@@ -6,3 +6,7 @@ button {
   margin: 1em 1em 1em 1em;
   background: lightcyan;
 }
+
+.highlight-not-graded {
+  background: #e1e8b5;
+}

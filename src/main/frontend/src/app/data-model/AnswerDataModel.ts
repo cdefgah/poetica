@@ -86,6 +86,10 @@ export class AnswerDataModel {
     return answer;
   }
 
+  public answerHasNotGradedYet(): boolean {
+    return this.grade == AnswerDataModel.GradeNone;
+  }
+
   /**
    * Конструктор класса.
    * @param questionNumber уникальный номер задания (бескрылки).

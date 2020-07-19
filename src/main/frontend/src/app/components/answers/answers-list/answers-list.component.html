@@ -80,8 +80,11 @@
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
         <tr
           mat-row
-          *matRowDef="let row; columns: displayedAnswerColumns"
+          *matRowDef="let row; columns: displayedAnswerColumns; let answer"
           (click)="onAnswerRowClicked(row)"
+          [ngClass]="{
+            'highlight-answer-without-grade': answer.grade == 'None'
+          }"
         ></tr>
       </table>
     </mat-tab>
@@ -123,8 +126,9 @@
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
         <tr
           mat-row
-          *matRowDef="let row; columns: displayedAnswerColumns"
+          *matRowDef="let row; columns: displayedAnswerColumns; let answer"
           (click)="onAnswerRowClicked(row)"
+          class="highlight-answer-without-grade"
         ></tr>
       </table>
     </mat-tab>
