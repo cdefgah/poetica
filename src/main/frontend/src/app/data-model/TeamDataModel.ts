@@ -22,7 +22,7 @@ export class TeamDataModel {
   /**
    * Уникальный номер команды.
    */
-  number: string = "";
+  number: number = -1;
 
   /**
    * Уникальное название команды.
@@ -30,7 +30,7 @@ export class TeamDataModel {
   title: string = "";
 
   public static createTeamByNumberAndTitle(
-    number: string,
+    number: number,
     title: string
   ): TeamDataModel {
     return new TeamDataModel(number, title);
@@ -53,8 +53,8 @@ export class TeamDataModel {
    * @param number уникальный номер команды.
    * @param title название команды.
    */
-  private constructor(number?: string, title?: string) {
-    this.number = number ? number : "";
+  private constructor(number?: number, title?: string) {
+    this.number = number ? number : -1;
     this.title = title ? title : "";
   }
 

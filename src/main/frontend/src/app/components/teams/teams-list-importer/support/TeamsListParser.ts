@@ -18,7 +18,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
   }
 
   processText() {
-    var processedTeamNumbers: Set<string> = new Set();
+    var processedTeamNumbers: Set<number> = new Set();
     var processedTeamTitles: Set<string> = new Set();
 
     this._teams = [];
@@ -37,11 +37,11 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
         return;
       }
 
-      var teamNumber: string = teamNumberAndTitleArray[0];
+      var teamNumberString: string = teamNumberAndTitleArray[0];
       var teamTitle: string = teamNumberAndTitleArray[1];
 
       var teamNumberValidationMessage: string = this._parameters.teamValidationService.checkTeamNumberAndGetValidationMessage(
-        teamNumber
+        teamNumberString
       );
 
       if (
@@ -54,6 +54,8 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
         );
         return;
       }
+
+      var teamNumber: number = parseInt(teamNumberString);
 
       var teamTitleValidationMessage: string = this._parameters.teamValidationService.checkTeamTitleAndGetValidationMessage(
         teamTitle
@@ -77,7 +79,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       processedTeamNumbers.add(teamNumber);
 
       var teamTitleInLowerCase: string = teamTitle.toLowerCase();
-      if (processedTeamNumbers.has(teamTitleInLowerCase)) {
+      if (processedTeamTitles.has(teamTitleInLowerCase)) {
         this._onFailure(
           this._parameters.parentComponentObject,
           `В строке: '${lineWithTeamNumberAndTitle}' указано повторяющееся название команды. Это название уже есть у другой команды выше в списке.`

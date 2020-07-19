@@ -133,7 +133,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       if (!this.team.id) {
         // добавляем новую запись
         const payload = new HttpParams()
-          .set("teamNumber", this.team.number.trim())
+          .set("teamNumber", String(this.team.number))
           .set("teamTitle", this.team.title.trim());
 
         this.http.post("/teams", payload).subscribe(
@@ -145,17 +145,17 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
         );
       } else {
         // обновляем существующую запись
-        var newTeamNumber: string =
-          this.team.number != this.teamCopy.number ? this.team.number : "";
+        var newTeamNumber: number =
+          this.team.number != this.teamCopy.number ? this.team.number : -1;
 
         var newTeamTitle: string =
           this.team.title != this.teamCopy.title ? this.team.title : "";
 
-        if (newTeamNumber.length > 0 || newTeamTitle.length > 0) {
+        if (newTeamNumber >= 0 || newTeamTitle.length > 0) {
           // данные изменились, обновляем их на сервере
           var requestUrl = `/teams/${this.team.id}`;
           const payload = new HttpParams()
-            .set("newTeamNumber", newTeamNumber)
+            .set("newTeamNumber", String(newTeamNumber))
             .set("newTeamTitle", newTeamTitle);
 
           this.http.put(requestUrl, payload).subscribe(
@@ -205,13 +205,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   /**
-   * Выполняет проверку заполненности полей.
-   * @returns true, если поля заполнены, иначе false.
+   * Выполняет проверку корректности заполнения полей.
+   * @returns true, если поля заполнены корректно, иначе false.
    */
   private validateFields(): boolean {
-    this.teamNumberIsIncorrect = !this._modelValidatorService.isTeamNumberCorrect(
-      this.team.number
-    );
+    this.teamNumberIsIncorrect = this.team.number < 0;
 
     this.teamTitleIsIncorrect =
       !this.team.title || this.team.title.trim().length == 0;

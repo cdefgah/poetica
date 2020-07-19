@@ -40,7 +40,7 @@ public final class Team {
      * Номер команды.
      */
     @Column(nullable = false, unique = true)
-    private String number;
+    private int number;
 
     /**
      * Название команды.
@@ -80,7 +80,7 @@ public final class Team {
      * Возвращает номер команды.
      * @return номер команды.
      */
-    public String getNumber() {
+    public int getNumber() {
         return number;
     }
 
@@ -88,7 +88,7 @@ public final class Team {
      * Устанавливает номер команды.
      * @param number номер команды.
      */
-    public void setNumber(String number) {
+    public void setNumber(int number) {
         this.number = number;
     }
 

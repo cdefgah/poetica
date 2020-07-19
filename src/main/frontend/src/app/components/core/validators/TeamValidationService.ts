@@ -34,9 +34,11 @@ export class TeamValidationService extends AbstractModelValidationService {
    * @param teamNumber строка с номером команды.
    * @return пустая строка, если всё в порядке, либо сообщение об ошибке, если номер команды неправильный.
    */
-  public checkTeamNumberAndGetValidationMessage(teamNumber: string): string {
-    if (!this.isTeamNumberCorrect(teamNumber)) {
-      return `Номер команды может быть нулём или положительным целым числом. А вы указали: ${teamNumber}`;
+  public checkTeamNumberAndGetValidationMessage(
+    teamNumberString: string
+  ): string {
+    if (!this.isTeamNumberCorrect(teamNumberString)) {
+      return `Номер команды может быть нулём или положительным целым числом. А вы указали: ${teamNumberString}`;
     } else {
       return "";
     }
