@@ -2,7 +2,6 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Team;
-import com.github.cdefgah.poetica.model.repositories.TeamsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +37,11 @@ public class TeamsController extends AbstractController {
     @RequestMapping(path = "/teams", method = RequestMethod.POST,
             consumes = "application/x-www-form-urlencoded",
             produces = "application/json")
-    public ResponseEntity<String> addNewTeam(@RequestParam("teamNumber") String teamNumber,
+    public ResponseEntity<String> addNewTeam(@RequestParam("teamNumber") int teamNumber,
                                              @RequestParam("teamTitle") String teamTitle) {
 
-        if (isStringEmpty(teamNumber)) {
-            return new ResponseEntity<>(composeErrorMessage("Номер команды не может быть пустым"),
+        if (teamNumber < 0) {
+            return new ResponseEntity<>(composeErrorMessage("Номер команды не может быть отрицательным"),
                     HttpStatus.BAD_REQUEST);
         }
 
@@ -76,10 +75,10 @@ public class TeamsController extends AbstractController {
 
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateTeam(@PathVariable long teamId,
-                                             @RequestParam("newTeamNumber") String newTeamNumber,
+                                             @RequestParam("newTeamNumber") int newTeamNumber,
                                              @RequestParam("newTeamTitle") String newTeamTitle) {
 
-        boolean updateNumber = !isStringEmpty(newTeamNumber);
+        boolean updateNumber = newTeamNumber >= 0;
         boolean updateTitle = !isStringEmpty(newTeamTitle);
 
         if (!updateNumber && !updateTitle) {
@@ -116,7 +115,7 @@ public class TeamsController extends AbstractController {
         return ResponseEntity.ok().build();
     }
 
-    private boolean isNumberUnique(String teamNumber) {
+    private boolean isNumberUnique(int teamNumber) {
         TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
                 "team where team.number=:teamNumber", Long.class);
         query.setParameter("teamNumber", teamNumber);
