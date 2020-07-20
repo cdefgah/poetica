@@ -3,3 +3,15 @@
   overflow: auto;
   white-space: pre-wrap;
 }
+
+.email-body {
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-line;
+}
+
+.question-body {
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-line;
+}

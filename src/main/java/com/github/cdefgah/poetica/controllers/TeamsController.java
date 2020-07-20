@@ -149,7 +149,7 @@ public class TeamsController extends AbstractController {
     }
 
     @RequestMapping(path = "/teams/numbers/{teamNumber}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Team> getTeamByNumber(@PathVariable String teamNumber) {
+    public ResponseEntity<Team> getTeamByNumber(@PathVariable int teamNumber) {
         TypedQuery<Team> query = entityManager.createQuery("select team from Team " +
                 "team where team.number=:teamNumber", Team.class);
         query.setParameter("teamNumber", teamNumber);

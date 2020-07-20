@@ -12,7 +12,7 @@ export class TeamDataModel {
    * Используется в случаях, когда нет информации о команде,
    * чтобы не создавать новых экземпляров класса.
    */
-  public static readonly emptyTeam: TeamDataModel = new TeamDataModel();
+  public static readonly emptyTeam: TeamDataModel = TeamDataModel.createtTeam();
 
   /**
    * Идентификатор записи в базе данных.
@@ -39,13 +39,13 @@ export class TeamDataModel {
   public static createTeamFromMap(
     mapWithValues: Map<string, any>
   ): TeamDataModel {
-    var team = new TeamDataModel();
+    var team = TeamDataModel.createtTeam();
     team.setValuesFromMap(mapWithValues);
     return team;
   }
 
   public static createtTeam(): TeamDataModel {
-    return new TeamDataModel();
+    return new TeamDataModel(-1, "");
   }
 
   /**
@@ -53,9 +53,9 @@ export class TeamDataModel {
    * @param number уникальный номер команды.
    * @param title название команды.
    */
-  private constructor(number?: number, title?: string) {
-    this.number = number ? number : -1;
-    this.title = title ? title : "";
+  private constructor(teamNumber: number, teamTitle?: string) {
+    this.number = teamNumber;
+    this.title = teamTitle ? teamTitle : "";
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {

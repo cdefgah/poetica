@@ -334,20 +334,43 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       // составной номер
       var internalNumberParts: string[] = numberBodyString.split("-");
       var expectedInternalNumber: number = -1;
-      for (var oneInternalNumber of internalNumberParts) {
-        // валидация номера на формат
-        if (!QuestionsImporter.isZeroOrPositiveInteger(oneInternalNumber)) {
+      debugString("Processing compound number: start");
+
+      for (var oneInternalNumberString of internalNumberParts) {
+        // валидация числового формата номера
+        var normalizedOneInternalNumberString: string = oneInternalNumberString.trim();
+        debugString(
+          `normalizedOneInternalNumberString: ${normalizedOneInternalNumberString}`
+        );
+
+        if (
+          !QuestionsImporter.isZeroOrPositiveInteger(
+            normalizedOneInternalNumberString
+          )
+        ) {
+          debugString(
+            `${normalizedOneInternalNumberString} is not a zero nor a positive integer number!`
+          );
+
           this._allThingsOk = false;
           this._onFailure(
             this._parentComponentObject,
-            `Номер задания может быть либо нулём, либо положительным целым числом. Но вы передали значение ${oneInternalNumber} в составном номере ${numberBodyString}. Строка: ${sourceStringLine}`
+            `Номер задания может быть либо нулём, либо положительным целым числом. Но вы передали значение ${oneInternalNumberString} в составном номере ${numberBodyString}. Строка: ${sourceStringLine}`
           );
           return null;
         }
 
+        debugString(
+          `${normalizedOneInternalNumberString} is acceptable number, zero or positive integer.`
+        );
+
+        var oneInternalNumber: number = parseInt(
+          normalizedOneInternalNumberString
+        );
+
         if (expectedInternalNumber !== -1) {
           // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию
-          if (parseInt(oneInternalNumber) !== expectedInternalNumber) {
+          if (oneInternalNumber !== expectedInternalNumber) {
             this._allThingsOk = false;
             this._onFailure(
               this._parentComponentObject,
@@ -358,13 +381,15 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
         }
 
         // формируем следующий ожидаемый номер внутри составного номера
-        expectedInternalNumber = parseInt(oneInternalNumber) + 1;
+        expectedInternalNumber = oneInternalNumber + 1;
       }
 
       parsingResult.lowestInternalNumber = parseInt(internalNumberParts[0]);
       parsingResult.highestInternalNumber = parseInt(
         internalNumberParts[internalNumberParts.length - 1]
       );
+
+      debugString("Processing compound number: end");
     }
 
     if (this._expectedQuestionNumber !== -1) {

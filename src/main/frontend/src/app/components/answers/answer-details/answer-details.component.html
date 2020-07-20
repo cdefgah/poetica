@@ -36,9 +36,18 @@
           </td>
         </tr>
         <tr>
-          <td>Задание (#{{ question.externalNumber }}):</td>
           <td>
-            <div>
+            <!-- Если номер не составной, то показываем externalNumber. Иначе externalNumber и фактический номер вопроса через / -->
+            Задание #{{
+              question.externalNumber == answer.questionNumber.toString()
+                ? question.externalNumber
+                : question.externalNumber +
+                  "/" +
+                  answer.questionNumber.toString()
+            }}:
+          </td>
+          <td>
+            <div class="question-body">
               <!-- Текст задания в диве фикс. высоты -->
               {{ question.body }}
             </div>
@@ -107,7 +116,9 @@
             Содержание:
           </td>
           <td>
-            {{ email.body }}
+            <div class="email-body">
+              {{ email.body }}
+            </div>
           </td>
         </tr>
       </table>
@@ -117,10 +128,10 @@
 
 <mat-dialog-actions>
   <button mat-raised-button color="primary" (click)="acceptAnswer()">
-    Принять ответ
+    Верно
   </button>
   <button mat-raised-button color="accent" (click)="declineAnswer()">
-    Отклонить ответ
+    Неверно
   </button>
 
   <span class="fill-remaining-space"></span>

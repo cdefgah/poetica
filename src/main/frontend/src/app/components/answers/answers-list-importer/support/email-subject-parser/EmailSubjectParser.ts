@@ -3,6 +3,7 @@ import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSingleline
 import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
 import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
 import { EmailSubjectParserParameters } from "./EmailSubjectParserParameters";
+import { debugString, debugObject } from "src/app/utils/Config";
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
   private _emailValidationService: EmailValidationService;
@@ -59,16 +60,19 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     var afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
 
     let {
-      foundTeamNumber,
+      foundTeamNumberString,
       foundRoundNumber,
     } = EmailSubjectParser.extractTeamAndRoundNumbers(afterCommaSubjectPart);
+
+    debugString(`foundTeamNumberString: ${foundTeamNumberString}`);
+    debugString(`foundRoundNumber: ${foundRoundNumber}`);
 
     // фиксируем номер раунда
     this._roundNumber = foundRoundNumber;
 
     // проверяем корректность номера команды и получаем сообщение, если номер некорректный
     var teamNumberValidationMessage = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
-      foundTeamNumber
+      foundTeamNumberString
     );
 
     if (teamNumberValidationMessage.length > 0) {
@@ -79,10 +83,16 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       return;
     }
 
+    var foundTeamNumber = parseInt(foundTeamNumberString);
+    debugString("foundTeamNumber: " + foundTeamNumber);
+
     this._team = TeamDataModel.createTeamByNumberAndTitle(
       foundTeamNumber,
       teamTitle
     );
+
+    debugString("this._team is below...");
+    debugObject(this._team);
 
     this._onSuccess(this._parentComponentObject, this._team, this._roundNumber);
   }
@@ -132,7 +142,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
   private static extractTeamAndRoundNumbers(
     afterCommaPartOfTheEmailSubject: string
   ): any {
-    var foundTeamNumber: string = "";
+    var foundTeamNumberString: string = "";
     var foundRoundNumber: string = "";
 
     const openingParenthesisPrefix: string = "(";
@@ -147,7 +157,7 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
         .substring(0, openingParenthesisPrefixPosition)
         .trim();
 
-      foundTeamNumber = substringWithTeamNumber;
+      foundTeamNumberString = substringWithTeamNumber;
 
       foundRoundNumber = EmailSubjectParser.extractRoundNumberFromSubstring(
         afterCommaPartOfTheEmailSubject.substring(
@@ -157,10 +167,10 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     } else {
       // если открывающей скобки нет в теме письма,
       // то вся правая часть темы письма после запятой - это номер команды.
-      foundTeamNumber = afterCommaPartOfTheEmailSubject;
+      foundTeamNumberString = afterCommaPartOfTheEmailSubject;
     }
 
-    return { foundTeamNumber, foundRoundNumber };
+    return { foundTeamNumberString, foundRoundNumber };
   }
 
   private static extractRoundNumberFromSubstring(

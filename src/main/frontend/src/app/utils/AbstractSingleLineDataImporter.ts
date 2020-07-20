@@ -52,11 +52,11 @@ export abstract class AbstractSingleLineDataImporter {
     var normalizedString: string = AbstractSingleLineDataImporter.isNumber(
       sourceString
     )
-      ? Number(sourceString).toString()
+      ? parseInt(sourceString, 10).toString()
       : "";
 
-    if (normalizedString.length > 0 && normalizedString == sourceString) {
-      return Number(sourceString) >= 0;
+    if (normalizedString.length > 0 && normalizedString === sourceString) {
+      return parseInt(sourceString, 10) >= 0;
     } else {
       return false;
     }

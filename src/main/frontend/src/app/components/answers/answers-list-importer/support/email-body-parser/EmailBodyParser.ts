@@ -9,8 +9,11 @@ import { StringBuilder } from "../../../../../utils/StringBuilder";
 import { EmailBodyParsingResult } from "./EmailBodyParsingResult";
 import { TeamDataModel } from "src/app/data-model/TeamDataModel";
 import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
+import { debugString } from "src/app/utils/Config";
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
+  private static readonly answersBlockPrefix: string = "***";
+
   private _team: TeamDataModel;
 
   private _emailValidationService: EmailValidationService;
@@ -97,9 +100,14 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     parserObjectReference: EmailBodyParser,
     loadedAnswers: AnswerDataModel[]
   ) {
+    debugString("Validating team title...");
     // сперва проверяем корректность названия команды из письма
-    var teamNumber: string = parserObjectReference._team.number;
+    var teamNumber: number = parserObjectReference._team.number;
+    debugString(`teamNumber: ${teamNumber}`);
+
     const teamValidationUrl: string = `/teams/numbers/${teamNumber}`;
+    debugString(`teamValidationUrl: ${teamValidationUrl}`);
+
     var importingTeamTitle = parserObjectReference._team.title;
     parserObjectReference._httpClient.get(teamValidationUrl).subscribe(
       (data: Map<string, any>) => {
@@ -192,12 +200,11 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
    * @returns первая строка блока ответов, из которой исключён префикс в три звёздочки.
    */
   private getTheFirstLineOfAnswersBlock(): CalculationResult {
-    const answersBlockPrefix: string = "***";
     while (this._sourceTextLinesIterator.hasNextLine()) {
       var oneLine = this._sourceTextLinesIterator.nextLine();
-      if (oneLine.startsWith(answersBlockPrefix)) {
+      if (oneLine.startsWith(EmailBodyParser.answersBlockPrefix)) {
         return new CalculationResult(
-          oneLine.substring(answersBlockPrefix.length + 1).trim(),
+          oneLine.substring(EmailBodyParser.answersBlockPrefix.length).trim(),
           null
         );
       }
@@ -213,13 +220,21 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     firstLine: string
   ): CalculationResult {
     var foundTeamTitle: string = "";
-    var foundTeamNumber: string = "";
+    var foundTeamNumberString: string = "";
+    var foundTeamNumber: number;
     var errorMessage: string = "";
 
     if (firstLine.indexOf(",") !== -1) {
       var firstLineParts = firstLine.split(",");
       foundTeamTitle = firstLineParts[0].trim();
-      foundTeamNumber = firstLineParts[1].trim();
+      foundTeamNumberString = firstLineParts[1].trim();
+
+      if (!EmailBodyParser.isZeroOrPositiveInteger(foundTeamNumberString)) {
+        errorMessage = `Номер команды может быть либо нулём, либо положительным целым значением. Но в письме передан номер: ${foundTeamNumberString}`;
+        return new CalculationResult(null, errorMessage);
+      } else {
+        foundTeamNumber = parseInt(foundTeamNumberString);
+      }
     } else {
       foundTeamTitle = firstLine;
     }
@@ -238,13 +253,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         errorMessage = `Номер команды в теме письма: ${this._teamFromEmailSubject.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
         return new CalculationResult(null, errorMessage);
       }
-    }
-
-    var teamNumberValidationMessage: string = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
-      foundTeamNumber
-    );
-    if (teamNumberValidationMessage.length > 0) {
-      return new CalculationResult(null, teamNumberValidationMessage);
     }
 
     var team: TeamDataModel = TeamDataModel.createTeamByNumberAndTitle(
