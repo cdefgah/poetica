@@ -273,7 +273,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     var questionNumber: string = "";
     var commentPrefixLocation: number;
     var processedQuestionNumbers = new Set();
-    var previousQuestionNumber: number = -1;
     var continueProcessingLines: boolean = true;
     var answerRegistrationResult: CalculationResult;
 
@@ -389,19 +388,9 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         );
       }
 
-      if (previousQuestionNumber != -1) {
-        if (Number(questionNumber) <= previousQuestionNumber) {
-          return new CalculationResult(
-            null,
-            `Номера бескрылок в блоке ответов должны идти в порядке возрастания. А у нас после номера: ${previousQuestionNumber} идёт номер: ${questionNumber}`
-          );
-        }
-
-        processedQuestionNumbers.add(questionNumber);
-      }
+      processedQuestionNumbers.add(questionNumber);
 
       var answerRecord: AnswerDataModel = AnswerDataModel.emptyAnswer;
-      previousQuestionNumber = Number(questionNumber);
 
       // в ответе может быть просто номер с точкой
       // но не быть ответа (placeholder для читабельности),

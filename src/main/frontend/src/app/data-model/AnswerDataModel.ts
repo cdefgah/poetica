@@ -86,10 +86,6 @@ export class AnswerDataModel {
     return answer;
   }
 
-  public answerHasNotGradedYet(): boolean {
-    return this.grade == AnswerDataModel.GradeNone;
-  }
-
   /**
    * Конструктор класса.
    * @param questionNumber уникальный номер задания (бескрылки).
@@ -122,11 +118,11 @@ export class AnswerDataModel {
         break;
 
       case "Accepted":
-        result = "принят";
+        result = "Зачтён (+)";
         break;
 
       case "NotAccepted":
-        result = "отклонён";
+        result = "Не зачтён (-)";
         break;
     }
 

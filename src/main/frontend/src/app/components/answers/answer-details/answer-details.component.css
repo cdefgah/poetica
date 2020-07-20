@@ -2,16 +2,19 @@
   max-height: 300px;
   overflow: auto;
   white-space: pre-wrap;
+  background-color: peachpuff;
 }
 
 .email-body {
   max-height: 300px;
   overflow: auto;
   white-space: pre-line;
+  background-color: peachpuff;
 }
 
 .question-body {
   max-height: 300px;
   overflow: auto;
   white-space: pre-line;
+  background-color: peachpuff;
 }
