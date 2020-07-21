@@ -15,8 +15,10 @@ public final class Question {
     private static class ModelConstraints {
         static final int MAX_TITLE_LENGTH = 128;
         static final int MAX_BODY_LENGTH = 1024;
-        static final int MAX_SOURCE_LENGTH = 256;
+        static final int MAX_AUTHORS_ANSWER_LENGTH = 1024;
         static final int MAX_COMMENT_LENGTH = 1024;
+        static final int MAX_SOURCE_LENGTH = 256;
+        static final int MAX_AUTHOR_INFO_LENGTH = 512;
     }
 
     private static final Map<String, String> modelConstraintsMap;
@@ -26,8 +28,11 @@ public final class Question {
         final Map<String, String> localConstraintsMap = new HashMap<>();
         localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(ModelConstraints.MAX_TITLE_LENGTH));
         localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
-        localConstraintsMap.put("MAX_SOURCE_LENGTH", String.valueOf(ModelConstraints.MAX_SOURCE_LENGTH));
+        localConstraintsMap.put("MAX_AUTHORS_ANSWER_LENGTH", String.valueOf(ModelConstraints.MAX_AUTHORS_ANSWER_LENGTH));
         localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
+        localConstraintsMap.put("MAX_SOURCE_LENGTH", String.valueOf(ModelConstraints.MAX_SOURCE_LENGTH));
+        localConstraintsMap.put("MAX_AUTHOR_INFO_LENGTH", String.valueOf(ModelConstraints.MAX_AUTHOR_INFO_LENGTH));
+
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
 
