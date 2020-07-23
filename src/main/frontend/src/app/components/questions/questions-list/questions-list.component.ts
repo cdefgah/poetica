@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatDialog, MatRadioChange } from "@angular/material";
 import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
+import { QuestionViewModelForTableRow } from "src/app/view-model/QuestionViewModelForTableRow";
 import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
 import { QuestionDetailsComponent } from "../question-details/question-details.component";
 import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
@@ -30,9 +31,15 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
 
-  displayedColumns: string[] = ["number", "title", "body", "source", "comment"];
+  displayedColumns: string[] = [
+    "externalNumber",
+    "mainContent",
+    "authorsAnswer",
+    "source",
+    "comment",
+  ];
 
-  dataSource: QuestionDataModel[];
+  dataSource: QuestionViewModelForTableRow[];
 
   selectedRowIndex: number;
 
@@ -64,8 +71,13 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
   loadQuestionsList() {
     const url: string = `/questions/${this.selectedDisplayModeAlias}`;
     this.http.get(url).subscribe(
-      (data: QuestionDataModel[]) => {
-        this.dataSource = data;
+      (receivedDataStructures: QuestionDataModel[]) => {
+        this.dataSource = [];
+        receivedDataStructures.forEach((oneDataStructure) => {
+          this.dataSource.push(
+            new QuestionViewModelForTableRow(oneDataStructure)
+          );
+        });
       },
       (error) => this.reportServerError(error)
     );
