@@ -8,18 +8,7 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
   protected abstract getMessageDialogReference(): MatDialog;
 
   protected reportServerError(error: any, customMessage: string = "") {
-    console.log("=== reportServerError start ====");
-    console.log("error object is below:");
-    console.dir(error);
-    console.log("=== end of error object");
-    console.log("Custom message: " + customMessage);
-
     function getServerErrorMessage(errorObject: any) {
-      console.log("getServerErrorMessage - start");
-      console.log("errorObject of internal function is below: ");
-      console.dir(errorObject);
-      console.log("**** end of errorObject of internal function ===");
-
       var rawErrorMessage: string;
       if (errorObject.hasOwnProperty("error")) {
         rawErrorMessage = errorObject.error.message;
@@ -27,6 +16,7 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
         rawErrorMessage = errorObject.toString();
       }
 
+      // TODO переделать на пристойный механизм обработки ошибок, а это это какая-то печаль и непристойность
       const prefixToCheck = "Внимание: "; // наличие этого префикса говорит о том, что ошибка штатная (не катастрофа).
 
       if (rawErrorMessage.startsWith(prefixToCheck)) {
