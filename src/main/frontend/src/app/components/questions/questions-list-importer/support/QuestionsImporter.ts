@@ -18,15 +18,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   private _questionModelValidatorService: QuestionValidationService;
 
-  // TODO Все задания зачётные по умолчанию.
-  // Для внезачётных заданий номер берется в круглые скобки (без символа #).
-  // То есть
-  // #4: - зачётное задание
-  // #(4): - внезачётное задание
-  // Зачётная двукрылка с оценкой по очку за каждое крыло, выглядит вот так:
-  // #4-5:
-  // Внезачётная двукрылка с оценками по очку за каждое крыло, выглядит вот так:
-  // #(4-5):
   constructor(
     importerComponentReference: QuestionsListImporterComponent,
     sourceText: string,
@@ -227,6 +218,31 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     question.comment = questionCommentNoteBody;
 
     return question;
+  }
+
+  /**
+   * Загружает тело того или иного сегмента до строки с control prefix.
+   * @param firstSegmentLine первая строка загружаемого сегмента.
+   * @returns текст с телом сегмента.
+   */
+  private loadSegmentBody(firstSegmentLine: string): string {
+    var stringBuilder: StringBuilder = new StringBuilder();
+    stringBuilder.addString(firstSegmentLine);
+
+    while (this._sourceTextLinesIterator.hasNextLine()) {
+      var processingLine: string = this._sourceTextLinesIterator.nextLine();
+
+      if (QuestionsImporter.hasControlPrefix(processingLine)) {
+        // если взяли строку с control prefix, откатываемся назад на одну строку
+        this._sourceTextLinesIterator.stepIndexBack();
+        // и прекращаем цикл
+        break;
+      }
+
+      stringBuilder.addString(processingLine);
+    }
+
+    return stringBuilder.toString();
   }
 
   /**
