@@ -13,7 +13,7 @@ export class QuestionViewModelForTableRow extends AbstractViewModel {
     return this._questionDataModel.externalNumber;
   }
 
-  public get mainContentForTableRow(): string {
+  public get mainContent(): string {
     var mainContent: string;
     var trimmedTitle: string = this._questionDataModel
       ? this._questionDataModel.title.trim()
@@ -27,7 +27,7 @@ export class QuestionViewModelForTableRow extends AbstractViewModel {
     return this.compressNewLines(mainContent);
   }
 
-  public get authorsAnswerForTableRow(): string {
+  public get authorsAnswer(): string {
     if (this._questionDataModel.authorsAnswer) {
       return this.compressNewLines(this._questionDataModel.authorsAnswer);
     } else {
