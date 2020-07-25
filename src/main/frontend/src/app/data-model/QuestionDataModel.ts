@@ -3,7 +3,8 @@
  */
 export class QuestionDataModel {
   /**
-   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса на сервер приходят пустые объекты без значений в полях.
+   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса 
+   * а сервер приходят пустые объекты без значений в полях.
    * Скорее всего это баг в Angular.
    * Так что в модели все поля публичные.
    */
@@ -92,20 +93,24 @@ export class QuestionDataModel {
     this.highestInternalNumber = -1;
     this.title = '';
     this.body = '';
+    this.authorsAnswer = '';
     this.source = '';
     this.comment = '';
+    this.authorInfo = '';
     this.graded = true;
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap['id'];
-    this.externalNumber = initialMap['externalNumber'];
-    this.lowestInternalNumber = initialMap['lowestInternalNumber'];
-    this.highestInternalNumber = initialMap['highestInternalNumber'];
-    this.title = initialMap['title'];
-    this.body = initialMap['body'];
-    this.source = initialMap['source'];
-    this.comment = initialMap['comment'];
-    this.graded = initialMap['graded'];
+    this.id = initialMap[`id`];
+    this.externalNumber = initialMap[`externalNumber`];
+    this.lowestInternalNumber = initialMap[`lowestInternalNumber`];
+    this.highestInternalNumber = initialMap[`highestInternalNumber`];
+    this.title = initialMap[`title`];
+    this.body = initialMap[`body`];
+    this.authorsAnswer = initialMap[`authorsAnswer`];
+    this.source = initialMap[`source`];
+    this.comment = initialMap[`comment`];
+    this.graded = initialMap[`graded`];
+    this.authorInfo = initialMap[`authorInfo`];
   }
 }

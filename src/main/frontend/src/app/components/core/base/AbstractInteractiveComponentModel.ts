@@ -11,11 +11,12 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
     function getServerErrorMessage(errorObject: any) {
       var rawErrorMessage: string;
       if (errorObject.hasOwnProperty("error")) {
-        rawErrorMessage = errorObject.error;
+        rawErrorMessage = errorObject.error.message;
       } else {
         rawErrorMessage = errorObject.toString();
       }
 
+      // TODO переделать на пристойный механизм обработки ошибок, а это это какая-то печаль и непристойность
       const prefixToCheck = "Внимание: "; // наличие этого префикса говорит о том, что ошибка штатная (не катастрофа).
 
       if (rawErrorMessage.startsWith(prefixToCheck)) {
