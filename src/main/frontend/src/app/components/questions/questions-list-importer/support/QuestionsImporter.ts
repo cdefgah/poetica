@@ -23,7 +23,6 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     return sourceStringLine.startsWith('#');
   }
 
-
   private static isAuthorsAnswerLine(sourceStringLine: string): boolean {
     const prefix = '#R:';
     return QuestionsImporter.startsWithIgnoringCase(sourceStringLine, prefix);
@@ -101,13 +100,23 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       return false;
     }
 
+    const authorsAnswerFirstLine: string = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
+    question.authorsAnswer = this.loadSegmentText(authorsAnswerFirstLine);
 
+    // проверяем наличие необязательного сегмента с комментарием
+    if (this.validateCommentsSegmentPresence()) {
+      // если комментарий есть, загружаем его
+      const firstCommentsLine: string = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
+      question.comment = this.loadSegmentText(firstCommentsLine);
+    }
 
-    //    question.body = questionBodyBuilder.toString();
-    //    question.source = questionSourceBody;
-    //    question.comment = questionCommentNoteBody;
 
     return true;
+  }
+
+  private removeSegmentPrefix(stringWithSegmentPrefix: string): string {
+    const segmentPrefixLength = 3;
+    return stringWithSegmentPrefix.substring(segmentPrefixLength);
   }
 
   private validateAuthorsAnswerSegmentPresence(question: QuestionDataModel): boolean {
@@ -122,7 +131,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       return false;
     }
 
-    const authorsAnswerFirstLine: string = this.sourceTextLinesIterator.nextLine();
+    const authorsAnswerFirstLine: string = this.sourceTextLinesIterator.nextLine(false);
     if (!QuestionsImporter.isAuthorsAnswerLine(authorsAnswerFirstLine)) {
       this.allThingsOk = false;
       this.onFailure(
@@ -132,11 +141,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       return false;
     }
 
-    // откатываемся назад на одну строку
-    this.sourceTextLinesIterator.stepIndexBack();
-
     // всё в порядке
     return true;
+  }
+
+  private validateCommentsSegmentPresence(): boolean {
+    if (this.sourceTextLinesIterator.hasNextLine()) {
+      const commentsLine = this.sourceTextLinesIterator.nextLine(false);
+      return QuestionsImporter.isQuestionCommentNoteLine(commentsLine);
+    } else {
+      return false;
+    }
   }
 
   /**
