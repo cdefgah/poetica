@@ -8,7 +8,7 @@ import {
 
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
-import { QuestionsImporter } from "./utils/QuestionsImporter";
+import { QuestionsImporter } from "./support/QuestionsImporter";
 import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
 import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
 
@@ -76,7 +76,7 @@ export class QuestionsListImporterComponent
 
     this.questionValidationService =
       dialogData[
-        QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
+      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
       ];
   }
 
@@ -84,7 +84,7 @@ export class QuestionsListImporterComponent
     return this.otherDialog;
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   cancelDialog() {
     this.confirmationDialog("Прервать импорт заданий?", () => {
@@ -144,7 +144,7 @@ export class QuestionsListImporterComponent
     importerComponent.foundError = errorMessage;
   }
 
-  onRowClicked(row: any) {}
+  onRowClicked(row: any) { }
 
   doImportQuestions() {
     this.confirmationDialog("Импортировать задания?", () => {

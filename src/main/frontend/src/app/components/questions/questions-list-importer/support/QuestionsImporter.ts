@@ -1,22 +1,50 @@
-import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
-import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
-import { QuestionValidationService } from "src/app/components/core/validators/QuestionValidationService";
-import { StringBuilder } from "src/app/utils/StringBuilder";
-import { QuestionsListImporterComponent } from "../questions-list-importer.component";
-import { FirstQuestionLineParsingResults } from "./FirstQuestionLineParsingResults";
-import { debugString } from "src/app/utils/Config";
+import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
+import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
+import { QuestionValidationService } from 'src/app/components/core/validators/QuestionValidationService';
+import { StringBuilder } from 'src/app/utils/StringBuilder';
+import { QuestionsListImporterComponent } from '../questions-list-importer.component';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
-  private static readonly sourcePrefix: string = "#S:";
-  private static readonly commentNotePrefix: string = "#N:";
 
   questions: QuestionDataModel[];
 
-  private _allThingsOk: boolean;
+  private allThingsOk: boolean;
 
-  private _expectedQuestionNumber: number;
+  private expectedQuestionNumber: number;
 
-  private _questionModelValidatorService: QuestionValidationService;
+  private questionModelValidatorService: QuestionValidationService;
+
+  /**
+   * Возвращает true, если строка начинается с контрольного префикса #.
+   * @param sourceStringLine строка к проверке.
+   * @returns true если строка начинается с контрольного префикса #.
+   */
+  private static hasControlPrefix(sourceStringLine: string): boolean {
+    return sourceStringLine.startsWith('#');
+  }
+
+
+  private static isAuthorsAnswerLine(sourceStringLine: string): boolean {
+    const prefix = '#R:';
+    return QuestionsImporter.startsWithIgnoringCase(sourceStringLine, prefix);
+  }
+
+  private static isQuestionCommentNoteLine(sourceStringLine: string): boolean {
+    const prefix = '#N:';
+    return QuestionsImporter.startsWithIgnoringCase(sourceStringLine, prefix);
+  }
+
+  private static isQuestionSourceLine(sourceStringLine: string): boolean {
+    const prefix = '#S:';
+    return QuestionsImporter.startsWithIgnoringCase(sourceStringLine, prefix);
+  }
+
+  private static isAuthorsInfoSourceLine(sourceStringLine: string): boolean {
+    const englishLetterPrefix = '#A:';
+    const russianLetterPrefix = '#А:';
+    return QuestionsImporter.startsWithIgnoringCase(sourceStringLine, englishLetterPrefix) ||
+      QuestionsImporter.startsWithIgnoringCase(sourceStringLine, russianLetterPrefix);
+  }
 
   constructor(
     importerComponentReference: QuestionsListImporterComponent,
@@ -26,198 +54,89 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     onFailure: Function
   ) {
     super(sourceText, onSuccess, onFailure);
-    this._questionModelValidatorService = questionModelValidatorService;
-    this._parentComponentObject = importerComponentReference;
+    this.questionModelValidatorService = questionModelValidatorService;
+    this.parentComponentObject = importerComponentReference;
   }
 
   public doImport() {
-    this._allThingsOk = true;
+    this.allThingsOk = true;
     this.questions = [];
-    this._expectedQuestionNumber = -1;
+    this.expectedQuestionNumber = -1;
 
-    var question: QuestionDataModel;
-    while ((question = this.nextQuestion()) != null) {
-      this.questions.push(question);
+    let keepLoadingQuestions = true;
+    while (keepLoadingQuestions) {
+      // создаём объект вопроса
+      const question: QuestionDataModel = QuestionDataModel.createQuestion();
+      if (this.loadQuestion(question)) {
+        // если вопрос удалось загрузить, добавляем его в список
+        this.questions.push(question);
+      } else {
+        // иначе - выходим из цикла
+        keepLoadingQuestions = false;
+      }
     }
 
-    if (this._allThingsOk) {
-      this._onSuccess(this._parentComponentObject, this.questions);
+    if (this.allThingsOk) {
+      this.onSuccess(this.parentComponentObject, this.questions);
     }
   }
 
-  private nextQuestion(): QuestionDataModel {
-    if (!this._sourceTextLinesIterator.hasNextLine()) {
-      return null;
+  private loadQuestion(question: QuestionDataModel): boolean {
+    if (!this.sourceTextLinesIterator.hasNextLine()) {
+      return false;
     }
 
-    var firstQuestionLine: string = this._sourceTextLinesIterator.nextLine();
+    const firstQuestionLine: string = this.sourceTextLinesIterator.nextLine();
 
-    var firstQuestionLineParsingResults: FirstQuestionLineParsingResults = this.parseFirstQuestionLine(
-      firstQuestionLine
-    );
-
-    if (firstQuestionLineParsingResults == null) {
-      return null;
+    // разбираем первую строку сегмента вопроса и инициализируем свойства объекта
+    if (!this.parseFirstQuestionLine(firstQuestionLine, question)) {
+      return false;
     }
 
-    var questionBodyBuilder: StringBuilder = new StringBuilder();
-    var processingLine: string;
-    var nextSegmentDetected: boolean = false;
+    // загружаем содержимое вопроса
+    question.body = this.loadSegmentText('');
 
-    // загружаем непосредственный текст задания
-    while (this._sourceTextLinesIterator.hasNextLine()) {
-      processingLine = this._sourceTextLinesIterator.nextLine();
-      if (QuestionsImporter.hasControlPrefix(processingLine)) {
-        nextSegmentDetected = true;
-        break;
-      }
-
-      questionBodyBuilder.addString(processingLine);
+    // после сегмента с содержимым вопроса ожидаем сегмент с авторским ответом
+    if (!this.validateAuthorsAnswerSegmentPresence(question)) {
+      return false;
     }
 
-    var rtfmMessage: string =
-      "Ознакомьтесь, пожалуйста, с требованиями к формату текста.";
 
-    if (!nextSegmentDetected) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `После блока с текстом задания номер ${firstQuestionLineParsingResults.externalNumber} ожидался блок с информацией об источнике для этого задания. Но текст внезапно кончился. ${rtfmMessage}`
+
+    //    question.body = questionBodyBuilder.toString();
+    //    question.source = questionSourceBody;
+    //    question.comment = questionCommentNoteBody;
+
+    return true;
+  }
+
+  private validateAuthorsAnswerSegmentPresence(question: QuestionDataModel): boolean {
+    const firstPartOfErrorMessage = `После блока с текстом задания номер ${question.externalNumber} ожидался блок с информацией об авторском ответе для этого задания.`;
+
+    if (!this.sourceTextLinesIterator.hasNextLine()) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но текст внезапно кончился. ${QuestionsImporter.rtfmMessage}`
       );
-      return;
+      return false;
     }
 
-    if (!QuestionsImporter.isQuestionSourceLine(processingLine)) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `После блока с текстом задания номер ${firstQuestionLineParsingResults.externalNumber} ожидался блок с информацией об источнике для этого задания. Но вместо него оказалась вот эта строка: ${processingLine}. ${rtfmMessage}`
+    const authorsAnswerFirstLine: string = this.sourceTextLinesIterator.nextLine();
+    if (!QuestionsImporter.isAuthorsAnswerLine(authorsAnswerFirstLine)) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но вы передаёте строку ${authorsAnswerFirstLine}. ${QuestionsImporter.rtfmMessage}`
       );
-      return;
+      return false;
     }
 
-    var questionSourceBody: string = processingLine.substring(
-      QuestionsImporter.sourcePrefix.length
-    );
+    // откатываемся назад на одну строку
+    this.sourceTextLinesIterator.stepIndexBack();
 
-    // загружаем информацию об источнике для задания
-    nextSegmentDetected = false;
-    while (this._sourceTextLinesIterator.hasNextLine()) {
-      processingLine = this._sourceTextLinesIterator.nextLine();
-
-      if (QuestionsImporter.hasControlPrefix(processingLine)) {
-        nextSegmentDetected = true;
-        break;
-      }
-
-      questionSourceBody =
-        questionSourceBody + QuestionsImporter.newline + processingLine;
-    }
-
-    var questionCommentNoteBody: string = "";
-
-    if (nextSegmentDetected) {
-      if (QuestionsImporter.isQuestionCommentNoteLine(processingLine)) {
-        // если начался блок комментария к заданию
-        questionCommentNoteBody = processingLine.substring(
-          QuestionsImporter.commentNotePrefix.length
-        );
-
-        // загружаем тело комментариев к заданию
-        var textBlockContinuesFurther: boolean = false;
-        while (this._sourceTextLinesIterator.hasNextLine()) {
-          processingLine = this._sourceTextLinesIterator.nextLine();
-
-          if (QuestionsImporter.hasControlPrefix(processingLine)) {
-            textBlockContinuesFurther = true;
-            break;
-          }
-
-          questionCommentNoteBody =
-            questionCommentNoteBody +
-            QuestionsImporter.newline +
-            processingLine;
-        }
-
-        // отматываем номер строки на одну строку назад,
-        // так как мы зацепили следующий вопрос
-        if (textBlockContinuesFurther) {
-          this._sourceTextLinesIterator.stepIndexBack();
-        }
-      } else {
-        // следующий вопрос
-
-        // отматываем номер строки на одну строку назад,
-        // так как мы зацепили следующий вопрос
-        this._sourceTextLinesIterator.stepIndexBack();
-      }
-    }
-
-    if (questionBodyBuilder.length() == 0) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `Содержимое не указано для задания с номером ${firstQuestionLineParsingResults.externalNumber}.`
-      );
-      return;
-    }
-
-    // проверяем ограничения на длину полей
-    if (
-      questionBodyBuilder.length() >
-      this._questionModelValidatorService.maxBodyLength
-    ) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `Размер блока текста с содержанием задания ${
-          firstQuestionLineParsingResults.externalNumber
-        } составляет ${questionBodyBuilder.length()} символов и превышает максимальный разрешённый размер в ${
-          this._questionModelValidatorService.maxBodyLength
-        } символов`
-      );
-      return;
-    }
-
-    if (
-      questionSourceBody.length >
-      this._questionModelValidatorService.maxSourceLength
-    ) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `Размер блока текста с информацией об источнике задания ${firstQuestionLineParsingResults.externalNumber} составляет ${questionSourceBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxSourceLength} символов`
-      );
-      return;
-    }
-
-    if (
-      questionCommentNoteBody.length >
-      this._questionModelValidatorService.maxCommentLength
-    ) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `Размер блока текста с комментарием к заданию с номером ${firstQuestionLineParsingResults.externalNumber} составляет ${questionCommentNoteBody.length} символов и превышает максимальный разрешённый размер в ${this._questionModelValidatorService.maxCommentLength} символов`
-      );
-      return;
-    }
-
-    // формируем вопрос
-    var question: QuestionDataModel = QuestionDataModel.createQuestion();
-    question.externalNumber = firstQuestionLineParsingResults.externalNumber;
-    question.title = firstQuestionLineParsingResults.questionTitle;
-    question.lowestInternalNumber =
-      firstQuestionLineParsingResults.lowestInternalNumber;
-    question.highestInternalNumber =
-      firstQuestionLineParsingResults.highestInternalNumber;
-    question.graded = firstQuestionLineParsingResults.isGraded;
-
-    question.body = questionBodyBuilder.toString();
-    question.source = questionSourceBody;
-    question.comment = questionCommentNoteBody;
-
-    return question;
+    // всё в порядке
+    return true;
   }
 
   /**
@@ -225,16 +144,19 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
    * @param firstSegmentLine первая строка загружаемого сегмента.
    * @returns текст с телом сегмента.
    */
-  private loadSegmentBody(firstSegmentLine: string): string {
-    var stringBuilder: StringBuilder = new StringBuilder();
-    stringBuilder.addString(firstSegmentLine);
+  private loadSegmentText(firstSegmentLine: string): string {
+    const stringBuilder: StringBuilder = new StringBuilder();
 
-    while (this._sourceTextLinesIterator.hasNextLine()) {
-      var processingLine: string = this._sourceTextLinesIterator.nextLine();
+    if (firstSegmentLine && firstSegmentLine.length > 0) {
+      stringBuilder.addString(firstSegmentLine);
+    }
+
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      const processingLine: string = this.sourceTextLinesIterator.nextLine();
 
       if (QuestionsImporter.hasControlPrefix(processingLine)) {
         // если взяли строку с control prefix, откатываемся назад на одну строку
-        this._sourceTextLinesIterator.stepIndexBack();
+        this.sourceTextLinesIterator.stepIndexBack();
         // и прекращаем цикл
         break;
       }
@@ -246,186 +168,144 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   /**
-   * Возвращает true, если строка начинается с контрольного префикса #.
-   * @param sourceStringLine строка к проверке.
-   * @returns true если строка начинается с контрольного префикса #.
-   */
-  private static hasControlPrefix(sourceStringLine: string): boolean {
-    return sourceStringLine.startsWith("#");
-  }
-
-  private static isQuestionSourceLine(sourceStringLine: string): boolean {
-    return sourceStringLine
-      .toUpperCase()
-      .startsWith(QuestionsImporter.sourcePrefix);
-  }
-
-  private static isQuestionCommentNoteLine(sourceStringLine: string): boolean {
-    return sourceStringLine
-      .toUpperCase()
-      .startsWith(QuestionsImporter.commentNotePrefix);
-  }
-
-  /**
    * Извлекает номер задания из строки.
    * @param sourceStringLine строка для обработки.
+   * @param currentQuestionObject объект класса QuestionDataModel для записи результатов парсинга.
    * @returns блок данных с информацией о номере, зачётности задания, и заголовок задания.
    */
-  private parseFirstQuestionLine(
-    sourceStringLine: string
-  ): FirstQuestionLineParsingResults {
+  private parseFirstQuestionLine(sourceStringLine: string, currentQuestionObject: QuestionDataModel): boolean {
     if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `Первым символом строки ожидался символ #. Строка: ${sourceStringLine}`
-      );
-      return;
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, `Первым символом строки ожидался символ #. Строка: ${sourceStringLine}`);
+      return false;
     }
 
-    var colonSymbolPosition: number = sourceStringLine.indexOf(":");
+    const colonSymbolPosition: number = sourceStringLine.indexOf(':');
 
     if (colonSymbolPosition == -1) {
-      this._allThingsOk = false;
-      this._onFailure(
-        this._parentComponentObject,
-        `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`
-      );
-      return null;
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`);
+      return false;
     }
 
-    var parsingResult: FirstQuestionLineParsingResults = new FirstQuestionLineParsingResults();
-    parsingResult.isGraded = true;
+    currentQuestionObject.graded = true;
 
-    var numberBodyString: string = sourceStringLine
-      .substring(1, colonSymbolPosition)
-      .trim();
+    let numberBodyString: string = sourceStringLine.substring(1, colonSymbolPosition).trim();
 
-    var openingParenPosition = numberBodyString.indexOf("(");
+    const openingParenPosition = numberBodyString.indexOf('(');
     if (openingParenPosition !== -1) {
       // внезачётное задание
-      parsingResult.isGraded = false;
+      currentQuestionObject.graded = false;
 
-      var closingParenPosition = numberBodyString.indexOf(
-        ")",
-        openingParenPosition
-      );
+      const closingParenPosition = numberBodyString.indexOf(')', openingParenPosition);
 
       if (closingParenPosition === -1) {
-        this._allThingsOk = false;
-        this._onFailure(
-          this._parentComponentObject,
+        this.allThingsOk = false;
+        this.onFailure(this.parentComponentObject,
           `В строке представлена открывающая скобка, но нет закрывающей для неё. Строка: ${sourceStringLine}`
         );
-        return null;
+        return false;
       }
 
-      numberBodyString = numberBodyString.substring(
-        openingParenPosition + 1,
-        closingParenPosition
-      );
+      numberBodyString = numberBodyString.substring(openingParenPosition + 1, closingParenPosition);
+
+      if (!this.parseQuestionNumber(numberBodyString, currentQuestionObject, sourceStringLine)) {
+        return false;
+      }
     }
 
-    parsingResult.externalNumber = numberBodyString;
+    this.expectedQuestionNumber = currentQuestionObject.highestInternalNumber + 1;
+    currentQuestionObject.title = sourceStringLine.substring(colonSymbolPosition + 1).trim();
 
-    debugString("numberBodyString = " + numberBodyString);
+    return true;
+  }
 
-    const hypen: string = "-";
-    if (numberBodyString.indexOf(hypen) === -1) {
+  private parseQuestionNumber(numberBodyString: string, currentQuestionObject: QuestionDataModel, sourceStringLine: string): boolean {
+
+    currentQuestionObject.externalNumber = numberBodyString;
+
+    if (numberBodyString.indexOf('-') === -1) {
       // одиночный номер
-
-      // валидация номера
-      if (!QuestionsImporter.isZeroOrPositiveInteger(numberBodyString)) {
-        this._allThingsOk = false;
-        this._onFailure(
-          this._parentComponentObject,
-          `Номер задания может быть либо нулём, либо положительным целым числом. Строка: ${sourceStringLine}`
-        );
-        return null;
+      if (!this.parseSingleNumber(numberBodyString, currentQuestionObject, sourceStringLine)) {
+        return false;
       }
-
-      parsingResult.lowestInternalNumber = parseInt(numberBodyString);
-      parsingResult.highestInternalNumber = parsingResult.lowestInternalNumber;
     } else {
       // составной номер
-      var internalNumberParts: string[] = numberBodyString.split("-");
-      var expectedInternalNumber: number = -1;
-      debugString("Processing compound number: start");
-
-      for (var oneInternalNumberString of internalNumberParts) {
-        // валидация числового формата номера
-        var normalizedOneInternalNumberString: string = oneInternalNumberString.trim();
-        debugString(
-          `normalizedOneInternalNumberString: ${normalizedOneInternalNumberString}`
-        );
-
-        if (
-          !QuestionsImporter.isZeroOrPositiveInteger(
-            normalizedOneInternalNumberString
-          )
-        ) {
-          debugString(
-            `${normalizedOneInternalNumberString} is not a zero nor a positive integer number!`
-          );
-
-          this._allThingsOk = false;
-          this._onFailure(
-            this._parentComponentObject,
-            `Номер задания может быть либо нулём, либо положительным целым числом. Но вы передали значение ${oneInternalNumberString} в составном номере ${numberBodyString}. Строка: ${sourceStringLine}`
-          );
-          return null;
-        }
-
-        debugString(
-          `${normalizedOneInternalNumberString} is acceptable number, zero or positive integer.`
-        );
-
-        var oneInternalNumber: number = parseInt(
-          normalizedOneInternalNumberString
-        );
-
-        if (expectedInternalNumber !== -1) {
-          // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию
-          if (oneInternalNumber !== expectedInternalNumber) {
-            this._allThingsOk = false;
-            this._onFailure(
-              this._parentComponentObject,
-              `Внутри составного номера номера должны идти друг за другом по возрастанию. Это правило не соблюдается для составного номера ${numberBodyString}. Строка: ${sourceStringLine}`
-            );
-            return null;
-          }
-        }
-
-        // формируем следующий ожидаемый номер внутри составного номера
-        expectedInternalNumber = oneInternalNumber + 1;
+      if (!this.parseCompoundNumber(numberBodyString, currentQuestionObject, sourceStringLine)) {
+        return false;
       }
-
-      parsingResult.lowestInternalNumber = parseInt(internalNumberParts[0]);
-      parsingResult.highestInternalNumber = parseInt(
-        internalNumberParts[internalNumberParts.length - 1]
-      );
-
-      debugString("Processing compound number: end");
     }
 
-    if (this._expectedQuestionNumber !== -1) {
+    if (this.expectedQuestionNumber !== -1) {
       // если это не первый вопрос, проверяем порядок следования номеров заданий
-      if (parsingResult.lowestInternalNumber !== this._expectedQuestionNumber) {
-        this._allThingsOk = false;
-        this._onFailure(
-          this._parentComponentObject,
+      if (
+        currentQuestionObject.lowestInternalNumber !==
+        this.expectedQuestionNumber
+      ) {
+        this.allThingsOk = false;
+        this.onFailure(
+          this.parentComponentObject,
           `Номера заданий должны идти в порядке возрастания друг за другом. Но это правило нарушено на строке: ${sourceStringLine}`
         );
-        return null;
+        return false;
       }
     }
 
-    this._expectedQuestionNumber = parsingResult.highestInternalNumber + 1;
+    return true;
+  }
 
-    parsingResult.questionTitle = sourceStringLine
-      .substring(colonSymbolPosition + 1)
-      .trim();
+  private parseSingleNumber(numberBodyString: string, currentQuestionObject: QuestionDataModel, sourceStringLine: string): boolean {
+    // валидация номера
+    if (!QuestionsImporter.isZeroOrPositiveInteger(numberBodyString)) {
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject,
+        `Номер задания может быть либо нулём, либо положительным целым числом. Строка: ${sourceStringLine}`
+      );
+      return false;
+    }
 
-    return parsingResult;
+    currentQuestionObject.lowestInternalNumber = QuestionsImporter.parseInt(numberBodyString);
+    currentQuestionObject.highestInternalNumber = currentQuestionObject.lowestInternalNumber;
+
+    return true;
+  }
+
+  private parseCompoundNumber(numberBodyString: string, currentQuestionObject: QuestionDataModel, sourceStringLine: string): boolean {
+    const internalNumberParts: string[] = numberBodyString.split('-');
+    let expectedInternalNumber = -1;
+
+    for (const oneInternalNumberString of internalNumberParts) {
+      // валидация числового формата номера
+      const normalizedOneInternalNumberString: string = oneInternalNumberString.trim();
+      if (!QuestionsImporter.isZeroOrPositiveInteger(normalizedOneInternalNumberString)) {
+        this.allThingsOk = false;
+        this.onFailure(
+          this.parentComponentObject,
+          `Номер задания может быть либо нулём, либо положительным целым числом. Но вы передали значение ${oneInternalNumberString} в составном номере ${numberBodyString}. Строка: ${sourceStringLine}`
+        );
+        return false;
+      }
+
+      const oneInternalNumber: number = QuestionsImporter.parseInt(normalizedOneInternalNumberString);
+
+      if (expectedInternalNumber !== -1) {
+        // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию
+        if (oneInternalNumber !== expectedInternalNumber) {
+          this.allThingsOk = false;
+          this.onFailure(this.parentComponentObject,
+            `Внутри составного номера номера должны идти друг за другом по возрастанию. Это правило не соблюдается для составного номера ${numberBodyString}. Строка: ${sourceStringLine}`
+          );
+          return false;
+        }
+      }
+
+      // формируем следующий ожидаемый номер внутри составного номера
+      expectedInternalNumber = oneInternalNumber + 1;
+    }
+
+    currentQuestionObject.lowestInternalNumber = QuestionsImporter.parseInt(internalNumberParts[0]);
+    currentQuestionObject.highestInternalNumber = QuestionsImporter.parseInt(internalNumberParts[internalNumberParts.length - 1]);
+
+    return true;
   }
 }

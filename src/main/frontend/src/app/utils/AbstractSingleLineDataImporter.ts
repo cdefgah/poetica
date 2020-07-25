@@ -1,22 +1,18 @@
 export abstract class AbstractSingleLineDataImporter {
-  protected _parentComponentObject: any;
+  protected static readonly rtfmMessage = 'Ознакомьтесь, пожалуйста, с требованиями к формату текста.';
 
-  private _normalizedSourceString: string;
+  protected parentComponentObject: any;
 
-  protected _onSuccess: Function;
-  protected _onFailure: Function;
+  protected normalizedSourceString: string;
+
+  protected onSuccess: Function;
+  protected onFailure: Function;
 
   constructor(rawSourceText: string, onSuccess: Function, onFailure: Function) {
-    this._normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(
-      rawSourceText
-    );
+    this.normalizedSourceString = AbstractSingleLineDataImporter.normalizeString(rawSourceText);
 
-    this._onSuccess = onSuccess;
-    this._onFailure = onFailure;
-  }
-
-  protected get normalizedSourceString(): string {
-    return this._normalizedSourceString;
+    this.onSuccess = onSuccess;
+    this.onFailure = onFailure;
   }
 
   /**
@@ -79,5 +75,13 @@ export abstract class AbstractSingleLineDataImporter {
     }
 
     return processedString;
+  }
+
+  protected static parseInt(stringValue: string): number {
+    return parseInt(stringValue, 10);
+  }
+
+  protected static startsWithIgnoringCase(originalString: string, prefixToCheck: string): boolean {
+    return originalString.toUpperCase().startsWith(prefixToCheck.toUpperCase());
   }
 }

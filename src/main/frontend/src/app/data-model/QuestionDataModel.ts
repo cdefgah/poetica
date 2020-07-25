@@ -47,15 +47,26 @@ export class QuestionDataModel {
    */
   body: string;
 
+
+  /**
+   * Авторский вариант ответа.
+   */
+  authorsAnswer: string;
+
+  /**
+   * Комментарий к заданию.
+   */
+  comment: string;
+
   /**
    * Источник задания.
    */
   source: string;
 
   /**
-   * Комментарий к заданию.
+   * Информация об авторе задания.
    */
-  comment: string;
+  authorInfo: string;
 
   /**
    * Отметка, является-ли задание зачётным (значение true).
@@ -69,32 +80,32 @@ export class QuestionDataModel {
   public static createQuestionFromMap(
     mapWithValues: Map<string, any>
   ): QuestionDataModel {
-    var question = new QuestionDataModel();
+    const question = new QuestionDataModel();
     question.setValuesFromMap(mapWithValues);
     return question;
   }
 
   private constructor() {
     this.id = 0;
-    this.externalNumber = "";
+    this.externalNumber = '';
     this.lowestInternalNumber = -1;
     this.highestInternalNumber = -1;
-    this.title = "";
-    this.body = "";
-    this.source = "";
-    this.comment = "";
+    this.title = '';
+    this.body = '';
+    this.source = '';
+    this.comment = '';
     this.graded = true;
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap["id"];
-    this.externalNumber = initialMap["externalNumber"];
-    this.lowestInternalNumber = initialMap["lowestInternalNumber"];
-    this.highestInternalNumber = initialMap["highestInternalNumber"];
-    this.title = initialMap["title"];
-    this.body = initialMap["body"];
-    this.source = initialMap["source"];
-    this.comment = initialMap["comment"];
-    this.graded = initialMap["graded"];
+    this.id = initialMap['id'];
+    this.externalNumber = initialMap['externalNumber'];
+    this.lowestInternalNumber = initialMap['lowestInternalNumber'];
+    this.highestInternalNumber = initialMap['highestInternalNumber'];
+    this.title = initialMap['title'];
+    this.body = initialMap['body'];
+    this.source = initialMap['source'];
+    this.comment = initialMap['comment'];
+    this.graded = initialMap['graded'];
   }
 }
