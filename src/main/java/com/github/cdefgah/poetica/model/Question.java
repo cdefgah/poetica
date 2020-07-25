@@ -77,6 +77,13 @@ public final class Question {
     private String body;
 
     /**
+     * Ответ автора на бескрылку.
+     */
+    @Column(length = ModelConstraints.MAX_AUTHORS_ANSWER_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_AUTHORS_ANSWER_LENGTH)
+    private String authorsAnswer;
+
+    /**
      * Источник бескрылки.
      */
     @Column(length = ModelConstraints.MAX_SOURCE_LENGTH, nullable = false)
@@ -91,6 +98,13 @@ public final class Question {
 
     @Column(nullable = false)
     private boolean graded;
+
+    /**
+     * Информация об авторе бескрылки.
+     */
+    @Column(length = ModelConstraints.MAX_AUTHOR_INFO_LENGTH, nullable = false)
+    @Size(max = ModelConstraints.MAX_AUTHOR_INFO_LENGTH)
+    private String authorInfo;
 
     public Question() {
     }
@@ -184,6 +198,23 @@ public final class Question {
         return Objects.hash(id);
     }
 
+
+    public String getAuthorsAnswer() {
+        return authorsAnswer;
+    }
+
+    public void setAuthorsAnswer(String authorsAnswer) {
+        this.authorsAnswer = authorsAnswer;
+    }
+
+    public String getAuthorInfo() {
+        return authorInfo;
+    }
+
+    public void setAuthorInfo(String authorInfo) {
+        this.authorInfo = authorInfo;
+    }
+
     @Override
     public String toString() {
         return "Question{" +
@@ -193,9 +224,11 @@ public final class Question {
                 ", highestInternalNumber=" + highestInternalNumber +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
+                ", authorsAnswer='" + authorsAnswer + '\'' +
                 ", source='" + source + '\'' +
                 ", comment='" + comment + '\'' +
                 ", graded=" + graded +
+                ", authorInfo='" + authorInfo + '\'' +
                 '}';
     }
 }

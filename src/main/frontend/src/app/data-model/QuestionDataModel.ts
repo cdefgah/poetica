@@ -48,6 +48,11 @@ export class QuestionDataModel {
   body: string;
 
   /**
+   * Авторский ответ.
+   */
+  authorsAnswer: string;
+
+  /**
    * Источник задания.
    */
   source: string;
@@ -56,6 +61,11 @@ export class QuestionDataModel {
    * Комментарий к заданию.
    */
   comment: string;
+
+  /**
+   * Информация об авторе.
+   */
+  author: string;
 
   /**
    * Отметка, является-ли задание зачётным (значение true).
@@ -81,9 +91,11 @@ export class QuestionDataModel {
     this.highestInternalNumber = -1;
     this.title = "";
     this.body = "";
+    this.authorsAnswer = "";
     this.source = "";
     this.comment = "";
     this.graded = true;
+    this.author = "";
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
@@ -93,8 +105,10 @@ export class QuestionDataModel {
     this.highestInternalNumber = initialMap["highestInternalNumber"];
     this.title = initialMap["title"];
     this.body = initialMap["body"];
+    this.authorsAnswer = initialMap["authorsAnswer"];
     this.source = initialMap["source"];
     this.comment = initialMap["comment"];
     this.graded = initialMap["graded"];
+    this.author = initialMap["author"];
   }
 }

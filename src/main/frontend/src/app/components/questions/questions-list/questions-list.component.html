@@ -19,21 +19,25 @@
 </mat-radio-group>
 <hr />
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-  <ng-container matColumnDef="number">
+  <ng-container matColumnDef="externalNumber">
     <th mat-header-cell *matHeaderCellDef>&nbsp;Номер&nbsp;</th>
     <td mat-cell *matCellDef="let oneQuestion">
       {{ oneQuestion.externalNumber }}
     </td>
   </ng-container>
 
-  <ng-container matColumnDef="title">
-    <th mat-header-cell *matHeaderCellDef>&nbsp;Заголовок&nbsp;</th>
-    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.title }}</td>
+  <ng-container matColumnDef="mainContent">
+    <th mat-header-cell *matHeaderCellDef>&nbsp;Содержание&nbsp;</th>
+    <td mat-cell *matCellDef="let oneQuestion">
+      {{ oneQuestion.mainContent }}
+    </td>
   </ng-container>
 
-  <ng-container matColumnDef="body">
-    <th mat-header-cell *matHeaderCellDef>&nbsp;Содержание&nbsp;</th>
-    <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.body }}</td>
+  <ng-container matColumnDef="authorsAnswer">
+    <th mat-header-cell *matHeaderCellDef>&nbsp;Авторский ответ&nbsp;</th>
+    <td mat-cell *matCellDef="let oneQuestion">
+      {{ oneQuestion.authorsAnswer }}
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="source">
