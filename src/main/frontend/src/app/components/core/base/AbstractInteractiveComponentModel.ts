@@ -35,8 +35,6 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
       error
     )}.`;
     this.displayMessage(errorMessage);
-
-    console.log("=== reportServerError end ====");
   }
 
   protected displayMessage(
