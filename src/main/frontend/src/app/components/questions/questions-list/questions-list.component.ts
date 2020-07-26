@@ -1,25 +1,25 @@
-import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { MatDialog, MatRadioChange } from "@angular/material";
-import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
-import { QuestionViewModelForTableRow } from "src/app/view-model/QuestionViewModelForTableRow";
-import { QuestionsListImporterComponent } from "../questions-list-importer/questions-list-importer.component";
-import { QuestionDetailsComponent } from "../question-details/question-details.component";
-import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog, MatRadioChange } from '@angular/material';
+import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
+import { QuestionViewModelForTableRow } from 'src/app/view-model/QuestionViewModelForTableRow';
+import { QuestionsListImporterComponent } from '../questions-list-importer/questions-list-importer.component';
+import { QuestionDetailsComponent } from '../question-details/question-details.component';
+import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
+import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
 
 @Component({
-  selector: "app-questions-list",
-  templateUrl: "./questions-list.component.html",
-  styleUrls: ["./questions-list.component.css"],
+  selector: 'app-questions-list',
+  templateUrl: './questions-list.component.html',
+  styleUrls: ['./questions-list.component.css'],
 })
 export class QuestionsListComponent extends AbstractInteractiveComponentModel
   implements OnInit {
   // эти псевдонимы также используются для формирования строки http-запроса, не меняйте их.
-  private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = "all";
-  private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = "credited";
+  private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = 'all';
+  private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = 'credited';
   private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS =
-    "not-credited";
+    'not-credited';
 
   displayModeAliases: string[] = [
     QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS,
@@ -27,16 +27,16 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
     QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS,
   ];
 
-  displayModeTitles: string[] = ["Все", "Зачётные", "Внезачётные"];
+  displayModeTitles: string[] = ['Все', 'Зачётные', 'Внезачётные'];
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
 
   displayedColumns: string[] = [
-    "externalNumber",
-    "mainContent",
-    "authorsAnswer",
-    "source",
-    "comment",
+    'externalNumber',
+    'mainContent',
+    'authorsAnswer',
+    'source',
+    'comment',
   ];
 
   dataSource: QuestionViewModelForTableRow[];
@@ -66,10 +66,10 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
     return this.otherDialog;
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   loadQuestionsList() {
-    const url: string = `/questions/${this.selectedDisplayModeAlias}`;
+    const url = `/questions/${this.selectedDisplayModeAlias}`;
     this.http.get(url).subscribe(
       (receivedDataStructures: QuestionDataModel[]) => {
         this.dataSource = [];
@@ -84,8 +84,9 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
   }
 
   listDisplayModeChanged(event: MatRadioChange) {
-    var receivedDisplayModeAlias = event.value;
-    if (this.selectedDisplayModeAlias != receivedDisplayModeAlias) {
+    const receivedDisplayModeAlias = event.value;
+
+    if (this.selectedDisplayModeAlias !== receivedDisplayModeAlias) {
       this.selectedDisplayModeAlias = receivedDisplayModeAlias;
       this.loadQuestionsList();
     }
@@ -96,7 +97,8 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
       this.questionValidationService,
       selectedRow
     );
-    var dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
+
+    const dialogRef = this.dialog.open(QuestionDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
@@ -112,13 +114,13 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   ImportQuestions() {
     if (this.dataSource.length > 0) {
-      var confirmationMessage =
-        "В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?";
+      const confirmationMessage =
+        'В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?';
 
-      var dialogAcceptedAction: Function = () => {
+      const dialogAcceptedAction = () => {
         // если диалог был принят (accepted)
         // удаляем задания на сервере
-        this.http.delete("/questions/all").subscribe(
+        this.http.delete('/questions/all').subscribe(
           (data: any) => {
             // обновляем таблицу со списком вопросов (уже пустую)
             this.loadQuestionsList();
@@ -141,7 +143,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
     const importDialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
       this.questionValidationService
     );
-    var dialogRef = this.dialog.open(
+    const dialogRef = this.dialog.open(
       QuestionsListImporterComponent,
       importDialogConfig
     );

@@ -1,124 +1,35 @@
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { AbstractSingleLineDataImporter } from "src/app/utils/AbstractSinglelineDataImporter";
-import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
-import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
-import { EmailSubjectParserParameters } from "./EmailSubjectParserParameters";
-import { debugString, debugObject } from "src/app/utils/Config";
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { AbstractSingleLineDataImporter } from 'src/app/utils/AbstractSinglelineDataImporter';
+import { TeamValidationService } from 'src/app/components/core/validators/TeamValidationService';
+import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
+import { EmailSubjectParserParameters } from './EmailSubjectParserParameters';
+import { debugString, debugObject } from 'src/app/utils/Config';
 
 export class EmailSubjectParser extends AbstractSingleLineDataImporter {
-  private _emailValidationService: EmailValidationService;
-  private _teamValidationService: TeamValidationService;
+  private emailValidationService: EmailValidationService;
+  private teamValidationService: TeamValidationService;
 
-  private _team: TeamDataModel;
-  private _roundNumber: string;
-
-  constructor(
-    parameters: EmailSubjectParserParameters,
-    onSuccess: Function,
-    onFailure: Function
-  ) {
-    super(parameters.emailSubject, onSuccess, onFailure);
-    this._parentComponentObject = parameters.parentComponentObject;
-    this._emailValidationService = parameters.emailValidationService;
-    this._teamValidationService = parameters.teamValidationService;
-  }
-
-  public parse() {
-    // если тема письма не задана, просто выходим,
-    // не генерируя ошибки. Нужная информация может быть в теле письма.
-    if (this.normalizedSourceString.length == 0) {
-      this._onSuccess(this._parentComponentObject, null, null);
-      return;
-    }
-
-    var subjectValidationMessage = this._emailValidationService.validateEmailSubject(
-      this.normalizedSourceString
-    );
-    if (subjectValidationMessage.length > 0) {
-      this._onFailure(this._parentComponentObject, subjectValidationMessage);
-      return;
-    }
-
-    // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
-    var processedSubject: string = EmailSubjectParser.extractSignificantPartFromTheEmailSubject(
-      this.normalizedSourceString
-    );
-
-    var commaPosition = processedSubject.indexOf(",");
-    if (commaPosition == -1) {
-      this._onFailure(
-        this._parentComponentObject,
-        "Некорректный формат темы письма. Нет запятой."
-      );
-      return;
-    }
-
-    var teamTitle = EmailSubjectParser.removeDoubleQuotations(
-      processedSubject.substring(0, commaPosition)
-    );
-
-    var afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
-
-    let {
-      foundTeamNumberString,
-      foundRoundNumber,
-    } = EmailSubjectParser.extractTeamAndRoundNumbers(afterCommaSubjectPart);
-
-    debugString(`foundTeamNumberString: ${foundTeamNumberString}`);
-    debugString(`foundRoundNumber: ${foundRoundNumber}`);
-
-    // фиксируем номер раунда
-    this._roundNumber = foundRoundNumber;
-
-    // проверяем корректность номера команды и получаем сообщение, если номер некорректный
-    var teamNumberValidationMessage = this._teamValidationService.checkTeamNumberAndGetValidationMessage(
-      foundTeamNumberString
-    );
-
-    if (teamNumberValidationMessage.length > 0) {
-      this._onFailure(
-        this._parentComponentObject,
-        `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`
-      );
-      return;
-    }
-
-    var foundTeamNumber = parseInt(foundTeamNumberString);
-    debugString("foundTeamNumber: " + foundTeamNumber);
-
-    this._team = TeamDataModel.createTeamByNumberAndTitle(
-      foundTeamNumber,
-      teamTitle
-    );
-
-    debugString("this._team is below...");
-    debugObject(this._team);
-
-    this._onSuccess(this._parentComponentObject, this._team, this._roundNumber);
-  }
+  private team: TeamDataModel;
+  private roundNumber: string;
 
   /**
    * Извлекает значимую часть темы письма, всё кроме префиксе "Ответы команды " или "Otvety komandy ".
    * @param sourceEmailSubject тема письма для обработки.
    * @returns значимая часть темы письма.
    */
-  private static extractSignificantPartFromTheEmailSubject(
-    sourceEmailSubject: string
-  ): string {
-    const subjectPrefixTransliterated: string = "otvety komandy ";
-    const subjectPrefixRussian: string = "ответы команды ";
+  private static extractSignificantPartFromTheEmailSubject(sourceEmailSubject: string): string {
+    const subjectPrefixTransliterated = 'otvety komandy ';
+    const subjectPrefixRussian = 'ответы команды ';
 
     // проверяем наличие префикса с lower-case строкой
     // а вырезаем уже из нормальной строки (sourceEmailSubject)
-    var subjectInLowerCase: string = sourceEmailSubject.toLowerCase();
+    const subjectInLowerCase: string = sourceEmailSubject.toLowerCase();
 
-    var processedSubject: string;
-    var prefixLocation = subjectInLowerCase.indexOf(
-      subjectPrefixTransliterated
-    );
-    if (prefixLocation == -1) {
+    let processedSubject: string;
+    let prefixLocation = subjectInLowerCase.indexOf(subjectPrefixTransliterated);
+    if (prefixLocation === -1) {
       prefixLocation = subjectInLowerCase.indexOf(subjectPrefixRussian);
-      if (prefixLocation == -1) {
+      if (prefixLocation === -1) {
         processedSubject = sourceEmailSubject;
       } else {
         processedSubject = sourceEmailSubject.substring(
@@ -139,31 +50,22 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
    * @param afterCommaPartOfTheEmailSubject часть темы письма, после запятой.
    * @return возвращает два значения, первое - номер команды в виде строки, второе - номер тура в виде строки.
    */
-  private static extractTeamAndRoundNumbers(
-    afterCommaPartOfTheEmailSubject: string
-  ): any {
-    var foundTeamNumberString: string = "";
-    var foundRoundNumber: string = "";
+  private static extractTeamAndRoundNumbers(afterCommaPartOfTheEmailSubject: string): any {
+    let foundTeamNumberString = '';
+    let foundRoundNumber = '';
 
-    const openingParenthesisPrefix: string = "(";
-    var openingParenthesisPrefixPosition = afterCommaPartOfTheEmailSubject.indexOf(
-      openingParenthesisPrefix
-    );
+    const openingParenthesisPrefix = '(';
+    const openingParenthesisPrefixPosition = afterCommaPartOfTheEmailSubject.indexOf(openingParenthesisPrefix);
 
     if (openingParenthesisPrefixPosition !== -1) {
       // открывающая скобка представлена в теме письма
 
-      var substringWithTeamNumber: string = afterCommaPartOfTheEmailSubject
-        .substring(0, openingParenthesisPrefixPosition)
-        .trim();
+      const substringWithTeamNumber: string = afterCommaPartOfTheEmailSubject.substring(0, openingParenthesisPrefixPosition).trim();
 
       foundTeamNumberString = substringWithTeamNumber;
 
       foundRoundNumber = EmailSubjectParser.extractRoundNumberFromSubstring(
-        afterCommaPartOfTheEmailSubject.substring(
-          openingParenthesisPrefixPosition + 1
-        )
-      );
+        afterCommaPartOfTheEmailSubject.substring(openingParenthesisPrefixPosition + 1));
     } else {
       // если открывающей скобки нет в теме письма,
       // то вся правая часть темы письма после запятой - это номер команды.
@@ -173,17 +75,15 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
     return { foundTeamNumberString, foundRoundNumber };
   }
 
-  private static extractRoundNumberFromSubstring(
-    subjectSubstring: string
-  ): string {
-    var string2Check = subjectSubstring.toLowerCase();
-    const preliminaryRoundPrefixRussian: string = "пред";
-    const finalRoundPrefixRussian: string = "осн";
-    const preliminaryRoundPrefixREnglish: string = "pred";
-    const finalRoundPrefixEnglish: string = "osn";
+  private static extractRoundNumberFromSubstring(subjectSubstring: string): string {
+    const string2Check = subjectSubstring.toLowerCase();
+    const preliminaryRoundPrefixRussian = 'пред';
+    const finalRoundPrefixRussian = 'осн';
+    const preliminaryRoundPrefixREnglish = 'pred';
+    const finalRoundPrefixEnglish = 'osn';
 
-    const preliminaryRoundNumberAlias: string = "1";
-    const finalRoundNumberAlias: string = "2";
+    const preliminaryRoundNumberAlias = '1';
+    const finalRoundNumberAlias = '2';
 
     if (
       string2Check.startsWith(preliminaryRoundPrefixRussian) ||
@@ -199,7 +99,83 @@ export class EmailSubjectParser extends AbstractSingleLineDataImporter {
       return finalRoundNumberAlias;
     } else {
       // не распознали
-      return "";
+      return '';
     }
+  }
+
+  constructor(
+    parameters: EmailSubjectParserParameters,
+    onSuccess: Function,
+    onFailure: Function
+  ) {
+    super(parameters.emailSubject, onSuccess, onFailure);
+    this.parentComponentObject = parameters.parentComponentObject;
+    this.emailValidationService = parameters.emailValidationService;
+    this.teamValidationService = parameters.teamValidationService;
+  }
+
+  public parse() {
+    // если тема письма не задана, просто выходим,
+    // не генерируя ошибки. Нужная информация может быть в теле письма.
+    if (this.normalizedSourceString.length === 0) {
+      this.onSuccess(this.parentComponentObject, null, null);
+      return;
+    }
+
+    const subjectValidationMessage = this.emailValidationService.validateEmailSubject(
+      this.normalizedSourceString
+    );
+    if (subjectValidationMessage.length > 0) {
+      this.onFailure(this.parentComponentObject, subjectValidationMessage);
+      return;
+    }
+
+    // вырезаем из темы письма префикс "Ответы команды " (на русском или на транслите)
+    const processedSubject: string = EmailSubjectParser.extractSignificantPartFromTheEmailSubject(
+      this.normalizedSourceString
+    );
+
+    const commaPosition = processedSubject.indexOf(',');
+    if (commaPosition === -1) {
+      this.onFailure(this.parentComponentObject, 'Некорректный формат темы письма. Нет запятой.');
+      return;
+    }
+
+    const teamTitle = EmailSubjectParser.removeDoubleQuotations(
+      processedSubject.substring(0, commaPosition)
+    );
+
+    const afterCommaSubjectPart = processedSubject.substring(commaPosition + 1);
+
+    const {
+      foundTeamNumberString,
+      foundRoundNumber,
+    } = EmailSubjectParser.extractTeamAndRoundNumbers(afterCommaSubjectPart);
+
+    debugString(`foundTeamNumberString: ${foundTeamNumberString}`);
+    debugString(`foundRoundNumber: ${foundRoundNumber}`);
+
+    // фиксируем номер раунда
+    this.roundNumber = foundRoundNumber;
+
+    // проверяем корректность номера команды и получаем сообщение, если номер некорректный
+    const teamNumberValidationMessage = this.teamValidationService.checkTeamNumberAndGetValidationMessage(
+      foundTeamNumberString
+    );
+
+    if (teamNumberValidationMessage.length > 0) {
+      this.onFailure(this.parentComponentObject, `Неверный номер команды в теме письма. ${teamNumberValidationMessage}`);
+      return;
+    }
+
+    const foundTeamNumber = EmailSubjectParser.parseInt(foundTeamNumberString);
+    debugString('foundTeamNumber: ' + foundTeamNumber);
+
+    this.team = TeamDataModel.createTeamByNumberAndTitle(foundTeamNumber, teamTitle);
+
+    debugString('this.team is below...');
+    debugObject(this.team);
+
+    this.onSuccess(this.parentComponentObject, this.team, this.roundNumber);
   }
 }

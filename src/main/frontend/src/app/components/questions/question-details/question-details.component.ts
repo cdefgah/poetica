@@ -1,44 +1,23 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialogConfig,
   MatDialog,
-} from "@angular/material/dialog";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
-import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
-import { MatRadioChange } from "@angular/material/radio";
+} from '@angular/material/dialog';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
+import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
+import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Component({
-  selector: "app-question-details",
-  templateUrl: "./question-details.component.html",
-  styleUrls: ["./question-details.component.css"],
+  selector: 'app-question-details',
+  templateUrl: './question-details.component.html',
+  styleUrls: ['./question-details.component.css'],
 })
 export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
-  private static readonly KEY_DIALOG_ID = "id";
-  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
-    "modelValidatorService";
-
-  dialogTitle: string;
-
-  question: QuestionDataModel;
-  questionCopy: QuestionDataModel; // используется для сравнения, были-ли изменения при редактировании
-
-  questionValidationService: QuestionValidationService;
-
-  selectedGradeStateAlias: string = QuestionDetailsComponent.KEY_ALIAS_GRADED;
-
-  private static KEY_ALIAS_GRADED = "1";
-  private static KEY_ALIAS_NOT_GRADED = "0";
-
-  allGradeStateAliases: string[] = [
-    QuestionDetailsComponent.KEY_ALIAS_GRADED,
-    QuestionDetailsComponent.KEY_ALIAS_NOT_GRADED,
-  ];
-  allGradeStates: string[] = ["Зачётное", "Внезачётное"];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -60,11 +39,11 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
     this.questionValidationService =
       dialogData[QuestionDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
-    var questionId = dialogData[QuestionDetailsComponent.KEY_DIALOG_ID];
+    const questionId = dialogData[QuestionDetailsComponent.KEY_DIALOG_ID];
 
     if (questionId) {
       // редактируем существующее задание
-      const url: string = `/questions/${questionId}`;
+      const url = `/questions/${questionId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
           this.question = QuestionDataModel.createQuestionFromMap(data);
@@ -85,10 +64,35 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
       this.dialogTitle = this.getDialogTitle(this.question);
     }
   }
+  private static readonly KEY_DIALOG_ID = 'id';
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE = 'modelValidatorService';
 
-  protected getMessageDialogReference(): MatDialog {
-    return this.otherDialog;
-  }
+  private static KEY_ALIAS_GRADED = '1';
+  private static KEY_ALIAS_NOT_GRADED = '0';
+
+  dialogTitle: string;
+
+  question: QuestionDataModel;
+  questionCopy: QuestionDataModel; // используется для сравнения, были-ли изменения при редактировании
+
+  questionValidationService: QuestionValidationService;
+
+  selectedGradeStateAlias: string = QuestionDetailsComponent.KEY_ALIAS_GRADED;
+
+  allGradeStateAliases: string[] = [
+    QuestionDetailsComponent.KEY_ALIAS_GRADED,
+    QuestionDetailsComponent.KEY_ALIAS_NOT_GRADED,
+  ];
+  allGradeStates: string[] = ['Зачётное', 'Внезачётное'];
+
+  modelConstraints: Map<string, number>;
+
+  questionBodyIsIncorrect = false;
+  authorsAnswerIsIncorrect = false;
+  questionSourceIsIncorrect = false;
+  authorsInfoIsIncorrect = false;
+
+  serverResponse: any;
 
   static getDialogConfigWithData(
     questionValidationService: QuestionValidationService,
@@ -98,7 +102,7 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "62%";
+    dialogConfig.width = '62%';
 
     dialogConfig.data = new Map<string, any>();
 
@@ -107,29 +111,25 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
     ] = questionValidationService;
 
     if (row) {
-      dialogConfig.data[QuestionDetailsComponent.KEY_DIALOG_ID] =
-        row[QuestionDetailsComponent.KEY_DIALOG_ID];
+      dialogConfig.data[QuestionDetailsComponent.KEY_DIALOG_ID] = row[QuestionDetailsComponent.KEY_DIALOG_ID];
     }
 
     return dialogConfig;
   }
 
-  modelConstraints: Map<string, number>;
+  protected getMessageDialogReference(): MatDialog {
+    return this.otherDialog;
+  }
 
-  questionBodyIsIncorrect: boolean = false;
-  questionSourceIsIncorrect: boolean = false;
-
-  serverResponse: any;
-
-  ngOnInit() {}
+  ngOnInit() { }
 
   private getDialogTitle(questionObject: QuestionDataModel): string {
-    if (questionObject.externalNumber.length == 0) {
-      return "Новое задание";
+    if (questionObject.externalNumber.length === 0) {
+      return 'Новое задание';
     } else {
-      var isGradedString = questionObject.graded
-        ? " (Зачётное)"
-        : " (Внезачётное)";
+      const isGradedString = questionObject.graded
+        ? ' (Зачётное)'
+        : ' (Внезачётное)';
 
       return `Задание №${String(
         questionObject.externalNumber
@@ -141,28 +141,28 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
     this.resetValidationFlags();
     if (this.validateFields()) {
       // обновляем существующую запись
-      var newQuestionTitle: string =
-        this.questionCopy.title != this.question.title
+      const newQuestionTitle: string =
+        this.questionCopy.title !== this.question.title
           ? this.question.title
-          : "";
+          : '';
 
-      var updateGradedState = this.question.graded != this.questionCopy.graded;
+      const updateGradedState = this.question.graded !== this.questionCopy.graded;
 
-      var newQuestionBody: string =
-        this.questionCopy.body != this.question.body ? this.question.body : "";
+      const newQuestionBody: string =
+        this.questionCopy.body !== this.question.body ? this.question.body : '';
 
-      var newQuestionSource: string =
-        this.questionCopy.source != this.question.source
+      const newQuestionSource: string =
+        this.questionCopy.source !== this.question.source
           ? this.question.source
-          : "";
+          : '';
 
-      var newQuestionComment: string =
-        this.questionCopy.comment != this.question.comment
+      const newQuestionComment: string =
+        this.questionCopy.comment !== this.question.comment
           ? this.question.comment
-          : "";
+          : '';
 
-      var updateComment: boolean =
-        this.questionCopy.comment != this.question.comment;
+      const updateComment: boolean =
+        this.questionCopy.comment !== this.question.comment;
 
       if (
         newQuestionTitle.length > 0 ||
@@ -172,15 +172,15 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
         updateComment
       ) {
         // данные изменились, обновляем их на сервере
-        var requestUrl = `/questions/${this.question.id}`;
+        const requestUrl = `/questions/${this.question.id}`;
         const payload = new HttpParams()
-          .set("newQuestionTitle", newQuestionTitle)
-          .set("updateGradedState", String(updateGradedState))
-          .set("newGradedState", String(this.question.graded))
-          .set("newQuestionBody", newQuestionBody)
-          .set("newQuestionSource", newQuestionSource)
-          .set("updateComment", String(updateComment))
-          .set("newQuestionComment", newQuestionComment);
+          .set('newQuestionTitle', newQuestionTitle)
+          .set('updateGradedState', String(updateGradedState))
+          .set('newGradedState', String(this.question.graded))
+          .set('newQuestionBody', newQuestionBody)
+          .set('newQuestionSource', newQuestionSource)
+          .set('updateComment', String(updateComment))
+          .set('newQuestionComment', newQuestionComment);
 
         this.http.put(requestUrl, payload).subscribe(
           () => {
@@ -214,19 +214,18 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
    * @returns true, если поля заполнены, иначе false.
    */
   private validateFields(): boolean {
-    if (this.question.body.trim().length == 0) {
-      this.questionBodyIsIncorrect = true;
-    }
 
-    if (this.question.source.trim().length == 0) {
-      this.questionSourceIsIncorrect = true;
-    }
+    this.questionBodyIsIncorrect = this.question.body.trim().length === 0;
+    this.authorsAnswerIsIncorrect = this.question.authorsAnswer.trim().length === 0;
+    this.questionSourceIsIncorrect = this.question.source.trim().length === 0;
+    this.authorsInfoIsIncorrect = this.question.authorInfo.trim().length === 0;
 
-    return !(this.questionBodyIsIncorrect || this.questionSourceIsIncorrect);
+    return !(this.questionBodyIsIncorrect || this.authorsAnswerIsIncorrect ||
+      this.questionSourceIsIncorrect || this.authorsInfoIsIncorrect);
   }
 
   gradedStateChanged(event: MatRadioChange) {
     this.question.graded =
-      event.value == QuestionDetailsComponent.KEY_ALIAS_GRADED;
+      event.value === QuestionDetailsComponent.KEY_ALIAS_GRADED;
   }
 }

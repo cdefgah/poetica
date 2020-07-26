@@ -1,66 +1,25 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject } from '@angular/core';
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialog,
-} from "@angular/material/dialog";
+} from '@angular/material/dialog';
 
-import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
-import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
-import { QuestionsImporter } from "./utils/QuestionsImporter";
-import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { QuestionValidationService } from "../../core/validators/QuestionValidationService";
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
+import { QuestionsImporter } from './support/QuestionsImporter';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
 
 @Component({
-  selector: "app-questions-list-importer",
-  templateUrl: "./questions-list-importer.component.html",
-  styleUrls: ["./questions-list-importer.component.css"],
+  selector: 'app-questions-list-importer',
+  templateUrl: './questions-list-importer.component.html',
+  styleUrls: ['./questions-list-importer.component.css'],
 })
 export class QuestionsListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
-  rawSourceTextFormGroup: any;
-
-  dataSource: QuestionDataModel[] = [];
-
-  displayedColumns: string[] = [
-    "externalNumber",
-    "graded",
-    "title",
-    "body",
-    "source",
-    "comment",
-  ];
-
-  sourceText: string;
-
-  foundError: string = "";
-
-  dataIsReadyForImport: boolean = false;
-
-  private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE =
-    "questionModelValidatorService";
-
-  questionValidationService: QuestionValidationService;
-
-  static getDialogConfigWithData(
-    questionValidationService: QuestionValidationService
-  ): MatDialogConfig {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "62%";
-
-    dialogConfig.data = new Map<string, any>();
-
-    dialogConfig.data[
-      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
-    ] = questionValidationService;
-
-    return dialogConfig;
-  }
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -76,18 +35,60 @@ export class QuestionsListImporterComponent
 
     this.questionValidationService =
       dialogData[
-        QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
+      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
       ];
+  }
+
+  private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE = 'questionModelValidatorService';
+  rawSourceTextFormGroup: any;
+
+  dataSource: QuestionDataModel[] = [];
+
+  displayedColumns: string[] = [
+    'externalNumber',
+    'graded',
+    'title',
+    'body',
+    'authorsAnswer',
+    'comment',
+    'source',
+    'authorInfo'
+  ];
+
+  sourceText: string;
+
+  foundError = '';
+
+  dataIsReadyForImport = false;
+
+  questionValidationService: QuestionValidationService;
+
+  static getDialogConfigWithData(
+    questionValidationService: QuestionValidationService
+  ): MatDialogConfig {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = '62%';
+
+    dialogConfig.data = new Map<string, any>();
+
+    dialogConfig.data[
+      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
+    ] = questionValidationService;
+
+    return dialogConfig;
   }
 
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   cancelDialog() {
-    this.confirmationDialog("Прервать импорт заданий?", () => {
+    this.confirmationDialog('Прервать импорт заданий?', () => {
       // если диалог был принят (accepted)
       this.dialog.close(false);
     });
@@ -95,7 +96,7 @@ export class QuestionsListImporterComponent
 
   onStepChange(event: any) {
     if (event.previouslySelectedIndex == 0) {
-      this.foundError = "";
+      this.foundError = '';
       this.processSourceText();
 
       this.dataIsReadyForImport = this.foundError.length == 0;
@@ -106,7 +107,7 @@ export class QuestionsListImporterComponent
   }
 
   private processSourceText(): void {
-    var questionsImporter = new QuestionsImporter(
+    let questionsImporter = new QuestionsImporter(
       this,
       this.sourceText,
       this.questionValidationService,
@@ -123,17 +124,17 @@ export class QuestionsListImporterComponent
     importerComponent.dataSource = questionsList;
 
     console.log(
-      "=================== QUESTIONS TO IMPORT ======================"
+      '=================== QUESTIONS TO IMPORT ======================'
     );
 
     questionsList.forEach((oneQuestion) => {
-      console.log("+++++++++++");
+      console.log('+++++++++++');
       console.log(oneQuestion);
-      console.log("+++++++++++");
+      console.log('+++++++++++');
     });
 
     console.log(
-      "=============================================================="
+      '=============================================================='
     );
   }
 
@@ -144,24 +145,24 @@ export class QuestionsListImporterComponent
     importerComponent.foundError = errorMessage;
   }
 
-  onRowClicked(row: any) {}
+  onRowClicked(row: any) { }
 
   doImportQuestions() {
-    this.confirmationDialog("Импортировать задания?", () => {
+    this.confirmationDialog('Импортировать задания?', () => {
       // если диалог был принят (accepted)
       // импортируем задания
       const headers = new HttpHeaders().set(
-        "Content-Type",
-        "application/json; charset=utf-8"
+        'Content-Type',
+        'application/json; charset=utf-8'
       );
 
       this.http
-        .post("/questions/import", this.dataSource, { headers: headers })
+        .post('/questions/import', this.dataSource, { headers })
         .subscribe(
           (data) => {
             this.dialog.close(true);
           },
-          (error) => this.reportServerError(error, "Сбой при импорте заданий.")
+          (error) => this.reportServerError(error, 'Сбой при импорте заданий.')
         );
     });
   }

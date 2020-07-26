@@ -1,5 +1,5 @@
 export class StringLinesIterator {
-  protected readonly newLine: string = "\n";
+  protected static readonly newLine: string = '\n';
 
   protected sourceTextLines: string[];
 
@@ -13,16 +13,16 @@ export class StringLinesIterator {
      */
     function normalizeString(string2Process: string): string {
       // сжимаем последовательные переносы (пустые строки) в один
-      var processedString: string = string2Process.replace(/[\r\n]+/g, "\n");
+      let processedString: string = string2Process.replace(/[\r\n]+/g, StringLinesIterator.newLine);
 
       // удаляем ненужные символы
-      processedString = processedString.replace(/[¶]/g, "");
+      processedString = processedString.replace(/[¶]/g, '');
 
       // кавычки в порядок приводим
       processedString = processedString.replace(/[‘’“”„‹›'»«]/g, '"');
 
       // дефисы причёсываем
-      processedString = processedString.replace(/[-֊־᠆‐‒–—―⸺⸻〰﹘﹣－]/g, "-");
+      processedString = processedString.replace(/[-֊־᠆‐‒–—―⸺⸻〰﹘﹣－]/g, '-');
 
       return processedString;
     }
@@ -30,8 +30,8 @@ export class StringLinesIterator {
     this.sourceTextLinesIndex = -1;
     if (sourceText) {
       if (sourceText.length > 0) {
-        var normalizedString = normalizeString(sourceText);
-        this.sourceTextLines = normalizedString.trim().split(this.newLine);
+        const normalizedString = normalizeString(sourceText);
+        this.sourceTextLines = normalizedString.trim().split(StringLinesIterator.newLine);
       }
     }
   }
@@ -44,18 +44,28 @@ export class StringLinesIterator {
     }
   }
 
-  public nextLine(): string {
+  public nextLine(increaseIndex: boolean = true): string {
     if (this.hasNextLine()) {
       this.sourceTextLinesIndex++;
-      return this.sourceTextLines[this.sourceTextLinesIndex].trim();
+      const resultString = this.sourceTextLines[this.sourceTextLinesIndex].trim();
+
+      // в некоторых случаях нам надо получить строку
+      // но не сдвигать индекс вперед
+      // например для проверки начала следующего сегмента
+      if (!increaseIndex) {
+        this.sourceTextLinesIndex--;
+      }
+
+      return resultString;
+
     } else {
       throw new Error(
-        "Исходный текст обработан полностью, но сделана попытка прочитать следующую строку из него."
+        'Исходный текст обработан полностью, но сделана попытка прочитать следующую строку из него.'
       );
     }
   }
 
-  public stepIndexBack() {
+  public rewindIndexOneStepBack() {
     if (this.sourceTextLinesIndex > 0) {
       this.sourceTextLinesIndex--;
     }

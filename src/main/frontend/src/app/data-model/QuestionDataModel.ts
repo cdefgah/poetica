@@ -3,7 +3,8 @@
  */
 export class QuestionDataModel {
   /**
-   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса на сервер приходят пустые объекты без значений в полях.
+   * NOTE: если применять геттеры и сеттеры для полей, то при отправке массива объектов этого класса 
+   * а сервер приходят пустые объекты без значений в полях.
    * Скорее всего это баг в Angular.
    * Так что в модели все поля публичные.
    */
@@ -47,15 +48,11 @@ export class QuestionDataModel {
    */
   body: string;
 
-  /**
-   * Авторский ответ.
-   */
-  authorsAnswer: string;
 
   /**
-   * Источник задания.
+   * Авторский вариант ответа.
    */
-  source: string;
+  authorsAnswer: string;
 
   /**
    * Комментарий к заданию.
@@ -63,9 +60,14 @@ export class QuestionDataModel {
   comment: string;
 
   /**
-   * Информация об авторе.
+   * Источник задания.
    */
-  author: string;
+  source: string;
+
+  /**
+   * Информация об авторе задания.
+   */
+  authorInfo: string;
 
   /**
    * Отметка, является-ли задание зачётным (значение true).
@@ -79,36 +81,36 @@ export class QuestionDataModel {
   public static createQuestionFromMap(
     mapWithValues: Map<string, any>
   ): QuestionDataModel {
-    var question = new QuestionDataModel();
+    const question = new QuestionDataModel();
     question.setValuesFromMap(mapWithValues);
     return question;
   }
 
   private constructor() {
     this.id = 0;
-    this.externalNumber = "";
+    this.externalNumber = '';
     this.lowestInternalNumber = -1;
     this.highestInternalNumber = -1;
-    this.title = "";
-    this.body = "";
-    this.authorsAnswer = "";
-    this.source = "";
-    this.comment = "";
+    this.title = '';
+    this.body = '';
+    this.authorsAnswer = '';
+    this.source = '';
+    this.comment = '';
+    this.authorInfo = '';
     this.graded = true;
-    this.author = "";
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap["id"];
-    this.externalNumber = initialMap["externalNumber"];
-    this.lowestInternalNumber = initialMap["lowestInternalNumber"];
-    this.highestInternalNumber = initialMap["highestInternalNumber"];
-    this.title = initialMap["title"];
-    this.body = initialMap["body"];
-    this.authorsAnswer = initialMap["authorsAnswer"];
-    this.source = initialMap["source"];
-    this.comment = initialMap["comment"];
-    this.graded = initialMap["graded"];
-    this.author = initialMap["author"];
+    this.id = initialMap['id'];
+    this.externalNumber = initialMap['externalNumber'];
+    this.lowestInternalNumber = initialMap['lowestInternalNumber'];
+    this.highestInternalNumber = initialMap['highestInternalNumber'];
+    this.title = initialMap['title'];
+    this.body = initialMap['body'];
+    this.authorsAnswer = initialMap['authorsAnswer'];
+    this.source = initialMap['source'];
+    this.comment = initialMap['comment'];
+    this.graded = initialMap['graded'];
+    this.authorInfo = initialMap['authorInfo'];
   }
 }

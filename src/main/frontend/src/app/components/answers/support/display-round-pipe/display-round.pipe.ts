@@ -1,16 +1,16 @@
-import { Pipe, PipeTransform } from "@angular/core";
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: "displayRound",
+  name: 'displayRound',
 })
 export class DisplayRoundPipe implements PipeTransform {
   transform(value: number): string {
     if (value == 1) {
-      return "Предварительный";
+      return 'Предварительный';
     } else if (value == 2) {
-      return "Окончательный";
+      return 'Окончательный';
     } else {
-      return "???";
+      return '???';
     }
   }
 }
