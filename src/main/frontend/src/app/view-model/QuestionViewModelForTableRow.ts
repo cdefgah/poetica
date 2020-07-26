@@ -2,7 +2,7 @@ import { QuestionDataModel } from '../data-model/QuestionDataModel';
 import { AbstractViewModel } from './AbstractViewModel';
 
 export class QuestionViewModelForTableRow extends AbstractViewModel {
-  private questionDataModel: QuestionDataModel;
+  private readonly questionDataModel: QuestionDataModel;
 
   constructor(questionDataModel: QuestionDataModel) {
     super();

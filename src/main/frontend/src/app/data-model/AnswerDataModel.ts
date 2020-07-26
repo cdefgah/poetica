@@ -1,5 +1,5 @@
-import { logging } from "protractor";
-import { debugString } from "../utils/Config";
+import { logging } from 'protractor';
+import { debugString } from '../utils/Config';
 
 /**
  * Модель данных ответа на вопрос (бескрылку).
@@ -11,11 +11,11 @@ export class AnswerDataModel {
    */
   public static readonly emptyAnswer: AnswerDataModel = new AnswerDataModel(
     undefined,
-    "",
-    ""
+    '',
+    ''
   );
 
-  public static readonly GradeNone: string = "None";
+  public static readonly GradeNone: string = 'None';
 
   /**
    * Уникальный идентификатор ответа в базе данных.
@@ -50,12 +50,12 @@ export class AnswerDataModel {
   /**
    * Содержание ответа.
    */
-  body: string = "";
+  body = '';
 
   /**
    * Необязательный комментарий к ответу.
    */
-  comment: string = "";
+  comment = '';
 
   /**
    * Отметка об оценке
@@ -67,21 +67,19 @@ export class AnswerDataModel {
    */
   emailSentOn: number;
 
-  public static createAnswerFromMap(
-    mapWithValues: Map<string, any>
-  ): AnswerDataModel {
-    var questionNumber: number = mapWithValues["questionNumber"];
-    var body: string = mapWithValues["body"];
-    var comment: string = mapWithValues["comment"];
+  public static createAnswerFromMap(mapWithValues: Map<string, any>): AnswerDataModel {
+    const questionNumber: number = mapWithValues['questionNumber'];
+    const body: string = mapWithValues['body'];
+    const comment: string = mapWithValues['comment'];
 
-    var answer = new AnswerDataModel(questionNumber, body, comment);
-    answer.id = mapWithValues["id"];
-    answer.emailId = mapWithValues["emailId"];
-    answer.teamId = mapWithValues["teamId"];
-    answer.roundNumber = mapWithValues["roundNumber"];
-    answer.questionId = mapWithValues["questionId"];
-    answer.grade = mapWithValues["grade"];
-    answer.emailSentOn = mapWithValues["emailSentOn"];
+    const answer = new AnswerDataModel(questionNumber, body, comment);
+    answer.id = mapWithValues['id'];
+    answer.emailId = mapWithValues['emailId'];
+    answer.teamId = mapWithValues['teamId'];
+    answer.roundNumber = mapWithValues['roundNumber'];
+    answer.questionId = mapWithValues['questionId'];
+    answer.grade = mapWithValues['grade'];
+    answer.emailSentOn = mapWithValues['emailSentOn'];
 
     return answer;
   }
@@ -111,18 +109,18 @@ export class AnswerDataModel {
   }
 
   public get answerGrade2Display() {
-    var result: string = "???";
+    let result = '???';
     switch (this.grade) {
-      case "None":
-        result = "без оценки";
+      case 'None':
+        result = 'без оценки';
         break;
 
-      case "Accepted":
-        result = "Зачтён (+)";
+      case 'Accepted':
+        result = 'Зачтён (+)';
         break;
 
-      case "NotAccepted":
-        result = "Не зачтён (-)";
+      case 'NotAccepted':
+        result = 'Не зачтён (-)';
         break;
     }
 

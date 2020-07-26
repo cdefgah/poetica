@@ -1,20 +1,20 @@
-import { Component, OnInit } from "@angular/core";
-import { MatRadioChange, MatDialog, MatSelectChange } from "@angular/material";
-import { HttpClient } from "@angular/common/http";
-import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { EmailDataModel } from "src/app/data-model/EmailDataModel";
-import { AnswersListImporterComponent } from "../answers-list-importer/answers-list-importer.component";
-import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
-import { EmailsCountDigest } from "./support/EmailsCountDigest";
-import { AnswerDetailsComponent } from "../answer-details/answer-details.component";
-import { debugString, debugObject } from "src/app/utils/Config";
-import { EmailDetailsComponent } from "../email-details/email-details.component";
+import { Component, OnInit } from '@angular/core';
+import { MatRadioChange, MatDialog, MatSelectChange } from '@angular/material';
+import { HttpClient } from '@angular/common/http';
+import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
+import { AnswersListImporterComponent } from '../answers-list-importer/answers-list-importer.component';
+import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
+import { EmailsCountDigest } from './support/EmailsCountDigest';
+import { AnswerDetailsComponent } from '../answer-details/answer-details.component';
+import { debugString, debugObject } from 'src/app/utils/Config';
+import { EmailDetailsComponent } from '../email-details/email-details.component';
 
 @Component({
-  selector: "app-answers-list",
-  templateUrl: "./answers-list.component.html",
-  styleUrls: ["./answers-list.component.css"],
+  selector: 'app-answers-list',
+  templateUrl: './answers-list.component.html',
+  styleUrls: ['./answers-list.component.css'],
 })
 export class AnswersListComponent extends AbstractInteractiveComponentModel
   implements OnInit {
@@ -22,11 +22,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   allTeamIds: number[];
   teamTitleAndNumber: string[];
 
-  allRoundAliases: string[] = ["0", "1", "2"];
+  allRoundAliases: string[] = ['0', '1', '2'];
   allRoundTitles: string[] = [
-    "Все",
-    "Предварительный тур",
-    "Окончательный тур",
+    'Все',
+    'Предварительный тур',
+    'Окончательный тур',
   ];
 
   selectedRoundAlias: string = this.allRoundAliases[0];
@@ -43,17 +43,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   emailsCountDigest: EmailsCountDigest = EmailsCountDigest.emptyDigest;
 
   displayedAnswerColumns: string[] = [
-    "number",
-    "emailSentOn",
-    "body",
-    "roundNumber",
-    "comment",
+    'number',
+    'emailSentOn',
+    'body',
+    'roundNumber',
+    'comment',
   ];
 
   displayedEmailColumns: string[] = [
-    "sentOn",
-    "importedOn",
-    "questionNumbersSequence",
+    'sentOn',
+    'importedOn',
+    'questionNumbersSequence',
   ];
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
@@ -62,42 +62,42 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.loadTeamsList(this.loadAllDisplayedLists, this);
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   public checkPrerequisitesAndDoImportAnswers(): void {
-    var questionsMaxNumberEndPointUrl: string = "/questions/max-number";
+    const questionsMaxNumberEndPointUrl = '/questions/max-number';
     this.http.get(questionsMaxNumberEndPointUrl).subscribe(
       (maxNumberOfRegisteredQuestion: number) => {
         if (maxNumberOfRegisteredQuestion > 0) {
           // вопросы в базе представлены, проверяем наличие команд
-          var teamsTotalEndpointUrl: string = "/teams/total-number";
+          const teamsTotalEndpointUrl = '/teams/total-number';
           this.http.get(teamsTotalEndpointUrl).subscribe(
             (numberOfTeamsPresent: number) => {
               if (numberOfTeamsPresent > 0) {
                 this.importAnswers();
               } else {
                 this.displayMessage(
-                  "Не найдено зарегистрированных команд. Пожалуйста зарегистрируйте команды в системе, прежде чем импортировать ответы."
+                  'Не найдено зарегистрированных команд. Пожалуйста зарегистрируйте команды в системе, прежде чем импортировать ответы.'
                 );
               }
             },
             (error) => {
               this.reportServerError(
                 error,
-                "Не удалось получить информацию из базы данных о количестве команд."
+                'Не удалось получить информацию из базы данных о количестве команд.'
               );
             }
           );
         } else {
           this.displayMessage(
-            "Не удалось найти зарегистрированных заданий. Пожалуйста импортируйте в систему задания прежде чем импортировать ответы."
+            'Не удалось найти зарегистрированных заданий. Пожалуйста импортируйте в систему задания прежде чем импортировать ответы.'
           );
         }
       },
       (error) => {
         this.reportServerError(
           error,
-          "Не удалось получить информацию из базы данных о количестве заданий."
+          'Не удалось получить информацию из базы данных о количестве заданий.'
         );
       }
     );
@@ -105,7 +105,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   private importAnswers() {
     const importDialogConfig = AnswersListImporterComponent.getDialogConfigWithData();
-    var dialogRef = this.dialog.open(
+    const dialogRef = this.dialog.open(
       AnswersListImporterComponent,
       importDialogConfig
     );
@@ -115,21 +115,35 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
         // обновляем страницу со списками
         this.loadAllDisplayedLists(this);
 
-        debugString("Reloaded answers listed below:");
+        debugString('Reloaded answers listed below:');
         debugObject(this.answersDataSource);
       }
     });
   }
 
   loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent) {
-    const url: string = "/teams/all";
+    const url = '/teams/all';
 
     this.http.get(url).subscribe(
-      (data: TeamDataModel[]) => {
+      (unsortedTeamsList: TeamDataModel[]) => {
+
+        const sortedTeamsList: TeamDataModel[] = unsortedTeamsList.sort((team1, team2) => {
+
+          if (team1.title > team2.title) {
+            return 1;
+          }
+
+          if (team1.title < team2.title) {
+            return -1;
+          }
+
+          return 0;
+        });
+
         this.allTeamIds = [];
         this.teamTitleAndNumber = [];
 
-        data.forEach((oneTeam) => {
+        sortedTeamsList.forEach((oneTeam) => {
           this.allTeamIds.push(oneTeam.id);
           this.teamTitleAndNumber.push(`${oneTeam.title} (${oneTeam.number})`);
         });
@@ -159,7 +173,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       return;
     }
 
-    var url: string = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+    const url = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
     componentReference.http.get(url).subscribe(
       (loadedAnswers: AnswerDataModel[]) => {
@@ -226,13 +240,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       return;
     }
 
-    var emailsUrl: string = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+    const emailsUrl = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
     componentReference.http.get(emailsUrl).subscribe(
       (loadedEmailsList: EmailDataModel[]) => {
         componentReference.emailsDataSource = loadedEmailsList;
 
-        var digestUrl: string = `/emails/digest/${this.selectedTeamId}`;
+        const digestUrl = `/emails/digest/${this.selectedTeamId}`;
         componentReference.http.get(digestUrl).subscribe(
           (emailsCountDigest: EmailsCountDigest) => {
             componentReference.emailsCountDigest = emailsCountDigest;
@@ -259,13 +273,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onAnswerRowClicked(selectedRow: any) {
-    debugString("Answer row clicked. Selected row is below.");
+    debugString('Answer row clicked. Selected row is below.');
     debugObject(selectedRow);
 
     const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
-    var dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
+    const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result == AnswerDetailsComponent.DIALOG_GRADE_SET) {
@@ -279,13 +293,13 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onEmailRowClicked(selectedRow: any) {
-    debugString("Email row clicked. Selected row is below.");
+    debugString('Email row clicked. Selected row is below.');
     debugObject(selectedRow);
 
     const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
-    var dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
+    const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
