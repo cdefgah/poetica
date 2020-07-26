@@ -64,4 +64,10 @@ export class StringLinesIterator {
       );
     }
   }
+
+  public rewindIndexOneStepBack() {
+    if (this.sourceTextLinesIndex > 0) {
+      this.sourceTextLinesIndex--;
+    }
+  }
 }

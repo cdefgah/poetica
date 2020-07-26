@@ -110,6 +110,21 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       question.comment = this.loadSegmentText(firstCommentsLine);
     }
 
+    // тут проверяем наличие сегмента с информацией об источнике
+    if (!this.validateSourceSegmentPresence(question)) {
+      return false;
+    }
+
+    const questionSource = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
+    question.source = this.loadSegmentText(questionSource);
+
+    // проверяем наличие информации об авторе бескрылки
+    if (!this.validateAuthorInfoSegmentPresence(question)) {
+      return false;
+    }
+
+    const firstAuthorsInfoLine = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
+    question.authorInfo = this.loadSegmentText(firstAuthorsInfoLine);
 
     return true;
   }
@@ -154,6 +169,58 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
   }
 
+  private validateSourceSegmentPresence(question: QuestionDataModel): boolean {
+    const firstPartOfErrorMessage = `Для задания номер ${question.externalNumber} ожидался блок с информацией об источнике для этого задания.`;
+
+    if (!this.sourceTextLinesIterator.hasNextLine()) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но текст внезапно кончился. ${QuestionsImporter.rtfmMessage}`
+      );
+      return false;
+    }
+
+    const sourceFirstLine: string = this.sourceTextLinesIterator.nextLine(false);
+    if (!QuestionsImporter.isQuestionSourceLine(sourceFirstLine)) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но вы передаёте строку ${sourceFirstLine}. ${QuestionsImporter.rtfmMessage}`
+      );
+      return false;
+    }
+
+    // всё в порядке
+    return true;
+  }
+
+  private validateAuthorInfoSegmentPresence(question: QuestionDataModel): boolean {
+    const firstPartOfErrorMessage = `Для задания номер ${question.externalNumber} ожидался блок с информацией об авторе этого задания.`;
+
+    if (!this.sourceTextLinesIterator.hasNextLine()) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но текст внезапно кончился. ${QuestionsImporter.rtfmMessage}`
+      );
+      return false;
+    }
+
+    const authorsInfoFirstLine: string = this.sourceTextLinesIterator.nextLine(false);
+    if (!QuestionsImporter.isAuthorsInfoSourceLine(authorsInfoFirstLine)) {
+      this.allThingsOk = false;
+      this.onFailure(
+        this.parentComponentObject,
+        `${firstPartOfErrorMessage} Но вы передаёте строку ${authorsInfoFirstLine}. ${QuestionsImporter.rtfmMessage}`
+      );
+      return false;
+    }
+
+    // всё в порядке
+    return true;
+  }
+
   /**
    * Загружает тело того или иного сегмента до строки с control prefix.
    * @param firstSegmentLine первая строка загружаемого сегмента.
@@ -171,7 +238,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
       if (QuestionsImporter.hasControlPrefix(processingLine)) {
         // если взяли строку с control prefix, откатываемся назад на одну строку
-        this.sourceTextLinesIterator.stepIndexBack();
+        this.sourceTextLinesIterator.rewindIndexOneStepBack();
         // и прекращаем цикл
         break;
       }
