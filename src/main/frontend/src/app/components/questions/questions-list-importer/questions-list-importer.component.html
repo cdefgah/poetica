@@ -653,12 +653,12 @@
                 </td>
               </ng-container>
 
-              <ng-container matColumnDef="source">
+              <ng-container matColumnDef="authorsAnswer">
                 <th mat-header-cell *matHeaderCellDef>
-                  &nbsp;&nbsp;Источник&nbsp;&nbsp;
+                  &nbsp;&nbsp;Авторский ответ&nbsp;&nbsp;
                 </th>
                 <td mat-cell *matCellDef="let oneQuestion">
-                  {{ oneQuestion.source }}
+                  {{ oneQuestion.authorsAnswer }}
                 </td>
               </ng-container>
 
@@ -668,6 +668,24 @@
                 </th>
                 <td mat-cell *matCellDef="let oneQuestion">
                   {{ oneQuestion.comment }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="source">
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Источник&nbsp;&nbsp;
+                </th>
+                <td mat-cell *matCellDef="let oneQuestion">
+                  {{ oneQuestion.source }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="authorInfo">
+                <th mat-header-cell *matHeaderCellDef>
+                  &nbsp;&nbsp;Автор&nbsp;&nbsp;
+                </th>
+                <td mat-cell *matCellDef="let oneQuestion">
+                  {{ oneQuestion.authorInfo }}
                 </td>
               </ng-container>
 
