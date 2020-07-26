@@ -1,26 +1,26 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
+import { Component, OnInit, Inject } from '@angular/core';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialog,
   MatDialogConfig,
-} from "@angular/material";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamValidationService } from "../../core/validators/TeamValidationService";
-import { debugString, debugObject } from "src/app/utils/Config";
+} from '@angular/material';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { TeamValidationService } from '../../core/validators/TeamValidationService';
+import { debugString, debugObject } from 'src/app/utils/Config';
 
 @Component({
-  selector: "app-team-details",
-  templateUrl: "./team-details.component.html",
-  styleUrls: ["./team-details.component.css"],
+  selector: 'app-team-details',
+  templateUrl: './team-details.component.html',
+  styleUrls: ['./team-details.component.css'],
 })
 export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
-  private static readonly KEY_DIALOG_ID = "id";
+  private static readonly KEY_DIALOG_ID = 'id';
   private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
-    "modelValidatorService";
+    'modelValidatorService';
 
   public static readonly DIALOG_RESULT_ACCEPTED: number = 1;
   public static readonly DIALOG_RESULT_DECLINED: number = 2;
@@ -33,8 +33,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   team: TeamDataModel;
   teamCopy: TeamDataModel;
 
-  teamNumberIsIncorrect: boolean = false;
-  teamTitleIsIncorrect: boolean = false;
+  teamNumberIsIncorrect = false;
+  teamTitleIsIncorrect = false;
 
   serverResponse: any;
 
@@ -48,7 +48,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "29%";
+    dialogConfig.width = '29%';
 
     dialogConfig.data = new Map<string, any>();
 
@@ -56,14 +56,14 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
     ] = modelValidatorService;
 
-    debugString("Checking the row validity");
+    debugString('Checking the row validity');
     debugString(row);
     if (row) {
-      debugString("Checking the row validity ... row is TRUE");
+      debugString('Checking the row validity ... row is TRUE');
       dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_ID] =
         row[TeamDetailsComponent.KEY_DIALOG_ID];
     } else {
-      debugString("Checking the row validity - ROW IS FALSE");
+      debugString('Checking the row validity - ROW IS FALSE');
     }
 
     return dialogConfig;
@@ -98,12 +98,12 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     this._modelValidatorService =
       dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
-    var teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
+    const teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
 
     if (teamId) {
       // редактируем существующее задание
       this.isExistingRecord = true;
-      const url: string = `/teams/${teamId}`;
+      const url = `/teams/${teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
           this.team = TeamDataModel.createTeamFromMap(data);
@@ -121,7 +121,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     }
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
@@ -133,10 +133,10 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
       if (!this.team.id) {
         // добавляем новую запись
         const payload = new HttpParams()
-          .set("teamNumber", String(this.team.number))
-          .set("teamTitle", this.team.title.trim());
+          .set('teamNumber', String(this.team.number))
+          .set('teamTitle', this.team.title.trim());
 
-        this.http.post("/teams", payload).subscribe(
+        this.http.post('/teams', payload).subscribe(
           (data) => {
             this.serverResponse = data;
             this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
@@ -145,18 +145,18 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
         );
       } else {
         // обновляем существующую запись
-        var newTeamNumber: number =
+        let newTeamNumber: number =
           this.team.number != this.teamCopy.number ? this.team.number : -1;
 
-        var newTeamTitle: string =
-          this.team.title != this.teamCopy.title ? this.team.title : "";
+        let newTeamTitle: string =
+          this.team.title != this.teamCopy.title ? this.team.title : '';
 
         if (newTeamNumber >= 0 || newTeamTitle.length > 0) {
           // данные изменились, обновляем их на сервере
-          var requestUrl = `/teams/${this.team.id}`;
+          let requestUrl = `/teams/${this.team.id}`;
           const payload = new HttpParams()
-            .set("newTeamNumber", String(newTeamNumber))
-            .set("newTeamTitle", newTeamTitle);
+            .set('newTeamNumber', String(newTeamNumber))
+            .set('newTeamTitle', newTeamTitle);
 
           this.http.put(requestUrl, payload).subscribe(
             () => {
@@ -178,11 +178,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   deleteRecord() {
-    var confirmationMessage: string = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
+    let confirmationMessage = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
-      const url: string = `/teams/${this.team.id}`;
+      const url = `/teams/${this.team.id}`;
       this.http.delete(url).subscribe(
         (data: any) => {
           this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
@@ -198,7 +198,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
   private getDialogTitle(teamObject?: TeamDataModel): string {
     if (!teamObject) {
-      return "Новая команда";
+      return 'Новая команда';
     } else {
       return `Команда №${teamObject.number}`;
     }

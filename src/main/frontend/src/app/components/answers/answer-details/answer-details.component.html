@@ -4,10 +4,10 @@
     <mat-tab label="Ответ">
       <table>
         <tr>
-          <td>
+          <td width="15%">
             Получен:
           </td>
-          <td>
+          <td width="85%">
             {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </tr>
@@ -52,6 +52,19 @@
               {{ question.body }}
             </div>
           </td>
+        </tr>
+        <tr>
+          <td>
+            Авторский ответ:
+          </td>
+          <td>
+            <div class="authors-answer">
+              {{ question.authorsAnswer }}
+            </div>
+          </td>
+        </tr>
+        <tr class="answer-empty-row-divider">
+          <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
           <td>
