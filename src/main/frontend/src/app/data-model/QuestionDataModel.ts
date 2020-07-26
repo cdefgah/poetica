@@ -101,16 +101,16 @@ export class QuestionDataModel {
   }
 
   private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap[`id`];
-    this.externalNumber = initialMap[`externalNumber`];
-    this.lowestInternalNumber = initialMap[`lowestInternalNumber`];
-    this.highestInternalNumber = initialMap[`highestInternalNumber`];
-    this.title = initialMap[`title`];
-    this.body = initialMap[`body`];
-    this.authorsAnswer = initialMap[`authorsAnswer`];
-    this.source = initialMap[`source`];
-    this.comment = initialMap[`comment`];
-    this.graded = initialMap[`graded`];
-    this.authorInfo = initialMap[`authorInfo`];
+    this.id = initialMap['id'];
+    this.externalNumber = initialMap['externalNumber'];
+    this.lowestInternalNumber = initialMap['lowestInternalNumber'];
+    this.highestInternalNumber = initialMap['highestInternalNumber'];
+    this.title = initialMap['title'];
+    this.body = initialMap['body'];
+    this.authorsAnswer = initialMap['authorsAnswer'];
+    this.source = initialMap['source'];
+    this.comment = initialMap['comment'];
+    this.graded = initialMap['graded'];
+    this.authorInfo = initialMap['authorInfo'];
   }
 }
