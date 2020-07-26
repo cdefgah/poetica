@@ -290,13 +290,12 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       }
 
       numberBodyString = numberBodyString.substring(openingParenPosition + 1, closingParenPosition);
-
-      if (!this.parseQuestionNumber(numberBodyString, currentQuestionObject, sourceStringLine)) {
-        return false;
-      }
     }
 
-    this.expectedQuestionNumber = currentQuestionObject.highestInternalNumber + 1;
+    if (!this.parseQuestionNumber(numberBodyString, currentQuestionObject, sourceStringLine)) {
+      return false;
+    }
+
     currentQuestionObject.title = sourceStringLine.substring(colonSymbolPosition + 1).trim();
 
     return true;
@@ -304,7 +303,13 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
   private parseQuestionNumber(numberBodyString: string, currentQuestionObject: QuestionDataModel, sourceStringLine: string): boolean {
 
+    console.log("parseQuestionNumber -- start");
+
     currentQuestionObject.externalNumber = numberBodyString;
+
+    console.log("numberBodyString: " + numberBodyString);
+    console.log("sourceStringLine: " + sourceStringLine);
+
 
     if (numberBodyString.indexOf('-') === -1) {
       // одиночный номер
@@ -318,12 +323,18 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       }
     }
 
+    console.log("currentQuestionObject.lowestInternalNumber: " + currentQuestionObject.lowestInternalNumber);
+    console.log("currentQuestionObject.highestInternalNumber: " + currentQuestionObject.highestInternalNumber);
+    console.log("currentQuestionObject.externalNumber: " + currentQuestionObject.externalNumber);
+
     if (this.expectedQuestionNumber !== -1) {
       // если это не первый вопрос, проверяем порядок следования номеров заданий
-      if (
-        currentQuestionObject.lowestInternalNumber !==
-        this.expectedQuestionNumber
-      ) {
+      if (currentQuestionObject.lowestInternalNumber !== this.expectedQuestionNumber) {
+        console.log("===================================================================");
+        console.log("currentQuestionObject.lowestInternalNumber = " + currentQuestionObject.lowestInternalNumber);
+        console.log("this.expectedQuestionNumber = " + this.expectedQuestionNumber);
+        console.log("===================================================================");
+
         this.allThingsOk = false;
         this.onFailure(
           this.parentComponentObject,
@@ -332,6 +343,16 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
         return false;
       }
     }
+
+    console.log("********************************************************************");
+    console.log("currentQuestionObject.highestInternalNumber before setting expected question number: " + currentQuestionObject.highestInternalNumber);
+    console.log("this.expectedQuestionNumber before update: " + this.expectedQuestionNumber);
+    this.expectedQuestionNumber = currentQuestionObject.highestInternalNumber + 1;
+    console.log("this.expectedQuestionNumber after update: " + this.expectedQuestionNumber);
+    console.log("********************************************************************");
+
+
+    console.log("parseQuestionNumber -- end");
 
     return true;
   }

@@ -1,45 +1,57 @@
-import { QuestionDataModel } from "../data-model/QuestionDataModel";
-import { AbstractViewModel } from "./AbstractViewModel";
+import { QuestionDataModel } from '../data-model/QuestionDataModel';
+import { AbstractViewModel } from './AbstractViewModel';
 
 export class QuestionViewModelForTableRow extends AbstractViewModel {
-  private _questionDataModel: QuestionDataModel;
+  private questionDataModel: QuestionDataModel;
 
   constructor(questionDataModel: QuestionDataModel) {
     super();
-    this._questionDataModel = questionDataModel;
+    this.questionDataModel = questionDataModel;
   }
 
   public get externalNumber(): string {
-    return this._questionDataModel.externalNumber;
+    return this.questionDataModel.externalNumber;
   }
 
   public get mainContent(): string {
-    var mainContent: string;
-    var trimmedTitle: string = this._questionDataModel
-      ? this._questionDataModel.title.trim()
-      : "";
+    let mainContent = '';
+
+    const trimmedTitle: string = this.questionDataModel.title ? this.questionDataModel.title.trim() : '';
+
     if (trimmedTitle.length > 0) {
-      mainContent = trimmedTitle + "\n";
+      mainContent = trimmedTitle + '\n';
     }
 
-    mainContent = mainContent + this._questionDataModel.body;
+    mainContent = mainContent + this.questionDataModel.body;
 
-    return this.compressNewLines(mainContent);
+    return this.replaceNewLinesWithSurrogate(mainContent);
   }
 
   public get authorsAnswer(): string {
-    if (this._questionDataModel.authorsAnswer) {
-      return this.compressNewLines(this._questionDataModel.authorsAnswer);
+    if (this.questionDataModel.authorsAnswer) {
+      return this.replaceNewLinesWithSurrogate(this.questionDataModel.authorsAnswer);
     } else {
-      return "";
+      return '';
     }
   }
 
+  get id(): number {
+    return this.questionDataModel.id;
+  }
+
   public get source(): string {
-    return this._questionDataModel.source;
+    return this.questionDataModel.source;
   }
 
   public get comment(): string {
-    return this._questionDataModel.comment;
+    return this.questionDataModel.comment;
+  }
+
+  public get graded(): boolean {
+    return this.questionDataModel.graded;
+  }
+
+  public get authorInfo(): string {
+    return this.questionDataModel.authorInfo;
   }
 }

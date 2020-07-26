@@ -30,3 +30,11 @@ body {
 table {
   width: 100%;
 }
+
+.mat-cell {
+  padding: 1em 1em 1em 0;
+}
+
+.full-width {
+  width: 100%;
+}
