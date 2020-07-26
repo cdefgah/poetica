@@ -1,26 +1,26 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { AbstractInteractiveComponentModel } from "src/app/components/core/base/AbstractInteractiveComponentModel";
+import { Component, OnInit, Inject } from '@angular/core';
+import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import {
   MatDialog,
   MatDialogConfig,
   MAT_DIALOG_DATA,
   MatDialogRef,
-} from "@angular/material";
-import { debugString, debugObject } from "src/app/utils/Config";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
-import { EmailDataModel } from "src/app/data-model/EmailDataModel";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { QuestionDataModel } from "src/app/data-model/QuestionDataModel";
+} from '@angular/material';
+import { debugString, debugObject } from 'src/app/utils/Config';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
+import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
 
 @Component({
-  selector: "app-answer-details",
-  templateUrl: "./answer-details.component.html",
-  styleUrls: ["./answer-details.component.css"],
+  selector: 'app-answer-details',
+  templateUrl: './answer-details.component.html',
+  styleUrls: ['./answer-details.component.css'],
 })
 export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
-  private static readonly KEY_DIALOG_ID = "id";
+  private static readonly KEY_DIALOG_ID = 'id';
 
   public static readonly DIALOG_GRADE_SET: number = 1;
 
@@ -35,20 +35,20 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "75%";
+    dialogConfig.width = '75%';
 
     dialogConfig.data = new Map<string, any>();
 
-    debugString("Checking the row validity");
+    debugString('Checking the row validity');
     debugString(row);
     if (row) {
-      debugString("Checking the row validity ... row is defined!");
+      debugString('Checking the row validity ... row is defined!');
 
       // идентификатор ответа (из строки списка ответов)
       dialogConfig.data[AnswerDetailsComponent.KEY_DIALOG_ID] =
         row[AnswerDetailsComponent.KEY_DIALOG_ID];
     } else {
-      debugString("Checking the row validity - ROW IS UNDEFINED!");
+      debugString('Checking the row validity - ROW IS UNDEFINED!');
     }
 
     return dialogConfig;
@@ -62,29 +62,29 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    debugString("Loading answerId in the dialog ...");
-    var answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
+    debugString('Loading answerId in the dialog ...');
+    const answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
 
     debugString(`answerId = ${this.answer.id}`);
-    debugString("dialogData is below:");
+    debugString('dialogData is below:');
     debugObject(dialogData);
 
     // получаем объект answer
-    const answerDetailsUrl: string = `/answers/${answerId}`;
+    const answerDetailsUrl = `/answers/${answerId}`;
     this.httpClient.get(answerDetailsUrl).subscribe(
       (answerDetailsData: Map<string, any>) => {
         // получили, строим объект
         this.answer = AnswerDataModel.createAnswerFromMap(answerDetailsData);
 
         // получаем объект email
-        const emailRequestUrl: string = `/emails/${this.answer.emailId}`;
+        const emailRequestUrl = `/emails/${this.answer.emailId}`;
         this.httpClient.get(emailRequestUrl).subscribe(
           (emailDetailsData: Map<string, any>) => {
             // получили, строим объект
             this.email = EmailDataModel.createEmailFromMap(emailDetailsData);
 
             // получаем объект question
-            const questionRequestUrl: string = `/questions/${this.answer.questionId}`;
+            const questionRequestUrl = `/questions/${this.answer.questionId}`;
             this.httpClient.get(questionRequestUrl).subscribe(
               (questionDetailData: Map<string, any>) => {
                 // получили, строим объект
@@ -93,7 +93,7 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
                 );
 
                 // получаем объект team
-                const teamRequestUrl: string = `/teams/${this.answer.teamId}`;
+                const teamRequestUrl = `/teams/${this.answer.teamId}`;
                 this.httpClient.get(teamRequestUrl).subscribe(
                   (teamDetailsData: Map<string, any>) => {
                     // получили, строим объект
@@ -114,10 +114,10 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     );
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   get dialogTitle(): string {
-    return `Ответ (${this.answer.answerGrade2Display})`;
+    return `Ответ [ ${this.answer.answerGrade2Display} ]`;
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -125,17 +125,15 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   acceptAnswer() {
-    this.confirmationDialog("Принять ответ?", () => {
-      debugString("Answer has accepted");
-      var requestUrl = "/answers/accept";
-      const payload = new HttpParams().set(
-        "answerId",
-        this.answer.id.toString()
+    this.confirmationDialog('Принять ответ?', () => {
+      debugString('Answer has accepted');
+      const requestUrl = '/answers/accept';
+      const payload = new HttpParams().set('answerId', this.answer.id.toString()
       );
 
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
-          debugString("Answer has accepted ... request done successfully");
+          debugString('Answer has accepted ... request done successfully');
           this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
         },
         (error) => this.reportServerError(error)
@@ -144,17 +142,14 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   declineAnswer() {
-    this.confirmationDialog("Отклонить ответ?", () => {
-      debugString("Answer has declined");
-      var requestUrl = "/answers/decline";
-      const payload = new HttpParams().set(
-        "answerId",
-        this.answer.id.toString()
-      );
+    this.confirmationDialog('Отклонить ответ?', () => {
+      debugString('Answer has declined');
+      const requestUrl = '/answers/decline';
+      const payload = new HttpParams().set('answerId', this.answer.id.toString());
 
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
-          debugString("Answer has declined ... request done successfully");
+          debugString('Answer has declined ... request done successfully');
           this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
         },
         (error) => this.reportServerError(error)
@@ -163,7 +158,7 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   justCloseDialog() {
-    debugString("Just closing dialog without affecting answer");
+    debugString('Just closing dialog without affecting answer');
     this.dialog.close();
   }
 }

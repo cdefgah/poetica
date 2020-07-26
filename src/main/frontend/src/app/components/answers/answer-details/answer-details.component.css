@@ -2,19 +2,30 @@
   max-height: 300px;
   overflow: auto;
   white-space: pre-wrap;
-  background-color: peachpuff;
+  background-color: lightgoldenrodyellow;
 }
 
 .email-body {
   max-height: 300px;
   overflow: auto;
   white-space: pre-line;
-  background-color: peachpuff;
+  background-color:  lightcyan;
 }
 
 .question-body {
   max-height: 300px;
   overflow: auto;
   white-space: pre-line;
+  background-color: lightblue;
+}
+
+.answer-empty-row-divider {
+  height: 0.5em;
   background-color: peachpuff;
+}
+
+.authors-answer {
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-line;
 }
