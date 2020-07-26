@@ -1,5 +1,5 @@
-import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
+import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 
 export class EmailBodyParsingResult {
   team: TeamDataModel;
@@ -10,11 +10,11 @@ export class EmailBodyParsingResult {
     this.team = team;
     this.answers = answers;
 
-    var questionNumbersArray: number[] = [];
+    const questionNumbersArray: number[] = [];
     answers.forEach((oneAnswer) =>
       questionNumbersArray.push(oneAnswer.questionNumber)
     );
 
-    this.questionNumbersSequenceString = questionNumbersArray.join(", ");
+    this.questionNumbersSequenceString = questionNumbersArray.join(', ');
   }
 }

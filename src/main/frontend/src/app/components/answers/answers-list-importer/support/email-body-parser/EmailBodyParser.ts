@@ -1,29 +1,29 @@
-import { AbstractMultiLineDataImporter } from "src/app/utils/AbstractMultilineDataImporter";
-import { EmailBodyParserParameters } from "./EmailBodyParserParameters";
-import { HttpClient } from "@angular/common/http";
-import { EmailValidationService } from "src/app/components/core/validators/EmailValidationService";
-import { TeamValidationService } from "src/app/components/core/validators/TeamValidationService";
-import { AnswerValidationService } from "src/app/components/core/validators/AnswerValidationService";
-import { CalculationResult } from "../CalculationResult";
-import { StringBuilder } from "../../../../../utils/StringBuilder";
-import { EmailBodyParsingResult } from "./EmailBodyParsingResult";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { AnswerDataModel } from "src/app/data-model/AnswerDataModel";
-import { debugString } from "src/app/utils/Config";
+import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
+import { EmailBodyParserParameters } from './EmailBodyParserParameters';
+import { HttpClient } from '@angular/common/http';
+import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
+import { TeamValidationService } from 'src/app/components/core/validators/TeamValidationService';
+import { AnswerValidationService } from 'src/app/components/core/validators/AnswerValidationService';
+import { CalculationResult } from '../CalculationResult';
+import { StringBuilder } from '../../../../../utils/StringBuilder';
+import { EmailBodyParsingResult } from './EmailBodyParsingResult';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
+import { debugString } from 'src/app/utils/Config';
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
-  private static readonly answersBlockPrefix: string = "***";
+  private static readonly answersBlockPrefix: string = '***';
 
-  private _team: TeamDataModel;
+  private team: TeamDataModel;
 
-  private _emailValidationService: EmailValidationService;
-  private _teamValidationService: TeamValidationService;
-  private _answerValidationService: AnswerValidationService;
+  private emailValidationService: EmailValidationService;
+  private teamValidationService: TeamValidationService;
+  private answerValidationService: AnswerValidationService;
 
-  private _teamFromEmailSubject: TeamDataModel;
-  private _roundNumber: string;
+  private teamFromEmailSubject: TeamDataModel;
+  private roundNumber: string;
 
-  private _httpClient: HttpClient;
+  private httpClient: HttpClient;
 
   constructor(
     parameters: EmailBodyParserParameters,
@@ -31,96 +31,90 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     onFailure: Function
   ) {
     super(parameters.emailBody, onSuccess, onFailure);
-    this._parentComponentObject = parameters.parentComponentObject;
-    this._teamFromEmailSubject = parameters.teamFromEmailSubject;
-    this._roundNumber = parameters.roundNumber;
+    this.parentComponentObject = parameters.parentComponentObject;
+    this.teamFromEmailSubject = parameters.teamFromEmailSubject;
+    this.roundNumber = parameters.roundNumber;
 
-    this._emailValidationService = parameters.emailValidationService;
-    this._teamValidationService = parameters.teamValidationService;
-    this._answerValidationService = parameters.answerValidationService;
-    this._httpClient = parameters.httpClient;
+    this.emailValidationService = parameters.emailValidationService;
+    this.teamValidationService = parameters.teamValidationService;
+    this.answerValidationService = parameters.answerValidationService;
+    this.httpClient = parameters.httpClient;
   }
 
   public parse(): void {
-    var emailBodyValidationResult: string = this._emailValidationService.validateEmailBody(
-      this.normalizedSourceString
-    );
+    const emailBodyValidationResult: string = this.emailValidationService.validateEmailBody(this.normalizedSourceString);
     if (emailBodyValidationResult.length > 0) {
-      this._onFailure(this._parentComponentObject, emailBodyValidationResult);
+      this.onFailure(this.parentComponentObject, emailBodyValidationResult);
       return;
     }
 
-    var firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
+    const firstLineOfAnswersBlockCalcResult: CalculationResult = this.getTheFirstLineOfAnswersBlock();
     if (firstLineOfAnswersBlockCalcResult.errorsPresent) {
-      this._onFailure(
-        this._parentComponentObject,
+      this.onFailure(
+        this.parentComponentObject,
         firstLineOfAnswersBlockCalcResult.errorMessage
       );
       return;
     }
 
-    var firstLineFromAnswersBlock: string =
-      firstLineOfAnswersBlockCalcResult.result;
-
-    var teamInfoCalculationResult = this.getTeamFromTheFirstLineOfTheAnswersBlock(
-      firstLineFromAnswersBlock
-    );
+    const firstLineFromAnswersBlock: string = firstLineOfAnswersBlockCalcResult.resultObject;
+    const teamInfoCalculationResult = this.getTeamFromTheFirstLineOfTheAnswersBlock(firstLineFromAnswersBlock);
 
     if (teamInfoCalculationResult.errorsPresent) {
-      this._onFailure(
-        this._parentComponentObject,
+      this.onFailure(
+        this.parentComponentObject,
         teamInfoCalculationResult.errorMessage
       );
       return;
     } else {
-      this._team = teamInfoCalculationResult.result;
+      this.team = teamInfoCalculationResult.resultObject;
 
-      if (this._teamFromEmailSubject) {
-        if (this._teamFromEmailSubject.number != this._team.number) {
-          this._onFailure(
-            this._parentComponentObject,
-            `Номер команды в содержимом письма ${this._team.number} отличается от номера команды в теме письма: ${this._teamFromEmailSubject.number}`
+      if (this.teamFromEmailSubject) {
+        if (this.teamFromEmailSubject.number !== this.team.number) {
+          this.onFailure(
+            this.parentComponentObject,
+            `Номер команды в содержимом письма ${this.team.number} отличается от номера команды в теме письма: ${this.teamFromEmailSubject.number}`
           );
           return;
         }
       }
     }
 
-    var parsingResult: CalculationResult = this.parseAnswersBlock();
+    const parsingResult: CalculationResult = this.parseAnswersBlock();
     if (parsingResult.errorsPresent) {
-      this._onFailure(this._parentComponentObject, parsingResult.errorMessage);
+      this.onFailure(this.parentComponentObject, parsingResult.errorMessage);
       return;
     }
 
     // и в финале всего запускаем проверку корректности данных на основе ответа сервера
-    this.doValidationWithServerData(this, parsingResult.result);
+    this.doValidationWithServerData(this, parsingResult.resultObject);
   }
 
   private doValidationWithServerData(
     parserObjectReference: EmailBodyParser,
     loadedAnswers: AnswerDataModel[]
   ) {
-    debugString("Validating team title...");
+    debugString('Validating team title...');
     // сперва проверяем корректность названия команды из письма
-    var teamNumber: number = parserObjectReference._team.number;
+    const teamNumber: number = parserObjectReference.team.number;
     debugString(`teamNumber: ${teamNumber}`);
 
-    const teamValidationUrl: string = `/teams/numbers/${teamNumber}`;
+    const teamValidationUrl = `/teams/numbers/${teamNumber}`;
     debugString(`teamValidationUrl: ${teamValidationUrl}`);
 
-    var importingTeamTitle = parserObjectReference._team.title;
-    parserObjectReference._httpClient.get(teamValidationUrl).subscribe(
+    const importingTeamTitle = parserObjectReference.team.title;
+    parserObjectReference.httpClient.get(teamValidationUrl).subscribe(
       (data: Map<string, any>) => {
-        var teamObjectfromTheServer: TeamDataModel = TeamDataModel.createTeamFromMap(
+        const teamObjectfromTheServer: TeamDataModel = TeamDataModel.createTeamFromMap(
           data
         );
-        var loadedTeamTitle: string = teamObjectfromTheServer.title;
+        const loadedTeamTitle: string = teamObjectfromTheServer.title;
         if (
           loadedTeamTitle.toLowerCase() !== importingTeamTitle.toLowerCase()
         ) {
-          parserObjectReference._onFailure(
-            parserObjectReference._parentComponentObject,
-            `В базе данных команда с номером: ${teamNumber} записана как '${loadedTeamTitle}'. 
+          parserObjectReference.onFailure(
+            parserObjectReference.parentComponentObject,
+            `В базе данных команда с номером: ${teamNumber} записана как '${loadedTeamTitle}'.
             А в письме передано название команды: '${importingTeamTitle}'`
           );
           return;
@@ -128,46 +122,44 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           // название команды в письме и в базе совпало
 
           // теперь прописываем полученный идентификатор команды в соответствующий объект
-          parserObjectReference._team.id = teamObjectfromTheServer.id;
+          parserObjectReference.team.id = teamObjectfromTheServer.id;
 
           // получаем максимальный номер загружаемого ответа
-          var maxQuestionNumberInAnswers: number =
-            loadedAnswers[loadedAnswers.length - 1].questionNumber;
+          const maxQuestionNumberInAnswers: number = loadedAnswers[loadedAnswers.length - 1].questionNumber;
 
           // теперь проверяем корректность максимального номера в ответах
-          const maxQuestionNumberValidationUrl: string =
-            "/questions/max-number";
-          parserObjectReference._httpClient
+          const maxQuestionNumberValidationUrl = '/questions/max-number';
+          parserObjectReference.httpClient
             .get(maxQuestionNumberValidationUrl)
             .subscribe(
               (maxNumberOfRegisteredQuestion: number) => {
                 if (
                   maxNumberOfRegisteredQuestion < maxQuestionNumberInAnswers
                 ) {
-                  parserObjectReference._onFailure(
-                    parserObjectReference._parentComponentObject,
-                    `Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}. 
+                  parserObjectReference.onFailure(
+                    parserObjectReference.parentComponentObject,
+                    `Максимальный номер задания, зарегистрированного в базе данных равен: ${maxNumberOfRegisteredQuestion}.
                 Но среди импортируемых ответов представлен ответ на задание с номером: ${maxQuestionNumberInAnswers}`
                   );
                   return;
                 } else {
                   // все проверки пройдены, ура!
-                  var emailBodyParsingResult: EmailBodyParsingResult = new EmailBodyParsingResult(
-                    parserObjectReference._team,
+                  const emailBodyParsingResult: EmailBodyParsingResult = new EmailBodyParsingResult(
+                    parserObjectReference.team,
                     loadedAnswers
                   );
 
-                  parserObjectReference._onSuccess(
-                    parserObjectReference._parentComponentObject,
+                  parserObjectReference.onSuccess(
+                    parserObjectReference.parentComponentObject,
                     emailBodyParsingResult
                   );
                   return;
                 }
               },
               (error) => {
-                parserObjectReference._onFailure(
-                  parserObjectReference._parentComponentObject,
-                  `Не удалось получить информацию из базы данных о максимальном номере загруженного задания. 
+                parserObjectReference.onFailure(
+                  parserObjectReference.parentComponentObject,
+                  `Не удалось получить информацию из базы данных о максимальном номере загруженного задания.
                 Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`
                 );
                 return;
@@ -176,17 +168,17 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         }
       },
       (error) => {
-        const NOT_FOUND_STATUS: number = 404;
-        var errorMessage: string;
-        if (error.status == NOT_FOUND_STATUS) {
+        const NOT_FOUND_STATUS = 404;
+        let errorMessage: string;
+        if (error.status === NOT_FOUND_STATUS) {
           errorMessage = `Не удалось найти в базе данных команду с номером: ${teamNumber}`;
         } else {
           errorMessage = `Не удалось получить информацию из базы данных о команде с номером: ${teamNumber}.
             Дополнительная информация от сервера: Сообщение: ${error.message}. Код ошибки: ${error.status}`;
         }
 
-        parserObjectReference._onFailure(
-          parserObjectReference._parentComponentObject,
+        parserObjectReference.onFailure(
+          parserObjectReference.parentComponentObject,
           errorMessage
         );
         return;
@@ -200,8 +192,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
    * @returns первая строка блока ответов, из которой исключён префикс в три звёздочки.
    */
   private getTheFirstLineOfAnswersBlock(): CalculationResult {
-    while (this._sourceTextLinesIterator.hasNextLine()) {
-      var oneLine = this._sourceTextLinesIterator.nextLine();
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      const oneLine = this.sourceTextLinesIterator.nextLine();
       if (oneLine.startsWith(EmailBodyParser.answersBlockPrefix)) {
         return new CalculationResult(
           oneLine.substring(EmailBodyParser.answersBlockPrefix.length).trim(),
@@ -212,20 +204,20 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
     return new CalculationResult(
       null,
-      "В теле письма не обнаружен признак начала блока ответов."
+      'В теле письма не обнаружен признак начала блока ответов.'
     );
   }
 
   private getTeamFromTheFirstLineOfTheAnswersBlock(
     firstLine: string
   ): CalculationResult {
-    var foundTeamTitle: string = "";
-    var foundTeamNumberString: string = "";
-    var foundTeamNumber: number;
-    var errorMessage: string = "";
+    let foundTeamTitle = '';
+    let foundTeamNumberString = '';
+    let foundTeamNumber: number;
+    let errorMessage = '';
 
-    if (firstLine.indexOf(",") !== -1) {
-      var firstLineParts = firstLine.split(",");
+    if (firstLine.indexOf(',') !== -1) {
+      const firstLineParts = firstLine.split(',');
       foundTeamTitle = firstLineParts[0].trim();
       foundTeamNumberString = firstLineParts[1].trim();
 
@@ -233,56 +225,52 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         errorMessage = `Номер команды может быть либо нулём, либо положительным целым значением. Но в письме передан номер: ${foundTeamNumberString}`;
         return new CalculationResult(null, errorMessage);
       } else {
-        foundTeamNumber = parseInt(foundTeamNumberString);
+        foundTeamNumber = EmailBodyParser.parseInt(foundTeamNumberString);
       }
     } else {
       foundTeamTitle = firstLine;
     }
 
     foundTeamTitle = EmailBodyParser.removeDoubleQuotations(foundTeamTitle);
-    if (foundTeamTitle.length == 0) {
-      errorMessage = "В содержании письма не указано название команды";
+    if (foundTeamTitle.length === 0) {
+      errorMessage = 'В содержании письма не указано название команды';
       return new CalculationResult(null, errorMessage);
     }
 
-    if (this._teamFromEmailSubject) {
+    if (this.teamFromEmailSubject) {
       // совпадение названия команды из темы письма с названием в содержании - не проверяем.
       // так как в теме письма может быть транслит, а в содержании - кириллица.
       // проверяем только номер.
-      if (foundTeamNumber != this._teamFromEmailSubject.number) {
-        errorMessage = `Номер команды в теме письма: ${this._teamFromEmailSubject.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
+      if (foundTeamNumber !== this.teamFromEmailSubject.number) {
+        errorMessage = `Номер команды в теме письма: ${this.teamFromEmailSubject.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
         return new CalculationResult(null, errorMessage);
       }
     }
 
-    var team: TeamDataModel = TeamDataModel.createTeamByNumberAndTitle(
-      foundTeamNumber,
-      foundTeamTitle
-    );
-
+    const team: TeamDataModel = TeamDataModel.createTeamByNumberAndTitle(foundTeamNumber, foundTeamTitle);
     return new CalculationResult(team, null);
   }
 
   private parseAnswersBlock(): CalculationResult {
-    var answers: AnswerDataModel[] = [];
+    const answers: AnswerDataModel[] = [];
 
-    var wholeAnswer: StringBuilder = new StringBuilder();
-    var wholeComment: StringBuilder = new StringBuilder();
+    const wholeAnswer: StringBuilder = new StringBuilder();
+    const wholeComment: StringBuilder = new StringBuilder();
 
-    const commentPrefix: string = "%";
-    var questionNumber: string = "";
-    var commentPrefixLocation: number;
-    var processedQuestionNumbers = new Set();
-    var continueProcessingLines: boolean = true;
-    var answerRegistrationResult: CalculationResult;
+    const commentPrefix = '%';
+    let questionNumber = '';
+    let commentPrefixLocation: number;
+    const processedQuestionNumbers = new Set();
+    let continueProcessingLines = true;
+    let answerRegistrationResult: CalculationResult;
 
     while (
-      this._sourceTextLinesIterator.hasNextLine() &&
+      this.sourceTextLinesIterator.hasNextLine() &&
       continueProcessingLines
     ) {
-      var currentLine = this._sourceTextLinesIterator.nextLine();
+      const currentLine = this.sourceTextLinesIterator.nextLine();
 
-      if (currentLine.startsWith("#")) {
+      if (currentLine.startsWith('#')) {
         // если строка начинается с символа, который знаменует начало ответа
         // сохраняем ранее сформированный ответ и комментарий к нему
         if (questionNumber.length > 0) {
@@ -292,7 +280,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           }
         }
 
-        var dotLocation: number = currentLine.indexOf(".");
+        const dotLocation: number = currentLine.indexOf('.');
         if (dotLocation !== -1) {
           questionNumber = currentLine.substring(1, dotLocation).trim();
           if (!EmailBodyParser.isZeroOrPositiveInteger(questionNumber)) {
@@ -302,20 +290,14 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
             );
           }
 
-          var firstLineOfTheAnswer: string = currentLine
-            .substring(dotLocation + 1)
-            .trim();
+          let firstLineOfTheAnswer: string = currentLine.substring(dotLocation + 1).trim();
 
-          var firstLineOfTheComment: string;
+          let firstLineOfTheComment: string;
           commentPrefixLocation = firstLineOfTheAnswer.indexOf(commentPrefix);
           if (commentPrefixLocation !== -1) {
             // комментарий в первой строке представлен
-            firstLineOfTheComment = firstLineOfTheAnswer
-              .substring(commentPrefixLocation + 1)
-              .trim();
-            firstLineOfTheAnswer = firstLineOfTheAnswer
-              .substring(0, commentPrefixLocation)
-              .trim();
+            firstLineOfTheComment = firstLineOfTheAnswer.substring(commentPrefixLocation + 1).trim();
+            firstLineOfTheAnswer = firstLineOfTheAnswer.substring(0, commentPrefixLocation).trim();
 
             wholeComment.addString(firstLineOfTheComment);
           }
@@ -328,21 +310,17 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
           );
         }
       } else {
-        if (!currentLine.startsWith("***")) {
+        if (!currentLine.startsWith('***')) {
           // если строка НЕ начинается с символа, который знаменует начало ответа
 
           commentPrefixLocation = currentLine.indexOf(commentPrefix);
 
           if (commentPrefixLocation !== -1) {
             // в обрабатываемой строке есть комментарий
-            var onlyAnswerPart: string = currentLine
-              .substring(0, commentPrefixLocation)
-              .trim();
+            const onlyAnswerPart: string = currentLine.substring(0, commentPrefixLocation).trim();
             wholeAnswer.addString(onlyAnswerPart);
 
-            var onlyCommentPart: string = currentLine
-              .substring(commentPrefixLocation + 1)
-              .trim();
+            const onlyCommentPart: string = currentLine.substring(commentPrefixLocation + 1).trim();
 
             wholeComment.addString(onlyCommentPart);
           } else {
@@ -363,15 +341,15 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       }
     }
 
-    if (answers.length == 0) {
+    if (answers.length === 0) {
       return new CalculationResult(
         null,
-        "В содержании письма не представлено ни одного ответа."
+        'В содержании письма не представлено ни одного ответа.'
       );
     }
 
     // возвращаем список ответов
-    return new CalculationResult(answers, "");
+    return new CalculationResult(answers, '');
 
     // ================================ Локальные функции ==============================
     /**
@@ -390,53 +368,45 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
       processedQuestionNumbers.add(questionNumber);
 
-      var answerRecord: AnswerDataModel = AnswerDataModel.emptyAnswer;
+      let answerRecord: AnswerDataModel = AnswerDataModel.emptyAnswer;
 
       // в ответе может быть просто номер с точкой
       // но не быть ответа (placeholder для читабельности),
       // в таком случае пустой ответ не регистрируем а пропускаем
       if (wholeAnswer.length() > 0) {
-        var answerBody: string = wholeAnswer.toString();
-        var answerBodyValidationMessage: string = currentObjectReference._answerValidationService.validateAnswerBody(
-          answerBody,
-          questionNumber
-        );
+        const answerBody: string = wholeAnswer.toString();
+        const answerBodyValidationMessage: string = currentObjectReference.answerValidationService.
+          validateAnswerBody(answerBody, questionNumber);
+
         if (answerBodyValidationMessage.length > 0) {
           return new CalculationResult(null, answerBodyValidationMessage);
         }
 
-        var answerComment: string = wholeComment.toString();
-        var answerCommentValidationMessage: string = currentObjectReference._answerValidationService.validateAnswerComment(
-          answerComment,
-          questionNumber
-        );
+        const answerComment: string = wholeComment.toString();
+        const answerCommentValidationMessage: string = currentObjectReference.answerValidationService.
+          validateAnswerComment(answerComment, questionNumber);
+
         if (answerCommentValidationMessage.length > 0) {
           return new CalculationResult(null, answerCommentValidationMessage);
         }
 
-        answerRecord = new AnswerDataModel(
-          parseInt(questionNumber),
-          answerBody,
-          answerComment
-        );
+        answerRecord = new AnswerDataModel(EmailBodyParser.parseInt(questionNumber), answerBody, answerComment);
 
         if (
-          currentObjectReference._roundNumber &&
-          currentObjectReference._roundNumber.length > 0
+          currentObjectReference.roundNumber &&
+          currentObjectReference.roundNumber.length > 0
         ) {
-          answerRecord.roundNumber = parseInt(
-            currentObjectReference._roundNumber
-          );
+          answerRecord.roundNumber = EmailBodyParser.parseInt(currentObjectReference.roundNumber);
         }
 
         answers.push(answerRecord);
       }
 
-      questionNumber = "";
+      questionNumber = '';
       wholeAnswer.reset();
       wholeComment.reset();
 
-      return new CalculationResult(answerRecord, "");
+      return new CalculationResult(answerRecord, '');
     }
     // =====================================================================================================
   }

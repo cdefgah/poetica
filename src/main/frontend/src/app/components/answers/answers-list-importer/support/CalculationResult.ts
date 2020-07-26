@@ -3,23 +3,15 @@
  * Также, если произошла ошибка, хранит информацию об этом.
  */
 export class CalculationResult {
-  private _resultObject: any;
-  private _errorMessage: string;
+  public readonly resultObject: any;
+  public readonly errorMessage: string;
 
   constructor(resultObject: any, errorMessage: string) {
-    this._resultObject = resultObject;
-    this._errorMessage = errorMessage;
+    this.resultObject = resultObject;
+    this.errorMessage = errorMessage;
   }
 
   public get errorsPresent(): boolean {
-    return this._errorMessage && this._errorMessage.length > 0;
-  }
-
-  get errorMessage() {
-    return this._errorMessage;
-  }
-
-  get result(): any {
-    return this._resultObject;
+    return this.errorMessage && this.errorMessage.length > 0;
   }
 }
