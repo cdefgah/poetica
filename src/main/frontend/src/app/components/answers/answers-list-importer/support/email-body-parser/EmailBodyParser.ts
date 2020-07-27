@@ -2,7 +2,6 @@ import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDa
 import { EmailBodyParserParameters } from './EmailBodyParserParameters';
 import { HttpClient } from '@angular/common/http';
 import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
-import { TeamValidationService } from 'src/app/components/core/validators/TeamValidationService';
 import { AnswerValidationService } from 'src/app/components/core/validators/AnswerValidationService';
 import { CalculationResult } from '../CalculationResult';
 import { StringBuilder } from '../../../../../utils/StringBuilder';
@@ -17,7 +16,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private team: TeamDataModel;
 
   private emailValidationService: EmailValidationService;
-  private teamValidationService: TeamValidationService;
   private answerValidationService: AnswerValidationService;
 
   private teamFromEmailSubject: TeamDataModel;
@@ -36,7 +34,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     this.roundNumber = parameters.roundNumber;
 
     this.emailValidationService = parameters.emailValidationService;
-    this.teamValidationService = parameters.teamValidationService;
     this.answerValidationService = parameters.answerValidationService;
     this.httpClient = parameters.httpClient;
   }
@@ -80,6 +77,11 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       }
     }
 
+    // тут пропускаем строки до начала блока ответов, а то иногда в письмах бывает, в нарушение регламента
+    // пишут разные пожелания и обращения.
+    this.skipLinesUnitlAnswersBlockStart();
+
+    // загружаем ответы
     const parsingResult: CalculationResult = this.parseAnswersBlock();
     if (parsingResult.errorsPresent) {
       this.onFailure(this.parentComponentObject, parsingResult.errorMessage);
@@ -184,6 +186,16 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         return;
       }
     );
+  }
+
+  private skipLinesUnitlAnswersBlockStart(): void {
+    while (this.sourceTextLinesIterator.hasNextLine()) {
+      const processingLine = this.sourceTextLinesIterator.nextLine();
+      if (processingLine.startsWith('#')) {
+        this.sourceTextLinesIterator.rewindIndexOneStepBack();
+        break;
+      }
+    }
   }
 
   /**

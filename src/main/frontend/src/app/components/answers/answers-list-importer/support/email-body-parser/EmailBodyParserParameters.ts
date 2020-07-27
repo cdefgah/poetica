@@ -9,7 +9,6 @@ export class EmailBodyParserParameters {
 
   emailBody: string;
   emailValidationService: EmailValidationService;
-  teamValidationService: TeamValidationService;
   answerValidationService: AnswerValidationService;
 
   teamFromEmailSubject: TeamDataModel;
