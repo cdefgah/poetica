@@ -155,4 +155,12 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
       }
     });
   }
+
+  public ExportQuestions() {
+    this.displayMessage('Экспортировать! ататата!');
+  }
+
+  public get questionsArePresent(): boolean {
+    return this.dataSource && this.dataSource.length > 0;
+  }
 }

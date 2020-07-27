@@ -8,10 +8,6 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
   protected abstract getMessageDialogReference(): MatDialog;
 
   protected reportServerError(error: any, customMessage: string = '') {
-    console.log("=====================================================");
-    console.log("error object is below");
-    console.dir(error);
-    console.log("=====================================================");
 
     function getServerErrorMessage(errorObject: any) {
       let rawErrorMessage: string;
@@ -25,11 +21,6 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
       } else {
         rawErrorMessage = errorObject.toString();
       }
-
-      console.log("raw error message is below");
-      console.log(rawErrorMessage);
-      console.dir(rawErrorMessage);
-      console.log("============================");
 
       // TODO переделать на пристойный механизм обработки ошибок, а это это какая-то печаль и непристойность
       const prefixToCheck = 'Внимание: '; // наличие этого префикса говорит о том, что ошибка штатная (не катастрофа).
@@ -53,11 +44,11 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
   }
 
   protected displayMessage(
-    errorMessage: string,
+    messageToDisplay: string,
     messageBoxTitle: string = 'Внимание'
   ): void {
     const msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      errorMessage,
+      messageToDisplay,
       messageBoxTitle
     );
 

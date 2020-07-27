@@ -32,7 +32,7 @@ export class AnswersListImporterComponent
 
   get selectedRoundTitle(): string {
     if (this.selectedRoundNumber) {
-      let index = parseInt(this.selectedRoundNumber) - 1;
+      const index = parseInt(this.selectedRoundNumber) - 1;
       return this.allRoundTitles[index];
     } else {
       return '???';
@@ -190,7 +190,7 @@ export class AnswersListImporterComponent
   }
 
   private static generateClockOptions(maxValue: number): any {
-    let result: string[] = [];
+    const result: string[] = [];
     let element: string;
     for (let i = 0; i <= maxValue; i++) {
       element = i < 10 ? '0' : '';
@@ -279,7 +279,7 @@ export class AnswersListImporterComponent
 
     debugString('Initializing the emailSubjectParser object');
 
-    let emailSubjectParser = new EmailSubjectParser(
+    const emailSubjectParser = new EmailSubjectParser(
       emailSubjectParserParameters,
       onSuccess,
       onFailure
@@ -318,13 +318,12 @@ export class AnswersListImporterComponent
 
     debugString('Preparing email body parser for launch...');
 
-    let emailBodyParserParameters: EmailBodyParserParameters = new EmailBodyParserParameters();
+    const emailBodyParserParameters: EmailBodyParserParameters = new EmailBodyParserParameters();
     emailBodyParserParameters.parentComponentObject = parentComponentObject;
     emailBodyParserParameters.emailBody = parentComponentObject.emailBody;
     emailBodyParserParameters.emailValidationService =
       parentComponentObject.emailValidationService;
-    emailBodyParserParameters.teamValidationService =
-      parentComponentObject.teamValidationService;
+
     emailBodyParserParameters.answerValidationService =
       parentComponentObject.answerValidationService;
 
@@ -336,7 +335,7 @@ export class AnswersListImporterComponent
     emailBodyParserParameters.httpClient = parentComponentObject.httpClient;
 
     debugString('Creating emailBodyParser object');
-    let emailBodyParser: EmailBodyParser = new EmailBodyParser(
+    const emailBodyParser: EmailBodyParser = new EmailBodyParser(
       emailBodyParserParameters,
       parentComponentObject.onSuccessfullyEmailBodyParse,
       parentComponentObject.onEmailParsingFailure
@@ -408,9 +407,9 @@ export class AnswersListImporterComponent
     if (this.emailSentOnDate) {
       debugString(`this.emailSentOnDate = ${this.emailSentOnDate}`);
 
-      let day = this.emailSentOnDate.getDate();
-      let month = this.emailSentOnDate.getMonth();
-      let year = this.emailSentOnDate.getFullYear();
+      const day = this.emailSentOnDate.getDate();
+      const month = this.emailSentOnDate.getMonth();
+      const year = this.emailSentOnDate.getFullYear();
 
       if (!this.emailSentOnHour) {
         this.emailSentOnHour = '0';
@@ -446,10 +445,10 @@ export class AnswersListImporterComponent
   }
 
   private validateEmailUniqueness(onEmailUniquenessCheckFailure: Function) {
-    let thisComponentReference: AnswersListImporterComponent = this;
-    let teamId: number = this.teamFromEmailBody.id;
-    let roundNumber: string = this.selectedRoundNumber;
-    let emailSentOn: number = this.compoundEmailSentOnDate.getTime();
+    const thisComponentReference: AnswersListImporterComponent = this;
+    const teamId: number = this.teamFromEmailBody.id;
+    const roundNumber: string = this.selectedRoundNumber;
+    const emailSentOn: number = this.compoundEmailSentOnDate.getTime();
 
     const emailUniquenessCheckUrl = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
@@ -457,7 +456,7 @@ export class AnswersListImporterComponent
         const emailIsUnique = '1';
         if (resultFlag == emailIsUnique) {
         } else {
-          let errorMessage =
+          const errorMessage =
             'В базе данных уже есть загруженное письмо с ответами от этой команды на этот раунд и на это-же время. Проверьте всё ещё раз, пожалуйста.';
           onEmailUniquenessCheckFailure(thisComponentReference, errorMessage);
         }
@@ -494,11 +493,11 @@ export class AnswersListImporterComponent
   }
 
   cancelDialog() {
-    let confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+    const confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
       'Прервать импорт ответов?'
     );
 
-    let dialogRef = this.otherDialog.open(
+    const dialogRef = this.otherDialog.open(
       ConfirmationDialogComponent,
       confirmationDialogConfig
     );
@@ -536,7 +535,7 @@ export class AnswersListImporterComponent
       debugString('Action confirmed. Preparing email to save in database ...');
 
       // сперва отправляем присланный email в базу
-      let email2Import = new EmailDataModel();
+      const email2Import = new EmailDataModel();
       email2Import.teamId = this.teamFromEmailBody.id;
       email2Import.subject = this.emailSubject;
       email2Import.body = this.emailBody;
@@ -563,7 +562,7 @@ export class AnswersListImporterComponent
               `Email import request succeed. Now getting the id of saved email. It is: ${receivedEmailId}`
             );
 
-            let emailId: number = parseInt(receivedEmailId.toString());
+            const emailId: number = parseInt(receivedEmailId.toString());
             this.prepareAnswersToImport(emailId, email2Import.sentOn);
 
             debugString(

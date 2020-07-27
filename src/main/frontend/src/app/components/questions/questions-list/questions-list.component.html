@@ -5,15 +5,15 @@
   <button mat-raised-button color="primary" (click)="ImportQuestions()">
     Импортировать список заданий
   </button>
+
+  <button mat-raised-button color="primary" (click)="ExportQuestions()">
+    Экспортировать список заданий
+  </button>
 </mat-toolbar>
 
 <mat-radio-group [(ngModel)]="selectedDisplayModeAlias">
-  <mat-radio-button
-    class="display-mode-radio-button"
-    *ngFor="let displayModeAlias of displayModeAliases; index as i"
-    [value]="displayModeAlias"
-    (change)="listDisplayModeChanged($event)"
-  >
+  <mat-radio-button class="display-mode-radio-button" *ngFor="let displayModeAlias of displayModeAliases; index as i"
+    [value]="displayModeAlias" (change)="listDisplayModeChanged($event)">
     {{ displayModeTitles[i] }}
   </mat-radio-button>
 </mat-radio-group>
@@ -51,10 +51,6 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr
-    mat-row
-    *matRowDef="let row; columns: displayedColumns; let question"
-    (click)="onRowClicked(row)"
-    [ngClass]="{ 'highlight-not-graded': !question.graded }"
-  ></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns; let question" (click)="onRowClicked(row)"
+    [ngClass]="{ 'highlight-not-graded': !question.graded }"></tr>
 </table>
