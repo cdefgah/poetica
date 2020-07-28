@@ -23,6 +23,8 @@ import java.util.Map;
 @Transactional
 public class TeamsController extends AbstractController {
 
+    private static final long NO_TEAM_ID = 0;
+
     /**
      * Менеджер сущностей для взаимодействия с базой данных.
      */
@@ -50,14 +52,14 @@ public class TeamsController extends AbstractController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!isNumberUnique(teamNumber)) {
+        if (!isNumberUnique(teamNumber, NO_TEAM_ID)) {
             return new ResponseEntity<>(composeErrorMessage("В базе данных уже существует " +
                             "команда с таким номером: " +
                     teamNumber),
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!isTitleUnique(teamTitle)) {
+        if (!isTitleUnique(teamTitle, NO_TEAM_ID)) {
             return new ResponseEntity<>(composeErrorMessage("В базе данных уже " +
                             "существует команда с таким названием: " +
                     teamTitle),
@@ -96,7 +98,7 @@ public class TeamsController extends AbstractController {
         }
 
         if (updateNumber) {
-            if (isNumberUnique(newTeamNumber)) {
+            if (isNumberUnique(newTeamNumber, teamId)) {
                 team.setNumber(newTeamNumber);
             } else {
                 return new ResponseEntity<>(composeErrorMessage("В базе данных уже существует " +
@@ -107,27 +109,32 @@ public class TeamsController extends AbstractController {
         }
 
         if (updateTitle) {
-            team.setTitle(newTeamTitle);
-            team.setTitleInLowerCase(newTeamTitle.toLowerCase());
+            if (isTitleUnique(newTeamTitle, teamId)) {
+                team.setTitle(newTeamTitle);
+                team.setTitleInLowerCase(newTeamTitle.toLowerCase());
+            }
         }
 
         entityManager.persist(team);
         return ResponseEntity.ok().build();
     }
 
-    private boolean isNumberUnique(int teamNumber) {
+    private boolean isNumberUnique(int teamNumber, long processingTeamId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
-                "team where team.number=:teamNumber", Long.class);
+                "team where team.number=:teamNumber and team.id<>:processingTeamId", Long.class);
+
         query.setParameter("teamNumber", teamNumber);
+        query.setParameter("processingTeamId", processingTeamId);
         return query.getSingleResult() == 0;
     }
 
-    private boolean isTitleUnique(String teamTitle) {
+    private boolean isTitleUnique(String teamTitle, long processingTeamId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
-                "team where team.titleInLowerCase=:titleInLowerCase", Long.class);
-        query.setParameter("titleInLowerCase", teamTitle.toLowerCase());
-        return query.getSingleResult() == 0;
+                "team where team.titleInLowerCase=:titleInLowerCase and team.id<>:processingTeamId", Long.class);
 
+        query.setParameter("titleInLowerCase", teamTitle.toLowerCase());
+        query.setParameter("processingTeamId", processingTeamId);
+        return query.getSingleResult() == 0;
     }
 
     @RequestMapping(path = "/teams/all", method = RequestMethod.GET, produces = "application/json")
@@ -167,11 +174,11 @@ public class TeamsController extends AbstractController {
     public ResponseEntity<List<String>> validateTeamNumberAndTitle(@RequestBody Team[] teamsToImport) {
         List<String> validationErrors = new ArrayList<>();
         for (Team team: teamsToImport) {
-            if (!isNumberUnique(team.getNumber())) {
+            if (!isNumberUnique(team.getNumber(), team.getId())) {
                 validationErrors.add("В базе уже есть команда с номером: " + team.getNumber());
             }
 
-            if (!isTitleUnique(team.getTitle())) {
+            if (!isTitleUnique(team.getTitle(), team.getId())) {
                 validationErrors.add("В базе уже есть команда с названием: " + team.getTitle());
             }
         }

@@ -16,17 +16,16 @@ import { debugString, debugObject } from 'src/app/utils/Config';
   templateUrl: './team-details.component.html',
   styleUrls: ['./team-details.component.css'],
 })
-export class TeamDetailsComponent extends AbstractInteractiveComponentModel
-  implements OnInit {
+export class TeamDetailsComponent extends AbstractInteractiveComponentModel implements OnInit {
+
   private static readonly KEY_DIALOG_ID = 'id';
-  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
-    'modelValidatorService';
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE = 'modelValidatorService';
 
   public static readonly DIALOG_RESULT_ACCEPTED: number = 1;
   public static readonly DIALOG_RESULT_DECLINED: number = 2;
   public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
 
-  private readonly _modelValidatorService: TeamValidationService;
+  public readonly modelValidatorService: TeamValidationService;
 
   dialogTitle: string;
 
@@ -40,10 +39,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
   isExistingRecord: boolean;
 
-  static getDialogConfigWithData(
-    modelValidatorService: TeamValidationService,
-    row?: any
-  ): MatDialogConfig {
+  static getDialogConfigWithData(modelValidatorService: TeamValidationService, row?: any): MatDialogConfig {
+
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
@@ -52,18 +49,10 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
 
     dialogConfig.data = new Map<string, any>();
 
-    dialogConfig.data[
-      TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
-    ] = modelValidatorService;
+    dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE] = modelValidatorService;
 
-    debugString('Checking the row validity');
-    debugString(row);
     if (row) {
-      debugString('Checking the row validity ... row is TRUE');
-      dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_ID] =
-        row[TeamDetailsComponent.KEY_DIALOG_ID];
-    } else {
-      debugString('Checking the row validity - ROW IS FALSE');
+      dialogConfig.data[TeamDetailsComponent.KEY_DIALOG_ID] = row[TeamDetailsComponent.KEY_DIALOG_ID];
     }
 
     return dialogConfig;
@@ -95,7 +84,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
     // например в случаях, когда get запрос ещё не закончил выполняться
     this.team = TeamDataModel.emptyTeam;
 
-    this._modelValidatorService =
+    this.modelValidatorService =
       dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
 
     const teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
@@ -145,15 +134,15 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
         );
       } else {
         // обновляем существующую запись
-        let newTeamNumber: number =
-          this.team.number != this.teamCopy.number ? this.team.number : -1;
+        const newTeamNumber: number =
+          this.team.number !== this.teamCopy.number ? this.team.number : -1;
 
-        let newTeamTitle: string =
-          this.team.title != this.teamCopy.title ? this.team.title : '';
+        const newTeamTitle: string =
+          this.team.title !== this.teamCopy.title ? this.team.title : '';
 
         if (newTeamNumber >= 0 || newTeamTitle.length > 0) {
           // данные изменились, обновляем их на сервере
-          let requestUrl = `/teams/${this.team.id}`;
+          const requestUrl = `/teams/${this.team.id}`;
           const payload = new HttpParams()
             .set('newTeamNumber', String(newTeamNumber))
             .set('newTeamTitle', newTeamTitle);
@@ -178,7 +167,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   deleteRecord() {
-    let confirmationMessage = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
+    const confirmationMessage = `Удалить команду: '${this.team.title}' (номер: ${this.team.number}) ?`;
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
@@ -190,10 +179,6 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
         (error) => this.reportServerError(error)
       );
     });
-  }
-
-  get modelValidatorService(): TeamValidationService {
-    return this._modelValidatorService;
   }
 
   private getDialogTitle(teamObject?: TeamDataModel): string {
@@ -209,10 +194,11 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel
    * @returns true, если поля заполнены корректно, иначе false.
    */
   private validateFields(): boolean {
-    this.teamNumberIsIncorrect = this.team.number < 0;
+    const stringRepresentation = String(this.team.number);
+    const dotOrCommaIsPresent = stringRepresentation.indexOf('.') !== -1 || stringRepresentation.indexOf(',') !== -1;
 
-    this.teamTitleIsIncorrect =
-      !this.team.title || this.team.title.trim().length == 0;
+    this.teamNumberIsIncorrect = dotOrCommaIsPresent || this.team.number < 0;
+    this.teamTitleIsIncorrect = !this.team.title || this.team.title.trim().length === 0;
 
     return !(this.teamNumberIsIncorrect || this.teamTitleIsIncorrect);
   }

@@ -3,28 +3,15 @@
   <div style="display: flex; flex-direction: column;">
     <mat-form-field appearance="outline">
       <mat-label>Номер</mat-label>
-      <input
-        matInput
-        required
-        placeholder="Номер команды"
-        [(ngModel)]="team.number"
-      />
-      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect"
-        >Ожидается ноль или положительное целое число</mat-hint
-      >
+      <input type="number" matInput required placeholder="Номер команды" [(ngModel)]="team.number" />
+      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect">Ожидается ноль или положительное целое число
+      </mat-hint>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Название</mat-label>
-      <input
-        matInput
-        required
-        placeholder="Название команды"
-        maxlength="{{ modelValidatorService.maxTeamTitleLength }}"
-        [(ngModel)]="team.title"
-      />
-      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect"
-        >Обязательное поле</mat-hint
-      >
+      <input matInput required placeholder="Название команды" maxlength="{{ modelValidatorService.maxTeamTitleLength }}"
+        [(ngModel)]="team.title" />
+      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect">Обязательное поле</mat-hint>
     </mat-form-field>
   </div>
 </mat-dialog-content>
@@ -39,12 +26,7 @@
 
   <span class="fill-remaining-space"></span>
 
-  <button
-    mat-raised-button
-    color="accent"
-    *ngIf="isExistingRecord"
-    (click)="deleteRecord()"
-  >
+  <button mat-raised-button color="accent" *ngIf="isExistingRecord" (click)="deleteRecord()">
     Удалить
   </button>
 </mat-dialog-actions>
