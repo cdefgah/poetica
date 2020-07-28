@@ -92,6 +92,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     this.doValidationWithServerData(this, parsingResult.resultObject);
   }
 
+  // TODO переделать этот callback-hell на async-await
   private doValidationWithServerData(
     parserObjectReference: EmailBodyParser,
     loadedAnswers: AnswerDataModel[]
