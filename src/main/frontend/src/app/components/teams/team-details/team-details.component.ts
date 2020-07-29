@@ -105,6 +105,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
     } else {
       // создаём объект новой команды и заголовок диалога для новой команды
       this.team = TeamDataModel.createtTeam();
+      this.team.number = null;
       this.isExistingRecord = false;
       this.dialogTitle = this.getDialogTitle();
     }
@@ -134,8 +135,13 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
         );
       } else {
         // обновляем существующую запись
+        console.log("================ newTeamNumber ===========================");
         const newTeamNumber: number =
           this.team.number !== this.teamCopy.number ? this.team.number : -1;
+
+        console.log("this.team.number: " + this.team.number);
+        console.log("this.teamCopy.number: " + this.teamCopy.number);
+        console.log("newTeamNumber: " + newTeamNumber);
 
         const newTeamTitle: string =
           this.team.title !== this.teamCopy.title ? this.team.title : '';
@@ -197,7 +203,10 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
     const stringRepresentation = String(this.team.number);
     const dotOrCommaIsPresent = stringRepresentation.indexOf('.') !== -1 || stringRepresentation.indexOf(',') !== -1;
 
-    this.teamNumberIsIncorrect = dotOrCommaIsPresent || this.team.number < 0;
+    // не используй тут !this.team.number
+    // ибо в таком случае разрешенный ноль не пройдет проверки
+    this.teamNumberIsIncorrect = (this.team.number == null) || dotOrCommaIsPresent || this.team.number < 0;
+
     this.teamTitleIsIncorrect = !this.team.title || this.team.title.trim().length === 0;
 
     return !(this.teamNumberIsIncorrect || this.teamTitleIsIncorrect);
