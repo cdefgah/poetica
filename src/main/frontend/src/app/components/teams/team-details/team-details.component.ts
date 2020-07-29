@@ -135,13 +135,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
         );
       } else {
         // обновляем существующую запись
-        console.log("================ newTeamNumber ===========================");
         const newTeamNumber: number =
           this.team.number !== this.teamCopy.number ? this.team.number : -1;
-
-        console.log("this.team.number: " + this.team.number);
-        console.log("this.teamCopy.number: " + this.teamCopy.number);
-        console.log("newTeamNumber: " + newTeamNumber);
 
         const newTeamTitle: string =
           this.team.title !== this.teamCopy.title ? this.team.title : '';
