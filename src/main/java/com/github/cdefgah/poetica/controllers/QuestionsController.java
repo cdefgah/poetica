@@ -3,7 +3,11 @@ package com.github.cdefgah.poetica.controllers;
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +32,12 @@ public class QuestionsController extends AbstractController {
      */
     @Autowired
     private EntityManager entityManager;
+
+    @RequestMapping(path = "/questions/total-amount", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Long> getQuestionsTotalAmount() {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) FROM Question question", Long.class);
+        return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
+    }
 
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
@@ -210,5 +222,22 @@ public class QuestionsController extends AbstractController {
                         "question where question.graded=:graded", Question.class);
         query.setParameter("graded", onlyGradedQuestions);
         return query.getResultList();
+    }
+
+    @RequestMapping(path = "/questions/export", method = RequestMethod.GET)
+    public ResponseEntity<Resource> getReport() throws IOException {
+
+        String payload = "Жромотрульки тарампульки\nКекелушки мапатуршки!\n1234567890";
+
+        String fileName = this.getTimestampPrefixForFileName() + "exportedQuestions.txt";
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(payload.getBytes(StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
     }
 }

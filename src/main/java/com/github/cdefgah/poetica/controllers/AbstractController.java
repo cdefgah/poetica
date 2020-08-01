@@ -1,6 +1,13 @@
 package com.github.cdefgah.poetica.controllers;
 
+import org.springframework.http.HttpHeaders;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 abstract class AbstractController {
+
+    private static final SimpleDateFormat fileNamePrefixDateFormat = new SimpleDateFormat("yyyyMMdd-HHMM-");
 
     /**
      * Проверяет, если строка пустая, возвращает true.
@@ -19,5 +26,25 @@ abstract class AbstractController {
      */
     protected static String composeErrorMessage(String rawErrorMessage) {
         return "Внимание: " + rawErrorMessage;
+    }
+
+
+    /**
+     * Формирует HTTP заголовки для выгрузки файла.
+     * @param fileNameWithExtension имя файла с расширением, которое будет выгружаться.
+     * @return HTTP заголовки.
+     */
+    protected HttpHeaders getHttpHeaderForGeneratedFile(String fileNameWithExtension) {
+        HttpHeaders header = new HttpHeaders();
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileNameWithExtension + "\"");
+        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        header.add("Pragma", "no-cache");
+        header.add("Expires", "0");
+
+        return header;
+    }
+
+    protected String getTimestampPrefixForFileName() {
+        return fileNamePrefixDateFormat.format(new Date());
     }
 }

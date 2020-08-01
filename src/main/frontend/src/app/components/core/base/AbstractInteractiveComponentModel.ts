@@ -10,17 +10,16 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
   protected reportServerError(error: any, customMessage: string = '') {
 
     function getServerErrorMessage(errorObject: any) {
-      let rawErrorMessage: string;
-      if (errorObject.hasOwnProperty('error')) {
-        if (errorObject.error.hasOwnProperty('message')) {
-          rawErrorMessage = errorObject.error.message;
-        } else {
-          rawErrorMessage = errorObject.error;
-        }
+      // TODO сделать функцию, которая ищет message в глубину
+      // ибо бывают ошибки error.error.error.error.message
+      // спросить на SO - как лучше сделать.
+      console.log('===========================================');
+      console.log('========= SERFVER ERROR OBJECT ============');
+      console.log('===========================================');
+      console.dir(errorObject);
+      console.log('===========================================');
 
-      } else {
-        rawErrorMessage = errorObject.toString();
-      }
+      const rawErrorMessage: string = String(errorObject.message);
 
       // TODO переделать на пристойный механизм обработки ошибок, а это это какая-то печаль и непристойность
       const prefixToCheck = 'Внимание: '; // наличие этого префикса говорит о том, что ошибка штатная (не катастрофа).

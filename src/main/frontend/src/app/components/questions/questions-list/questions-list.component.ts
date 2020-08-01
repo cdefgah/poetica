@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatDialog, MatRadioChange } from '@angular/material';
 import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
 import { QuestionViewModelForTableRow } from 'src/app/view-model/QuestionViewModelForTableRow';
@@ -13,8 +13,7 @@ import { QuestionValidationService } from '../../core/validators/QuestionValidat
   templateUrl: './questions-list.component.html',
   styleUrls: ['./questions-list.component.css'],
 })
-export class QuestionsListComponent extends AbstractInteractiveComponentModel
-  implements OnInit {
+export class QuestionsListComponent extends AbstractInteractiveComponentModel implements OnInit {
   // эти псевдонимы также используются для формирования строки http-запроса, не меняйте их.
   private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = 'all';
   private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = 'credited';
@@ -40,6 +39,8 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
   ];
 
   dataSource: QuestionViewModelForTableRow[];
+
+  totalQuestionsAmount: number;
 
   selectedRowIndex: number;
 
@@ -78,6 +79,18 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
             new QuestionViewModelForTableRow(oneDataStructure)
           );
         });
+
+        this.loadTotalQuestionsAmount();
+      },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  loadTotalQuestionsAmount() {
+    const url = '/questions/total-amount';
+    this.http.get(url).subscribe(
+      (totalAmount: number) => {
+        this.totalQuestionsAmount = totalAmount;
       },
       (error) => this.reportServerError(error)
     );
@@ -110,6 +123,10 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
 
   onRowClicked(row: any) {
     this.openDetailsDialog(row);
+  }
+
+  public get questionsArePresent(): boolean {
+    return this.dataSource && this.dataSource.length > 0;
   }
 
   ImportQuestions() {
@@ -157,10 +174,29 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel
   }
 
   public ExportQuestions() {
-    this.displayMessage('Экспортировать! ататата!');
+    const confirmationMessage = `Выгруженные вопросы будут в формате требуемом механизмом импорта вопросов и в кодировке UTF-8 (Unicode). 
+    Выгруженный файл будет находиться в вашей папке загрузок (Downloads). Продолжать?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем вопросы
+      const url = '/questions/export';
+      this.http.get(url, { responseType: 'blob' }).subscribe(
+        (data: Blob) => {
+          console.log("====================");
+          console.log(data);
+          console.log("====================");
+          console.dir(data);
+          console.log("====================");
+
+          this.displayMessage('Скачалось!');
+        },
+        (error) => this.reportServerError(error)
+      );
+
+    };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
   }
 
-  public get questionsArePresent(): boolean {
-    return this.dataSource && this.dataSource.length > 0;
-  }
 }

@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
 enum AppWindowState {
   Questions,
@@ -8,13 +8,15 @@ enum AppWindowState {
   About,
 }
 
+// TODO привести в соответствие весь проект: https://angular.io/guide/styleguide
+
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = "Poetica";
+  title = 'Poetica';
 
   // Store a reference to the enum for further use in html template
   appWindowState = AppWindowState;

@@ -6,30 +6,22 @@
   <mat-form-field class="encoding-selection-field">
     <mat-label>Кодировка отчёта:</mat-label>
     <mat-select [(value)]="selectedEncodingSystemName">
-      <mat-option
-        *ngFor="let encodingSystemName of encodingSystemNames; index as i"
-        [value]="encodingSystemName"
-      >
+      <mat-option *ngFor="let encodingSystemName of encodingSystemNames; index as i" [value]="encodingSystemName">
         {{ encodingHumanReadableTitles[i] }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 </p>
 
+
+
+
 <p>
-  <label id="report-selection-label-field-id" class="report-radio-group-label"
-    >Выберите отчёт для выгрузки:</label
-  >
-  <mat-radio-group
-    aria-labelledby="report-selection-label-field-id"
-    class="reports-radio-group"
-    [(ngModel)]="selectedReportAlias"
-  >
-    <mat-radio-button
-      class="reports-radio-button"
-      *ngFor="let reportAlias of reportAliases; index as i"
-      [value]="reportAlias"
-    >
+  <label id="report-selection-label-field-id" class="report-radio-group-label">Выберите отчёт для выгрузки:</label>
+  <mat-radio-group aria-labelledby="report-selection-label-field-id" class="reports-radio-group"
+    [(ngModel)]="selectedReportAlias">
+    <mat-radio-button class="reports-radio-button" *ngFor="let reportAlias of reportAliases; index as i"
+      [value]="reportAlias">
       {{ reportTitles[i] }}
     </mat-radio-button>
   </mat-radio-group>

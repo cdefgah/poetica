@@ -6,7 +6,7 @@
     Импортировать список заданий
   </button>
 
-  <button mat-raised-button color="primary" (click)="ExportQuestions()">
+  <button mat-raised-button color="primary" (click)="ExportQuestions()" *ngIf="totalQuestionsAmount > 0">
     Экспортировать список заданий
   </button>
 </mat-toolbar>
