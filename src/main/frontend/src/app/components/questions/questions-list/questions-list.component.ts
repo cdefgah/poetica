@@ -181,19 +181,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
       // если диалог был принят (accepted)
       // выгружаем вопросы
       const url = '/questions/export';
-      this.http.get(url, { responseType: 'blob' }).subscribe(
-        (data: Blob) => {
-          console.log("====================");
-          console.log(data);
-          console.log("====================");
-          console.dir(data);
-          console.log("====================");
-
-          this.displayMessage('Скачалось!');
-        },
-        (error) => this.reportServerError(error)
-      );
-
+      window.location.href = url;
     };
 
     this.confirmationDialog(confirmationMessage, dialogAcceptedAction);

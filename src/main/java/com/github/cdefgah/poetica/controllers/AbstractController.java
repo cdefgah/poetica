@@ -7,7 +7,7 @@ import java.util.Date;
 
 abstract class AbstractController {
 
-    private static final SimpleDateFormat fileNamePrefixDateFormat = new SimpleDateFormat("yyyyMMdd-HHMM-");
+    private static final SimpleDateFormat fileNamePrefixDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss-");
 
     /**
      * Проверяет, если строка пустая, возвращает true.
