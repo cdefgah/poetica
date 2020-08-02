@@ -17,24 +17,19 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
 
   selectedEncodingSystemName: string;
 
-  /**
-   * Сделать map, где отчёту будет соответствовать action.
-   * дёргаем action из map по выбранному отчёту и просто его вызываем action.run();
-   */
+  allResultsTableFormatTitles: string[] = [
+    'Длинный',
+    'Промежуточный',
+    'Короткий'
+  ];
 
-  reportAliases: string[] = [
-    'listOfAnsweredCommands',
-    'preliminaryTable',
-    'finalTable',
-    'collectionOfWorks',
+  allResultsTableFormatAliases: string[] = [
+    'Full',
+    'Medium',
+    'Short'
   ];
-  reportTitles: string[] = [
-    'Сводка команд, приславших ответы',
-    'Предварительная таблица результатов',
-    'Окончательная таблица результатов',
-    'Собрание сочинений',
-  ];
-  selectedReportAlias: string = this.reportAliases[0];
+
+  selectedResultsTableFormatAlias: string = this.allResultsTableFormatAliases[0];
 
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
@@ -56,23 +51,22 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
           this.encodingHumanReadableTitles.push(element.humanReadableTitle);
         });
 
-        this.initActualReportEncodingSystemName();
+        this.selectedEncodingSystemName = this.encodingSystemNames[0];
       },
       (error) => this.reportServerError(error)
     );
   }
 
-  initActualReportEncodingSystemName() {
-    const url = '/configuration/actual-report-encoding-system-name';
-    this.http.get(url).subscribe(
-      (data: ConfigurationValue) => {
-        this.selectedEncodingSystemName = data.value;
-      },
-      (error) => {
-        this.reportServerError(error);
-      }
-    );
+  exportResultsTable() {
+    const confirmationMessage = `Выгрузить таблицу результатов в указанном формате и кодировке?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем отчёт
+      const url = `/reports/results-table/${this.selectedResultsTableFormatAlias}/${this.selectedEncodingSystemName}`;
+      window.location.href = url;
+    };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
   }
 }
-
-

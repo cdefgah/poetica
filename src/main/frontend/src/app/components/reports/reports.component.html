@@ -4,7 +4,7 @@
 
 <p>
   <mat-form-field class="encoding-selection-field">
-    <mat-label>Кодировка отчёта:</mat-label>
+    <mat-label>Кодировка выгружаемых отчётов:</mat-label>
     <mat-select [(value)]="selectedEncodingSystemName">
       <mat-option *ngFor="let encodingSystemName of encodingSystemNames; index as i" [value]="encodingSystemName">
         {{ encodingHumanReadableTitles[i] }}
@@ -13,27 +13,26 @@
   </mat-form-field>
 </p>
 
-
-
-
-<p>
-  <label id="report-selection-label-field-id" class="report-radio-group-label">Выберите отчёт для выгрузки:</label>
-  <mat-radio-group aria-labelledby="report-selection-label-field-id" class="reports-radio-group"
-    [(ngModel)]="selectedReportAlias">
-    <mat-radio-button class="reports-radio-button" *ngFor="let reportAlias of reportAliases; index as i"
-      [value]="reportAlias">
-      {{ reportTitles[i] }}
-    </mat-radio-button>
-  </mat-radio-group>
-</p>
-
-<p>
-  <button mat-raised-button color="primary" class="report-button">
-    Сформировать и выгрузить отчёт
-  </button>
-</p>
-
-<p>
-  Ещё сделать диалог подтверждения, в некоторых диалогах выбирать формат отчёта
-  (полный, такой-сякой, сокращённый)
-</p>
+<table class="reports-table">
+  <tr class="reports-table-row">
+    <td class="reports-table-prompt-cell">
+      Таблица результатов
+    </td>
+    <td class="reports-table-action-cell">
+      <mat-form-field class="team-selection-field">
+        <mat-label>Формат:</mat-label>
+        <mat-select [(value)]="selectedResultsTableFormatAlias" placeholder="Формат отчёта">
+          <mat-option *ngFor="let resultsTableFormatAlias of allResultsTableFormatAliases; index as i"
+            [value]="resultsTableFormatAlias">
+            {{ allResultsTableFormatTitles[i] }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </td>
+    <td class="reports-table-action-cell">
+      <button mat-raised-button color="primary" (click)="exportResultsTable()">
+        Выгрузить отчёт
+      </button>
+    </td>
+  </tr>
+</table>

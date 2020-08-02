@@ -1,21 +1,27 @@
 .encoding-selection-field {
   margin-left: 1em;
+  width: 25%;
 }
 
-.report-radio-group-label {
+.reports-table {
   margin-left: 1em;
+  border: 1px darkblue solid;
+  width: 50%;
 }
 
-.reports-radio-group {
-  display: flex;
-  flex-direction: column;
+.reports-table-row {
+  border: 1px darkblue solid;
+}
+
+.reports-table-prompt-cell {
+  border: 1px darkblue solid;
   margin-left: 1em;
+  text-align: left;
+  width: 50%;
 }
 
-.reports-radio-button {
-  margin: 0.5em;
-}
-
-.report-button {
-  margin-left: 1em;
+.reports-table-action-cell {
+  border: 1px darkblue solid;
+  text-align: center;
+  width: auto;
 }

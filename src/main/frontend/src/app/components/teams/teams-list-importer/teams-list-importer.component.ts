@@ -1,29 +1,27 @@
-import { Component, OnInit, Inject, ViewChild } from "@angular/core";
-import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialog,
   MatDialogConfig,
-} from "@angular/material/dialog";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { ConfirmationDialogComponent } from "../../core/confirmation-dialog/confirmation-dialog.component";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { debugString, debugObject } from "src/app/utils/Config";
-import { TeamValidationService } from "../../core/validators/TeamValidationService";
-import { TeamsListParserParameters } from "./support/TeamsListParserParameters";
-import { TeamsListParser } from "./support/TeamsListParser";
+} from '@angular/material/dialog';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { debugString, debugObject } from 'src/app/utils/Config';
+import { TeamValidationService } from '../../core/validators/TeamValidationService';
+import { TeamsListParserParameters } from './support/TeamsListParserParameters';
+import { TeamsListParser } from './support/TeamsListParser';
 
 @Component({
-  selector: "app-teams-list-importer",
-  templateUrl: "./teams-list-importer.component.html",
-  styleUrls: ["./teams-list-importer.component.css"],
+  selector: 'app-teams-list-importer',
+  templateUrl: './teams-list-importer.component.html',
+  styleUrls: ['./teams-list-importer.component.css'],
 })
 export class TeamsListImporterComponent
   extends AbstractInteractiveComponentModel
   implements OnInit {
-  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
-    "modelValidatorService";
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -36,38 +34,6 @@ export class TeamsListImporterComponent
     this._teamValidationService =
       dialogData[TeamsListImporterComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
   }
-
-  private _teamValidationService: TeamValidationService;
-
-  static getDialogConfigWithData(
-    teamValidationService: TeamValidationService
-  ): MatDialogConfig {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "62%";
-
-    dialogConfig.data = new Map<string, any>();
-
-    dialogConfig.data[
-      TeamsListImporterComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
-    ] = teamValidationService;
-
-    return dialogConfig;
-  }
-
-  displayImportButton: boolean = false;
-
-  displayedTeamColumns: string[] = ["number", "title"];
-
-  textWithTeamsList: string = "";
-
-  ngOnInit(): void {}
-
-  teams: TeamDataModel[] = [];
-
-  firstStepErrorMessage: string = "";
 
   get IsFirstStepOk(): boolean {
     return this.firstStepErrorMessage.trim().length == 0;
@@ -87,22 +53,56 @@ export class TeamsListImporterComponent
 
   get lastStepTitle(): string {
     if (this.allThingsAreOk) {
-      return "Предварительный просмотр и импорт";
+      return 'Предварительный просмотр и импорт';
     } else {
-      return "Информация об ошибках";
+      return 'Информация об ошибках';
     }
   }
+  private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE =
+    'modelValidatorService';
+
+  private _teamValidationService: TeamValidationService;
+
+  displayImportButton = false;
+
+  displayedTeamColumns: string[] = ['number', 'title'];
+
+  textWithTeamsList = '';
+
+  teams: TeamDataModel[] = [];
+
+  firstStepErrorMessage = '';
+
+  static getDialogConfigWithData(
+    teamValidationService: TeamValidationService
+  ): MatDialogConfig {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = '62%';
+
+    dialogConfig.data = new Map<string, any>();
+
+    dialogConfig.data[
+      TeamsListImporterComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE
+    ] = teamValidationService;
+
+    return dialogConfig;
+  }
+
+  ngOnInit(): void { }
 
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
   }
 
   cancelDialog() {
-    var confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
-      "Прервать импорт команд?"
+    const confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
+      'Прервать импорт команд?'
     );
 
-    var dialogRef = this.otherDialog.open(
+    const dialogRef = this.otherDialog.open(
       ConfirmationDialogComponent,
       confirmationDialogConfig
     );
@@ -115,13 +115,13 @@ export class TeamsListImporterComponent
   }
 
   processTextWithTeamsList(onSuccess: Function, onFailure: Function) {
-    var teamsListParserParameters: TeamsListParserParameters = new TeamsListParserParameters();
+    const teamsListParserParameters: TeamsListParserParameters = new TeamsListParserParameters();
     teamsListParserParameters.parentComponentObject = this;
     teamsListParserParameters.teamValidationService = this._teamValidationService;
     teamsListParserParameters.httpClient = this.httpClient;
     teamsListParserParameters.textWithTeamsList = this.textWithTeamsList;
 
-    var parser: TeamsListParser = new TeamsListParser(
+    const parser: TeamsListParser = new TeamsListParser(
       teamsListParserParameters,
       onSuccess,
       onFailure
@@ -135,10 +135,10 @@ export class TeamsListImporterComponent
     teams2Import: TeamDataModel[]
   ) {
     debugString(
-      "Teams are processed successfully. Object is displayed below..."
+      'Teams are processed successfully. Object is displayed below...'
     );
     debugObject(teams2Import);
-    currentComponentReference.firstStepErrorMessage = ""; // нет ошибок
+    currentComponentReference.firstStepErrorMessage = ''; // нет ошибок
     currentComponentReference.teams = teams2Import;
 
     // второй шаг имеет индекс == 1
@@ -158,17 +158,17 @@ export class TeamsListImporterComponent
 
   onStepChange(event: any) {
     // если перешли на нулевой шаг с любого
-    if (event.selectedIndex == 0) {
+    if (event.selectedIndex === 0) {
       // сбрасываем состояние всех контролирующих переменных
       // и выходим
-      debugString("Switched to the first step. Resetting vars and exiting.");
+      debugString('Switched to the first step. Resetting vars and exiting.');
       this.resetStepperVariables(event);
       return;
     }
 
     if (event.previouslySelectedIndex == 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем список команд
-      debugString("Moving from the first step. Processing teams list.");
+      debugString('Moving from the first step. Processing teams list.');
 
       // обрабатываем список команд
       this.processTextWithTeamsList(
@@ -183,33 +183,33 @@ export class TeamsListImporterComponent
   }
 
   doImportTeams() {
-    this.confirmationDialog("Импортировать команды?", () => {
+    this.confirmationDialog('Импортировать команды?', () => {
       // если диалог был принят (accepted)
 
       const headers = new HttpHeaders().set(
-        "Content-Type",
-        "application/json; charset=utf-8"
+        'Content-Type',
+        'application/json; charset=utf-8'
       );
 
       // импортируем команды
       this.httpClient
-        .post("/teams/import", this.teams, { headers: headers })
+        .post('/teams/import', this.teams, { headers })
         .subscribe(
           (data) => {
-            debugString("Request succeed. Closing the import dialog.");
+            debugString('Request succeed. Closing the import dialog.');
             this.dialog.close(true);
           },
           (error) => {
-            debugString("Request failed. Error is below:");
+            debugString('Request failed. Error is below:');
             debugObject(error);
-            this.reportServerError(error, "Сбой при импорте команд.");
+            this.reportServerError(error, 'Сбой при импорте команд.');
           }
         );
     });
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {
-    this.firstStepErrorMessage = "";
+    this.firstStepErrorMessage = '';
     this.updateDisplayImportButton(stepChangeEvent);
   }
 

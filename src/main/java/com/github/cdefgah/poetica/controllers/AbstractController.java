@@ -1,13 +1,21 @@
 package com.github.cdefgah.poetica.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
+import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 abstract class AbstractController {
 
     private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss-");
+
+    /**
+     * Менеджер сущностей для взаимодействия с базой данных.
+     */
+    @Autowired
+    EntityManager entityManager;
 
     /**
      * Проверяет, если строка пустая, возвращает true.

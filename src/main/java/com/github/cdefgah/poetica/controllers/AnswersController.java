@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -18,12 +17,6 @@ import java.util.Optional;
 @RestController
 @Transactional
 public class AnswersController extends AbstractController {
-
-    /**
-     * Менеджер сущностей для взаимодействия с базой данных.
-     */
-    @Autowired
-    EntityManager entityManager;
 
     @RequestMapping(path = "/answers/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {

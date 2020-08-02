@@ -2,7 +2,6 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -12,10 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +23,6 @@ import java.util.Map;
 @RestController
 @Transactional
 public class QuestionsController extends AbstractController {
-
-    /**
-     * Менеджер сущностей для взаимодействия с базой данных.
-     */
-    @Autowired
-    private EntityManager entityManager;
 
     @RequestMapping(path = "/questions/total-amount", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Long> getQuestionsTotalAmount() {

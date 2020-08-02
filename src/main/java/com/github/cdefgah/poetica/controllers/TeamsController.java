@@ -30,12 +30,6 @@ public class TeamsController extends AbstractController {
 
     private static final long NO_TEAM_ID = 0;
 
-    /**
-     * Менеджер сущностей для взаимодействия с базой данных.
-     */
-    @Autowired
-    EntityManager entityManager;
-
     @RequestMapping(path = "/teams/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Team.getModelConstraintsMap(), HttpStatus.OK);
@@ -258,19 +252,5 @@ public class TeamsController extends AbstractController {
         Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
         query.setParameter("teamId", teamId);
         return query.getResultList().isEmpty();
-    }
-
-    @RequestMapping(path = "/teams/zuzz", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Integer> getMaxLengthOfTeamNumber() {
-        TypedQuery<Integer> query = entityManager.createQuery("select max(team.number) FROM Team team",
-                                                                                                        Integer.class);
-        final Integer maxTeamNumberObject = query.getSingleResult();
-        final int maxTeamNumber = maxTeamNumberObject != null ? maxTeamNumberObject : 0;
-
-        System.out.println("=============================================================");
-        System.out.println("maxTeamNumber: " + maxTeamNumber);
-        System.out.println("=============================================================");
-
-        return new ResponseEntity<>(maxTeamNumber, HttpStatus.OK);
     }
 }
