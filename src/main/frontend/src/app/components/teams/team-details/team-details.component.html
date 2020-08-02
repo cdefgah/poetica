@@ -4,14 +4,15 @@
     <mat-form-field appearance="outline">
       <mat-label>Номер</mat-label>
       <input type="number" matInput required placeholder="Номер команды" [(ngModel)]="team.number" />
-      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect">Ожидается ноль или положительное целое число
+      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect">Ожидается ноль или положительное целое число.
       </mat-hint>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Название</mat-label>
       <input matInput required placeholder="Название команды" maxlength="{{ modelValidatorService.maxTeamTitleLength }}"
         [(ngModel)]="team.title" />
-      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect">Обязательное поле</mat-hint>
+      <mat-hint class="validation-text" *ngIf="teamTitleIsIncorrect">Обязательное поле.
+      </mat-hint>
     </mat-form-field>
   </div>
 </mat-dialog-content>

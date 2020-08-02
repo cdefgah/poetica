@@ -141,4 +141,10 @@ public final class Team {
     public void setTitleInLowerCase(String titleInLowerCase) {
         this.titleInLowerCase = titleInLowerCase;
     }
+
+    public String getTextRepresentationForImporter() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.number).append(',').append(this.title).append('\n');
+        return sb.toString();
+    }
 }

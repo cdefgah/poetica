@@ -225,14 +225,22 @@ public class QuestionsController extends AbstractController {
     }
 
     @RequestMapping(path = "/questions/export", method = RequestMethod.GET)
-    public ResponseEntity<Resource> getReport() throws IOException {
+    public ResponseEntity<Resource> exportQuestions() {
 
-        String payload = "Жромотрульки тарампульки\nКекелушки мапатуршки!\n1234567890";
+        TypedQuery<Question> query = entityManager.
+                                        createQuery("select question from Question question", Question.class);
 
-        String fileName = this.getTimestampPrefixForFileName() + "exportedQuestions.txt";
+        List<Question> allQuestions = query.getResultList();
+
+        StringBuilder payload = new StringBuilder();
+        for (Question question: allQuestions) {
+            payload.append(question.getTextRepresentationForImporter()).append('\n');
+        }
+
+        String fileName = "exportedQuestions_" + this.getTimeStampPartForFileName()  +".txt";
         HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
 
-        ByteArrayResource resource = new ByteArrayResource(payload.getBytes(StandardCharsets.UTF_8));
+        ByteArrayResource resource = new ByteArrayResource(payload.toString().getBytes(StandardCharsets.UTF_8));
 
         return ResponseEntity.ok()
                 .headers(header)

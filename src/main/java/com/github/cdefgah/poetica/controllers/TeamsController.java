@@ -3,7 +3,11 @@ package com.github.cdefgah.poetica.controllers;
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Team;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +230,28 @@ public class TeamsController extends AbstractController {
                 entityManager.createQuery("select count(*) FROM Team team", Long.class);
 
         return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/teams/export", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Resource> exportTeams() {
+        TypedQuery<Team> query = entityManager.createQuery("select team from Team team", Team.class);
+        List<Team> allTeams = query.getResultList();
+
+        StringBuilder payload = new StringBuilder();
+        for (Team team : allTeams) {
+            payload.append(team.getTextRepresentationForImporter());
+        }
+
+        String fileName = "exportedTeams_" + this.getTimeStampPartForFileName()  +".txt";
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(payload.toString().getBytes(StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
     }
 
     private boolean thisTeamHasNoAnswers(long teamId) {

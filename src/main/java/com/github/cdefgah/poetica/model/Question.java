@@ -215,6 +215,28 @@ public final class Question {
         this.authorInfo = authorInfo;
     }
 
+    public String getTextRepresentationForImporter() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('#');
+
+        if (this.graded) {
+            sb.append(this.externalNumber);
+        } else {
+            sb.append('(').append(this.externalNumber).append(')');
+        }
+
+        sb.append(':').append(this.title).append('\n').append(this.body).append('\n');
+        sb.append("#R: ").append(this.authorsAnswer).append('\n');
+        if (!this.comment.isEmpty()) {
+            sb.append("#N: ").append(this.comment).append('\n');
+        }
+
+        sb.append("#S: ").append(this.source).append('\n');
+        sb.append("#A: ").append(this.authorInfo).append('\n');
+
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         return "Question{" +

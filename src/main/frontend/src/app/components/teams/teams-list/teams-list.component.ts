@@ -1,17 +1,17 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { MatDialog } from "@angular/material/dialog";
-import { TeamDetailsComponent } from "../team-details/team-details.component";
-import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { TeamValidationService } from "../../core/validators/TeamValidationService";
-import { TeamDataModel } from "src/app/data-model/TeamDataModel";
-import { TeamsListImporterComponent } from "../teams-list-importer/teams-list-importer.component";
-import { MatTableDataSource, MatSort } from "@angular/material";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { TeamDetailsComponent } from '../team-details/team-details.component';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { TeamValidationService } from '../../core/validators/TeamValidationService';
+import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+import { TeamsListImporterComponent } from '../teams-list-importer/teams-list-importer.component';
+import { MatTableDataSource, MatSort } from '@angular/material';
 
 @Component({
-  selector: "app-teams-list",
-  templateUrl: "./teams-list.component.html",
-  styleUrls: ["./teams-list.component.css"],
+  selector: 'app-teams-list',
+  templateUrl: './teams-list.component.html',
+  styleUrls: ['./teams-list.component.css'],
 })
 export class TeamsListComponent extends AbstractInteractiveComponentModel
   implements OnInit {
@@ -30,13 +30,13 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  ngOnInit() {}
-
-  displayedColumns: string[] = ["number", "title"];
+  displayedColumns: string[] = ['number', 'title'];
 
   teamsListDataSource: MatTableDataSource<
     TeamDataModel
   > = new MatTableDataSource([]);
+
+  ngOnInit() { }
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
@@ -51,7 +51,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
       this.teamValidationService,
       selectedRow
     );
-    var dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
+    const dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
       if (result != TeamDetailsComponent.DIALOG_RESULT_DECLINED) {
         // если диалог был принят (accepted), либо была удалена запись о команде
@@ -62,7 +62,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   }
 
   loadTeamsList() {
-    const url: string = "/teams/all";
+    const url = '/teams/all';
     this.http.get(url).subscribe(
       (teamsList: TeamDataModel[]) => {
         this.teamsListDataSource = new MatTableDataSource(teamsList);
@@ -76,7 +76,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     const importDialogConfig = TeamsListImporterComponent.getDialogConfigWithData(
       this.teamValidationService
     );
-    var dialogRef = this.dialog.open(
+    const dialogRef = this.dialog.open(
       TeamsListImporterComponent,
       importDialogConfig
     );
@@ -87,5 +87,19 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
         this.loadTeamsList();
       }
     });
+  }
+
+  public ExportTeams() {
+    const confirmationMessage = `Выгруженный список команд будет в формате требуемом механизмом импорта команд и в кодировке UTF-8 (Unicode).
+     Выгруженный файл будет находиться в вашей папке загрузок (Downloads). Продолжать?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем команды
+      const url = '/teams/export';
+      window.location.href = url;
+    };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
   }
 }

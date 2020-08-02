@@ -7,7 +7,7 @@ import java.util.Date;
 
 abstract class AbstractController {
 
-    private static final SimpleDateFormat fileNamePrefixDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss-");
+    private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss-");
 
     /**
      * Проверяет, если строка пустая, возвращает true.
@@ -44,7 +44,7 @@ abstract class AbstractController {
         return header;
     }
 
-    protected String getTimestampPrefixForFileName() {
-        return fileNamePrefixDateFormat.format(new Date());
+    protected String getTimeStampPartForFileName() {
+        return fileNameTimeStampDateFormat.format(new Date());
     }
 }
