@@ -259,4 +259,18 @@ public class TeamsController extends AbstractController {
         query.setParameter("teamId", teamId);
         return query.getResultList().isEmpty();
     }
+
+    @RequestMapping(path = "/teams/zuzz", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Integer> getMaxLengthOfTeamNumber() {
+        TypedQuery<Integer> query = entityManager.createQuery("select max(team.number) FROM Team team",
+                                                                                                        Integer.class);
+        final Integer maxTeamNumberObject = query.getSingleResult();
+        final int maxTeamNumber = maxTeamNumberObject != null ? maxTeamNumberObject : 0;
+
+        System.out.println("=============================================================");
+        System.out.println("maxTeamNumber: " + maxTeamNumber);
+        System.out.println("=============================================================");
+
+        return new ResponseEntity<>(maxTeamNumber, HttpStatus.OK);
+    }
 }

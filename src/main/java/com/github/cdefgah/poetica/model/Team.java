@@ -18,6 +18,7 @@ public final class Team {
 
     private static class ModelConstraints {
         static final int MAX_TITLE_LENGTH = 256;
+        static final int MAX_NUMBER_VALUE = 999;
     }
 
     private static final Map<String, String> modelConstraintsMap;
@@ -26,6 +27,7 @@ public final class Team {
     {
         final Map<String, String> localConstraintsMap = new HashMap<>();
         localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(Team.ModelConstraints.MAX_TITLE_LENGTH));
+        localConstraintsMap.put("MAX_NUMBER_VALUE", String.valueOf(Team.ModelConstraints.MAX_NUMBER_VALUE));
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
 

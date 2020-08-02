@@ -1,32 +1,39 @@
-import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
-import { HttpClient } from "@angular/common/http";
+import { AbstractModelValidationService } from '../base/AbstractModelValidationService';
+import { HttpClient } from '@angular/common/http';
 
 export class TeamValidationService extends AbstractModelValidationService {
-  private _maxTeamTitleLength: number;
+  public maxTeamTitleLength: number;
+
+  public maxTeamNumberValue: number;
 
   constructor(httpClient: HttpClient) {
     super();
 
-    const url: string = "/teams/model-constraints";
+    const url = '/teams/model-constraints';
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._maxTeamTitleLength = parseInt(data["MAX_TITLE_LENGTH"]);
+        this.maxTeamTitleLength = parseInt(data['MAX_TITLE_LENGTH'], 10);
+        this.maxTeamNumberValue = parseInt(data['MAX_NUMBER_VALUE'], 10);
       },
       (error) => {
-        var errorMessage: string = `$Ошибка при получении model-constraints для Team. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+        const errorMessage = `$Ошибка при получении model-constraints для Team. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
         this.setBrokenInternalState(errorMessage);
       }
     );
   }
 
-  get maxTeamTitleLength(): number {
-    return this._maxTeamTitleLength;
+  public isTeamNumberCorrect(teamNumber: string): boolean {
+    const stringNumberRepresentation = teamNumber;
+    const dotOrCommaIsPresent = stringNumberRepresentation.indexOf('.') !== -1 || stringNumberRepresentation.indexOf(',') !== -1;
+
+    return (
+      TeamValidationService.isNumber(teamNumber) && Number(teamNumber) >= 0 &&
+      Number(teamNumber) <= this.maxTeamNumberValue && !dotOrCommaIsPresent
+    );
   }
 
-  public isTeamNumberCorrect(teamNumber: string): boolean {
-    return (
-      TeamValidationService.isNumber(teamNumber) && Number(teamNumber) >= 0
-    );
+  public isTeamTitleCorrect(teamTitle: string): boolean {
+    return (teamTitle && teamTitle.length > 0 && teamTitle.length <= this.maxTeamTitleLength);
   }
 
   /**
@@ -34,21 +41,19 @@ export class TeamValidationService extends AbstractModelValidationService {
    * @param teamNumber строка с номером команды.
    * @return пустая строка, если всё в порядке, либо сообщение об ошибке, если номер команды неправильный.
    */
-  public checkTeamNumberAndGetValidationMessage(
-    teamNumberString: string
-  ): string {
+  public checkTeamNumberAndGetValidationMessage(teamNumberString: string): string {
     if (!this.isTeamNumberCorrect(teamNumberString)) {
-      return `Номер команды может быть нулём или положительным целым числом. А вы указали: ${teamNumberString}`;
+      return `Номер команды может быть нулём или положительным целым числом не более ${this.maxTeamNumberValue}. А вы указали: ${teamNumberString}`;
     } else {
-      return "";
+      return '';
     }
   }
 
   public checkTeamTitleAndGetValidationMessage(teamTitle: string): string {
-    if (teamTitle && teamTitle.length > this._maxTeamTitleLength) {
-      return `Длина строки с названием команды не должна превышать ${this._maxTeamTitleLength} символов, а она составляет: ${teamTitle.length} символов`;
+    if (this.isTeamTitleCorrect(teamTitle)) {
+      return `Длина строки с названием команды не должна превышать ${this.maxTeamTitleLength} символов, а она составляет: ${teamTitle.length} символов`;
     } else {
-      return "";
+      return '';
     }
   }
 }

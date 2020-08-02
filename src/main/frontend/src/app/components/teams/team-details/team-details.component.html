@@ -3,8 +3,10 @@
   <div style="display: flex; flex-direction: column;">
     <mat-form-field appearance="outline">
       <mat-label>Номер</mat-label>
-      <input type="number" matInput required placeholder="Номер команды" [(ngModel)]="team.number" />
-      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect">Ожидается ноль или положительное целое число.
+      <input type="number" matInput required placeholder="Номер команды" min="0"
+        max="{{ modelValidatorService.maxTeamNumberValue }}" step="1" [(ngModel)]="team.number" />
+      <mat-hint class="validation-text" *ngIf="teamNumberIsIncorrect">Ожидается ноль или положительное целое число не
+        более {{ modelValidatorService.maxTeamNumberValue }}.
       </mat-hint>
     </mat-form-field>
     <mat-form-field appearance="outline">

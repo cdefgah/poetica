@@ -195,14 +195,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
    * @returns true, если поля заполнены корректно, иначе false.
    */
   private validateFields(): boolean {
-    const stringNumberRepresentation = String(this.team.number);
-    const dotOrCommaIsPresent = stringNumberRepresentation.indexOf('.') !== -1 || stringNumberRepresentation.indexOf(',') !== -1;
-
-    // не используй тут !this.team.number
-    // ибо в таком случае разрешенный ноль не пройдет проверки
-    this.teamNumberIsIncorrect = (this.team.number == null) || dotOrCommaIsPresent || this.team.number < 0;
-
-    this.teamTitleIsIncorrect = !this.team.title || this.team.title.trim().length === 0;
+    this.teamNumberIsIncorrect = !this.modelValidatorService.isTeamNumberCorrect(String(this.team.number));
+    this.teamTitleIsIncorrect = !this.modelValidatorService.isTeamTitleCorrect(this.team.title);
 
     return !(this.teamNumberIsIncorrect || this.teamTitleIsIncorrect);
   }

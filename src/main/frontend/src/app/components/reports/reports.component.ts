@@ -1,13 +1,14 @@
-import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { MatDialog } from "@angular/material/dialog";
-import { ConfigurationValue } from "src/app/data-model/ConfigurationValue";
-import { AbstractInteractiveComponentModel } from "../core/base/AbstractInteractiveComponentModel";
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfigurationValue } from 'src/app/data-model/ConfigurationValue';
+import { AbstractInteractiveComponentModel } from '../core/base/AbstractInteractiveComponentModel';
+import { CharsetEncodingEntity } from './support/CharsetEncodingEntity';
 
 @Component({
-  selector: "app-reports",
-  templateUrl: "./reports.component.html",
-  styleUrls: ["./reports.component.css"],
+  selector: 'app-reports',
+  templateUrl: './reports.component.html',
+  styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
@@ -22,16 +23,16 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
    */
 
   reportAliases: string[] = [
-    "listOfAnsweredCommands",
-    "preliminaryTable",
-    "finalTable",
-    "collectionOfWorks",
+    'listOfAnsweredCommands',
+    'preliminaryTable',
+    'finalTable',
+    'collectionOfWorks',
   ];
   reportTitles: string[] = [
-    "Сводка команд, приславших ответы",
-    "Предварительная таблица результатов",
-    "Окончательная таблица результатов",
-    "Собрание сочинений",
+    'Сводка команд, приславших ответы',
+    'Предварительная таблица результатов',
+    'Окончательная таблица результатов',
+    'Собрание сочинений',
   ];
   selectedReportAlias: string = this.reportAliases[0];
 
@@ -40,14 +41,14 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
     this.loadAllReportEncodingVariants();
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
   }
 
   loadAllReportEncodingVariants() {
-    const url: string = "/configuration/supported-report-encodings";
+    const url = '/configuration/supported-report-encodings';
     this.http.get(url).subscribe(
       (data: CharsetEncodingEntity[]) => {
         data.forEach((element) => {
@@ -62,7 +63,7 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   initActualReportEncodingSystemName() {
-    const url: string = "/configuration/actual-report-encoding-system-name";
+    const url = '/configuration/actual-report-encoding-system-name';
     this.http.get(url).subscribe(
       (data: ConfigurationValue) => {
         this.selectedEncodingSystemName = data.value;
@@ -74,7 +75,4 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 }
 
-class CharsetEncodingEntity {
-  humanReadableTitle: string;
-  systemName: string;
-}
+
