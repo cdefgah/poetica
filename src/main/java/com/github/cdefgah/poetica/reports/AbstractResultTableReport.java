@@ -41,4 +41,10 @@ abstract class AbstractResultTableReport {
     public abstract String getFileNamePart();
 
     public abstract String getReportText();
+
+    protected String getBlockTitle(boolean isTheMainRound) {
+        return "ЗАЧЁТ  " + (isTheMainRound ? "Основной" : "Предварительный");
+    }
+
+
 }

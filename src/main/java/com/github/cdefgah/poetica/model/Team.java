@@ -18,7 +18,7 @@ public final class Team {
 
     private static class ModelConstraints {
         static final int MAX_TITLE_LENGTH = 256;
-        static final int MAX_NUMBER_VALUE = 999;
+        static final int MAX_NUMBER_VALUE = 99999;
     }
 
     private static final Map<String, String> modelConstraintsMap;

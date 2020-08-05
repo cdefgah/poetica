@@ -2,7 +2,6 @@ import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../message-box/message-box.component';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { AbstractBareComponent } from './AbstractBareComponent';
-import { debugString, debugObject } from 'src/app/utils/Config';
 
 export abstract class AbstractInteractiveComponentModel extends AbstractBareComponent {
   protected abstract getMessageDialogReference(): MatDialog;
