@@ -199,7 +199,15 @@ public class ResultTableReportModel {
         }
 
         public void recalculateTeamRating() {
-
+            final Map<Integer, Integer> actualRatingMap = isMainRound ? mainRoundQuestionsRatingMap :
+                                                                                    preliminaryRoundQuestionsRatingMap;
+            teamRating = 0;
+            int questionNumber = minQuestionNumber;
+            for (int i = 0; i < answerFlags.length; i++) {
+                if (answerFlags[i]) {
+                    teamRating = teamRating + actualRatingMap.get(questionNumber);
+                }
+            }
         }
 
         public int getTeamNumber() {
