@@ -1,5 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
+import com.github.cdefgah.poetica.reports.restable.ResultTableReportModel;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,9 @@ public class ReportsController extends  AbstractController {
     @RequestMapping(path = "/reports/results-table/{reportFormat}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
                                                                                     @PathVariable String encodingName) {
+
+        final ResultTableReportModel reportModel = new ResultTableReportModel();
+
 
         String payload = "Жромотрульки тарампульки\nКекелушки мапатуршки!\n1234567890";
 

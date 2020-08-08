@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.reports.restable.model;
+package com.github.cdefgah.poetica.reports.restable;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
@@ -43,15 +43,6 @@ public class ResultTableReportModel {
     private final int minQuestionNumber;
 
     private final int maxQuestionNumber;
-
-    /**
-     * Три прохода:
-     * <p>
-     * 1. Для каждого вопроса для каждой команды выполняем запрос, с целью получить
-     * самый последний ответ для запрошенного раунда.
-     * 2. Считаем рейтинг вопроса в туре.
-     * 3. Считаем рейтинг каждой команды по сумме рейтингов взятых в туре вопросов.
-     */
 
     public ResultTableReportModel() {
         minQuestionNumber = getMinQuestionNumber();
