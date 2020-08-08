@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.reports;
+package com.github.cdefgah.poetica.reports.restable;
 
 public class FullResultTableReport extends  AbstractResultTableReport {
 

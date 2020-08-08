@@ -5,7 +5,6 @@ import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Класс ответа на вопрос (бескрылку).
@@ -55,18 +54,9 @@ public final class Answer {
     @Column(nullable = false)
     private int questionNumber;
 
-    /**
-     * Идентификатор сохранённого сообщения электронной почты с ответами.
-     * Отсутствие значения для этого поля означает, что ответ добавлен вручную, через кнопку "Добавить ответ".
-     * Иначе - ответ загружен из письма с ответами.
-     */
     @Column(nullable = false)
     private Long emailId;
 
-    /**
-     * Если ответ дан в первом раунде (первый день) тура,
-     * то в поле хранится true. Иначе - false.
-     */
     @Column(nullable = false)
     private int roundNumber;
 
@@ -80,14 +70,14 @@ public final class Answer {
     /**
      * Комментарий к ответу, данный ответившей командой.
      */
-    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH, nullable = true)
+    @Column(length = ModelConstraints.MAX_COMMENT_LENGTH)
     @Size(max = ModelConstraints.MAX_COMMENT_LENGTH)
     private String comment;
 
     /**
      * Оценка ответу, выставленная дежурной командой.
      */
-    @Column(nullable = true)
+    @Column()
     @Enumerated(EnumType.STRING)
     private Grade grade = Grade.None;
 
