@@ -1,6 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
-import com.github.cdefgah.poetica.reports.restable.ResultTableReportModel;
+import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

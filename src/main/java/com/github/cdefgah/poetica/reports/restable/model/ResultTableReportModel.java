@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.reports.restable;
+package com.github.cdefgah.poetica.reports.restable.model;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ResultTableReportModel {
 
@@ -45,8 +42,8 @@ public class ResultTableReportModel {
     private final int maxQuestionNumber;
 
     public ResultTableReportModel() {
-        minQuestionNumber = getMinQuestionNumber();
-        maxQuestionNumber = getMaxQuestionNumber();
+        minQuestionNumber = calculateMinQuestionNumber();
+        maxQuestionNumber = calculateMaxQuestionNumber();
 
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
 
@@ -77,6 +74,22 @@ public class ResultTableReportModel {
         }
     }
 
+    public int getMinQuestionNumber() {
+        return minQuestionNumber;
+    }
+
+    public int getMaxQuestionNumber() {
+        return maxQuestionNumber;
+    }
+
+    public Collection<ReportRowModel> getPreliminaryRoundBlockReportRows() {
+        return Collections.unmodifiableCollection(preliminaryRoundBlockReportRows);
+    }
+
+    public Collection<ReportRowModel> getMainRoundBlockReportRows() {
+        return Collections.unmodifiableCollection(mainRoundBlockReportRows);
+    }
+
     /**
      * Выполняет инициализацию таблиц с рейтингом вопросов.
      * @param minQuestionNumber минимальный номер вопроса в системе.
@@ -94,7 +107,7 @@ public class ResultTableReportModel {
         return query.getResultList();
     }
 
-    private int getMaxQuestionNumber() {
+    private int calculateMaxQuestionNumber() {
         TypedQuery<Integer> query = entityManager.createQuery("select max(question.lowestInternalNumber) " +
                         "FROM Question question",
                 Integer.class);
@@ -102,7 +115,7 @@ public class ResultTableReportModel {
         return resultValue != null ? resultValue : 0;
     }
 
-    private int getMinQuestionNumber() {
+    private int calculateMinQuestionNumber() {
         TypedQuery<Integer> query = entityManager.createQuery("select min(question.lowestInternalNumber) " +
                         "FROM Question question",
                 Integer.class);
@@ -135,7 +148,7 @@ public class ResultTableReportModel {
          * @param team объект команды.
          * @param amountOfAnswersTakenInPreviousRound количество ответов, взятых в предыдущем раунде.
          */
-        public ReportRowModel(int minQuestionNumber, int maxQuestionNumber, boolean isMainRound, Team team,
+        ReportRowModel(int minQuestionNumber, int maxQuestionNumber, boolean isMainRound, Team team,
                                                                             int amountOfAnswersTakenInPreviousRound) {
 
             this.isMainRound = isMainRound;
@@ -189,7 +202,7 @@ public class ResultTableReportModel {
             return query.getSingleResult() != null;
         }
 
-        public void recalculateTeamRating() {
+        void recalculateTeamRating() {
             final Map<Integer, Integer> actualRatingMap = isMainRound ? mainRoundQuestionsRatingMap :
                                                                                     preliminaryRoundQuestionsRatingMap;
             teamRating = 0;
@@ -213,24 +226,12 @@ public class ResultTableReportModel {
             return amountOfTakenAnswersInThisRound;
         }
 
-        public void setAmountOfTakenAnswersInThisRound(int amountOfTakenAnswersInThisRound) {
-            this.amountOfTakenAnswersInThisRound = amountOfTakenAnswersInThisRound;
-        }
-
         public int getAmountOfTakenAnswersInPreviousRound() {
             return amountOfTakenAnswersInPreviousRound;
         }
 
-        public void setAmountOfTakenAnswersInPreviousRound(int amountOfTakenAnswersInPreviousRound) {
-            this.amountOfTakenAnswersInPreviousRound = amountOfTakenAnswersInPreviousRound;
-        }
-
         public int getTeamRating() {
             return teamRating;
-        }
-
-        public void setTeamRating(int teamRating) {
-            this.teamRating = teamRating;
         }
 
         public String getTeamTitle() {
