@@ -110,7 +110,9 @@ public class ResultTableReportModel {
     }
 
     private List<Team> getParticipatedTeams() {
-        TypedQuery<Team> query = entityManager.createQuery("select team from Team team", Team.class);
+        // TypedQuery<Team> query = entityManager.createQuery("select team from Team team", Team.class);
+
+        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, Email email where team.id=email.teamId", Team.class);
         return query.getResultList();
     }
 
