@@ -26,7 +26,7 @@ public class ReportsController extends  AbstractController {
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
                                                                                     @PathVariable String encodingName) {
 
-        final ResultTableReportModel reportModel = new ResultTableReportModel();
+        final ResultTableReportModel reportModel = new ResultTableReportModel(this.entityManager);
         FullResultTableReportView report = new FullResultTableReportView(reportModel);
 
         String payload = report.getReportText();

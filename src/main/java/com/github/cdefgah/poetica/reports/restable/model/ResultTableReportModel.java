@@ -14,8 +14,7 @@ public class ResultTableReportModel {
     /**
      * Менеджер сущностей для взаимодействия с базой данных.
      */
-    @Autowired
-    EntityManager entityManager;
+    private final EntityManager entityManager;
 
     /**
      * Строки для блока отчёта за предварительный тур.
@@ -41,7 +40,9 @@ public class ResultTableReportModel {
 
     private final int maxQuestionNumber;
 
-    public ResultTableReportModel() {
+    public ResultTableReportModel(EntityManager entityManager) {
+        this.entityManager = entityManager;
+
         minQuestionNumber = calculateMinQuestionNumber();
         maxQuestionNumber = calculateMaxQuestionNumber();
 
@@ -70,6 +71,10 @@ public class ResultTableReportModel {
         for (ReportRowModel reportRowModel: this.mainRoundBlockReportRows) {
             reportRowModel.recalculateTeamRating();
         }
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 
     public int getMinQuestionNumber() {
@@ -203,7 +208,7 @@ public class ResultTableReportModel {
             TypedQuery<Answer> query =
                     entityManager.createQuery("select answer from Answer answer " +
                                     "where answer.teamId=:teamId and answer.questionNumber=:questionNumber " +
-                                    "and answer.roundNumber=:roundNumber and answer.grade:=grade " +
+                                    "and answer.roundNumber=:roundNumber and answer.grade=:grade " +
                                     "order by answer.emailSentOn desc",
                             Answer.class);
             query.setMaxResults(1); // нам нужна только одна запись

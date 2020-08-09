@@ -8,7 +8,6 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
 
     public FullResultTableReportView(ResultTableReportModel reportModel) {
         super(reportModel);
-        this.reportModel = reportModel;
     }
 
     public String getReportText() {

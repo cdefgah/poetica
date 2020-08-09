@@ -14,10 +14,9 @@ abstract class AbstractResultTableReportView {
     /**
      * Менеджер сущностей для взаимодействия с базой данных.
      */
-    @Autowired
-    EntityManager entityManager;
+    protected final EntityManager entityManager;
 
-    protected ResultTableReportModel reportModel;
+    protected final ResultTableReportModel reportModel;
 
     protected final int maxTeamNumberLength;
 
@@ -31,6 +30,8 @@ abstract class AbstractResultTableReportView {
 
     public AbstractResultTableReportView(ResultTableReportModel reportModel) {
         this.reportModel = reportModel;
+        this.entityManager = reportModel.getEntityManager();
+
         maxQuestionNumberLength = getMaxQuestionNumberLength();
         maxTeamNumberLength = getMaxTeamNumberLength();
 

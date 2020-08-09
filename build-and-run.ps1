@@ -1,5 +1,5 @@
 clear
 mvn clean package
 cd target
-java -jar poetica-0.80.jar
+java -jar poetica-0.81.jar
 pause
