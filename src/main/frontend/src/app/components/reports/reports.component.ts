@@ -67,6 +67,21 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
       window.location.href = url;
     };
 
-    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
+    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+
+  }
+
+  checkAnswersPresentAndRunAction(action: any) {
+    const url = '/answers/present';
+    this.http.get(url).subscribe(
+      (answersPresentFlag: boolean) => {
+        if (answersPresentFlag) {
+          action();
+        } else {
+          this.displayMessage('В системе пока нет ни одного загруженного ответа, загрузите их, прежде чем строить отчёт.');
+        }
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 }

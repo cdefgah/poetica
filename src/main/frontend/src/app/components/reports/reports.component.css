@@ -25,3 +25,12 @@
   text-align: center;
   width: auto;
 }
+
+.notice {
+  border: 1px solid orange;
+  margin: 1em 1em 1em 1em;
+  background-color: darkblue;
+  color: yellow;
+  font-family: sans-serif;
+  font-weight: bold;
+}

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
 
 @RestController
@@ -44,4 +45,6 @@ public class ReportsController extends  AbstractController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
+
+
 }

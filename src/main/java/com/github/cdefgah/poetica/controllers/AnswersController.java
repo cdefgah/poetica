@@ -89,6 +89,12 @@ public class AnswersController extends AbstractController {
         return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
 
+    @RequestMapping(path = "/answers/present", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Boolean> areAnswersPresent() {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) FROM Email email", Long.class);
+        return ResponseEntity.status(HttpStatus.OK).body(query.getSingleResult() > 0);
+    }
+
     @RequestMapping(path = "/answers/{answerId}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Answer> getAnswerById(@PathVariable long answerId) {
         Answer answer = entityManager.find(Answer.class, answerId);
