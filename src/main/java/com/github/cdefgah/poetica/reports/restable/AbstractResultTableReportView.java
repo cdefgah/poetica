@@ -48,6 +48,14 @@ abstract class AbstractResultTableReportView {
         maxTeamRatingLengthForMainRound = getMaxTeamRatingValueLength(true);
     }
 
+    public String getReportText() {
+        return getRoundBlockText(false) +
+                "\n" +
+                getRoundBlockText(true);
+    }
+
+    protected abstract String getRoundBlockText(boolean isMainRound);
+
     protected int getMaxTeamRatingLength(boolean isMainRound) {
         return isMainRound ? this.maxTeamRatingLengthForMainRound : this.maxTeamRatingLengthForPreliminaryRound;
     }

@@ -195,7 +195,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     loadedAnswers.forEach((oneLoadedAnswer) => {
       componentReference.answersDataSource.push(oneLoadedAnswer);
-      if (oneLoadedAnswer.grade == AnswerDataModel.GradeNone) {
+      if (oneLoadedAnswer.grade === AnswerDataModel.GradeNone) {
         componentReference.answersWithoutGradesDataSource.push(oneLoadedAnswer);
       }
     });
@@ -282,7 +282,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result == AnswerDetailsComponent.DIALOG_GRADE_SET) {
+      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
         // если оценка была поставлена, то получаем заново таблицы
         // TODO очень неоптимальный код тут.
         // Из-за одной оценки грузить заново все ответы выбранной команды.

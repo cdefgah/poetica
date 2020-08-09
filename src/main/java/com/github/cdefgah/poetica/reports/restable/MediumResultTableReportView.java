@@ -5,9 +5,9 @@ import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import java.util.Collection;
 import java.util.Map;
 
-public class FullResultTableReportView extends AbstractResultTableReportView {
+public class MediumResultTableReportView extends AbstractResultTableReportView {
 
-    public FullResultTableReportView(ResultTableReportModel reportModel) {
+    public MediumResultTableReportView(ResultTableReportModel reportModel) {
         super(reportModel);
     }
 
@@ -22,10 +22,20 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
 
         // первая строка тела блока
         sb.append(getRightAlignedText(maxTeamNumberLength, "N")).append(twoSpaces);
-        for (int questionNumber = reportModel.getMinQuestionNumber();
-                                             questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
-            sb.append(getRightAlignedText(maxQuestionNumberLength, String.valueOf(questionNumber))).append(oneSpace);
+        final int groupSize = 5;
+        int shorthandForQuestionNumber = 0;
+        for (int questionNumber = reportModel.getMinQuestionNumber();
+            questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
+            shorthandForQuestionNumber++;
+            if (shorthandForQuestionNumber > 9) {
+                shorthandForQuestionNumber = 0;
+            }
+
+            sb.append(shorthandForQuestionNumber);
+            if (shorthandForQuestionNumber % groupSize == 0) {
+                sb.append(oneSpace);
+            }
         }
 
         sb.append(getRightAlignedText(maxTakenAnswersDigestLength, "О"));
@@ -36,7 +46,8 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
         sb.append("\n");
 
         // формируем тело блока
-        Collection<ResultTableReportModel.ReportRowModel>  reportModelRows = getReportModelRows(isMainRound);
+        int gradeCounter = 0;
+        Collection<ResultTableReportModel.ReportRowModel> reportModelRows = getReportModelRows(isMainRound);
         for (ResultTableReportModel.ReportRowModel oneModelRow: reportModelRows) {
             sb.append(getRightAlignedText(maxTeamNumberLength, String.valueOf(oneModelRow.getTeamNumber())));
             sb.append(twoSpaces);
@@ -45,18 +56,22 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
             final boolean[] answerFlags = oneModelRow.getAnswerFlags();
             for (boolean answerFlag: answerFlags) {
                 String gradeSymbol = answerFlag ? "+" : "-";
-                sb.append(getRightAlignedText(maxQuestionNumberLength, gradeSymbol));
-                sb.append(oneSpace);
+                sb.append(gradeSymbol);
+                gradeCounter++;
+
+                if (gradeCounter % groupSize == 0) {
+                    sb.append(oneSpace);
+                }
             }
 
             // выводим информацию о количестве взятых в предыдущем и текущем турах вопросах
             sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfTakenAnswersInThisRound()));
             sb.append(".");
             sb.append(getRightAlignedNumber(maxQuestionNumberLength,
-                                                                 oneModelRow.getAmountOfTakenAnswersInPreviousRound()));
+                    oneModelRow.getAmountOfTakenAnswersInPreviousRound()));
             sb.append(oneSpace);
             sb.append(getRightAlignedText(getMaxTeamRatingLength(isMainRound),
-                                                                          String.valueOf(oneModelRow.getTeamRating())));
+                    String.valueOf(oneModelRow.getTeamRating())));
 
             sb.append(oneSpace);
             sb.append(oneModelRow.getTeamTitle());
@@ -64,11 +79,19 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
         }
 
         // строка с рейтингом вопросов
-        sb.append(getRightAlignedText(maxTeamNumberLength, "Р")).append(twoSpaces);
+        sb.append("Рейтинг\n");
+        // номера вопросов сперва выписываем в строку
+        for (int questionNumber = reportModel.getMinQuestionNumber();
+            questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
+            sb.append(getRightAlignedText(maxQuestionNumberLength, String.valueOf(questionNumber))).append(oneSpace);
+        }
+        sb.append("\n");
+
+        // на новой строке - рейтинг вопросов
         final Map<Integer, Integer> questionsRatingMap = reportModel.getQuestionsRatingMap(isMainRound);
         for (int questionNumber = reportModel.getMinQuestionNumber();
-                                    questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
+             questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
             final int questionRating = questionsRatingMap.get(questionNumber);
             sb.append(getRightAlignedText(maxQuestionRatingLength, String.valueOf(questionRating)));

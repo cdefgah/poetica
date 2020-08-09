@@ -1,49 +1,18 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, Inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogConfig,
   MatDialogRef,
-} from "@angular/material";
-import { AbstractBareComponent } from "../base/AbstractBareComponent";
+} from '@angular/material';
+import { AbstractBareComponent } from '../base/AbstractBareComponent';
 
 @Component({
-  selector: "app-message-box",
-  templateUrl: "./message-box.component.html",
-  styleUrls: ["./message-box.component.css"],
+  selector: 'app-message-box',
+  templateUrl: './message-box.component.html',
+  styleUrls: ['./message-box.component.css'],
 })
 export class MessageBoxComponent extends AbstractBareComponent
   implements OnInit {
-  private static readonly KEY_DIALOG_TITLE = "dialogTitle";
-  private static readonly KEY_DIALOG_MESSAGE = "dialogMessage";
-  private static readonly KEY_ACCEPT_BUTTON_TITLE = "acceptButtonTitle";
-
-  static getDialogConfigWithData(
-    dialogMessage: string,
-    dialogTitle?: string,
-    acceptButtonTitle?: string
-  ): MatDialogConfig {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "38%";
-
-    dialogConfig.data = new Map<string, string>();
-
-    dialogConfig.data[MessageBoxComponent.KEY_DIALOG_MESSAGE] = dialogMessage;
-
-    if (dialogTitle) {
-      dialogConfig.data[MessageBoxComponent.KEY_DIALOG_TITLE] = dialogTitle;
-    }
-
-    if (acceptButtonTitle) {
-      dialogConfig.data[
-        MessageBoxComponent.KEY_ACCEPT_BUTTON_TITLE
-      ] = acceptButtonTitle;
-    }
-
-    return dialogConfig;
-  }
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -54,7 +23,7 @@ export class MessageBoxComponent extends AbstractBareComponent
       return;
     }
 
-    var passedValue: string = this.getMapValue(
+    let passedValue: string = this.getMapValue(
       MessageBoxComponent.KEY_DIALOG_TITLE,
       dialogData
     );
@@ -78,13 +47,44 @@ export class MessageBoxComponent extends AbstractBareComponent
       this.acceptButtonTitle = passedValue;
     }
   }
+  private static readonly KEY_DIALOG_TITLE = 'dialogTitle';
+  private static readonly KEY_DIALOG_MESSAGE = 'dialogMessage';
+  private static readonly KEY_ACCEPT_BUTTON_TITLE = 'acceptButtonTitle';
 
-  dialogTitle: string = "Сообщение";
-  dialogMessage: string =
-    "Если вы видите этот текст, значит объект MessageBoxComponent был некорректно проинициализирован.";
-  acceptButtonTitle: string = "Ok";
+  dialogTitle = 'Сообщение';
+  dialogMessage =
+    'Если вы видите этот текст, значит объект MessageBoxComponent был некорректно проинициализирован.';
+  acceptButtonTitle = 'Ok';
 
-  ngOnInit(): void {}
+  static getDialogConfigWithData(
+    dialogMessage: string,
+    dialogTitle?: string,
+    acceptButtonTitle?: string
+  ): MatDialogConfig {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = '38%';
+
+    dialogConfig.data = new Map<string, string>();
+
+    dialogConfig.data[MessageBoxComponent.KEY_DIALOG_MESSAGE] = dialogMessage;
+
+    if (dialogTitle) {
+      dialogConfig.data[MessageBoxComponent.KEY_DIALOG_TITLE] = dialogTitle;
+    }
+
+    if (acceptButtonTitle) {
+      dialogConfig.data[
+        MessageBoxComponent.KEY_ACCEPT_BUTTON_TITLE
+      ] = acceptButtonTitle;
+    }
+
+    return dialogConfig;
+  }
+
+  ngOnInit(): void { }
 
   acceptDialog() {
     this.dialog.close(true);
