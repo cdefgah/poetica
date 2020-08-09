@@ -4,7 +4,7 @@
 }
 
 .reports-table {
-  margin-left: 1em;
+  margin: 1em 1em 1em 1em;
   border: 1px darkblue solid;
   width: 50%;
 }
@@ -17,7 +17,7 @@
   border: 1px darkblue solid;
   margin-left: 1em;
   text-align: left;
-  width: 50%;
+  width: 30%;
 }
 
 .reports-table-action-cell {
@@ -26,11 +26,7 @@
   width: auto;
 }
 
-.notice {
-  border: 1px solid orange;
-  margin: 1em 1em 1em 1em;
-  background-color: darkblue;
-  color: yellow;
-  font-family: sans-serif;
-  font-weight: bold;
+.reports-table-empty-row {
+  background-color: lightblue;
+  font-size: 0.75em;
 }

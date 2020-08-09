@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfigurationValue } from 'src/app/data-model/ConfigurationValue';
 import { AbstractInteractiveComponentModel } from '../core/base/AbstractInteractiveComponentModel';
 import { CharsetEncodingEntity } from './support/CharsetEncodingEntity';
 
@@ -79,6 +78,46 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
           action();
         } else {
           this.displayMessage('В системе пока нет ни одного загруженного ответа, загрузите их, прежде чем строить отчёт.');
+        }
+      },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  exportQuestionsWithoutAnswers() {
+    const confirmationMessage = `Выгрузить вопросы без ответов в указанной кодировке?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем отчёт
+      const url = `/reports/questions-without-answers/${this.selectedEncodingSystemName}`;
+      window.location.href = url;
+    };
+
+    this.checkQuestionsPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+  }
+
+  exportQuestionsWithAnswers() {
+    const confirmationMessage = `Выгрузить вопросы с ответами в указанной кодировке?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем отчёт
+      const url = `/reports/questions-with-answers/${this.selectedEncodingSystemName}`;
+      window.location.href = url;
+    };
+
+    this.checkQuestionsPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+  }
+
+  checkQuestionsPresentAndRunAction(action: any) {
+    const url = '/questions/total-amount';
+    this.http.get(url).subscribe(
+      (totalAmount: number) => {
+        if (totalAmount === 0) {
+          this.displayMessage('В системе пока нет загруженных заданий (вопросов). Загрузите их, прежде чем строить отчёт.');
+        } else {
+          action();
         }
       },
       (error) => this.reportServerError(error)

@@ -237,6 +237,26 @@ public final class Question {
         return sb.toString();
     }
 
+    public String getQuestionBodyOnly() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.externalNumber).append('.').append(title).append('\n').append(this.body).append('\n');
+        return sb.toString();
+    }
+
+    public String getQuestionWithAllProperties() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.externalNumber).append('.').append(title).append('\n').append(this.body).append('\n');
+        sb.append("Ответ: ").append(this.authorsAnswer).append('\n');
+        if (!this.comment.isEmpty()) {
+            sb.append("Комментарий: ").append(this.comment).append('\n');
+        }
+
+        sb.append("Источник: ").append(this.source).append('\n');
+        sb.append("Автор: ").append(this.authorInfo).append('\n');
+
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         return "Question{" +

@@ -1,5 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
+import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
+import java.util.List;
 
 @RestController
 @Transactional
@@ -51,6 +54,61 @@ public class ReportsController extends  AbstractController {
         String fileName = "resultsTable_" + reportFormat + "_" +
                                                        encodingName + "_" + this.getTimeStampPartForFileName()  +".txt";
 
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
+    private List<Question> getAllQuestionObjects() {
+        TypedQuery<Question> query = entityManager.
+                createQuery("select question from Question question", Question.class);
+
+        return query.getResultList();
+    }
+
+    @RequestMapping(path = "/reports/questions-without-answers/{encodingName}", method = RequestMethod.GET)
+    public ResponseEntity<Resource> exportQuestionsWithoutAnswersReport(@PathVariable String encodingName) {
+
+        List<Question> allQuestions = getAllQuestionObjects();
+
+        StringBuilder payload = new StringBuilder();
+        for (Question question: allQuestions) {
+            payload.append(question.getQuestionBodyOnly()).append('\n');
+        }
+
+        final String reportText = payload.toString();
+        String fileName = "questionsWithoutAnswers_" + "_" + encodingName + "_" +
+                                                                            this.getTimeStampPartForFileName() +".txt";
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
+    @RequestMapping(path = "/reports/questions-with-answers/{encodingName}", method = RequestMethod.GET)
+    public ResponseEntity<Resource> exportQuestionsWithAnswersReport(@PathVariable String encodingName) {
+
+        List<Question> allQuestions = getAllQuestionObjects();
+
+        StringBuilder payload = new StringBuilder();
+        for (Question question: allQuestions) {
+            payload.append(question.getQuestionWithAllProperties()).append('\n');
+        }
+
+        final String reportText = payload.toString();
+        String fileName = "questionsWithAnswers_" + "_" + encodingName + "_" +
+                this.getTimeStampPartForFileName() +".txt";
         HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
 
         ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));
