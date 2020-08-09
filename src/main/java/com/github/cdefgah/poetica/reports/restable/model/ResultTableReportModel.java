@@ -55,28 +55,30 @@ public class ResultTableReportModel {
 
             // TODO - передавать null в параметрах нехорошо, переделать
             ReportRowModel preliminaryRoundBlockReportRow =
-                                    new ReportRowModel(minQuestionNumber,
-                                                                 maxQuestionNumber, team, null);
+                    new ReportRowModel(minQuestionNumber,
+                            maxQuestionNumber, team, null);
             preliminaryRoundBlockReportRows.add(preliminaryRoundBlockReportRow);
 
             mainRoundBlockReportRows.add(new ReportRowModel(minQuestionNumber, maxQuestionNumber,
-                                                                                team, preliminaryRoundBlockReportRow));
+                    team, preliminaryRoundBlockReportRow));
         }
 
         // считаем рейтинг команд согласно итоговым рейтингам вопросов
-        for (ReportRowModel reportRowModel: this.preliminaryRoundBlockReportRows) {
+        for (ReportRowModel reportRowModel : this.preliminaryRoundBlockReportRows) {
             reportRowModel.recalculateTeamRating();
         }
 
-        for (ReportRowModel reportRowModel: this.mainRoundBlockReportRows) {
+        for (ReportRowModel reportRowModel : this.mainRoundBlockReportRows) {
             reportRowModel.recalculateTeamRating();
         }
+
+        Collections.sort(preliminaryRoundBlockReportRows);
+        Collections.sort(mainRoundBlockReportRows);
     }
 
     public EntityManager getEntityManager() {
         return entityManager;
     }
-
 
 
     public int getMinQuestionNumber() {
@@ -97,6 +99,7 @@ public class ResultTableReportModel {
 
     /**
      * Выполняет инициализацию таблиц с рейтингом вопросов.
+     *
      * @param minQuestionNumber минимальный номер вопроса в системе.
      * @param maxQuestionNumber максимальный номер вопроса в системе.
      */
@@ -130,11 +133,11 @@ public class ResultTableReportModel {
 
     public Map<Integer, Integer> getQuestionsRatingMap(boolean isMainRound) {
         return Collections.unmodifiableMap(isMainRound ?
-                                            this.mainRoundQuestionsRatingMap : this.preliminaryRoundQuestionsRatingMap);
+                this.mainRoundQuestionsRatingMap : this.preliminaryRoundQuestionsRatingMap);
     }
 
     // ===========================================================================================================
-    public class ReportRowModel {
+    public class ReportRowModel implements Comparable<ReportRowModel> {
 
         private final int teamNumber;
 
@@ -152,9 +155,10 @@ public class ResultTableReportModel {
 
         /**
          * Конструктор.
-         * @param minQuestionNumber минимальный номер вопроса.
-         * @param maxQuestionNumber максимальный номер вопроса.
-         * @param team объект команды.
+         *
+         * @param minQuestionNumber     минимальный номер вопроса.
+         * @param maxQuestionNumber     максимальный номер вопроса.
+         * @param team                  объект команды.
          * @param previousRoundRowModel строка отчёта для этой команды, но из предыдущего раунда.
          */
         ReportRowModel(int minQuestionNumber, int maxQuestionNumber, Team team, ReportRowModel previousRoundRowModel) {
@@ -171,9 +175,9 @@ public class ResultTableReportModel {
             int answerFlagIndex = 0;
             int takenAnswersAmount = 0;
             final Map<Integer, Integer> questionsRatingMap = isMainRound ? mainRoundQuestionsRatingMap :
-                                                                                    preliminaryRoundQuestionsRatingMap;
+                    preliminaryRoundQuestionsRatingMap;
 
-            for(int questionNumber = minQuestionNumber; questionNumber <= maxQuestionNumber; questionNumber++) {
+            for (int questionNumber = minQuestionNumber; questionNumber <= maxQuestionNumber; questionNumber++) {
                 answerFlags[answerFlagIndex] = isAnswerAccepted(questionNumber, team.getId(), roundNumber);
 
                 if (answerFlags[answerFlagIndex]) {
@@ -230,7 +234,7 @@ public class ResultTableReportModel {
 
         void recalculateTeamRating() {
             final Map<Integer, Integer> actualRatingMap = isMainRound ? mainRoundQuestionsRatingMap :
-                                                                                    preliminaryRoundQuestionsRatingMap;
+                    preliminaryRoundQuestionsRatingMap;
             teamRating = 0;
             int questionNumber = minQuestionNumber;
             for (boolean answerFlag : answerFlags) {
@@ -263,6 +267,35 @@ public class ResultTableReportModel {
 
         public String getTeamTitle() {
             return teamTitle;
+        }
+
+        @Override
+        public int compareTo(ReportRowModel anotherRowModel) {
+            /**
+             * Сперва идёт сравнение по teamRating
+             * Затем по количеству взятых вопросов в текущем раунде.
+             * Потом по количеству взятых вопросов в предыдущем раунде.
+             * А затем уже по названию команды.
+             * Сортировка по числовым показателям у нас по убыванию, так что умножаем всё на -1.
+             * А сортировка по названиям - алфавитная в порядке возрастания.
+             */
+
+            if (this.teamRating == anotherRowModel.teamRating) {
+                if (this.amountOfTakenAnswersInThisRound == anotherRowModel.amountOfTakenAnswersInThisRound) {
+                    if (this.amountOfTakenAnswersInPreviousRound == anotherRowModel.amountOfTakenAnswersInPreviousRound) {
+                        return this.teamTitle.compareTo(anotherRowModel.teamTitle);
+
+                    } else {
+                        return -1 * Integer.valueOf(this.amountOfTakenAnswersInPreviousRound).
+                                                        compareTo(anotherRowModel.amountOfTakenAnswersInPreviousRound);
+                    }
+                } else {
+                    return -1 * Integer.valueOf(this.amountOfTakenAnswersInThisRound).
+                                                            compareTo(anotherRowModel.amountOfTakenAnswersInThisRound);
+                }
+            } else {
+                return -1 * Integer.valueOf(this.teamRating).compareTo(anotherRowModel.teamRating);
+            }
         }
     }
 }
