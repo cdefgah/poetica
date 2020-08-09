@@ -67,7 +67,6 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
     };
 
     this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
-
   }
 
   checkAnswersPresentAndRunAction(action: any) {
@@ -85,7 +84,7 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   exportQuestionsWithoutAnswers() {
-    const confirmationMessage = `Выгрузить вопросы без ответов в указанной кодировке?`;
+    const confirmationMessage = `Выгрузить задания без ответов в указанной кодировке?`;
 
     const dialogAcceptedAction = () => {
       // если диалог был принят (accepted)
@@ -98,7 +97,7 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   exportQuestionsWithAnswers() {
-    const confirmationMessage = `Выгрузить вопросы с ответами в указанной кодировке?`;
+    const confirmationMessage = `Выгрузить задания с ответами в указанной кодировке?`;
 
     const dialogAcceptedAction = () => {
       // если диалог был принят (accepted)

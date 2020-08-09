@@ -119,4 +119,15 @@ public class ReportsController extends  AbstractController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
+
+    @RequestMapping(path = "/reports/teams-with-not-graded-answers", method = RequestMethod.GET)
+    public ResponseEntity<Resource> exportTeamsWithNotGradedAnswers() {
+        /*
+            Тут надо подумать, сделать доп сервис, который проверяет наличие ответов без оценки.
+            И возвращает информацию об этом. Типа обнаружен ответ без оценки #1 для команды Бубубьки (1029)
+            И отдельный отчёт, чтобы формировать список команд со списком ответов без оценок
+         */
+
+        return null;
+    }
 }
