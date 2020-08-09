@@ -2,6 +2,7 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
+import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -15,15 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
 
 @RestController
 @Transactional
 public class ReportsController extends  AbstractController {
-
-    //  ByteArrayResource resource = new ByteArrayResource(payload.getBytes(StandardCharsets.UTF_8));
-    //  ByteArrayResource resource = new ByteArrayResource(payload.getBytes(Charset.forName("KOI8_R")));
 
     @RequestMapping(path = "/reports/results-table/{reportFormat}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
@@ -44,7 +41,7 @@ public class ReportsController extends  AbstractController {
                 break;
 
             case shortFormat:
-                reportText = "Пока не реализовано";
+                reportText = (new ShortResultTableReportView(reportModel)).getReportText();
                 break;
 
             default:
