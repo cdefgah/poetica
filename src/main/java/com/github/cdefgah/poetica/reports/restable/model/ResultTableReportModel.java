@@ -77,6 +77,8 @@ public class ResultTableReportModel {
         return entityManager;
     }
 
+
+
     public int getMinQuestionNumber() {
         return minQuestionNumber;
     }
@@ -124,6 +126,11 @@ public class ResultTableReportModel {
                 Integer.class);
         final Integer resultValue = query.getSingleResult();
         return resultValue != null ? resultValue : 0;
+    }
+
+    public Map<Integer, Integer> getQuestionsRatingMap(boolean isMainRound) {
+        return Collections.unmodifiableMap(isMainRound ?
+                                            this.mainRoundQuestionsRatingMap : this.preliminaryRoundQuestionsRatingMap);
     }
 
     // ===========================================================================================================

@@ -3,6 +3,7 @@ package com.github.cdefgah.poetica.reports.restable;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class FullResultTableReportView extends AbstractResultTableReportView {
 
@@ -12,7 +13,7 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
 
     public String getReportText() {
         return getRoundBlockText(false) +
-                "\n\n" +
+                "\n" +
                 getRoundBlockText(true);
     }
 
@@ -70,6 +71,16 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
         // строка с рейтингом вопросов
         sb.append(getRightAlignedText(maxTeamNumberLength, "Р")).append(twoSpaces);
 
+        final Map<Integer, Integer> questionsRatingMap = reportModel.getQuestionsRatingMap(isMainRound);
+        for (int questionNumber = reportModel.getMinQuestionNumber();
+                                    questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
+
+            final int questionRating = questionsRatingMap.get(questionNumber);
+            sb.append(getRightAlignedText(maxQuestionRatingLength, String.valueOf(questionRating)));
+            sb.append(oneSpace);
+        }
+
+        sb.append("\n");
         return sb.toString();
     }
 }
