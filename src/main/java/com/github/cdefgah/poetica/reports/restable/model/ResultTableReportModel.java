@@ -51,17 +51,15 @@ public class ResultTableReportModel {
 
         // первый проход, проставляем отметки о взятых вопросах и обновляем рейтинг вопросов
         for (Team team : teamsList) {
+
+            // TODO - передавать null в параметрах нехорошо, переделать
             ReportRowModel preliminaryRoundBlockReportRow =
                                     new ReportRowModel(minQuestionNumber,
-                                                            maxQuestionNumber, false,
-                                                                                team, 0);
+                                                                 maxQuestionNumber, team, null);
             preliminaryRoundBlockReportRows.add(preliminaryRoundBlockReportRow);
 
-            final int amountOfAnswersTakenInPrevRound =
-                                                preliminaryRoundBlockReportRow.getAmountOfTakenAnswersInThisRound();
-
             mainRoundBlockReportRows.add(new ReportRowModel(minQuestionNumber, maxQuestionNumber,
-                                                               true, team, amountOfAnswersTakenInPrevRound));
+                                                                                team, preliminaryRoundBlockReportRow));
         }
 
         // считаем рейтинг команд согласно итоговым рейтингам вопросов
@@ -126,32 +124,30 @@ public class ResultTableReportModel {
     // ===========================================================================================================
     public class ReportRowModel {
 
-        private int teamNumber;
+        private final int teamNumber;
 
-        private boolean[] answerFlags;
+        private final boolean[] answerFlags;
 
-        private int amountOfTakenAnswersInThisRound;
+        private final int amountOfTakenAnswersInThisRound;
 
         private int amountOfTakenAnswersInPreviousRound;
 
         private int teamRating;
 
-        private String teamTitle;
+        private final String teamTitle;
 
-        private boolean isMainRound;
+        private final boolean isMainRound;
 
         /**
          * Конструктор.
          * @param minQuestionNumber минимальный номер вопроса.
          * @param maxQuestionNumber максимальный номер вопроса.
-         * @param isMainRound true, если блок отчёта относится к основному раунду.
          * @param team объект команды.
-         * @param amountOfAnswersTakenInPreviousRound количество ответов, взятых в предыдущем раунде.
+         * @param previousRoundRowModel строка отчёта для этой команды, но из предыдущего раунда.
          */
-        ReportRowModel(int minQuestionNumber, int maxQuestionNumber, boolean isMainRound, Team team,
-                                                                            int amountOfAnswersTakenInPreviousRound) {
+        ReportRowModel(int minQuestionNumber, int maxQuestionNumber, Team team, ReportRowModel previousRoundRowModel) {
 
-            this.isMainRound = isMainRound;
+            this.isMainRound = previousRoundRowModel != null;
 
             final int roundNumber = isMainRound ? 2 : 1;
             this.teamNumber = team.getNumber();
@@ -172,17 +168,35 @@ public class ResultTableReportModel {
                     // если вопрос взят, увеличиваем счётчик взятых вопросов
                     takenAnswersAmount++;
                 } else {
-                    // иначе - обновляем рейтинг вопроса
-                    // если вопрос не взят, его рейтинг увеличивается на единицу
-                    final int currentQuestionRating = questionsRatingMap.get(questionNumber);
-                    questionsRatingMap.put(questionNumber, currentQuestionRating + 1);
+                    // иначе - если это основной раунд, проверяем, взят-ли этот вопрос в предыдущем раунде
+                    // если взят, учитываем его. Иначе - обновляем рейтинг вопроса.
+                    boolean questionIsNotAnswered = true;
+
+                    if (previousRoundRowModel != null) {
+                        final boolean[] preliminaryRoundAnswerFlags = previousRoundRowModel.getAnswerFlags();
+                        if (preliminaryRoundAnswerFlags[answerFlagIndex]) {
+                            // вопрос был взят в предыдущем раунде
+                            answerFlags[answerFlagIndex] = true; // помечаем его как взятый в этом раунде тоже
+                            questionIsNotAnswered = false;
+                        }
+                    }
+
+                    if (questionIsNotAnswered) {
+                        // иначе - обновляем рейтинг вопроса
+                        // если вопрос не взят, его рейтинг увеличивается на единицу
+                        final int currentQuestionRating = questionsRatingMap.get(questionNumber);
+                        questionsRatingMap.put(questionNumber, currentQuestionRating + 1);
+                    }
                 }
 
                 answerFlagIndex++;
             }
 
             amountOfTakenAnswersInThisRound = takenAnswersAmount;
-            amountOfTakenAnswersInPreviousRound = amountOfAnswersTakenInPreviousRound;
+            if (previousRoundRowModel != null) {
+                // если строка отчёта за предыдущий раунд представлена
+                amountOfTakenAnswersInPreviousRound = previousRoundRowModel.getAmountOfTakenAnswersInThisRound();
+            }
         }
 
         private boolean isAnswerAccepted(int questionNumber, long teamId, int roundNumber) {
@@ -207,10 +221,11 @@ public class ResultTableReportModel {
                                                                                     preliminaryRoundQuestionsRatingMap;
             teamRating = 0;
             int questionNumber = minQuestionNumber;
-            for (int i = 0; i < answerFlags.length; i++) {
-                if (answerFlags[i]) {
+            for (boolean answerFlag : answerFlags) {
+                if (answerFlag) {
                     teamRating = teamRating + actualRatingMap.get(questionNumber);
                 }
+                questionNumber++;
             }
         }
 

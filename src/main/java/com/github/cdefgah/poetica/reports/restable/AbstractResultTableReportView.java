@@ -57,9 +57,17 @@ abstract class AbstractResultTableReportView {
      * @return выровненный по правому краю пробелами текст.
      */
     protected String getRightAlignedText(int placeHolderLength, String text) {
+        return getRightAlignedText(placeHolderLength, text, ' ');
+    }
+
+    protected String getRightAlignedNumber(int placeHolderLength, int number) {
+        return getRightAlignedText(placeHolderLength, String.valueOf(number), '0');
+    }
+
+    private String getRightAlignedText(int placeHolderLength, String text, char spacerSymbol) {
         final int lengthDelta = placeHolderLength - text.length();
         if (lengthDelta > 0) {
-            return String.join("", Collections.nCopies(lengthDelta, " ")) + text;
+            return String.join("", Collections.nCopies(lengthDelta, String.valueOf(spacerSymbol))) + text;
         } else {
             return text;
         }

@@ -1,5 +1,6 @@
 package com.github.cdefgah.poetica.controllers;
 
+import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,9 +27,9 @@ public class ReportsController extends  AbstractController {
                                                                                     @PathVariable String encodingName) {
 
         final ResultTableReportModel reportModel = new ResultTableReportModel();
+        FullResultTableReportView report = new FullResultTableReportView(reportModel);
 
-
-        String payload = "Жромотрульки тарампульки\nКекелушки мапатуршки!\n1234567890";
+        String payload = report.getReportText();
 
         String fileName = "resultsTable_" + reportFormat + "_" +
                                                        encodingName + "_" + this.getTimeStampPartForFileName()  +".txt";
