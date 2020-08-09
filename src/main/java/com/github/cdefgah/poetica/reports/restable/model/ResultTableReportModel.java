@@ -3,7 +3,6 @@ package com.github.cdefgah.poetica.reports.restable.model;
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Team;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -271,13 +270,13 @@ public class ResultTableReportModel {
 
         @Override
         public int compareTo(ReportRowModel anotherRowModel) {
-            /**
-             * Сперва идёт сравнение по teamRating
-             * Затем по количеству взятых вопросов в текущем раунде.
-             * Потом по количеству взятых вопросов в предыдущем раунде.
-             * А затем уже по названию команды.
-             * Сортировка по числовым показателям у нас по убыванию, так что умножаем всё на -1.
-             * А сортировка по названиям - алфавитная в порядке возрастания.
+            /*
+              Сперва идёт сравнение по teamRating
+              Затем по количеству взятых вопросов в текущем раунде.
+              Потом по количеству взятых вопросов в предыдущем раунде.
+              А затем уже по названию команды.
+              Сортировка по числовым показателям у нас по убыванию, так что умножаем всё на -1.
+              А сортировка по названиям - алфавитная в порядке возрастания.
              */
 
             if (this.teamRating == anotherRowModel.teamRating) {
@@ -286,15 +285,13 @@ public class ResultTableReportModel {
                         return this.teamTitle.compareTo(anotherRowModel.teamTitle);
 
                     } else {
-                        return -1 * Integer.valueOf(this.amountOfTakenAnswersInPreviousRound).
-                                                        compareTo(anotherRowModel.amountOfTakenAnswersInPreviousRound);
+                        return -1 * Integer.compare(this.amountOfTakenAnswersInPreviousRound, anotherRowModel.amountOfTakenAnswersInPreviousRound);
                     }
                 } else {
-                    return -1 * Integer.valueOf(this.amountOfTakenAnswersInThisRound).
-                                                            compareTo(anotherRowModel.amountOfTakenAnswersInThisRound);
+                    return -1 * Integer.compare(this.amountOfTakenAnswersInThisRound, anotherRowModel.amountOfTakenAnswersInThisRound);
                 }
             } else {
-                return -1 * Integer.valueOf(this.teamRating).compareTo(anotherRowModel.teamRating);
+                return -1 * Integer.compare(this.teamRating, anotherRowModel.teamRating);
             }
         }
     }
