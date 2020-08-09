@@ -211,14 +211,14 @@ public class ResultTableReportModel {
                                     "and answer.roundNumber=:roundNumber and answer.grade=:grade " +
                                     "order by answer.emailSentOn desc",
                             Answer.class);
-            query.setMaxResults(1); // нам нужна только одна запись
 
             query.setParameter("teamId", teamId);
             query.setParameter("questionNumber", questionNumber);
             query.setParameter("roundNumber", roundNumber);
             query.setParameter("grade", Grade.Accepted);
 
-            return query.getSingleResult() != null;
+            final List<Answer> result = query.getResultList();
+            return result != null && result.size() > 0;
         }
 
         void recalculateTeamRating() {

@@ -1,13 +1,12 @@
 package com.github.cdefgah.poetica.reports.restable;
 
+import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 abstract class AbstractResultTableReportView {
 
@@ -18,7 +17,7 @@ abstract class AbstractResultTableReportView {
 
     protected final ResultTableReportModel reportModel;
 
-    protected final int maxTeamNumberLength;
+    protected final int maxTeamNumberLength = Team.getMaxTeamNumberValueLength();
 
     protected final int maxQuestionNumberLength;
 
@@ -33,7 +32,6 @@ abstract class AbstractResultTableReportView {
         this.entityManager = reportModel.getEntityManager();
 
         maxQuestionNumberLength = getMaxQuestionNumberLength();
-        maxTeamNumberLength = getMaxTeamNumberLength();
 
         // это длина раздела, в котором показано сколько вопросов взято в текущем (для блока) и предыдущем (для блока)
         // раундах. Выглядит он вот так: 12.34
@@ -94,23 +92,11 @@ abstract class AbstractResultTableReportView {
     }
 
     /**
-     * Возвращает максимальную длину в символах номера команды.
-     * @return максимальная длина в символах номера команды.
-     */
-    private int getMaxTeamNumberLength() {
-        return getLengthOfMaxIntValueFromDatabase("select max(team.number) FROM Team team");
-    }
-
-    /**
      * Возвращает максимальную длину в символах номера вопроса (задания).
      * @return максимальная длина в символах номера вопроса (задания).
      */
     private int getMaxQuestionNumberLength() {
-        return getLengthOfMaxIntValueFromDatabase("select max(question.highestInternalNumber) " +
-                                                                                              "FROM Question question");
-    }
-
-    private int getLengthOfMaxIntValueFromDatabase(String queryString) {
+        final String queryString = "select max(question.highestInternalNumber) FROM Question question";
         final TypedQuery<Integer> query = entityManager.createQuery(queryString, Integer.class);
         final Integer maxValueObject = query.getSingleResult();
         final int maxValueObjectNumber = maxValueObject != null ? maxValueObject : 0;

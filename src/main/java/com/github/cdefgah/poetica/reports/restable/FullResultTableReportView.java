@@ -11,11 +11,9 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
     }
 
     public String getReportText() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getRoundBlockText(false));
-        sb.append("\n\n");
-        sb.append(getRoundBlockText(true));
-        return sb.toString();
+        return getRoundBlockText(false) +
+                "\n\n" +
+                getRoundBlockText(true);
     }
 
     private String getRoundBlockText(boolean isMainRound) {
@@ -33,7 +31,7 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
 
             sb.append(getRightAlignedText(maxQuestionNumberLength, String.valueOf(questionNumber))).append(oneSpace);
         }
-        sb.append(oneSpace);
+
         sb.append(getRightAlignedText(maxTakenAnswersDigestLength, "О"));
         sb.append(oneSpace);
         sb.append(getRightAlignedText(getMaxTeamRatingLength(isMainRound), "Р"));

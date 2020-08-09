@@ -62,6 +62,10 @@ public final class Team {
 
     }
 
+    public static int getMaxTeamNumberValueLength() {
+        return String.valueOf(ModelConstraints.MAX_NUMBER_VALUE).length();
+    }
+
     /**
      * Возвращает уникальный идентификатор.
      * @return уникальный идентификатор.
