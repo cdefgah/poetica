@@ -34,6 +34,7 @@ public class ShortResultTableReportView  extends AbstractResultTableReportView {
 
             sb.append(shorthandForQuestionNumber);
         }
+        sb.append(oneSpace);
 
         sb.append(getRightAlignedText(maxTakenAnswersDigestLength, "О"));
         sb.append(oneSpace);
@@ -55,6 +56,8 @@ public class ShortResultTableReportView  extends AbstractResultTableReportView {
                 sb.append(gradeSymbol);
             }
 
+            sb.append(oneSpace);
+            
             // выводим информацию о количестве взятых в предыдущем и текущем турах вопросах
             sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfTakenAnswersInThisRound()));
             sb.append(".");
