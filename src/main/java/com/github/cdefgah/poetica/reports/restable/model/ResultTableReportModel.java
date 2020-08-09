@@ -47,7 +47,7 @@ public class ResultTableReportModel {
 
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
 
-        final List<Team> teamsList = getAllTeams();
+        final List<Team> teamsList = getParticipatedTeams();
 
         // первый проход, проставляем отметки о взятых вопросах и обновляем рейтинг вопросов
         for (Team team : teamsList) {
@@ -109,7 +109,7 @@ public class ResultTableReportModel {
         }
     }
 
-    private List<Team> getAllTeams() {
+    private List<Team> getParticipatedTeams() {
         TypedQuery<Team> query = entityManager.createQuery("select team from Team team", Team.class);
         return query.getResultList();
     }
@@ -182,6 +182,7 @@ public class ResultTableReportModel {
                 if (answerFlags[answerFlagIndex]) {
                     // если вопрос взят, увеличиваем счётчик взятых вопросов
                     takenAnswersAmount++;
+
                 } else {
                     // иначе - если это основной раунд, проверяем, взят-ли этот вопрос в предыдущем раунде
                     // если взят, учитываем его. Иначе - обновляем рейтинг вопроса.
@@ -191,7 +192,14 @@ public class ResultTableReportModel {
                         final boolean[] preliminaryRoundAnswerFlags = previousRoundRowModel.getAnswerFlags();
                         if (preliminaryRoundAnswerFlags[answerFlagIndex]) {
                             // вопрос был взят в предыдущем раунде
-                            answerFlags[answerFlagIndex] = true; // помечаем его как взятый в этом раунде тоже
+
+                            // увеличиваем счётчик взятых вопросов, несмотря на то, что вопрос взят в предыдущем раунде
+                            takenAnswersAmount++;
+
+                            // помечаем его как взятый в этом раунде тоже
+                            answerFlags[answerFlagIndex] = true;
+
+                            // ставим отметку, что вопрос взят
                             questionIsNotAnswered = false;
                         }
                     }
