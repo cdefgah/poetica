@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { AbstractInteractiveComponentModel } from '../core/base/AbstractInteractiveComponentModel';
 import { CharsetEncodingEntity } from './support/CharsetEncodingEntity';
+import { TeamDataModel } from '../../data-model/TeamDataModel';
 
 @Component({
   selector: 'app-reports',
@@ -57,16 +58,45 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   }
 
   exportResultsTable() {
+
     const confirmationMessage = `Выгрузить таблицу результатов в указанном формате и кодировке?`;
 
-    const dialogAcceptedAction = () => {
+    const exportReportAction = () => {
       // если диалог был принят (accepted)
       // выгружаем отчёт
       const url = `/reports/results-table/${this.selectedResultsTableFormatAlias}/${this.selectedEncodingSystemName}`;
       window.location.href = url;
     };
 
-    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+    const notGradedAnswerPresenceAction = () => {
+      // сперва делаем запрос на наличие ответов без оценок
+      const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
+      this.http.get(answerWithoutGradesCheckUri).subscribe(
+        (foundTeamIdString: string) => {
+          if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
+            // если нет команд с не оцененными ответами
+            // подтверждаем действие экспорта отчёта и выполняем его
+            this.confirmationDialog(confirmationMessage, exportReportAction)
+          } else {
+            // если найдена команда, для которой есть ответы без оценок.
+            const teamInfoUri = `/teams/${foundTeamIdString}`;
+            this.http.get(teamInfoUri).subscribe(
+              (foundTeam: TeamDataModel) => {
+                this.displayMessage(`Найдена как минимум одна команда, у которой не все ответы получили оценку.
+                 Команда называется '${foundTeam.title}', её номер: '${foundTeam.number}'.
+                  На странице ответов выберите эту команду и укажите режим отображения 'Ответы без оценки',
+                   чтобы увидеть ответы без оценки`);
+                return;
+              },
+              (error) => this.reportServerError(error)
+            );
+          }
+        },
+        (error) => this.reportServerError(error)
+      );
+    };
+
+    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, notGradedAnswerPresenceAction));
   }
 
   checkAnswersPresentAndRunAction(action: any) {
