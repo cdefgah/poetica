@@ -2,7 +2,6 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,7 +119,7 @@ public class AnswersController extends AbstractController {
     }
 
     @RequestMapping(path = "/answers/decline", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity declineAnswer(@RequestParam("answerId") long answerId) {
+    public ResponseEntity<String> declineAnswer(@RequestParam("answerId") long answerId) {
         Answer answer = entityManager.find(Answer.class, answerId);
         if (answer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
@@ -131,5 +130,24 @@ public class AnswersController extends AbstractController {
         answer.setGrade(Grade.NotAccepted);
         entityManager.persist(answer);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Проверяет наличие ответов без оценок в базе.
+     * @return Возвращает строку с id первой найденной команды, для которой занесены не все оценки к ответам.
+     * Если нет ответов без оценок, возвращается пустая строка.
+     */
+    @RequestMapping(path = "/answers/not-graded-presence", method = RequestMethod.GET)
+    public ResponseEntity<String> notGradedAnswersPresent() {
+        TypedQuery<Long> query = entityManager.createQuery("select distinct team.id from Team team, " +
+                                       "Answer answer where team.id=answer.teamId and answer.grade=:grade", Long.class);
+        query.setParameter("grade", Grade.None);
+        List<Long> resultList = query.getResultList();
+        String foundTeamId = "";
+        if (resultList != null && resultList.size() > 0) {
+            foundTeamId = resultList.get(0).toString();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(foundTeamId);
     }
 }
