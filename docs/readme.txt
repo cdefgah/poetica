@@ -1,17 +1,31 @@
-1. Select folder with the application, open its properties and check "Unblock" checkbox if it is displayed here.
-Files downloaded from the Internet are marked as readonly (blocked), so make sure you have unblocked all files of the application.
+В дистрибутиве идёт база данных с уже внесёнными данными, что ты присылал.
 
-2. Launch runme.bat. DON'T LAUNCH THE APP JUST CLICKING ON THE JAR FILE.
-It will start local web-server along with the application.
-As the application has started (check for "Started PoeticaApplication in ..... seconds" string in the black console), launch any modern browser on your computer.
-And go to the address:
+Программа по-умолчанию стартует по порту 7777. 
 
-localhost:8080
+После запуска start-poetica.bat, как только в консоли прекратится движение и строки перестанут появляться, открывай браузер и вбивай там адрес:
 
-or
+http://127.0.0.1:7777
 
-127.0.0.1:8080
+Приложение откроется в браузере.
 
-Browser will display the web-application ready to work with.
+Если надо открыть запущенное на компе приложение с планшета, узнай ip-адрес своего компа, указав в cmd-окне команду ipconfig, и в планшете, в браузере, 
+укажи адрес своего компьютера вместе с нужным портом, как это было сделано для адреса 127.0.0.1
 
-Please note, application generates poetica.sqlite file upon start if it does not exist. It is database file, that holds all application information.
+Например, адрес твоего компа в домашней сети: 192.168.0.15
+
+тогда адрес для доступа с планшета будет:
+
+http://192.168.0.15:7777
+
+
+Для того, чтобы прекратить выполнение приложения либо закрой консольное окно (крестиком), либо (предпочтительный вариант), выполни stop-poetica.bat
+
+Если вдруг будешь менять порт, по которому работает приложение (в папке config, в настроечном файле), то отредактируй порт и в файле stop-poetica.bat
+
+
+Для запуска на Маке или на другой Unix-платформе предварительно задайте атрибут Executable для sh-файлов перед тем как их запускать.
+
+Выполните в терминале, находясь в папке программы следующие команды:
+
+chmod +x start-poetica.sh
+chmod +x stop-poetica.sh

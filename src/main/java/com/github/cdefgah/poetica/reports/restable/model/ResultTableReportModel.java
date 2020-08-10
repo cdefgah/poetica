@@ -288,19 +288,34 @@ public class ResultTableReportModel {
               А сортировка по названиям - алфавитная в порядке возрастания.
              */
 
-            if (this.teamRating == anotherRowModel.teamRating) {
-                if (this.amountOfTakenAnswersInThisRound == anotherRowModel.amountOfTakenAnswersInThisRound) {
-                    if (this.amountOfTakenAnswersInPreviousRound == anotherRowModel.amountOfTakenAnswersInPreviousRound) {
-                        return this.teamTitle.compareTo(anotherRowModel.teamTitle);
+            /**
+             * Согласно пункту 9.2 регламента:
+             *
+             * 9.2. Место команды в туре определяется ее результатом в основном зачете.
+             * В случае равенства дополнительным показателем служит результат команды в предварительном зачете.
+             * Если совпадает и этот показатель, соответствующие места в туре делятся.
+             *
+             * Так что сперва сравниваем по количеству ответов в основном зачёте.
+             * Затем по количеству отчётов в предварительном зачете.
+             * После - по рейтингу.
+             * Затем - по названию команды.
+             *
+             * Сортировка по числовым показателям у нас по убыванию, так что умножаем всё на -1.
+             * А сортировка по названиям - алфавитная в порядке возрастания.
+             */
 
+            if (this.amountOfTakenAnswersInThisRound == anotherRowModel.amountOfTakenAnswersInThisRound) {
+                if (this.amountOfTakenAnswersInPreviousRound == anotherRowModel.amountOfTakenAnswersInPreviousRound) {
+                    if (this.teamRating == anotherRowModel.teamRating) {
+                        return this.teamTitle.compareTo(anotherRowModel.teamTitle);
                     } else {
-                        return -1 * Integer.compare(this.amountOfTakenAnswersInPreviousRound, anotherRowModel.amountOfTakenAnswersInPreviousRound);
+                        return -1 * Integer.compare(this.teamRating, anotherRowModel.teamRating);
                     }
                 } else {
-                    return -1 * Integer.compare(this.amountOfTakenAnswersInThisRound, anotherRowModel.amountOfTakenAnswersInThisRound);
+                    return -1 * Integer.compare(this.amountOfTakenAnswersInPreviousRound, anotherRowModel.amountOfTakenAnswersInPreviousRound);
                 }
             } else {
-                return -1 * Integer.compare(this.teamRating, anotherRowModel.teamRating);
+                return -1 * Integer.compare(this.amountOfTakenAnswersInThisRound, anotherRowModel.amountOfTakenAnswersInThisRound);
             }
         }
     }
