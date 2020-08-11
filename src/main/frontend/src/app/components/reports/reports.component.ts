@@ -57,6 +57,45 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
     );
   }
 
+  exportTeamsWithNotGradedAnswers() {
+    const notGradedAnswerPresenceAction = () => {
+      // сперва делаем запрос на наличие ответов без оценок
+      const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
+
+      this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
+        const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
+
+        if (foundTeamIdString && foundTeamIdString.length > 0) {
+          // если есть хотя-бы одна команда с неоцененными ответами
+          // выгружаем отчёт, после подтверждения действия
+
+          // если нет команд с не оцененными ответами
+          // подтверждаем действие экспорта отчёта и выполняем его
+          const confirmationMessage = `Выгрузить перечень команд, у которых не все ответы получили оценку? Отчёт будет выгружен в указанной вверху кодировке.`;
+
+          this.confirmationDialog(confirmationMessage, () => {
+            // если диалог был принят (accepted)
+            // выгружаем отчёт
+
+            // TODO такой подход к выгрузке, мягко говоря, неправильный.
+            // Если пользователь обновит страницу после выгрузки отчёта, он опять его выгрузит,
+            // так как location.href будет показывать на url сервиса генерации отчётов.
+
+            const actionUri = `/reports/teams-with-not-graded-answers/${this.selectedEncodingSystemName}`;
+            window.location.href = actionUri;
+          });
+
+        } else {
+          this.displayMessage('Все зарегистрированные в системе ответы получили оценку.');
+        }
+      },
+        (error) => this.reportServerError(error)
+      );
+    };
+
+    this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
+  }
+
   exportResultsTable() {
     const notGradedAnswerPresenceAction = () => {
       // сперва делаем запрос на наличие ответов без оценок

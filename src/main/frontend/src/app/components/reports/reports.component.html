@@ -16,6 +16,19 @@
 <table class="reports-table">
   <tr class="reports-table-row">
     <td class="reports-table-prompt-cell">
+      Список команд, у которых не все ответы получили оценку
+    </td>
+    <td class="reports-table-action-cell">
+      <button mat-raised-button color="primary" (click)="exportTeamsWithNotGradedAnswers()">
+        Выгрузить список команд
+      </button>
+    </td>
+  </tr>
+</table>
+
+<table class="reports-table">
+  <tr class="reports-table-row">
+    <td class="reports-table-prompt-cell">
       Список заданий без ответов
     </td>
     <td class="reports-table-action-cell">
@@ -38,6 +51,7 @@
     </td>
   </tr>
 </table>
+
 
 <table class="reports-table">
   <tr class="reports-table-row">
