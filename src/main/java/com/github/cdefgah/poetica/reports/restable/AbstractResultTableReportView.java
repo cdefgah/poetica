@@ -5,8 +5,8 @@ import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 abstract class AbstractResultTableReportView {
 
@@ -130,5 +130,33 @@ abstract class AbstractResultTableReportView {
         final long totalTeamsQty = query.getSingleResult();
 
         return String.valueOf(1 + totalTeamsQty).length();
+    }
+
+    /**
+     * Выдаёт строку с номерами внезачётных вопросов для отображения в отчёте.
+     * @return строка с номерами внезачётных вопросов для отображения в отчёте.
+     */
+    protected String getListedNotGradedQuestions() {
+        // вопросы номер {номера вопросов через запятую} игрались в туре вне зачёта
+        StringBuilder sb = new StringBuilder();
+        Map<Integer, Boolean> map = reportModel.getAllQuestionGradesMap();
+        final List<Integer> numbersOfNotGradedQuestions = new ArrayList<>();
+        if (!map.isEmpty()) {
+            map.forEach((key, value) -> {
+                if (!value) {
+                    numbersOfNotGradedQuestions.add(key);
+                }
+            });
+
+            String stringWithNumbersOfNotGradedQuestions =
+                                    numbersOfNotGradedQuestions.
+                                                stream().sorted().
+                                                        map(String::valueOf).collect(Collectors.joining(","));
+
+            sb.append("Вопросы с номерами: ").
+                    append(stringWithNumbersOfNotGradedQuestions).append(" игрались в туре вне зачёта.");
+        }
+
+        return sb.toString();
     }
 }

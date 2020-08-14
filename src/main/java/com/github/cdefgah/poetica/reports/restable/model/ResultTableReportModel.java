@@ -162,6 +162,10 @@ public class ResultTableReportModel {
                 this.mainRoundQuestionsRatingMap : this.preliminaryRoundQuestionsRatingMap);
     }
 
+    public Map<Integer, Boolean> getAllQuestionGradesMap() {
+        return Collections.unmodifiableMap(allQuestionGradesMap);
+    }
+
     // ===========================================================================================================
     public class ReportRowModel implements Comparable<ReportRowModel> {
 

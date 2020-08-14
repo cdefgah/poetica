@@ -18,6 +18,11 @@ public class ShortResultTableReportView  extends AbstractResultTableReportView {
         final String twoSpaces = oneSpace + oneSpace;
         final StringBuilder sb = new StringBuilder();
 
+        String notGradedQuestionsInfo = getListedNotGradedQuestions();
+        if (!notGradedQuestionsInfo.isEmpty()) {
+            sb.append(notGradedQuestionsInfo).append("\n\n");
+        }
+
         // заголовок блока
         sb.append(getBlockTitle(isMainRound)).append("\n");
 
