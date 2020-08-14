@@ -25,7 +25,7 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
         for (int questionNumber = reportModel.getMinQuestionNumber();
                                              questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
-            sb.append(getRightAlignedText(maxQuestionNumberLength, String.valueOf(questionNumber))).append(oneSpace);
+            sb.append(getRightAlignedText(blockBodyColumnLength, String.valueOf(questionNumber))).append(oneSpace);
         }
 
         sb.append(getRightAlignedText(maxTakenAnswersDigestLength, "О"));
@@ -45,7 +45,7 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
             final boolean[] answerFlags = oneModelRow.getAnswerFlags();
             for (boolean answerFlag: answerFlags) {
                 String gradeSymbol = answerFlag ? "+" : "-";
-                sb.append(getRightAlignedText(maxQuestionNumberLength, gradeSymbol));
+                sb.append(getRightAlignedText(blockBodyColumnLength, gradeSymbol));
                 sb.append(oneSpace);
             }
 
@@ -71,7 +71,7 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
                                     questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
             final int questionRating = questionsRatingMap.get(questionNumber);
-            sb.append(getRightAlignedText(maxQuestionRatingLength, String.valueOf(questionRating)));
+            sb.append(getRightAlignedText(blockBodyColumnLength, String.valueOf(questionRating)));
             sb.append(oneSpace);
         }
 

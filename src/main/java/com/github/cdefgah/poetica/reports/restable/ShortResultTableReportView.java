@@ -78,7 +78,7 @@ public class ShortResultTableReportView  extends AbstractResultTableReportView {
         for (int questionNumber = reportModel.getMinQuestionNumber();
              questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
-            sb.append(getRightAlignedText(maxQuestionNumberLength, String.valueOf(questionNumber))).append(oneSpace);
+            sb.append(getRightAlignedText(blockBodyColumnLength, String.valueOf(questionNumber))).append(oneSpace);
         }
         sb.append("\n");
 
@@ -88,7 +88,7 @@ public class ShortResultTableReportView  extends AbstractResultTableReportView {
              questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 
             final int questionRating = questionsRatingMap.get(questionNumber);
-            sb.append(getRightAlignedText(maxQuestionRatingLength, String.valueOf(questionRating)));
+            sb.append(getRightAlignedText(blockBodyColumnLength, String.valueOf(questionRating)));
             sb.append(oneSpace);
         }
 

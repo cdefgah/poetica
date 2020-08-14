@@ -2,6 +2,7 @@ package com.github.cdefgah.poetica.reports.restable.model;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
+import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 
 import javax.persistence.EntityManager;
@@ -31,6 +32,11 @@ public class ResultTableReportModel {
     private final Map<Integer, Integer> preliminaryRoundQuestionsRatingMap = new HashMap<>();
 
     /**
+     * Номер вопроса - зачётный или внезачётный вопрос.
+     */
+    private final Map<Integer, Boolean> allQuestionGradesMap = new HashMap<>();
+
+    /**
      * Рейтинг вопросов за основной тур.
      */
     private final Map<Integer, Integer> mainRoundQuestionsRatingMap = new HashMap<>();
@@ -46,6 +52,7 @@ public class ResultTableReportModel {
         maxQuestionNumber = calculateMaxQuestionNumber();
 
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
+        initQuestionsGradesMap();
 
         final List<Team> teamsList = getParticipatedTeams();
 
@@ -94,6 +101,25 @@ public class ResultTableReportModel {
 
     public Collection<ReportRowModel> getMainRoundBlockReportRows() {
         return Collections.unmodifiableCollection(mainRoundBlockReportRows);
+    }
+
+    private  void initQuestionsGradesMap() {
+        final TypedQuery<Question> query = entityManager.createQuery("select question from Question question",
+                                                                                                        Question.class);
+        final List<Question> allQuestions = query.getResultList();
+        for (Question question: allQuestions) {
+            if (question.isSingleNumberQuestion()) {
+                // если у задания один номер, ставим в соответствие этому номеру признак "зачётный/внезачётный"
+                allQuestionGradesMap.put(question.getLowestInternalNumber(), question.isGraded());
+            } else {
+                // если нет - то заполняем карту номерами для быстрой проверки при формировании отчёта
+                // строго говоря можно было бы оставить только этот цикл, без проверки на isSingleNumberQuestion
+                // но код бы стал менее читабельным.
+                for (int i = question.getLowestInternalNumber(); i <= question.getHighestInternalNumber(); i++) {
+                    allQuestionGradesMap.put(i, question.isGraded());
+                }
+            }
+        }
     }
 
     /**
@@ -182,8 +208,10 @@ public class ResultTableReportModel {
 
                 if (answerFlags[answerFlagIndex]) {
                     // если вопрос взят, увеличиваем счётчик взятых вопросов
-                    takenAnswersAmount++;
-
+                    // но только, если вопрос был зачётным
+                    if (allQuestionGradesMap.get(questionNumber)) {
+                        takenAnswersAmount++;
+                    }
                 } else {
                     // иначе - если это основной раунд, проверяем, взят-ли этот вопрос в предыдущем раунде
                     // если взят, учитываем его. Иначе - обновляем рейтинг вопроса.
@@ -195,7 +223,10 @@ public class ResultTableReportModel {
                             // вопрос был взят в предыдущем раунде
 
                             // увеличиваем счётчик взятых вопросов, несмотря на то, что вопрос взят в предыдущем раунде
-                            takenAnswersAmount++;
+                            if (allQuestionGradesMap.get(questionNumber)) {
+                                // но только для зачётных заданий
+                                takenAnswersAmount++;
+                            }
 
                             // помечаем его как взятый в этом раунде тоже
                             answerFlags[answerFlagIndex] = true;

@@ -3,6 +3,7 @@ import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDa
 import { QuestionValidationService } from 'src/app/components/core/validators/QuestionValidationService';
 import { StringBuilder } from 'src/app/utils/StringBuilder';
 import { QuestionsListImporterComponent } from '../questions-list-importer.component';
+import { debugString } from 'src/app/utils/Config';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
@@ -367,9 +368,9 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       }
 
       const oneInternalNumber: number = QuestionsImporter.parseInt(normalizedOneInternalNumberString);
-
       if (expectedInternalNumber !== -1) {
-        // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию
+        // если это не первая итерация цикла, то проверяем, чтобы номера в составном номере шли по возрастанию,
+        // например: 4-5-6 для трёхкрылок
         if (oneInternalNumber !== expectedInternalNumber) {
           this.allThingsOk = false;
           this.onFailure(this.parentComponentObject,

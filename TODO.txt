@@ -24,3 +24,6 @@ https://www.javadevjournal.com/spring-boot/shutdown-spring-boot-application/#:~:
 ==============
 сделать нестандартный порт для поэтики
 чтоб минимизировать конфликты с другими программами
+
+====================
+локализация: https://angular.io/guide/i18n

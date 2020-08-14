@@ -109,6 +109,14 @@ public final class Question {
     public Question() {
     }
 
+    /**
+     * Возвращает true, если у задания только один номер, оно не состоит из нескольких крыльев.
+     * @return true, если у задания только один номер, оно не состоит из нескольких крыльев.
+     */
+    public boolean isSingleNumberQuestion() {
+        return this.lowestInternalNumber == this.highestInternalNumber;
+    }
+
     public static Map<String, String> getModelConstraintsMap() {
         return modelConstraintsMap;
     }

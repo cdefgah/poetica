@@ -155,4 +155,10 @@ public class ReportsController extends  AbstractController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
+
+    // запрос для получения ответов с номерами вопросов и количеством
+    // Select question_number, body, count(*) as totcl FROM answers where grade='NotAccepted' group by body order by question_number, body
+    // https://stackoverflow.com/a/40934100/12576990
+    // https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#projections
+
 }

@@ -29,12 +29,21 @@ abstract class AbstractResultTableReportView {
 
     protected final int maxQuestionRatingLength;
 
+    // ширина колонки, в которой показываются номера вопросов
+    // отметки + -
+    // и рейтинг вопросов
+    // вычисляется как максимум между
+    // максимальной длиной в символах максимального вопроса
+    // и максимальной длиной в символах максимального рейтинга
+    protected final int blockBodyColumnLength;
+
     public AbstractResultTableReportView(ResultTableReportModel reportModel) {
         this.reportModel = reportModel;
         this.entityManager = reportModel.getEntityManager();
 
         maxQuestionNumberLength = getMaxQuestionNumberLength();
         maxQuestionRatingLength = getMaxQuestionRatingLength();
+        blockBodyColumnLength = Math.max(maxQuestionNumberLength, maxQuestionRatingLength);
 
         // это длина раздела, в котором показано сколько вопросов взято в текущем (для блока) и предыдущем (для блока)
         // раундах. Выглядит он вот так: 12.34
@@ -115,10 +124,11 @@ abstract class AbstractResultTableReportView {
     }
 
     private int getMaxQuestionRatingLength() {
+        // рейтинг вопроса вычисляется как = 1 + (число команд не взявших вопрос).
         final String queryString = "select count(*) FROM Team team";
         final TypedQuery<Long> query = entityManager.createQuery(queryString, Long.class);
         final long totalTeamsQty = query.getSingleResult();
 
-        return String.valueOf(totalTeamsQty).length();
+        return String.valueOf(1 + totalTeamsQty).length();
     }
 }

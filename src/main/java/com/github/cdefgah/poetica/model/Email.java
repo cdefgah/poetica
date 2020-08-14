@@ -11,7 +11,7 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "Emails")
-public class Email {
+public final class Email {
 
 
     private static class ModelConstraints {

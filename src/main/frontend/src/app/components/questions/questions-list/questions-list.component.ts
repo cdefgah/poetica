@@ -130,30 +130,39 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   }
 
   ImportQuestions() {
-    if (this.dataSource.length > 0) {
-      const confirmationMessage =
-        'В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?';
+    this.http.get('/answers/present').subscribe(
+      (answersArePresentFlag: boolean) => {
+        if (answersArePresentFlag) {
+          this.displayMessage('Чтобы импортировать задания, надо предварительно удалить уже существующие. Но этого сделать нельзя, пока в системе есть ответы на них. Удалите их, прежде чем импортировать вопросы заново.');
+        } else {
+          if (this.dataSource.length > 0) {
+            const confirmationMessage =
+              'В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?';
 
-      const dialogAcceptedAction = () => {
-        // если диалог был принят (accepted)
-        // удаляем задания на сервере
-        this.http.delete('/questions/all').subscribe(
-          (data: any) => {
-            // обновляем таблицу со списком вопросов (уже пустую)
-            this.loadQuestionsList();
+            const dialogAcceptedAction = () => {
+              // если диалог был принят (accepted)
+              // удаляем задания на сервере
+              this.http.delete('/questions/all').subscribe(
+                (data: any) => {
+                  // обновляем таблицу со списком вопросов (уже пустую)
+                  this.loadQuestionsList();
 
+                  // запускаем импорт вопросов
+                  this.startImportingQuestions();
+                },
+                (error) => this.reportServerError(error)
+              );
+            };
+
+            this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
+          } else {
             // запускаем импорт вопросов
             this.startImportingQuestions();
-          },
-          (error) => this.reportServerError(error)
-        );
-      };
-
-      this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
-    } else {
-      // запускаем импорт вопросов
-      this.startImportingQuestions();
-    }
+          }
+        }
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 
   private startImportingQuestions() {

@@ -3,7 +3,7 @@ package com.github.cdefgah.poetica.model;
 /**
  * Используется для получения сводки по загруженным в систему письмам.
  */
-public class EmailsCountDigest {
+public final class EmailsCountDigest {
 
     private final long emailsQtyForTheFirstRound;
     private final long emailsQtyForTheSecondRound;
