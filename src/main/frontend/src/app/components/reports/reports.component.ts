@@ -135,7 +135,22 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
       );
     };
 
-    this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
+    const checkAnswersPresenceAndRun = () => this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
+    this.checkGradedQuestionsPresentAndRunAction(checkAnswersPresenceAndRun);
+  }
+
+  checkGradedQuestionsPresentAndRunAction(action: any) {
+    const url = '/questions/graded-present';
+    this.http.get(url).subscribe(
+      (gradedQuestionsPresentFlag: boolean) => {
+        if (gradedQuestionsPresentFlag) {
+          action();
+        } else {
+          this.displayMessage('Все задания в системе отмечены как внезачётные. В таком случае нет никакого смысла строить этот отчёт. Очки команд и их рейтинги будут нулевыми.');
+        }
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 
   checkAnswersPresentAndRunAction(action: any) {

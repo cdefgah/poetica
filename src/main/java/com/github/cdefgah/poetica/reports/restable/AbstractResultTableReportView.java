@@ -5,6 +5,7 @@ import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -138,24 +139,27 @@ abstract class AbstractResultTableReportView {
      */
     protected String getListedNotGradedQuestions() {
         // вопросы номер {номера вопросов через запятую} игрались в туре вне зачёта
-        StringBuilder sb = new StringBuilder();
-        Map<Integer, Boolean> map = reportModel.getAllQuestionGradesMap();
+        final StringBuilder sb = new StringBuilder();
+        final  Map<Integer, Boolean> map = reportModel.getAllQuestionGradesMap();
         final List<Integer> numbersOfNotGradedQuestions = new ArrayList<>();
-        if (!map.isEmpty()) {
-            map.forEach((key, value) -> {
-                if (!value) {
-                    numbersOfNotGradedQuestions.add(key);
-                }
-            });
+        map.forEach((key, value) -> {
+            if (!value) {
+                numbersOfNotGradedQuestions.add(key);
+            }
+        });
 
+        if (!numbersOfNotGradedQuestions.isEmpty()) {
             // получаем остортированные номера внезачётных заданий в виде строки, через запятую
-            String stringWithNumbersOfNotGradedQuestions =
+            final String stringWithNumbersOfNotGradedQuestions =
                                     numbersOfNotGradedQuestions.
                                                 stream().sorted().
                                                         map(String::valueOf).collect(Collectors.joining(","));
 
-            sb.append("Вопросы с номерами: ").
-                    append(stringWithNumbersOfNotGradedQuestions).append(" игрались в туре вне зачёта.");
+            final boolean isPlural = numbersOfNotGradedQuestions.size() > 1;
+            final String prefixString = isPlural ? "Вопросы с номерами: " : "Вопрос с номером: ";
+            final String suffixString = isPlural ? " игрались в туре вне зачёта." : " игрался в туре вне зачёта.";
+
+            sb.append(prefixString).append(stringWithNumbersOfNotGradedQuestions).append(suffixString);
         }
 
         return sb.toString();

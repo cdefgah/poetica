@@ -119,6 +119,15 @@ public class QuestionsController extends AbstractController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(path = "/questions/graded-present", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Boolean> getGradedQuestionsPresent() {
+        TypedQuery<Long> query =
+                entityManager.createQuery("select count(*) from Question " +
+                                                                "question where question.graded=:graded", Long.class);
+        query.setParameter("graded", true);
+        return ResponseEntity.status(HttpStatus.OK).body(query.getSingleResult() > 0);
+    }
+
     /**
      * Возвращает список всех вопросов (бескрылок), и зачётных и внезачётных.
      * @return HTTP OK и список всех вопросов.
