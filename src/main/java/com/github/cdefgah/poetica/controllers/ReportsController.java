@@ -4,7 +4,8 @@ import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.model.repositories.AnswersRepository;
-import com.github.cdefgah.poetica.reports.collection.model.CollectionReportRecord;
+import com.github.cdefgah.poetica.reports.collection.CollectionReportView;
+import com.github.cdefgah.poetica.reports.collection.model.CollectionReportModel;
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
@@ -176,10 +177,10 @@ public class ReportsController extends  AbstractController {
     @RequestMapping(path = "/reports/collection/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
 
-        List<CollectionReportRecord> acceptedAnswers = null; // answersRepository.getCollectionRecordsForAcceptedAnswers();
-        List<CollectionReportRecord> notAcceptedAnswers = null; // answersRepository.getCollectionRecordsForNotAcceptedAnswers();
+        final CollectionReportModel reportModel = new CollectionReportModel(entityManager);
+        final CollectionReportView report = new CollectionReportView(reportModel);
 
-        final String reportText = buildCollectionReportBody(acceptedAnswers, notAcceptedAnswers);
+        final String reportText = report.getReportText();
         String fileName = "collection_" + "_" + encodingName + "_" +
                 this.getTimeStampPartForFileName() +".txt";
         HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
@@ -192,32 +193,4 @@ public class ReportsController extends  AbstractController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
-
-
-    private String buildCollectionReportBody(List<CollectionReportRecord> acceptedAnswers,
-                                             List<CollectionReportRecord> notAcceptedAnswers) {
-
-        final StringBuilder sb = new StringBuilder();
-
-        sb.append("AcceptedAnswers");
-        for (Object oneRecord: acceptedAnswers) {
-           sb.append(oneRecord.toString());
-        }
-
-        sb.append("\n*******************************************************************\n");
-
-        sb.append("notAcceptedAnswers");
-            for (Object oneRecord: notAcceptedAnswers) {
-                sb.append(oneRecord.toString());
-            }
-
-
-        return sb.toString();
-    }
-
-
-    // запрос для получения ответов с номерами вопросов и количеством
-    // Select question_number, body, count(*) as totcl FROM answers where grade='NotAccepted' group by body order by question_number, body
-    // https://stackoverflow.com/a/40934100/12576990
-    // https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#projections
 }

@@ -165,4 +165,17 @@ public final class Answer {
     public void setEmailSentOn(long emailSentOn) {
         this.emailSentOn = emailSentOn;
     }
+
+    public String getAnswerWithComment() {
+        String answerComment = this.comment != null ? this.comment : "";
+        if (answerComment.isEmpty()) {
+            return this.body;
+        } else {
+            return this.body + " % " + answerComment;
+        }
+    }
+
+    public boolean isAccepted() {
+        return this.grade == Grade.Accepted;
+    }
 }

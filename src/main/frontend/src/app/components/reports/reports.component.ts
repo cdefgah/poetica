@@ -206,4 +206,17 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
       (error) => this.reportServerError(error)
     );
   }
+
+  exportCollectionReport() {
+    const confirmationMessage = `Выгрузить собрание сочинений в указанной кодировке?`;
+
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем отчёт
+      const url = `/reports/collection/${this.selectedEncodingSystemName}`;
+      window.location.href = url;
+    };
+
+    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+  }
 }
