@@ -3,11 +3,13 @@ package com.github.cdefgah.poetica.controllers;
 import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
+import com.github.cdefgah.poetica.model.repositories.AnswersRepository;
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import com.github.cdefgah.poetica.utils.AppVersion;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -27,6 +30,9 @@ import java.util.List;
 @RestController
 @Transactional
 public class ReportsController extends  AbstractController {
+
+    @Autowired
+    AnswersRepository answersRepository;
 
     @RequestMapping(path = "/reports/results-table/{reportFormat}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
@@ -161,6 +167,60 @@ public class ReportsController extends  AbstractController {
     public ResponseEntity<String> getAppVersion() {
         return ResponseEntity.ok().body(AppVersion.CURRENT_VERSION);
     }
+
+    /**
+     * Отчёт "Собрание сочинений".
+     * @param encodingName кодировка отчёта.
+     * @return объект ответа HTTP с отчётом.
+     */
+    @RequestMapping(path = "/reports/collection/{encodingName}", method = RequestMethod.GET)
+    public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
+        final Query query = entityManager.createNativeQuery(
+                            "SELECT question_number, body, count(*) as total_count " +
+                                           "FROM Answers where grade=? GROUP BY body order by question_number, body");
+
+        query.setParameter(1, Grade.Accepted);
+        List<Object> acceptedAnswers = query.getResultList();
+
+        query.setParameter(1, Grade.NotAccepted);
+        List<Object> notAcceptedAnswers = query.getResultList();
+
+
+        final String reportText = buildCollectionReportBody(acceptedAnswers, notAcceptedAnswers);
+        String fileName = "collection_" + "_" + encodingName + "_" +
+                this.getTimeStampPartForFileName() +".txt";
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
+
+    private String buildCollectionReportBody(List acceptedAnswers, List notAcceptedAnswers) {
+
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append("AcceptedAnswers");
+        for (Object oneRecord: acceptedAnswers) {
+           sb.append(oneRecord.toString());
+        }
+
+        sb.append("\n*******************************************************************\n");
+
+        sb.append("notAcceptedAnswers");
+            for (Object oneRecord: notAcceptedAnswers) {
+                sb.append(oneRecord.toString());
+            }
+
+
+        return sb.toString();
+    }
+
 
     // запрос для получения ответов с номерами вопросов и количеством
     // Select question_number, body, count(*) as totcl FROM answers where grade='NotAccepted' group by body order by question_number, body
