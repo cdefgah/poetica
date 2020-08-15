@@ -1,6 +1,5 @@
 package com.github.cdefgah.poetica.reports.restable.model;
 
-import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
@@ -260,20 +259,18 @@ public class ResultTableReportModel {
         }
 
         private boolean isAnswerAccepted(int questionNumber, long teamId, int roundNumber) {
-            TypedQuery<Answer> query =
-                    entityManager.createQuery("select answer from Answer answer " +
+            TypedQuery<Long> query =
+                    entityManager.createQuery("select count(*) from Answer answer " +
                                     "where answer.teamId=:teamId and answer.questionNumber=:questionNumber " +
-                                    "and answer.roundNumber=:roundNumber and answer.grade=:grade " +
-                                    "order by answer.emailSentOn desc",
-                            Answer.class);
+                                    "and answer.roundNumber=:roundNumber and answer.grade=:grade",
+                            Long.class);
 
             query.setParameter("teamId", teamId);
             query.setParameter("questionNumber", questionNumber);
             query.setParameter("roundNumber", roundNumber);
             query.setParameter("grade", Grade.Accepted);
 
-            final List<Answer> result = query.getResultList();
-            return result != null && result.size() > 0;
+            return query.getSingleResult() > 0;
         }
 
         void recalculateTeamRating() {

@@ -4,7 +4,7 @@ import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.model.repositories.AnswersRepository;
-import com.github.cdefgah.poetica.reports.collection.CollectionReportRecord;
+import com.github.cdefgah.poetica.reports.collection.model.CollectionReportRecord;
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
@@ -176,8 +176,8 @@ public class ReportsController extends  AbstractController {
     @RequestMapping(path = "/reports/collection/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
 
-        List<CollectionReportRecord> acceptedAnswers = answersRepository.getCollectionRecordsForAcceptedAnswers();
-        List<CollectionReportRecord> notAcceptedAnswers = answersRepository.getCollectionRecordsForNotAcceptedAnswers();
+        List<CollectionReportRecord> acceptedAnswers = null; // answersRepository.getCollectionRecordsForAcceptedAnswers();
+        List<CollectionReportRecord> notAcceptedAnswers = null; // answersRepository.getCollectionRecordsForNotAcceptedAnswers();
 
         final String reportText = buildCollectionReportBody(acceptedAnswers, notAcceptedAnswers);
         String fileName = "collection_" + "_" + encodingName + "_" +

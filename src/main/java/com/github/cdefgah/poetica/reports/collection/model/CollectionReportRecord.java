@@ -1,4 +1,4 @@
-package com.github.cdefgah.poetica.reports.collection;
+package com.github.cdefgah.poetica.reports.collection.model;
 
 public class CollectionReportRecord {
 
