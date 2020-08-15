@@ -23,4 +23,13 @@ public class CollectionReportRecord {
     public long getTotalCount() {
         return totalCount;
     }
+
+    @Override
+    public String toString() {
+        return "CollectionReportRecord{" +
+                "questionNumber=" + questionNumber +
+                ", answerBody='" + answerBody + '\'' +
+                ", totalCount=" + totalCount +
+                '}';
+    }
 }

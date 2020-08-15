@@ -4,6 +4,7 @@ import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.model.repositories.AnswersRepository;
+import com.github.cdefgah.poetica.reports.collection.CollectionReportRecord;
 import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -175,16 +175,9 @@ public class ReportsController extends  AbstractController {
      */
     @RequestMapping(path = "/reports/collection/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
-        final Query query = entityManager.createNativeQuery(
-                            "SELECT question_number, body, count(*) as total_count " +
-                                           "FROM Answers where grade=? GROUP BY body order by question_number, body");
 
-        query.setParameter(1, Grade.Accepted);
-        List<Object> acceptedAnswers = query.getResultList();
-
-        query.setParameter(1, Grade.NotAccepted);
-        List<Object> notAcceptedAnswers = query.getResultList();
-
+        List<CollectionReportRecord> acceptedAnswers = answersRepository.getCollectionRecordsForAcceptedAnswers();
+        List<CollectionReportRecord> notAcceptedAnswers = answersRepository.getCollectionRecordsForNotAcceptedAnswers();
 
         final String reportText = buildCollectionReportBody(acceptedAnswers, notAcceptedAnswers);
         String fileName = "collection_" + "_" + encodingName + "_" +
@@ -201,7 +194,8 @@ public class ReportsController extends  AbstractController {
     }
 
 
-    private String buildCollectionReportBody(List acceptedAnswers, List notAcceptedAnswers) {
+    private String buildCollectionReportBody(List<CollectionReportRecord> acceptedAnswers,
+                                             List<CollectionReportRecord> notAcceptedAnswers) {
 
         final StringBuilder sb = new StringBuilder();
 
