@@ -282,7 +282,9 @@ public class ResultTableReportModel {
             teamRating = 0;
             int questionNumber = minQuestionNumber;
             for (boolean answerFlag : answerFlags) {
-                if (answerFlag) {
+                if (answerFlag && allQuestionGradesMap.get(questionNumber)) {
+                    // если ответ взят и задание является зачётным, то рейтин задания учитывается
+                    // в рейтинге команды
                     teamRating = teamRating + actualRatingMap.get(questionNumber);
                 }
                 questionNumber++;
