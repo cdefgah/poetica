@@ -1,2 +1,2 @@
-java -jar poetica
+java -jar poetica.dat
 pause
