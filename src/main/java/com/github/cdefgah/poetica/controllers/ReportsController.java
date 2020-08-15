@@ -7,6 +7,7 @@ import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
+import com.github.cdefgah.poetica.utils.AppVersion;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -156,9 +157,13 @@ public class ReportsController extends  AbstractController {
                 .body(resource);
     }
 
+    @RequestMapping(path = "/reports/app-version", method = RequestMethod.GET, produces = "text/plain")
+    public ResponseEntity<String> getAppVersion() {
+        return ResponseEntity.ok().body(AppVersion.CURRENT_VERSION);
+    }
+
     // запрос для получения ответов с номерами вопросов и количеством
     // Select question_number, body, count(*) as totcl FROM answers where grade='NotAccepted' group by body order by question_number, body
     // https://stackoverflow.com/a/40934100/12576990
     // https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#projections
-
 }

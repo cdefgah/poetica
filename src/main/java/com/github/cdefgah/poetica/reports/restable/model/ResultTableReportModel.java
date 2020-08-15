@@ -208,9 +208,10 @@ public class ResultTableReportModel {
                     preliminaryRoundQuestionsRatingMap;
 
             for (int questionNumber = minQuestionNumber; questionNumber <= maxQuestionNumber; questionNumber++) {
-                answerFlags[answerFlagIndex] = isAnswerAccepted(questionNumber, team.getId(), roundNumber);
+                final boolean isAnswerAccepted = isAnswerAccepted(questionNumber, team.getId(), roundNumber);
+                answerFlags[answerFlagIndex] = isAnswerAccepted;
 
-                if (answerFlags[answerFlagIndex]) {
+                if (isAnswerAccepted) {
                     // если вопрос взят, увеличиваем счётчик взятых вопросов
                     // но только, если вопрос был зачётным
                     if (allQuestionGradesMap.get(questionNumber)) {

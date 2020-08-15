@@ -148,6 +148,7 @@ abstract class AbstractResultTableReportView {
                 }
             });
 
+            // получаем остортированные номера внезачётных заданий в виде строки, через запятую
             String stringWithNumbersOfNotGradedQuestions =
                                     numbersOfNotGradedQuestions.
                                                 stream().sorted().
