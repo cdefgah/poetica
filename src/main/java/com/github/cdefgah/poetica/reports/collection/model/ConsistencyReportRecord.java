@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class ConsistencyReportRecord {
+public final class ConsistencyReportRecord implements Comparable<ConsistencyReportRecord> {
 
     private final int questionNumber;
     private final String answerBody;
@@ -41,5 +41,15 @@ public final class ConsistencyReportRecord {
 
     public String getAnswerBody() {
         return answerBody;
+    }
+
+    public boolean gradesAreInconsistent() {
+        // если один и тот-же ответ для разных команды был оценен иначе, то мы имеем дело с проблемой
+        return !answerAcceptedFor.isEmpty() && !answerDeclinedFor.isEmpty();
+    }
+
+    @Override
+    public int compareTo(ConsistencyReportRecord anotherConsistencyReportRecord) {
+        return Integer.compare(this.questionNumber, anotherConsistencyReportRecord.questionNumber);
     }
 }

@@ -36,9 +36,12 @@ public class CollectionReportModel extends AbstractReportModel {
         consistencyReportRecords = checkReportModelConsistency();
         reportModelIsConsistent = consistencyReportRecords.isEmpty();
         if (!reportModelIsConsistent) {
+            // если в отчёте ошибки, нет смысла дальше что-то обсчитывать
             return;
         }
 
+        // если в отчёте нет ошибок - считаем дальше
+        buildMainReport();
     }
 
     public boolean isReportModelIsConsistent() {
@@ -47,6 +50,10 @@ public class CollectionReportModel extends AbstractReportModel {
 
     public List<ConsistencyReportRecord> getConsistencyReportRecords() {
         return Collections.unmodifiableList(consistencyReportRecords);
+    }
+
+    private void buildMainReport() {
+
     }
 
     private void populateAnswersListAndConsistencyMap() {
@@ -79,7 +86,31 @@ public class CollectionReportModel extends AbstractReportModel {
      * @return список с записями о несоответствиях. Если несоответствий нет - пустой список.
      */
     private List<ConsistencyReportRecord> checkReportModelConsistency() {
-        return Collections.EMPTY_LIST;
+        final List<ConsistencyReportRecord> resultRowsList = new ArrayList<>();
+        for (ReportConsistencyMapKey reportConsistencyMapKey : consistencyMap.keySet()) {
+            // проходим по всем элементам карты и проверяем корректность ответов для каждого ключа
+            final ConsistencyReportRecord consistencyReportRecord =
+                    new ConsistencyReportRecord(reportConsistencyMapKey.getQuestionNumber(),
+                                                                               reportConsistencyMapKey.getAnswerBody());
+            final List<Answer> answerList = consistencyMap.get(reportConsistencyMapKey).getListOfAnswers();
+            for (Answer oneAnswer : answerList) {
+                final Team team = participatedTeamsMap.get(oneAnswer.getTeamId());
+
+                if (oneAnswer.isAccepted()) {
+                    consistencyReportRecord.registerAcceptedAnswer(team);
+                } else {
+                    consistencyReportRecord.registerDeclinedAnswer(team);
+                }
+            }
+
+            // обработали все ответы, теперь проверяем, они либо все должны быть либо зачтены либо отклонены
+            // если это правило не соблюдается, мы фиксируем запись для дальнейшей обработки (выдаче в отчете)
+            if (consistencyReportRecord.gradesAreInconsistent()) {
+                resultRowsList.add(consistencyReportRecord);
+            }
+        }
+
+        return resultRowsList;
     }
 
     /**

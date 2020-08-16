@@ -2,7 +2,7 @@ package com.github.cdefgah.poetica.reports.collection.model;
 
 import java.util.Objects;
 
-public class ReportConsistencyMapKey {
+final class ReportConsistencyMapKey {
 
     private final int questionNumber;
     private final String answerBody;
