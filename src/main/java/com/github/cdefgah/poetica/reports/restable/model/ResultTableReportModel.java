@@ -3,17 +3,13 @@ package com.github.cdefgah.poetica.reports.restable.model;
 import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
+import com.github.cdefgah.poetica.reports.AbstractReportModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
 
-public class ResultTableReportModel {
-
-    /**
-     * Менеджер сущностей для взаимодействия с базой данных.
-     */
-    private final EntityManager entityManager;
+public class ResultTableReportModel extends AbstractReportModel {
 
     /**
      * Строки для блока отчёта за предварительный тур.
@@ -40,15 +36,8 @@ public class ResultTableReportModel {
      */
     private final Map<Integer, Integer> mainRoundQuestionsRatingMap = new HashMap<>();
 
-    private final int minQuestionNumber;
-
-    private final int maxQuestionNumber;
-
     public ResultTableReportModel(EntityManager entityManager) {
-        this.entityManager = entityManager;
-
-        minQuestionNumber = calculateMinQuestionNumber();
-        maxQuestionNumber = calculateMaxQuestionNumber();
+        super(entityManager);
 
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
         initQuestionsGradesMap();
@@ -83,15 +72,6 @@ public class ResultTableReportModel {
 
     public EntityManager getEntityManager() {
         return entityManager;
-    }
-
-
-    public int getMinQuestionNumber() {
-        return minQuestionNumber;
-    }
-
-    public int getMaxQuestionNumber() {
-        return maxQuestionNumber;
     }
 
     public Collection<ReportRowModel> getPreliminaryRoundBlockReportRows() {
@@ -132,28 +112,6 @@ public class ResultTableReportModel {
             preliminaryRoundQuestionsRatingMap.put(questionNumber, 1);
             mainRoundQuestionsRatingMap.put(questionNumber, 1);
         }
-    }
-
-    private List<Team> getParticipatedTeams() {
-        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
-                                                                 "Email email where team.id=email.teamId", Team.class);
-        return query.getResultList();
-    }
-
-    private int calculateMaxQuestionNumber() {
-        TypedQuery<Integer> query = entityManager.createQuery("select max(question.lowestInternalNumber) " +
-                        "FROM Question question",
-                Integer.class);
-        final Integer resultValue = query.getSingleResult();
-        return resultValue != null ? resultValue : 0;
-    }
-
-    private int calculateMinQuestionNumber() {
-        TypedQuery<Integer> query = entityManager.createQuery("select min(question.lowestInternalNumber) " +
-                        "FROM Question question",
-                Integer.class);
-        final Integer resultValue = query.getSingleResult();
-        return resultValue != null ? resultValue : 0;
     }
 
     public Map<Integer, Integer> getQuestionsRatingMap(boolean isMainRound) {

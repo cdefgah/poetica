@@ -183,8 +183,8 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   }
 
   public ExportQuestions() {
-    const confirmationMessage = `Выгруженные задания будут в формате требуемом механизмом импорта заданий и в кодировке UTF-8 (Unicode). 
-    Выгруженный файл будет находиться в вашей папке загрузок (Downloads). Продолжать?`;
+    const confirmationMessage = `Выгруженные задания будут в формате требуемом механизмом импорта заданий и в кодировке UTF-8 (Unicode).
+     Выгруженный файл будет находиться в вашей папке загрузок (Downloads). Продолжать?`;
 
     const dialogAcceptedAction = () => {
       // если диалог был принят (accepted)
