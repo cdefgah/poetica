@@ -21,11 +21,16 @@ public class CollectionReportModel extends AbstractReportModel {
 
     // карта для проверки корректности оценок.
     // чтобы один и тот-же ответ (до буквы) на одно и то-же задание был либо принят либо отклонён для всех команд
-    private final Map<ReportConsistencyMapKey, ReportConsistencyMapValue> consistencyMap = new HashMap<>();
+    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> consistencyMap = new HashMap<>();
 
     private final List<ConsistencyReportRecord> consistencyReportRecords;
 
     private final boolean reportModelIsConsistent;
+
+    /**
+     * Карта для расчёта тела отчёта.
+     */
+    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> reportBodyMap = new TreeMap<>();
 
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
@@ -53,7 +58,19 @@ public class CollectionReportModel extends AbstractReportModel {
     }
 
     private void buildMainReport() {
+        // заполняем карту reportBodyMap
+        for (Answer answer : allRecentAnswersList) {
+            final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
+                    new QuestionNumberAndAnswerPair(answer.getQuestionNumber(), answer.getBodyWithComment());
 
+            ListOfAnswersFacade listOfAnswersFacade = reportBodyMap.get(questionNumberAndAnswerPair);
+            if (listOfAnswersFacade == null) {
+                listOfAnswersFacade = new ListOfAnswersFacade();
+                reportBodyMap.put(questionNumberAndAnswerPair, listOfAnswersFacade);
+            }
+
+            listOfAnswersFacade.addAnswer(answer);
+        }
     }
 
     private void populateAnswersListAndConsistencyMap() {
@@ -67,12 +84,13 @@ public class CollectionReportModel extends AbstractReportModel {
                     allRecentAnswersList.add(answer);
 
                     // добавляем ответ в consistencyMap
-                    final ReportConsistencyMapKey reportConsistencyMapKey =
-                                                      new ReportConsistencyMapKey(questionNumber, answer.getBody());
+                    final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
+                                                      new QuestionNumberAndAnswerPair(questionNumber, answer.getBody());
 
-                    ReportConsistencyMapValue reportConsistencyMapValue = consistencyMap.get(reportConsistencyMapKey);
+                    ListOfAnswersFacade reportConsistencyMapValue = consistencyMap.get(questionNumberAndAnswerPair);
                     if (reportConsistencyMapValue == null) {
-                        reportConsistencyMapValue = new ReportConsistencyMapValue();
+                        reportConsistencyMapValue = new ListOfAnswersFacade();
+                        consistencyMap.put(questionNumberAndAnswerPair, reportConsistencyMapValue);
                     }
 
                     reportConsistencyMapValue.addAnswer(answer);
@@ -87,12 +105,12 @@ public class CollectionReportModel extends AbstractReportModel {
      */
     private List<ConsistencyReportRecord> checkReportModelConsistency() {
         final List<ConsistencyReportRecord> resultRowsList = new ArrayList<>();
-        for (ReportConsistencyMapKey reportConsistencyMapKey : consistencyMap.keySet()) {
+        for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : consistencyMap.keySet()) {
             // проходим по всем элементам карты и проверяем корректность ответов для каждого ключа
             final ConsistencyReportRecord consistencyReportRecord =
-                    new ConsistencyReportRecord(reportConsistencyMapKey.getQuestionNumber(),
-                                                                               reportConsistencyMapKey.getAnswerBody());
-            final List<Answer> answerList = consistencyMap.get(reportConsistencyMapKey).getListOfAnswers();
+                    new ConsistencyReportRecord(questionNumberAndAnswerPair.getQuestionNumber(),
+                                                                               questionNumberAndAnswerPair.getAnswer());
+            final List<Answer> answerList = consistencyMap.get(questionNumberAndAnswerPair).getListOfAnswers();
             for (Answer oneAnswer : answerList) {
                 final Team team = participatedTeamsMap.get(oneAnswer.getTeamId());
 

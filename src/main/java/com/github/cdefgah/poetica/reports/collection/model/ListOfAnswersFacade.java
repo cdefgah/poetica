@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-final class ReportConsistencyMapValue {
+public final class ListOfAnswersFacade {
     private final List<Answer> listOfAnswers = new ArrayList<>();
 
-    public ReportConsistencyMapValue() {
+    public ListOfAnswersFacade() {
 
     }
 

@@ -166,7 +166,7 @@ public final class Answer {
         this.emailSentOn = emailSentOn;
     }
 
-    public String getAnswerWithComment() {
+    public String getBodyWithComment() {
         String answerComment = this.comment != null ? this.comment : "";
         if (answerComment.isEmpty()) {
             return this.body;
