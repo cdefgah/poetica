@@ -35,7 +35,7 @@ public class CollectionReportModel extends AbstractReportModel {
     /**
      * Содержит окончательную информацию по отчёту.
      */
-    private final Map<QuestionNumberAndAnswerPair, Integer> reportBodyMap = new TreeMap<>();
+    private final Map<QuestionNumberAndAnswerPair, AnswerFrequencySummary> reportBodyMap = new TreeMap<>();
 
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
@@ -62,7 +62,7 @@ public class CollectionReportModel extends AbstractReportModel {
         return Collections.unmodifiableList(consistencyReportRecords);
     }
 
-    public Map<QuestionNumberAndAnswerPair, Integer> getReportBodyMap() {
+    public Map<QuestionNumberAndAnswerPair, AnswerFrequencySummary> getReportBodyMap() {
         return Collections.unmodifiableMap(reportBodyMap);
     }
 
@@ -83,8 +83,12 @@ public class CollectionReportModel extends AbstractReportModel {
 
         // теперь строим окончательный отчёт
         for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : reportTemporaryMap.keySet()) {
-            final int totalAnswers = reportTemporaryMap.get(questionNumberAndAnswerPair).getAnswersCount();
-            reportBodyMap.put(questionNumberAndAnswerPair, totalAnswers);
+            final ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
+            final boolean areAnswersAccepted = listOfAnswersFacade.isAccepted();
+            final int totalAnswers = listOfAnswersFacade.getAnswersCount();
+
+            reportBodyMap.put(questionNumberAndAnswerPair,
+                                                    new AnswerFrequencySummary(areAnswersAccepted, totalAnswers));
         }
     }
 

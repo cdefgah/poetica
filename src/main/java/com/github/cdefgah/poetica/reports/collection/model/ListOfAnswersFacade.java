@@ -21,6 +21,14 @@ public final class ListOfAnswersFacade {
         return Collections.unmodifiableList(listOfAnswers);
     }
 
+    /**
+     * Используется только в случае корректного отчёта. Все ответы либо приняты либо нет.
+     * @return true, если ответы приняты.
+     */
+    public boolean isAccepted() {
+        return listOfAnswers.get(0).isAccepted();
+    }
+
     public int getAnswersCount() {
         return this.listOfAnswers.size();
     }
