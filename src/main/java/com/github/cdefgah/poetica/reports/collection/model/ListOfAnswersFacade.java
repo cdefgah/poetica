@@ -20,4 +20,8 @@ public final class ListOfAnswersFacade {
     public List<Answer> getListOfAnswers() {
         return Collections.unmodifiableList(listOfAnswers);
     }
+
+    public int getAnswersCount() {
+        return this.listOfAnswers.size();
+    }
 }

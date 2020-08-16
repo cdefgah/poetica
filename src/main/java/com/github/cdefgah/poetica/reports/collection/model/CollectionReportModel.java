@@ -28,9 +28,14 @@ public class CollectionReportModel extends AbstractReportModel {
     private final boolean reportModelIsConsistent;
 
     /**
-     * Карта для расчёта тела отчёта.
+     * Временная карта для расчёта тела отчёта.
      */
-    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> reportBodyMap = new TreeMap<>();
+    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> reportTemporaryMap = new TreeMap<>();
+
+    /**
+     * Содержит окончательную информацию по отчёту.
+     */
+    private final Map<QuestionNumberAndAnswerPair, Integer> reportBodyMap = new TreeMap<>();
 
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
@@ -57,19 +62,29 @@ public class CollectionReportModel extends AbstractReportModel {
         return Collections.unmodifiableList(consistencyReportRecords);
     }
 
+    public Map<QuestionNumberAndAnswerPair, Integer> getReportBodyMap() {
+        return Collections.unmodifiableMap(reportBodyMap);
+    }
+
     private void buildMainReport() {
         // заполняем карту reportBodyMap
         for (Answer answer : allRecentAnswersList) {
             final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
                     new QuestionNumberAndAnswerPair(answer.getQuestionNumber(), answer.getBodyWithComment());
 
-            ListOfAnswersFacade listOfAnswersFacade = reportBodyMap.get(questionNumberAndAnswerPair);
+            ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
             if (listOfAnswersFacade == null) {
                 listOfAnswersFacade = new ListOfAnswersFacade();
-                reportBodyMap.put(questionNumberAndAnswerPair, listOfAnswersFacade);
+                reportTemporaryMap.put(questionNumberAndAnswerPair, listOfAnswersFacade);
             }
 
             listOfAnswersFacade.addAnswer(answer);
+        }
+
+        // теперь строим окончательный отчёт
+        for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : reportTemporaryMap.keySet()) {
+            final int totalAnswers = reportTemporaryMap.get(questionNumberAndAnswerPair).getAnswersCount();
+            reportBodyMap.put(questionNumberAndAnswerPair, totalAnswers);
         }
     }
 
