@@ -96,46 +96,56 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
     this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
   }
 
-  exportResultsTable() {
-    const notGradedAnswerPresenceAction = () => {
-      // сперва делаем запрос на наличие ответов без оценок
-      const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
+  private checkAllAnswersAreGradedAndRunAction(action: any) {
+    // сперва делаем запрос на наличие ответов без оценок
+    const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
 
-      this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
-        const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
+    this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
+      const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
 
-        if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
-          // если нет команд с не оцененными ответами
-          // подтверждаем действие экспорта отчёта и выполняем его
-          const confirmationMessage = `Выгрузить таблицу результатов в указанном формате и кодировке?`;
+      if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
+        // если нет команд с не оцененными ответами
+        action();
 
-          this.confirmationDialog(confirmationMessage, () => {
-            // если диалог был принят (accepted)
-            // выгружаем отчёт
-            const actionUri = `/reports/results-table/${this.selectedResultsTableFormatAlias}/${this.selectedEncodingSystemName}`;
-            window.location.href = actionUri;
-          });
-
-        } else {
-          // если найдена команда, для которой есть ответы без оценок.
-          const teamInfoUri = `/teams/${foundTeamIdString}`;
-          this.http.get(teamInfoUri).subscribe(
-            (foundTeam: TeamDataModel) => {
-              this.displayMessage(`Найдена как минимум одна команда, у которой не все ответы получили оценку.
+      } else {
+        // если найдена команда, для которой есть ответы без оценок.
+        const teamInfoUri = `/teams/${foundTeamIdString}`;
+        this.http.get(teamInfoUri).subscribe(
+          (foundTeam: TeamDataModel) => {
+            this.displayMessage(`Найдена как минимум одна команда, у которой не все ответы получили оценку.
                  Команда называется '${foundTeam.title}', её номер: ${foundTeam.number}.
                   На странице ответов выберите эту команду и укажите режим отображения 'Все -> Ответы без оценки',
                    чтобы увидеть ответы этой команды, у которых нет оценки.`);
-              return;
-            },
-            (error) => this.reportServerError(error)
-          );
-        }
-      },
-        (error) => this.reportServerError(error)
-      );
+            return;
+          },
+          (error) => this.reportServerError(error)
+        );
+      }
+    },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  exportResultsTable() {
+    const exportResultsTableAction = () => {
+      // подтверждаем действие экспорта отчёта и выполняем его
+      const confirmationMessage = `Выгрузить таблицу результатов в указанном формате и кодировке?`;
+
+      this.confirmationDialog(confirmationMessage, () => {
+        // если диалог был принят (accepted)
+        // выгружаем отчёт
+        const actionUri = `/reports/results-table/${this.selectedResultsTableFormatAlias}/${this.selectedEncodingSystemName}`;
+        window.location.href = actionUri;
+      });
     };
 
+    // при наличии ответов - проверяем, чтобы не было ответов без оценок
+    const notGradedAnswerPresenceAction = () => this.checkAllAnswersAreGradedAndRunAction(exportResultsTableAction);
+
+    // после проверки на наличие зачётных заданий, проверяем наличие ответов
     const checkAnswersPresenceAndRun = () => this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
+
+    // сперва проверяем, чтобы был хоть один зачётный вопрос (задание)
     this.checkGradedQuestionsPresentAndRunAction(checkAnswersPresenceAndRun);
   }
 
@@ -210,13 +220,17 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
   exportCollectionReport() {
     const confirmationMessage = `Выгрузить собрание сочинений в указанной кодировке?`;
 
-    const dialogAcceptedAction = () => {
+    const exportCollectionReportAction = () => {
       // если диалог был принят (accepted)
       // выгружаем отчёт
       const url = `/reports/collection/${this.selectedEncodingSystemName}`;
       window.location.href = url;
     };
 
-    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
+    // при наличии ответов - проверяем, чтобы не было ответов без оценок
+    const notGradedAnswerPresenceAction = () => this.checkAllAnswersAreGradedAndRunAction(exportCollectionReportAction);
+
+    // сперва проверяем наличие ответов
+    this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
   }
 }
