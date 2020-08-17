@@ -228,7 +228,8 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
     };
 
     // при наличии ответов - проверяем, чтобы не было ответов без оценок
-    const notGradedAnswerPresenceAction = () => this.checkAllAnswersAreGradedAndRunAction(exportCollectionReportAction);
+    const notGradedAnswerPresenceAction = () =>
+      this.checkAllAnswersAreGradedAndRunAction(() => this.confirmationDialog(confirmationMessage, exportCollectionReportAction));
 
     // сперва проверяем наличие ответов
     this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);

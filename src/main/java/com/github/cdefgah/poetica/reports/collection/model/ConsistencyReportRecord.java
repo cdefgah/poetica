@@ -45,7 +45,7 @@ public final class ConsistencyReportRecord implements Comparable<ConsistencyRepo
 
     public boolean gradesAreInconsistent() {
         // если один и тот-же ответ для разных команды был оценен иначе, то мы имеем дело с проблемой
-        return !answerAcceptedFor.isEmpty() && !answerDeclinedFor.isEmpty();
+        return (answerAcceptedFor.size()) > 0 && (answerDeclinedFor.size() > 0);
     }
 
     @Override

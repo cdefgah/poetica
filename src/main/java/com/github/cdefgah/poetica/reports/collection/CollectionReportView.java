@@ -1,13 +1,12 @@
 package com.github.cdefgah.poetica.reports.collection;
 
 import com.github.cdefgah.poetica.model.Team;
-import com.github.cdefgah.poetica.reports.collection.model.AnswerFrequencySummary;
+import com.github.cdefgah.poetica.reports.collection.model.AnswerWithFrequency;
 import com.github.cdefgah.poetica.reports.collection.model.CollectionReportModel;
 import com.github.cdefgah.poetica.reports.collection.model.ConsistencyReportRecord;
-import com.github.cdefgah.poetica.reports.collection.model.QuestionNumberAndAnswerPair;
+import com.github.cdefgah.poetica.reports.collection.model.QuestionSummary;
 
 import java.util.List;
-import java.util.Map;
 
 public class CollectionReportView {
 
@@ -51,30 +50,26 @@ public class CollectionReportView {
     }
 
     private String getMainReportText() {
-        ВОТ ТУТ Я ЗАПУТАЛСЯ
-
-        НАДО ГРУППИРОВАТЬ ПО ЗАСЧИТАНО/НЕЗАСЧИТАНО - и надо делать в модели скорее всего.
-
-        иду спать. уже понедельник, с утра на работу :)
-
         final StringBuilder sb = new StringBuilder();
-        final Map<QuestionNumberAndAnswerPair, AnswerFrequencySummary> reportBodyMap = reportModel.getReportBodyMap();
-        int processingQuestionNumber = -1;
-        boolean currentAcceptedFlag; // для определения момента, когда происходит смена курса
-
-        for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : reportBodyMap.keySet()) {
-            final AnswerFrequencySummary answerFrequencySummary = reportBodyMap.get(questionNumberAndAnswerPair);
-
-            if (processingQuestionNumber != questionNumberAndAnswerPair.getQuestionNumber()) {
-                processingQuestionNumber = questionNumberAndAnswerPair.getQuestionNumber();
-                sb.append("ВОПРОС ").append(processingQuestionNumber).append(":\n\n");
-
-
-
-                sb.append("ЗАСЧИТАНО: ")
-
+        final List<QuestionSummary> questionSummaries = reportModel.getQuestionSummariesList();
+        for (QuestionSummary questionSummary : questionSummaries) {
+            sb.append("ВОПРОС ").append(questionSummary.getQuestionNumber()).append(":\n");
+            sb.append("ЗАСЧИТАНО:\n\n");
+            if (questionSummary.getAcceptedCount() > 0) {
+                final List<AnswerWithFrequency> acceptedAnswersList = questionSummary.getAcceptedAnswersSummary();
+                for (AnswerWithFrequency answerWithFrequency : acceptedAnswersList) {
+                    sb.append("+ ").append(answerWithFrequency.toString()).append("\n");
+                }
             }
 
+            sb.append("\n");
+            sb.append("НЕ ЗАСЧИТАНО:\n\n");
+            if (questionSummary.getDeclinedCount() > 0) {
+                final List<AnswerWithFrequency> acceptedAnswersList = questionSummary.getDeclinedAnswersSummary();
+                for (AnswerWithFrequency answerWithFrequency : acceptedAnswersList) {
+                    sb.append("- ").append(answerWithFrequency.toString()).append("\n");
+                }
+            }
         }
 
         return sb.toString();

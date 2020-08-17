@@ -23,7 +23,7 @@ public class CollectionReportModel extends AbstractReportModel {
     // чтобы один и тот-же ответ (до буквы) на одно и то-же задание был либо принят либо отклонён для всех команд
     private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> consistencyMap = new HashMap<>();
 
-    private final List<ConsistencyReportRecord> consistencyReportRecords;
+    private final List<ConsistencyReportRecord> consistencyReportRecords = null;
 
     private final boolean reportModelIsConsistent;
 
@@ -35,7 +35,7 @@ public class CollectionReportModel extends AbstractReportModel {
     /**
      * Содержит окончательную информацию по отчёту.
      */
-    private final Map<QuestionNumberAndAnswerPair, AnswerFrequencySummary> reportBodyMap = new TreeMap<>();
+    private final List<QuestionSummary> questionSummariesList = new ArrayList<>();
 
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
@@ -43,15 +43,23 @@ public class CollectionReportModel extends AbstractReportModel {
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
         populateAnswersListAndConsistencyMap();
 
+        /*
         consistencyReportRecords = checkReportModelConsistency();
         reportModelIsConsistent = consistencyReportRecords.isEmpty();
         if (!reportModelIsConsistent) {
             // если в отчёте ошибки, нет смысла дальше что-то обсчитывать
             return;
         }
+        */
+
+        reportModelIsConsistent = true;
 
         // если в отчёте нет ошибок - считаем дальше
         buildMainReport();
+    }
+
+    public List<QuestionSummary> getQuestionSummariesList() {
+        return Collections.unmodifiableList(questionSummariesList);
     }
 
     public boolean isReportModelIsConsistent() {
@@ -62,12 +70,9 @@ public class CollectionReportModel extends AbstractReportModel {
         return Collections.unmodifiableList(consistencyReportRecords);
     }
 
-    public Map<QuestionNumberAndAnswerPair, AnswerFrequencySummary> getReportBodyMap() {
-        return Collections.unmodifiableMap(reportBodyMap);
-    }
 
     private void buildMainReport() {
-        // заполняем карту reportBodyMap
+        // группируем ответы по номерам заданий и тексту ответа с комментарием
         for (Answer answer : allRecentAnswersList) {
             final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
                     new QuestionNumberAndAnswerPair(answer.getQuestionNumber(), answer.getBodyWithComment());
@@ -82,14 +87,31 @@ public class CollectionReportModel extends AbstractReportModel {
         }
 
         // теперь строим окончательный отчёт
+        int currentProcessingQuestionNumber = -1;
+        QuestionSummary questionSummary = null;
         for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : reportTemporaryMap.keySet()) {
-            final ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
-            final boolean areAnswersAccepted = listOfAnswersFacade.isAccepted();
-            final int totalAnswers = listOfAnswersFacade.getAnswersCount();
+            if (questionNumberAndAnswerPair.getQuestionNumber() != currentProcessingQuestionNumber) {
+                if (questionSummary != null) {
+                    questionSummariesList.add(questionSummary);
+                }
 
-            reportBodyMap.put(questionNumberAndAnswerPair,
-                                                    new AnswerFrequencySummary(areAnswersAccepted, totalAnswers));
+                currentProcessingQuestionNumber = questionNumberAndAnswerPair.getQuestionNumber();
+                questionSummary = new QuestionSummary(currentProcessingQuestionNumber);
+            }
+
+            final ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
+            final String answerBodyWithComment = questionNumberAndAnswerPair.getAnswer();
+            final int frequency = listOfAnswersFacade.getAnswersCount();
+
+            // все ответы в списке либо приняты, либо нет, поэтому достаточно взять этот признак от одного ответа
+            final boolean isAccepted = listOfAnswersFacade.isAccepted();
+
+            assert questionSummary != null;
+            questionSummary.addAnswerFrequency(answerBodyWithComment, frequency, isAccepted);
         }
+
+        // записываем последний questionSummary
+        questionSummariesList.add(questionSummary);
     }
 
     private void populateAnswersListAndConsistencyMap() {
