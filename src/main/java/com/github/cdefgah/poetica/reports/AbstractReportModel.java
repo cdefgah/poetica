@@ -4,6 +4,9 @@ import com.github.cdefgah.poetica.model.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public abstract class AbstractReportModel {
@@ -12,6 +15,8 @@ public abstract class AbstractReportModel {
      * Менеджер сущностей для взаимодействия с базой данных.
      */
     protected final EntityManager entityManager;
+
+    private final String reportGeneratedOnMSKTime;
 
     protected final int minQuestionNumber;
 
@@ -22,6 +27,13 @@ public abstract class AbstractReportModel {
 
         minQuestionNumber = calculateMinQuestionNumber();
         maxQuestionNumber = calculateMaxQuestionNumber();
+
+        reportGeneratedOnMSKTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"))
+                                                           .format(DateTimeFormatter.ofPattern("d.MM.yyyy HH:mm"));
+    }
+
+    public String getReportGeneratedOnMSKTime() {
+        return reportGeneratedOnMSKTime;
     }
 
     public int getMinQuestionNumber() {

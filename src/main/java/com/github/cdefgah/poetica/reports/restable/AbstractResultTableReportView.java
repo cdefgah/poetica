@@ -62,7 +62,8 @@ abstract class AbstractResultTableReportView {
     }
 
     public String getReportText() {
-        return getRoundBlockText(false) +
+        return "Московское время генерации отчёта: " + reportModel.getReportGeneratedOnMSKTime() + "\n\n" +
+                getRoundBlockText(false) +
                 "\n" +
                 getRoundBlockText(true);
     }

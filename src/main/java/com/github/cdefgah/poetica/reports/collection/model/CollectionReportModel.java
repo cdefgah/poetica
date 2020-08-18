@@ -19,14 +19,6 @@ public class CollectionReportModel extends AbstractReportModel {
 
     protected final List<Answer> allRecentAnswersList = new ArrayList<>();
 
-    // карта для проверки корректности оценок.
-    // чтобы один и тот-же ответ (до буквы) на одно и то-же задание был либо принят либо отклонён для всех команд
-    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> consistencyMap = new HashMap<>();
-
-    private final List<ConsistencyReportRecord> consistencyReportRecords = null;
-
-    private final boolean reportModelIsConsistent;
-
     /**
      * Временная карта для расчёта тела отчёта.
      */
@@ -43,17 +35,6 @@ public class CollectionReportModel extends AbstractReportModel {
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
         populateAnswersListAndConsistencyMap();
 
-        /*
-        consistencyReportRecords = checkReportModelConsistency();
-        reportModelIsConsistent = consistencyReportRecords.isEmpty();
-        if (!reportModelIsConsistent) {
-            // если в отчёте ошибки, нет смысла дальше что-то обсчитывать
-            return;
-        }
-        */
-
-        reportModelIsConsistent = true;
-
         // если в отчёте нет ошибок - считаем дальше
         buildMainReport();
     }
@@ -61,15 +42,6 @@ public class CollectionReportModel extends AbstractReportModel {
     public List<QuestionSummary> getQuestionSummariesList() {
         return Collections.unmodifiableList(questionSummariesList);
     }
-
-    public boolean isReportModelIsConsistent() {
-        return reportModelIsConsistent;
-    }
-
-    public List<ConsistencyReportRecord> getConsistencyReportRecords() {
-        return Collections.unmodifiableList(consistencyReportRecords);
-    }
-
 
     private void buildMainReport() {
         // группируем ответы по номерам заданий и тексту ответа с комментарием
@@ -128,48 +100,19 @@ public class CollectionReportModel extends AbstractReportModel {
                     final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
                                                       new QuestionNumberAndAnswerPair(questionNumber, answer.getBody());
 
+                    /*
                     ListOfAnswersFacade reportConsistencyMapValue = consistencyMap.get(questionNumberAndAnswerPair);
                     if (reportConsistencyMapValue == null) {
                         reportConsistencyMapValue = new ListOfAnswersFacade();
-                        consistencyMap.put(questionNumberAndAnswerPair, reportConsistencyMapValue);
+                       // consistencyMap.put(questionNumberAndAnswerPair, reportConsistencyMapValue);
                     }
 
                     reportConsistencyMapValue.addAnswer(answer);
+
+                     */
                 }
             }
         }
-    }
-
-    /**
-     * Проверяет корректность исходных данных для отчёта.
-     * @return список с записями о несоответствиях. Если несоответствий нет - пустой список.
-     */
-    private List<ConsistencyReportRecord> checkReportModelConsistency() {
-        final List<ConsistencyReportRecord> resultRowsList = new ArrayList<>();
-        for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : consistencyMap.keySet()) {
-            // проходим по всем элементам карты и проверяем корректность ответов для каждого ключа
-            final ConsistencyReportRecord consistencyReportRecord =
-                    new ConsistencyReportRecord(questionNumberAndAnswerPair.getQuestionNumber(),
-                                                                               questionNumberAndAnswerPair.getAnswer());
-            final List<Answer> answerList = consistencyMap.get(questionNumberAndAnswerPair).getListOfAnswers();
-            for (Answer oneAnswer : answerList) {
-                final Team team = participatedTeamsMap.get(oneAnswer.getTeamId());
-
-                if (oneAnswer.isAccepted()) {
-                    consistencyReportRecord.registerAcceptedAnswer(team);
-                } else {
-                    consistencyReportRecord.registerDeclinedAnswer(team);
-                }
-            }
-
-            // обработали все ответы, теперь проверяем, они либо все должны быть либо зачтены либо отклонены
-            // если это правило не соблюдается, мы фиксируем запись для дальнейшей обработки (выдаче в отчете)
-            if (consistencyReportRecord.gradesAreInconsistent()) {
-                resultRowsList.add(consistencyReportRecord);
-            }
-        }
-
-        return resultRowsList;
     }
 
     /**
