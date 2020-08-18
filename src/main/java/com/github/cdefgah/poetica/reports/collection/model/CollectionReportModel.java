@@ -3,6 +3,8 @@ package com.github.cdefgah.poetica.reports.collection.model;
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.reports.AbstractReportModel;
+import com.github.cdefgah.poetica.reports.collection.model.comparators.QuestionNumberAndAnswerBodyComparator;
+import com.github.cdefgah.poetica.reports.collection.model.comparators.QuestionNumberAnswerBodyAndCommentComparator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -19,6 +21,8 @@ public class CollectionReportModel extends AbstractReportModel {
 
     protected final List<Answer> allRecentAnswersList = new ArrayList<>();
 
+    private final List<ConsistencyReportRow> consistencyReportRows = new ArrayList<>();
+
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
 
@@ -29,10 +33,12 @@ public class CollectionReportModel extends AbstractReportModel {
         buildMainReport();
     }
 
+    public boolean isReportModelConsistent() {
+        return this.consistencyReportRows.isEmpty();
+    }
 
-
-    private void buildMainReport() {
-
+    public List<ConsistencyReportRow> getConsistencyReportRows() {
+        return Collections.unmodifiableList(consistencyReportRows);
     }
 
     private void populateAnswersListAndConsistencyMap() {
@@ -67,6 +73,75 @@ public class CollectionReportModel extends AbstractReportModel {
             return foundAnswers.get(0);
         } else {
             return null;
+        }
+    }
+
+    private void buildMainReport() {
+        // сортируем список ответов по номеру и телу ответа вместе с комментарием
+        this.allRecentAnswersList.sort(new QuestionNumberAnswerBodyAndCommentComparator());
+
+    }
+
+    private void buildConsistentReport() {
+        // сортируем список ответов по номеру и телу ответа (без комментария)
+        this.allRecentAnswersList.sort(new QuestionNumberAndAnswerBodyComparator());
+
+        int currentQuestionNumber = -1;
+        String currentAnswerBody = "";
+        boolean currentGroupAcceptedFlag = false;
+        for (int i=0; i<this.allRecentAnswersList.size(); i++) {
+            final Answer processingAnswer = allRecentAnswersList.get(i);
+            if (currentQuestionNumber == -1) {
+                currentQuestionNumber = processingAnswer.getQuestionNumber();
+                currentAnswerBody = processingAnswer.getBody();
+                currentGroupAcceptedFlag = processingAnswer.isAccepted();
+            }
+
+        }
+    }
+
+    // ==========================================================================================================
+
+    /**
+     * Содержит блок информации о рассогласовании в оценках одного и того-же ответа.
+     */
+    public class ConsistencyReportRow {
+        private final int questionNumber;
+        private final String answerBody;
+
+        private final List<Team> answerAcceptedFor = new ArrayList<>();
+        private final List<Team> answerDeclinedFor = new ArrayList<>();;
+
+        public ConsistencyReportRow(int questionNumber, String answerBody) {
+            this.questionNumber = questionNumber;
+            this.answerBody = answerBody;
+        }
+
+        public void registerTeam(long teamId, boolean isAnswerAccepted) {
+            final Team team = participatedTeamsMap.get(teamId);
+            assert team != null;
+
+            if (isAnswerAccepted) {
+                this.answerAcceptedFor.add(team);
+            } else {
+                this.answerDeclinedFor.add(team);
+            }
+        }
+
+        public int getQuestionNumber() {
+            return questionNumber;
+        }
+
+        public String getAnswerBody() {
+            return answerBody;
+        }
+
+        public List<Team> getAnswerAcceptedFor() {
+            return Collections.unmodifiableList(answerAcceptedFor);
+        }
+
+        public List<Team> getAnswerDeclinedFor() {
+            return Collections.unmodifiableList(answerDeclinedFor);
         }
     }
 }
