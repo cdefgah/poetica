@@ -1,9 +1,6 @@
 package com.github.cdefgah.poetica.reports.collection;
 
-import com.github.cdefgah.poetica.model.Team;
-import com.github.cdefgah.poetica.reports.collection.model.AnswerWithFrequency;
 import com.github.cdefgah.poetica.reports.collection.model.CollectionReportModel;
-import com.github.cdefgah.poetica.reports.collection.model.QuestionSummary;
 
 import java.util.List;
 
@@ -18,9 +15,11 @@ public class CollectionReportView {
     public String getReportText() {
         // return "Московское время генерации отчёта: " + reportModel.getReportGeneratedOnMSKTime() + "\n\n" +
 
-        return reportModel.isReportModelIsConsistent() ? getMainReportText() : getConsistencyReportText();
+      //  return reportModel.isReportModelIsConsistent() ? getMainReportText() : getConsistencyReportText();
+        return "";
     }
 
+    /*
     private String getConsistencyReportText() {
         final StringBuilder sb = new StringBuilder();
         sb.append("ВНИМАНИЕ!\nОценки за идентичные ответы на одни и те-же задания для разных команд разнятся.\n");
@@ -75,4 +74,6 @@ public class CollectionReportView {
 
         return sb.toString();
     }
+
+     */
 }

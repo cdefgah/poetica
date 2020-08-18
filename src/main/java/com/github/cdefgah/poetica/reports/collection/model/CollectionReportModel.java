@@ -19,16 +19,6 @@ public class CollectionReportModel extends AbstractReportModel {
 
     protected final List<Answer> allRecentAnswersList = new ArrayList<>();
 
-    /**
-     * Временная карта для расчёта тела отчёта.
-     */
-    private final Map<QuestionNumberAndAnswerPair, ListOfAnswersFacade> reportTemporaryMap = new TreeMap<>();
-
-    /**
-     * Содержит окончательную информацию по отчёту.
-     */
-    private final List<QuestionSummary> questionSummariesList = new ArrayList<>();
-
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
 
@@ -39,77 +29,19 @@ public class CollectionReportModel extends AbstractReportModel {
         buildMainReport();
     }
 
-    public List<QuestionSummary> getQuestionSummariesList() {
-        return Collections.unmodifiableList(questionSummariesList);
-    }
+
 
     private void buildMainReport() {
-        // группируем ответы по номерам заданий и тексту ответа с комментарием
-        for (Answer answer : allRecentAnswersList) {
-            final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
-                    new QuestionNumberAndAnswerPair(answer.getQuestionNumber(), answer.getBodyWithComment());
 
-            ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
-            if (listOfAnswersFacade == null) {
-                listOfAnswersFacade = new ListOfAnswersFacade();
-                reportTemporaryMap.put(questionNumberAndAnswerPair, listOfAnswersFacade);
-            }
-
-            listOfAnswersFacade.addAnswer(answer);
-        }
-
-        // теперь строим окончательный отчёт
-        int currentProcessingQuestionNumber = -1;
-        QuestionSummary questionSummary = null;
-        for (QuestionNumberAndAnswerPair questionNumberAndAnswerPair : reportTemporaryMap.keySet()) {
-            if (questionNumberAndAnswerPair.getQuestionNumber() != currentProcessingQuestionNumber) {
-                if (questionSummary != null) {
-                    questionSummariesList.add(questionSummary);
-                }
-
-                currentProcessingQuestionNumber = questionNumberAndAnswerPair.getQuestionNumber();
-                questionSummary = new QuestionSummary(currentProcessingQuestionNumber);
-            }
-
-            final ListOfAnswersFacade listOfAnswersFacade = reportTemporaryMap.get(questionNumberAndAnswerPair);
-            final String answerBodyWithComment = questionNumberAndAnswerPair.getAnswer();
-            final int frequency = listOfAnswersFacade.getAnswersCount();
-
-            // все ответы в списке либо приняты, либо нет, поэтому достаточно взять этот признак от одного ответа
-            final boolean isAccepted = listOfAnswersFacade.isAccepted();
-
-            assert questionSummary != null;
-            questionSummary.addAnswerFrequency(answerBodyWithComment, frequency, isAccepted);
-        }
-
-        // записываем последний questionSummary
-        questionSummariesList.add(questionSummary);
     }
 
     private void populateAnswersListAndConsistencyMap() {
-        for (int questionNumber = this.getMinQuestionNumber();
-             questionNumber <= this.getMaxQuestionNumber(); questionNumber++) {
-
+        for (int questionNumber = this.minQuestionNumber; questionNumber <= this.maxQuestionNumber; questionNumber++) {
             for (Team team : participatedTeamsMap.values()) {
                 final Answer answer = getMostRecentAnswer(team.getId(), questionNumber);
                 if (answer != null) {
                     // добавляем ответ в общий список ответов
                     allRecentAnswersList.add(answer);
-
-                    // добавляем ответ в consistencyMap
-                    final QuestionNumberAndAnswerPair questionNumberAndAnswerPair =
-                                                      new QuestionNumberAndAnswerPair(questionNumber, answer.getBody());
-
-                    /*
-                    ListOfAnswersFacade reportConsistencyMapValue = consistencyMap.get(questionNumberAndAnswerPair);
-                    if (reportConsistencyMapValue == null) {
-                        reportConsistencyMapValue = new ListOfAnswersFacade();
-                       // consistencyMap.put(questionNumberAndAnswerPair, reportConsistencyMapValue);
-                    }
-
-                    reportConsistencyMapValue.addAnswer(answer);
-
-                     */
                 }
             }
         }
