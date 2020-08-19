@@ -23,11 +23,17 @@ public final class CollectionReportModel extends AbstractReportModel {
 
     private final List<ConsistencyReportRow> consistencyReportRows = new ArrayList<>();
 
+    private final List<AnswerSummaryBlock> answerSummaryBlocks = new ArrayList<>();
+
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
 
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
         populateAnswersList();
+
+        if (this.allRecentAnswersList.isEmpty()) {
+            return;
+        }
 
         // проверяем корректность исходных данных
         buildConsistencyReport();
@@ -36,6 +42,10 @@ public final class CollectionReportModel extends AbstractReportModel {
             // если в отчёте нет ошибок - считаем дальше
             buildMainReport();
         }
+    }
+
+    public List<AnswerSummaryBlock> getAnswerSummaryBlocks() {
+        return Collections.unmodifiableList(answerSummaryBlocks);
     }
 
     public boolean isReportModelConsistent() {
@@ -85,13 +95,59 @@ public final class CollectionReportModel extends AbstractReportModel {
         // сортируем список ответов по номеру и телу ответа вместе с комментарием
         this.allRecentAnswersList.sort(new QuestionNumberAnswerBodyAndCommentComparator());
 
+        Answer processingAnswer = this.allRecentAnswersList.get(0);
+        int currentProcessingQuestionNumber = processingAnswer.getQuestionNumber();
+        String currentProcessingAnswerBodyWithComment = processingAnswer.getBodyWithComment();
+        boolean currentIsAcceptedFlag = processingAnswer.isAccepted();
+        int totalCount = 1;
+
+        AnswerSummaryBlock answerSummaryBlock = new AnswerSummaryBlock(currentProcessingQuestionNumber);
+
+        for (int i = 1; i < allRecentAnswersList.size(); i++) {
+            processingAnswer = allRecentAnswersList.get(i);
+            if (processingAnswer.getQuestionNumber() != currentProcessingQuestionNumber) {
+                // сменился номер вопроса
+                // следовательно должен смениться answerSummaryBlock
+
+                // фиксируем текущую ситуацию в текущем answerSummaryBlock
+                answerSummaryBlock.registerAnswer(currentProcessingAnswerBodyWithComment,
+                                                                                    totalCount, currentIsAcceptedFlag);
+
+                // добавляем сформированный блок в список
+                answerSummaryBlocks.add(answerSummaryBlock);
+
+                // инициализируем новый блок
+                currentProcessingQuestionNumber = processingAnswer.getQuestionNumber();
+                currentProcessingAnswerBodyWithComment = processingAnswer.getBodyWithComment();
+                currentIsAcceptedFlag = processingAnswer.isAccepted();
+                totalCount = 1;
+
+                answerSummaryBlock = new AnswerSummaryBlock(currentProcessingQuestionNumber);
+
+
+            } else if (!processingAnswer.getBodyWithComment().equals(currentProcessingAnswerBodyWithComment)) {
+                // сменился ответ внутри answerSummaryBlock
+                answerSummaryBlock.registerAnswer(currentProcessingAnswerBodyWithComment,
+                                                                                    totalCount, currentIsAcceptedFlag);
+
+                currentProcessingAnswerBodyWithComment = processingAnswer.getBodyWithComment();
+                totalCount = 1;
+                currentIsAcceptedFlag = processingAnswer.isAccepted();
+
+            } else {
+                // ответ не меняется
+                totalCount++;
+            }
+        }
+
+        // фиксируем последний объект
+        answerSummaryBlock.registerAnswer(currentProcessingAnswerBodyWithComment, totalCount, currentIsAcceptedFlag);
+
+        // добавляем его в список
+        answerSummaryBlocks.add(answerSummaryBlock);
     }
 
     private void buildConsistencyReport() {
-        if (this.allRecentAnswersList.isEmpty()) {
-            return;
-        }
-
         // сортируем список ответов по номеру и телу ответа (без комментария)
         this.allRecentAnswersList.sort(new QuestionNumberAndAnswerBodyComparator());
 
@@ -111,6 +167,11 @@ public final class CollectionReportModel extends AbstractReportModel {
             }
 
             consistencyReportRow.registerTeamFromAnswer(processingAnswer);
+        }
+
+        // последний объект проверяем
+        if (consistencyReportRow.isNotConsistent()) {
+            this.consistencyReportRows.add(consistencyReportRow);
         }
     }
     // ==========================================================================================================
