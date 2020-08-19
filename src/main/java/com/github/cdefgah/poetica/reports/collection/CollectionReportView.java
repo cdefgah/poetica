@@ -54,7 +54,27 @@ public class CollectionReportView {
     }
 
     private String getMainReportText() {
-        return "Отчёт в порядке";
+        final StringBuilder sb = new StringBuilder();
+        final List<CollectionReportModel.AnswerSummaryBlock> answerSummaryBlocks = reportModel.getAnswerSummaryBlocks();
+
+        for (CollectionReportModel.AnswerSummaryBlock block : answerSummaryBlocks) {
+            sb.append("ВОПРОС ").append(block.getQuestionNumber()).append(":\n\n");
+            sb.append("ЗАСЧИТАНО:\n");
+            for (CollectionReportModel.AnswerSummaryBlock.AnswerSummaryRow row: block.getAcceptedAnswers()) {
+                sb.append("+ ").append(row.toString()).append("\n");
+            }
+
+            sb.append("\n\n");
+
+            sb.append("НЕ ЗАСЧИТАНО:\n");
+            for (CollectionReportModel.AnswerSummaryBlock.AnswerSummaryRow row: block.getDeclinedAnswers()) {
+                sb.append("+ ").append(row.toString()).append("\n");
+            }
+
+            sb.append("\n\n\n");
+        }
+
+        return sb.toString();
     }
 
 /*

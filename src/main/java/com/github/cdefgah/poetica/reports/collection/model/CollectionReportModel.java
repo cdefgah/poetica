@@ -221,6 +221,15 @@ public final class CollectionReportModel extends AbstractReportModel {
             public int getTotalCount() {
                 return totalCount;
             }
+
+            @Override
+            public String toString() {
+               if (totalCount > 1) {
+                   return this.answerBodyWithComment + " [" + totalCount + "]";
+               } else {
+                   return this.answerBodyWithComment;
+               }
+            }
         }
     }
 
