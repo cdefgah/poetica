@@ -113,6 +113,55 @@ public final class CollectionReportModel extends AbstractReportModel {
             consistencyReportRow.registerTeamFromAnswer(processingAnswer);
         }
     }
+    // ==========================================================================================================
+    public static final class AnswerSummaryBlock {
+        private final int questionNumber;
+        private final List<AnswerSummaryRow> acceptedAnswers = new ArrayList<>();
+        private final List<AnswerSummaryRow> declinedAnswers = new ArrayList<>();
+
+        public AnswerSummaryBlock(int questionNumber) {
+            this.questionNumber = questionNumber;
+        }
+
+        public void registerAnswer(String answerBodyWithComment, int totalCount, boolean isAccepted) {
+            if (isAccepted) {
+                this.acceptedAnswers.add(new AnswerSummaryRow(answerBodyWithComment, totalCount));
+            } else {
+                this.declinedAnswers.add(new AnswerSummaryRow(answerBodyWithComment, totalCount));
+            }
+        }
+
+        public int getQuestionNumber() {
+            return questionNumber;
+        }
+
+        public List<AnswerSummaryRow> getAcceptedAnswers() {
+            return Collections.unmodifiableList(acceptedAnswers);
+        }
+
+        public List<AnswerSummaryRow> getDeclinedAnswers() {
+            return Collections.unmodifiableList(declinedAnswers);
+        }
+
+        // =====================================================================================================
+        public static final class AnswerSummaryRow {
+            private final String answerBodyWithComment;
+            private final int totalCount;
+
+            public AnswerSummaryRow(String answerBodyWithComment, int totalCount) {
+                this.answerBodyWithComment = answerBodyWithComment;
+                this.totalCount = totalCount;
+            }
+
+            public String getAnswerBodyWithComment() {
+                return answerBodyWithComment;
+            }
+
+            public int getTotalCount() {
+                return totalCount;
+            }
+        }
+    }
 
     // ==========================================================================================================
 
@@ -124,7 +173,7 @@ public final class CollectionReportModel extends AbstractReportModel {
         private final String answerBody;
 
         private final List<Team> answerAcceptedFor = new ArrayList<>();
-        private final List<Team> answerDeclinedFor = new ArrayList<>();;
+        private final List<Team> answerDeclinedFor = new ArrayList<>();
 
         public ConsistencyReportRow(Answer answer) {
             this.questionNumber = answer.getQuestionNumber();
