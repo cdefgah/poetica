@@ -68,7 +68,7 @@ public class CollectionReportView {
 
             sb.append("НЕ ЗАСЧИТАНО:\n");
             for (CollectionReportModel.AnswerSummaryBlock.AnswerSummaryRow row: block.getDeclinedAnswers()) {
-                sb.append("+ ").append(row.toString()).append("\n");
+                sb.append("- ").append(row.toString()).append("\n");
             }
 
             sb.append("\n\n\n");
