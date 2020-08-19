@@ -11,7 +11,7 @@ import javax.persistence.TypedQuery;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CollectionReportModel extends AbstractReportModel {
+public final class CollectionReportModel extends AbstractReportModel {
 
     /**
      * Чтобы избежать ненужных обращений в базу, когда надо получить объект команды по id.
@@ -27,10 +27,15 @@ public class CollectionReportModel extends AbstractReportModel {
         super(entityManager);
 
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
-        populateAnswersListAndConsistencyMap();
+        populateAnswersList();
 
-        // если в отчёте нет ошибок - считаем дальше
-        buildMainReport();
+        // проверяем корректность исходных данных
+        buildConsistencyReport();
+
+        if (this.isReportModelConsistent()) {
+            // если в отчёте нет ошибок - считаем дальше
+            buildMainReport();
+        }
     }
 
     public boolean isReportModelConsistent() {
@@ -41,7 +46,7 @@ public class CollectionReportModel extends AbstractReportModel {
         return Collections.unmodifiableList(consistencyReportRows);
     }
 
-    private void populateAnswersListAndConsistencyMap() {
+    private void populateAnswersList() {
         for (int questionNumber = this.minQuestionNumber; questionNumber <= this.maxQuestionNumber; questionNumber++) {
             for (Team team : participatedTeamsMap.values()) {
                 final Answer answer = getMostRecentAnswer(team.getId(), questionNumber);
@@ -82,21 +87,30 @@ public class CollectionReportModel extends AbstractReportModel {
 
     }
 
-    private void buildConsistentReport() {
+    private void buildConsistencyReport() {
+        if (this.allRecentAnswersList.isEmpty()) {
+            return;
+        }
+
         // сортируем список ответов по номеру и телу ответа (без комментария)
         this.allRecentAnswersList.sort(new QuestionNumberAndAnswerBodyComparator());
 
-        int currentQuestionNumber = -1;
-        String currentAnswerBody = "";
-        boolean currentGroupAcceptedFlag = false;
-        for (int i=0; i<this.allRecentAnswersList.size(); i++) {
-            final Answer processingAnswer = allRecentAnswersList.get(i);
-            if (currentQuestionNumber == -1) {
-                currentQuestionNumber = processingAnswer.getQuestionNumber();
-                currentAnswerBody = processingAnswer.getBody();
-                currentGroupAcceptedFlag = processingAnswer.isAccepted();
+        Answer processingAnswer = this.allRecentAnswersList.get(0);
+        ConsistencyReportRow consistencyReportRow = new ConsistencyReportRow(processingAnswer);
+        consistencyReportRow.registerTeamFromAnswer(processingAnswer);
+
+        for (int i=1; i<this.allRecentAnswersList.size(); i++) {
+            processingAnswer = allRecentAnswersList.get(i);
+            if (consistencyReportRow.itIsTimeToChangeRow(processingAnswer)) {
+                // если данные внутри consistencyReportRow сигнализируют о проблеме - сохраняем её
+                if (consistencyReportRow.isNotConsistent()) {
+                    this.consistencyReportRows.add(consistencyReportRow);
+                }
+
+                consistencyReportRow = new ConsistencyReportRow(processingAnswer);
             }
 
+            consistencyReportRow.registerTeamFromAnswer(processingAnswer);
         }
     }
 
@@ -112,20 +126,33 @@ public class CollectionReportModel extends AbstractReportModel {
         private final List<Team> answerAcceptedFor = new ArrayList<>();
         private final List<Team> answerDeclinedFor = new ArrayList<>();;
 
-        public ConsistencyReportRow(int questionNumber, String answerBody) {
-            this.questionNumber = questionNumber;
-            this.answerBody = answerBody;
+        public ConsistencyReportRow(Answer answer) {
+            this.questionNumber = answer.getQuestionNumber();
+            this.answerBody = answer.getBody();
         }
 
-        public void registerTeam(long teamId, boolean isAnswerAccepted) {
-            final Team team = participatedTeamsMap.get(teamId);
+        /**
+         * Возвращает true, если пришло время создавать новый объект ConsistencyReportRow.
+         * @param answer объект ответа.
+         * @return true, если пришло время создавать новый объект ConsistencyReportRow.
+         */
+        public boolean itIsTimeToChangeRow(Answer answer) {
+            return !(this.questionNumber == answer.getQuestionNumber() && this.answerBody.equals(answer.getBody()));
+        }
+
+        public void registerTeamFromAnswer(Answer answer) {
+            final Team team = participatedTeamsMap.get(answer.getTeamId());
             assert team != null;
 
-            if (isAnswerAccepted) {
+            if (answer.isAccepted()) {
                 this.answerAcceptedFor.add(team);
             } else {
                 this.answerDeclinedFor.add(team);
             }
+        }
+
+        public boolean isNotConsistent() {
+            return !(this.answerAcceptedFor.isEmpty() || this.answerDeclinedFor.isEmpty());
         }
 
         public int getQuestionNumber() {

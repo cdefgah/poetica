@@ -1,5 +1,6 @@
 package com.github.cdefgah.poetica.reports.collection;
 
+import com.github.cdefgah.poetica.model.Team;
 import com.github.cdefgah.poetica.reports.collection.model.CollectionReportModel;
 
 import java.util.List;
@@ -13,42 +14,50 @@ public class CollectionReportView {
     }
 
     public String getReportText() {
-        // return "Московское время генерации отчёта: " + reportModel.getReportGeneratedOnMSKTime() + "\n\n" +
+        StringBuilder sb = new StringBuilder();
+        sb.append("Московское время генерации отчёта: ").append(reportModel.getReportGeneratedOnMSKTime()).
+                append("\n\n");
 
-      //  return reportModel.isReportModelIsConsistent() ? getMainReportText() : getConsistencyReportText();
-        return "";
+        if (reportModel.isReportModelConsistent()) {
+            sb.append(getMainReportText());
+        } else {
+            sb.append(getConsistencyReportText());
+        }
+
+        return sb.toString();
     }
 
-    /*
     private String getConsistencyReportText() {
         final StringBuilder sb = new StringBuilder();
         sb.append("ВНИМАНИЕ!\nОценки за идентичные ответы на одни и те-же задания для разных команд разнятся.\n");
         sb.append("Ниже дана информация об этом. Пожалуйста скорректируйте оценки, чтобы подобного не было.\n");
         sb.append("В противном случае отчёт 'Собрание сочинений' не может быть корректно построен.\n\n\n");
 
-        final List<ConsistencyReportRecord> consistencyReportRecords  = reportModel.getConsistencyReportRecords();
-        for (ConsistencyReportRecord record: consistencyReportRecords) {
-            sb.append("ВОПРОС ").append(record.getQuestionNumber()).append(":\n");
-            sb.append("ОТВЕТ: ").append(record.getAnswerBody()).append(":\n\n");
+        List<CollectionReportModel.ConsistencyReportRow> consistencyReportRows = reportModel.getConsistencyReportRows();
+        for (CollectionReportModel.ConsistencyReportRow row : consistencyReportRows) {
+            sb.append("Вопрос №").append(row.getQuestionNumber()).append("\n");
+            sb.append("Ответ: ").append(row.getAnswerBody()).append("\n");
             sb.append("Зачтён для команд:\n");
-
-            final List<Team> acceptedTeams = record.getAnswerAcceptedFor();
-            for (Team team: acceptedTeams) {
+            for (Team team: row.getAnswerAcceptedFor()) {
                 sb.append("+ ").append(team.getTitle()).append(" (").append(team.getNumber()).append(")\n");
             }
-
+            sb.append("\n\n");
             sb.append("Не зачтён для команд:\n");
-            final List<Team> declinedTeams = record.getAnswerDeclinedFor();
-            for (Team team: declinedTeams) {
+            for (Team team: row.getAnswerDeclinedFor()) {
                 sb.append("- ").append(team.getTitle()).append(" (").append(team.getNumber()).append(")\n");
             }
-
-            sb.append("------------------------------------------------------------------------\n\n");
+            sb.append("\n");
+            sb.append("----------------------------------------------------------------------------------\n\n");
         }
 
         return sb.toString();
     }
 
+    private String getMainReportText() {
+        return "Отчёт в порядке";
+    }
+
+/*
     private String getMainReportText() {
         final StringBuilder sb = new StringBuilder();
         final List<QuestionSummary> questionSummaries = reportModel.getQuestionSummariesList();
