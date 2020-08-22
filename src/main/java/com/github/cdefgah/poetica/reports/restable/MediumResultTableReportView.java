@@ -17,9 +17,9 @@ public class MediumResultTableReportView extends AbstractResultTableReportView {
         final String twoSpaces = oneSpace + oneSpace;
         final StringBuilder sb = new StringBuilder();
 
-        String notGradedQuestionsInfo = getListedNotGradedQuestions();
-        if (!notGradedQuestionsInfo.isEmpty()) {
-            sb.append(notGradedQuestionsInfo).append("\n\n");
+        final String notGradedQuestionsMessage = getNotGradedQuestionsMessage();
+        if (!notGradedQuestionsMessage.isEmpty()) {
+            sb.append(notGradedQuestionsMessage).append("\n\n");
         }
 
         // заголовок блока
@@ -93,8 +93,10 @@ public class MediumResultTableReportView extends AbstractResultTableReportView {
         }
         sb.append("\n");
 
+        final ResultTableReportModel resultTableReportModel = (ResultTableReportModel)reportModel;
+
         // на новой строке - рейтинг вопросов
-        final Map<Integer, Integer> questionsRatingMap = reportModel.getQuestionsRatingMap(isMainRound);
+        final Map<Integer, Integer> questionsRatingMap = resultTableReportModel.getQuestionsRatingMap(isMainRound);
         for (int questionNumber = reportModel.getMinQuestionNumber();
              questionNumber <= reportModel.getMaxQuestionNumber(); questionNumber++) {
 

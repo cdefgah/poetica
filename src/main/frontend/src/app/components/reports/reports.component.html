@@ -59,7 +59,7 @@
       Таблица результатов
     </td>
     <td class="reports-table-action-cell">
-      <mat-form-field class="team-selection-field">
+      <mat-form-field class="dropdown-selection-field">
         <mat-label>Формат:</mat-label>
         <mat-select [(value)]="selectedResultsTableFormatAlias" placeholder="Формат отчёта">
           <mat-option *ngFor="let resultsTableFormatAlias of allResultsTableFormatAliases; index as i"
@@ -85,6 +85,30 @@
     <td class="reports-table-action-cell">
       <button mat-raised-button color="primary" (click)="exportCollectionReport()">
         Выгрузить собрание сочинений
+      </button>
+    </td>
+  </tr>
+</table>
+
+<table class="reports-table">
+  <tr class="reports-table-row">
+    <td class="reports-table-prompt-cell">
+      Сводка
+    </td>
+    <td class="reports-table-action-cell">
+      <mat-form-field class="dropdown-selection-field">
+        <mat-label>За какой тур?</mat-label>
+        <mat-select required name="selectedRoundNumber" [(value)]="selectedRoundNumber"
+          [(ngModel)]="selectedRoundNumber">
+          <mat-option *ngFor="let roundAliasOption of allRoundAliases; index as i" [value]="roundAliasOption">
+            {{ allRoundTitles[i] }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </td>
+    <td class="reports-table-action-cell">
+      <button mat-raised-button color="primary" (click)="exportEmailSummaryReport()">
+        Выгрузить сводку
       </button>
     </td>
   </tr>

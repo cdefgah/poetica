@@ -10,6 +10,8 @@ import com.github.cdefgah.poetica.reports.restable.FullResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.MediumResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.ShortResultTableReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
+import com.github.cdefgah.poetica.reports.summary.SummaryReportView;
+import com.github.cdefgah.poetica.reports.summary.model.SummaryReportModel;
 import com.github.cdefgah.poetica.utils.AppVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -183,6 +185,35 @@ public class ReportsController extends  AbstractController {
         final String reportText = report.getReportText();
         String fileName = "collection_" + "_" + encodingName + "_" +
                 this.getTimeStampPartForFileName() +".txt";
+        HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
+
+        ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));
+
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
+    /**
+     * Отчёт "Сводка".
+     * @param encodingName кодировка отчёта.
+     * @return объект ответа HTTP с отчётом.
+     */
+    @RequestMapping(path = "/reports/summary/{roundNumber}/{encodingName}", method = RequestMethod.GET)
+    public ResponseEntity<Resource> exportSummaryReport(@PathVariable int roundNumber,
+                                                        @PathVariable String encodingName) {
+
+        final SummaryReportModel reportModel = new SummaryReportModel(entityManager, roundNumber);
+        final SummaryReportView report = new SummaryReportView(reportModel);
+
+        final String reportText = report.getReportText();
+
+        String roundName = roundNumber == 1 ? "Preliminary_Round" : "Main_Round";
+        String fileName = "summary_" + roundName + "_" + encodingName + "_" +
+                                                                        this.getTimeStampPartForFileName() +".txt";
+
         HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
 
         ByteArrayResource resource = new ByteArrayResource(reportText.getBytes(Charset.forName(encodingName)));

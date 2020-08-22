@@ -1,25 +1,14 @@
 package com.github.cdefgah.poetica.reports.restable;
 
 import com.github.cdefgah.poetica.model.Team;
+import com.github.cdefgah.poetica.reports.AbstractReportView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-abstract class AbstractResultTableReportView {
-
-    /**
-     * Менеджер сущностей для взаимодействия с базой данных.
-     */
-    protected final EntityManager entityManager;
-
-    protected final ResultTableReportModel reportModel;
+abstract class AbstractResultTableReportView extends AbstractReportView {
 
     protected final int maxTeamNumberLength = Team.getMaxTeamNumberValueLength();
 
@@ -42,8 +31,7 @@ abstract class AbstractResultTableReportView {
     protected final int blockBodyColumnLength;
 
     public AbstractResultTableReportView(ResultTableReportModel reportModel) {
-        this.reportModel = reportModel;
-        this.entityManager = reportModel.getEntityManager();
+        super(reportModel);
 
         maxQuestionNumberLength = getMaxQuestionNumberLength();
         maxQuestionRatingLength = getMaxQuestionRatingLength();
@@ -102,14 +90,18 @@ abstract class AbstractResultTableReportView {
     }
 
     protected Collection<ResultTableReportModel.ReportRowModel> getReportModelRows(boolean isMainRound) {
-                return isMainRound ? reportModel.getMainRoundBlockReportRows() :
-                                                            reportModel.getPreliminaryRoundBlockReportRows();
+        final ResultTableReportModel resultTableReportModel = (ResultTableReportModel)reportModel;
+
+        return isMainRound ? resultTableReportModel.getMainRoundBlockReportRows() :
+                        resultTableReportModel.getPreliminaryRoundBlockReportRows();
     }
 
     private int getMaxTeamRatingValueLength(boolean isMainRound) {
+        final ResultTableReportModel resultTableReportModel = (ResultTableReportModel)reportModel;
+
         final Collection<ResultTableReportModel.ReportRowModel> reportRows =
-                                         isMainRound ? reportModel.getMainRoundBlockReportRows() :
-                                                                       reportModel.getPreliminaryRoundBlockReportRows();
+                                         isMainRound ? resultTableReportModel.getMainRoundBlockReportRows() :
+                                                 resultTableReportModel.getPreliminaryRoundBlockReportRows();
         final int maxTeamRating = reportRows.stream().
                                         mapToInt(ResultTableReportModel.ReportRowModel::getTeamRating).
                                                                     filter(oneRow -> oneRow >= 0).max().orElse(0);
@@ -135,37 +127,5 @@ abstract class AbstractResultTableReportView {
         final long totalTeamsQty = query.getSingleResult();
 
         return String.valueOf(1 + totalTeamsQty).length();
-    }
-
-    /**
-     * Выдаёт строку с номерами внезачётных вопросов для отображения в отчёте.
-     * @return строка с номерами внезачётных вопросов для отображения в отчёте.
-     */
-    protected String getListedNotGradedQuestions() {
-        // вопросы номер {номера вопросов через запятую} игрались в туре вне зачёта
-        final StringBuilder sb = new StringBuilder();
-        final  Map<Integer, Boolean> map = reportModel.getAllQuestionGradesMap();
-        final List<Integer> numbersOfNotGradedQuestions = new ArrayList<>();
-        map.forEach((key, value) -> {
-            if (!value) {
-                numbersOfNotGradedQuestions.add(key);
-            }
-        });
-
-        if (!numbersOfNotGradedQuestions.isEmpty()) {
-            // получаем остортированные номера внезачётных заданий в виде строки, через запятую
-            final String stringWithNumbersOfNotGradedQuestions =
-                                    numbersOfNotGradedQuestions.
-                                                stream().sorted().
-                                                        map(String::valueOf).collect(Collectors.joining(","));
-
-            final boolean isPlural = numbersOfNotGradedQuestions.size() > 1;
-            final String prefixString = isPlural ? "Вопросы с номерами: " : "Вопрос с номером: ";
-            final String suffixString = isPlural ? " игрались в туре вне зачёта." : " игрался в туре вне зачёта.";
-
-            sb.append(prefixString).append(stringWithNumbersOfNotGradedQuestions).append(suffixString);
-        }
-
-        return sb.toString();
     }
 }

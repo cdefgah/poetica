@@ -70,10 +70,6 @@ public class ResultTableReportModel extends AbstractReportModel {
         Collections.sort(mainRoundBlockReportRows);
     }
 
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
-
     public Collection<ReportRowModel> getPreliminaryRoundBlockReportRows() {
         return Collections.unmodifiableCollection(preliminaryRoundBlockReportRows);
     }

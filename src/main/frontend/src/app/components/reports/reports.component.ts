@@ -31,9 +31,27 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
 
   selectedResultsTableFormatAlias: string = this.allResultsTableFormatAliases[0];
 
+
+  selectedRoundNumber: string; // используется для хранения выбранного варианта
+  roundAliasOption: string; // используется для формирования списка вариантов
+
+  allRoundAliases: string[] = ['1', '2'];
+  allRoundTitles: string[] = ['Предварительный тур', 'Окончательный тур'];
+
+  get selectedRoundTitle(): string {
+    if (this.selectedRoundNumber) {
+      const index = parseInt(this.selectedRoundNumber, 10) - 1;
+      return this.allRoundTitles[index];
+    } else {
+      return '???';
+    }
+  }
+
+
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
     this.loadAllReportEncodingVariants();
+    this.selectedRoundNumber = this.allRoundAliases[0];
   }
 
   ngOnInit() { }
@@ -233,5 +251,18 @@ export class ReportsComponent extends AbstractInteractiveComponentModel
 
     // сперва проверяем наличие ответов
     this.checkAnswersPresentAndRunAction(notGradedAnswerPresenceAction);
+  }
+
+  exportEmailSummaryReport() {
+    const roundNumber = this.selectedRoundNumber;
+    const confirmationMessage = `Выгрузить сводку за указанный тур (раунд, зачёт) и в указанной кодировке?`;
+    const dialogAcceptedAction = () => {
+      // если диалог был принят (accepted)
+      // выгружаем отчёт
+      const url = `/reports/summary/${roundNumber}/${this.selectedEncodingSystemName}`;
+      window.location.href = url;
+    };
+
+    this.checkAnswersPresentAndRunAction(() => this.confirmationDialog(confirmationMessage, dialogAcceptedAction));
   }
 }

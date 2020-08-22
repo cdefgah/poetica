@@ -225,8 +225,12 @@ public final class CollectionReportModel extends AbstractReportModel {
             @Override
             public String toString() {
                if (totalCount > 1) {
+                   // выдача с хэш-кодом строки, чтобы видеть идентичные строки. Нужна иногда для отладки
+                   // return this.answerBodyWithComment + " [" + totalCount + "]" + " " + Objects.hash(this.answerBodyWithComment);
                    return this.answerBodyWithComment + " [" + totalCount + "]";
                } else {
+                   // выдача с хэш-кодом строки, чтобы видеть идентичные строки. Нужна иногда для отладки
+                   // return this.answerBodyWithComment  + " " + Objects.hash(this.answerBodyWithComment);
                    return this.answerBodyWithComment;
                }
             }
