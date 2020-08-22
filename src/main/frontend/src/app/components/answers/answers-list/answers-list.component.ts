@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { MatRadioChange, MatDialog, MatSelectChange, MatSort, MatTableDataSource } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
@@ -17,7 +17,7 @@ import { EmailDetailsComponent } from '../email-details/email-details.component'
   styleUrls: ['./answers-list.component.css'],
 })
 export class AnswersListComponent extends AbstractInteractiveComponentModel
-  implements OnInit {
+  implements OnInit, AfterViewInit {
   selectedTeamId: number;
   allTeamIds: number[];
   teamTitleAndNumber: string[];
@@ -29,16 +29,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     'Окончательный тур',
   ];
 
-  @ViewChild(MatSort, { static: true }) allAnswersSortHandler: MatSort;
-  @ViewChild(MatSort, { static: true }) answersWithoutGradesSortHandler: MatSort;
-  @ViewChild(MatSort, { static: true }) loadedEmailsSortHandler: MatSort;
+  // если у нас много таблиц с сортируемыми колонками, то надо хитрО извернуться
+  // https://stackoverflow.com/questions/48001006/angular-material-distinct-mat-sort-on-multiple-tables/49056060
+
+  @ViewChild('allAnswersSort') public allAnswersSortHandler: MatSort;
+  @ViewChild('answersWithoutGradesSort') public answersWithoutGradesSortHandler: MatSort;
+  @ViewChild('loadedEmailsSort') public loadedEmailsSortHandler: MatSort;
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
   answersDataSource: MatTableDataSource<AnswerDataModel> = new MatTableDataSource([]);
-
   answersWithoutGradesDataSource: MatTableDataSource<AnswerDataModel> = new MatTableDataSource([]);
-
   emailsDataSource: MatTableDataSource<EmailDataModel> = new MatTableDataSource([]);
 
   /**
@@ -61,16 +62,25 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     'questionNumbersSequence',
   ];
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {
+  notGradedAnswersArePresent = false;
+  displayingOnlyTeamsWithNotGradedAnswers = false;
+
+  constructor(private cdRef: ChangeDetectorRef, private http: HttpClient, private dialog: MatDialog) {
     super();
 
-    this.loadTeamsList(this.loadAllDisplayedLists, this);
+    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
   }
 
   ngOnInit() {
+
+  }
+
+  ngAfterViewInit() {
     this.answersDataSource.sort = this.allAnswersSortHandler;
     this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
     this.emailsDataSource.sort = this.loadedEmailsSortHandler;
+
+    this.cdRef.detectChanges();
   }
 
   public checkPrerequisitesAndDoImportAnswers(): void {
@@ -130,8 +140,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     });
   }
 
-  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent) {
-    const url = '/teams/all';
+  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean) {
+    const url = onlyWithNotGradedAnswers ? '/teams/only-with-not-graded-answers' : '/teams/all';
 
     this.http.get(url).subscribe(
       (unsortedTeamsList: TeamDataModel[]) => {
@@ -182,20 +192,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       return;
     }
 
+    // проверяем на наличие ответов без оценки
+    this.checkNotGradedAnswersPresence();
+
     const url = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
     componentReference.http.get(url).subscribe(
       (loadedAnswers: AnswerDataModel[]) => {
-        componentReference.answersDataSource = new MatTableDataSource(loadedAnswers);
-        componentReference.answersDataSource.sort = componentReference.allAnswersSortHandler;
-
-        const answersWithoutGradesList = componentReference.separateAndSortLoadedAnswers(
+        componentReference.separateAndSortLoadedAnswers(
           loadedAnswers,
           componentReference
         );
-
-        componentReference.answersWithoutGradesDataSource = new MatTableDataSource(answersWithoutGradesList);
-        componentReference.answersWithoutGradesDataSource.sort = componentReference.answersWithoutGradesSortHandler;
       },
       (error) => componentReference.reportServerError(error)
     );
@@ -215,10 +222,14 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       }
     });
 
-    return answersWithoutGradesList;
+    loadedAnswers.sort(compareAnswers);
+    answersWithoutGradesList.sort(compareAnswers);
 
-    // loadedAnswers.sort(compareAnswers);
-    // answersWithoutGradesList.sort(compareAnswers);   
+    componentReference.answersDataSource = new MatTableDataSource(loadedAnswers);
+    componentReference.answersDataSource.sort = componentReference.allAnswersSortHandler;
+
+    componentReference.answersWithoutGradesDataSource = new MatTableDataSource(answersWithoutGradesList);
+    componentReference.answersWithoutGradesDataSource.sort = componentReference.answersWithoutGradesSortHandler;
 
     // --- локальные функции ---
     function compareAnswers(
@@ -276,8 +287,39 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     );
   }
 
+  public turnOnDisplayingOnlyTeamsWithNonGradedAnswers() {
+    this.displayingOnlyTeamsWithNotGradedAnswers = true;
+    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
+  }
+
+  public turnOffDisplayingOnlyTeamsWithNonGradedAnswers() {
+    this.displayingOnlyTeamsWithNotGradedAnswers = false;
+    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
+  }
+
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
+  }
+
+  private checkNotGradedAnswersPresence() {
+    // сперва делаем запрос на наличие ответов без оценок
+    const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
+
+    this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
+      const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
+
+      if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
+        // если нет ответов без оценок.
+        this.notGradedAnswersArePresent = false;
+      } else {
+        // если есть ответы без оценок.
+        this.notGradedAnswersArePresent = true;
+      }
+
+      this.displayingOnlyTeamsWithNotGradedAnswers = false;
+    },
+      (error) => this.reportServerError(error)
+    );
   }
 
   actualRoundChanged(event: MatRadioChange) {
@@ -319,12 +361,12 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     );
     const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
 
+    const componentReference = this;
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если письмо было удалено (+ все ответы из него)
         // загружаем ответы заново и письма
-        this.loadAnswersList(this);
-        this.loadEmailsList(this);
+        componentReference.loadAllDisplayedLists(componentReference);
       }
     });
   }

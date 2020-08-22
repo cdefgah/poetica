@@ -6,30 +6,57 @@
   </button>
 </mat-toolbar>
 <div>
-  <p>
-    <mat-form-field class="team-selection-field">
-      <mat-label>Команда:</mat-label>
-      <mat-select [(value)]="selectedTeamId" placeholder="Команда" (selectionChange)="actualTeamChanged($event)">
-        <mat-option *ngFor="let teamId of allTeamIds; index as i" [value]="teamId">
-          {{ teamTitleAndNumber[i] }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </p>
-  <p>
-    <mat-radio-group [(ngModel)]="selectedRoundAlias">
-      <mat-radio-button class="round-selection-radio-button"
-        *ngFor="let selectedRoundAlias of allRoundAliases; index as i" [value]="selectedRoundAlias"
-        (change)="actualRoundChanged($event)">
-        {{ allRoundTitles[i] }}
-      </mat-radio-button>
-    </mat-radio-group>
-  </p>
+  <table>
+    <tr>
+      <td class="team-selection-cell">
+        <mat-form-field class="team-selection-field">
+          <mat-label>Команда:</mat-label>
+          <mat-select [(value)]="selectedTeamId" placeholder="Команда" (selectionChange)="actualTeamChanged($event)">
+            <mat-option *ngFor="let teamId of allTeamIds; index as i" [value]="teamId">
+              {{ teamTitleAndNumber[i] }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </td>
+      <td>
+        При обновлении списков мы вызываем функцию проверки, которая сбрасывает все флаги в начальное состояние
+        И кнопка 'показать все команды' больше не показывается. Херня какая-то. Но уже час ночи и башка не работает.
+        Костылями закрывать не хочу. Займусь с утра.
+        <div *ngIf="notGradedAnswersArePresent" class="not-graded-answers-warning">
+          <div *ngIf="!displayingOnlyTeamsWithNotGradedAnswers">
+            <p class="not-graded-answers-warning-message">Внимание, среди ответов команд есть ответы без оценок. Вы
+              можете отобразить в списке только те команды, у
+              которых есть такие ответы.</p>
+            <button mat-raised-button color="primary" (click)="turnOnDisplayingOnlyTeamsWithNonGradedAnswers()">
+              Отображать только команды у которых есть ответы без оценок
+            </button>
+          </div>
+          <div *ngIf="displayingOnlyTeamsWithNotGradedAnswers">
+            <p class="not-graded-answers-warning-message">В выпадающем списке команд слева показываются только команды,
+              для которых есть ответы без проставленных оценок.</p>
+            <button mat-raised-button color="primary" (click)="turnOffDisplayingOnlyTeamsWithNonGradedAnswers()">
+              Отображать все команды
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+<div>
+  <mat-radio-group [(ngModel)]="selectedRoundAlias">
+    <mat-radio-button class="round-selection-radio-button"
+      *ngFor="let selectedRoundAlias of allRoundAliases; index as i" [value]="selectedRoundAlias"
+      (change)="actualRoundChanged($event)">
+      {{ allRoundTitles[i] }}
+    </mat-radio-button>
+  </mat-radio-group>
 </div>
 <div>
   <mat-tab-group>
     <mat-tab label="Все ответы">
-      <table mat-table [dataSource]="answersDataSource" matSort class="mat-elevation-z8">
+      <table mat-table #allAnswersTable #allAnswersSort="matSort" [dataSource]="answersDataSource" matSort
+        class="mat-elevation-z8">
         <ng-container matColumnDef="number">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
@@ -67,7 +94,8 @@
       </table>
     </mat-tab>
     <mat-tab label="Ответы без оценок">
-      <table mat-table [dataSource]="answersWithoutGradesDataSource" matSort class="mat-elevation-z8">
+      <table mat-table #answersWithoutGradesTable #answersWithoutGradesSort="matSort"
+        [dataSource]="answersWithoutGradesDataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="number">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
@@ -127,7 +155,8 @@
         </tr>
       </table>
       &nbsp;
-      <table mat-table [dataSource]="emailsDataSource" matSort class="mat-elevation-z8">
+      <table mat-table #loadedEmailsTable #loadedEmailsSort="matSort" [dataSource]="emailsDataSource" matSort
+        class="mat-elevation-z8">
         <ng-container matColumnDef="sentOn">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Отправлено&nbsp;</th>
           <td mat-cell *matCellDef="let email">

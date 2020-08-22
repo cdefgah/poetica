@@ -34,9 +34,6 @@ import java.util.List;
 @Transactional
 public class ReportsController extends  AbstractController {
 
-    @Autowired
-    AnswersRepository answersRepository;
-
     @RequestMapping(path = "/reports/results-table/{reportFormat}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
                                                                                     @PathVariable String encodingName) {

@@ -1,6 +1,7 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
+import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Team;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -250,5 +251,14 @@ public class TeamsController extends AbstractController {
         Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
         query.setParameter("teamId", teamId);
         return query.getResultList().isEmpty();
+    }
+
+    @RequestMapping(path = "/teams/only-with-not-graded-answers", method = RequestMethod.GET)
+    public ResponseEntity<List<Team>> getOnlyTeamsWithNotGradedAnswers() {
+        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
+                "Answer answer where team.id=answer.teamId and answer.grade=:grade", Team.class);
+        query.setParameter("grade", Grade.None);
+
+        return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
 }

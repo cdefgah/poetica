@@ -5,7 +5,7 @@
 
 .team-selection-field {
   margin-left: 1em;
-  width: 33%;
+  width: 40%;
 }
 
 .email-digest-table {
@@ -44,4 +44,21 @@
 
 .highlight-answer-without-grade {
   background: #f3d278;
+}
+
+.not-graded-answers-warning {
+  background-color: #f3d278;
+  padding: 0.5em;
+  text-align: center;
+}
+
+.not-graded-answers-warning-message {
+  color: darkblue;
+  font-size: 1em;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.team-selection-cell {
+  width: 50%;
 }
