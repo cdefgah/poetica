@@ -28,13 +28,11 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   private teamValidationService: TeamValidationService;
 
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatSort, { static: true }) teamsSortHandler: MatSort;
 
   displayedColumns: string[] = ['number', 'title'];
 
-  teamsListDataSource: MatTableDataSource<
-    TeamDataModel
-  > = new MatTableDataSource([]);
+  teamsListDataSource: MatTableDataSource<TeamDataModel> = new MatTableDataSource([]);
 
   ngOnInit() { }
 
@@ -53,7 +51,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     );
     const dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
-      if (result != TeamDetailsComponent.DIALOG_RESULT_DECLINED) {
+      if (result !== TeamDetailsComponent.DIALOG_RESULT_DECLINED) {
         // если диалог был принят (accepted), либо была удалена запись о команде
         // обновляем таблицу со списком команд
         this.loadTeamsList();
@@ -66,7 +64,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     this.http.get(url).subscribe(
       (teamsList: TeamDataModel[]) => {
         this.teamsListDataSource = new MatTableDataSource(teamsList);
-        this.teamsListDataSource.sort = this.sort;
+        this.teamsListDataSource.sort = this.teamsSortHandler;
       },
       (error) => this.reportServerError(error)
     );

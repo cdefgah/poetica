@@ -9,7 +9,7 @@ import java.util.Date;
 
 abstract class AbstractController {
 
-    private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss-");
+    private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss");
 
     /**
      * Менеджер сущностей для взаимодействия с базой данных.

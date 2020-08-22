@@ -99,7 +99,7 @@ export class AnswerDataModel {
   public toString(): string {
     return `emailId: ${this.emailId}
     teamId: ${this.teamId}
-    questionId: ${this.questionNumber}
+    questionId: ${this.questionId}
     roundNumber: ${this.roundNumber}
     questionNumber: ${this.questionNumber}
     body: ${this.body}

@@ -245,18 +245,23 @@ public final class Question {
         return sb.toString();
     }
 
+    private String getQuestionTitleForReport() {
+        return this.isGraded() ? this.title : (this.title + " [ВНЕ ЗАЧЕТА]").trim();
+    }
+
     public String getQuestionBodyOnly() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.externalNumber).append('.').append(title).append('\n').append(this.body).append('\n');
+
+        sb.append(this.externalNumber).append('.').
+                append(getQuestionTitleForReport()).append('\n').append(this.body).append('\n');
         return sb.toString();
     }
 
     public String getQuestionWithAllProperties() {
         StringBuilder sb = new StringBuilder();
 
-        final String title2Return = this.isGraded() ? this.title : (this.title + " [ВНЕ ЗАЧЕТА]").trim();
-
-        sb.append(this.externalNumber).append('.').append(title2Return).append('\n').append(this.body).append("\n\n");
+        sb.append(this.externalNumber).append('.').append(getQuestionTitleForReport()).
+                                                                    append('\n').append(this.body).append("\n\n");
         sb.append("Ответ: ").append(this.authorsAnswer).append('\n');
         if (!this.comment.isEmpty()) {
             sb.append("Комментарий: ").append(this.comment).append('\n');

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatRadioChange, MatDialog, MatSelectChange } from '@angular/material';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatRadioChange, MatDialog, MatSelectChange, MatSort, MatTableDataSource } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
@@ -29,16 +29,21 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     'Окончательный тур',
   ];
 
+  @ViewChild(MatSort, { static: true }) allAnswersSortHandler: MatSort;
+  @ViewChild(MatSort, { static: true }) answersWithoutGradesSortHandler: MatSort;
+  @ViewChild(MatSort, { static: true }) loadedEmailsSortHandler: MatSort;
+
   selectedRoundAlias: string = this.allRoundAliases[0];
 
-  answersDataSource: AnswerDataModel[];
+  answersDataSource: MatTableDataSource<AnswerDataModel> = new MatTableDataSource([]);
 
-  answersWithoutGradesDataSource: AnswerDataModel[];
+  answersWithoutGradesDataSource: MatTableDataSource<AnswerDataModel> = new MatTableDataSource([]);
 
-  emailsDataSource: EmailDataModel[];
+  emailsDataSource: MatTableDataSource<EmailDataModel> = new MatTableDataSource([]);
 
   /**
    * Инициализируем пустым дайджестом, чтобы не сломались компоненты, привязанные к этому свойству.
+   * TODO - перенести потом инициализацию в ngOnInit() метод, чтоб не было нужды в инициализации пустыми значениями.
    */
   emailsCountDigest: EmailsCountDigest = EmailsCountDigest.emptyDigest;
 
@@ -62,7 +67,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.loadTeamsList(this.loadAllDisplayedLists, this);
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.answersDataSource.sort = this.allAnswersSortHandler;
+    this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
+    this.emailsDataSource.sort = this.loadedEmailsSortHandler;
+  }
 
   public checkPrerequisitesAndDoImportAnswers(): void {
     const questionsMaxNumberEndPointUrl = '/questions/max-number';
@@ -177,10 +186,16 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     componentReference.http.get(url).subscribe(
       (loadedAnswers: AnswerDataModel[]) => {
-        componentReference.separateAndSortLoadedAnswers(
+        componentReference.answersDataSource = new MatTableDataSource(loadedAnswers);
+        componentReference.answersDataSource.sort = componentReference.allAnswersSortHandler;
+
+        const answersWithoutGradesList = componentReference.separateAndSortLoadedAnswers(
           loadedAnswers,
           componentReference
         );
+
+        componentReference.answersWithoutGradesDataSource = new MatTableDataSource(answersWithoutGradesList);
+        componentReference.answersWithoutGradesDataSource.sort = componentReference.answersWithoutGradesSortHandler;
       },
       (error) => componentReference.reportServerError(error)
     );
@@ -190,18 +205,20 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     loadedAnswers: AnswerDataModel[],
     componentReference: AnswersListComponent
   ) {
-    componentReference.answersDataSource = [];
-    componentReference.answersWithoutGradesDataSource = [];
+
+    const answersWithoutGradesList: AnswerDataModel[] = [];
 
     loadedAnswers.forEach((oneLoadedAnswer) => {
-      componentReference.answersDataSource.push(oneLoadedAnswer);
+      componentReference.answersDataSource.data.push(oneLoadedAnswer);
       if (oneLoadedAnswer.grade === AnswerDataModel.GradeNone) {
-        componentReference.answersWithoutGradesDataSource.push(oneLoadedAnswer);
+        answersWithoutGradesList.push(oneLoadedAnswer);
       }
     });
 
-    componentReference.answersDataSource.sort(compareAnswers);
-    componentReference.answersWithoutGradesDataSource.sort(compareAnswers);
+    return answersWithoutGradesList;
+
+    // loadedAnswers.sort(compareAnswers);
+    // answersWithoutGradesList.sort(compareAnswers);   
 
     // --- локальные функции ---
     function compareAnswers(
@@ -244,7 +261,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     componentReference.http.get(emailsUrl).subscribe(
       (loadedEmailsList: EmailDataModel[]) => {
-        componentReference.emailsDataSource = loadedEmailsList;
+        componentReference.emailsDataSource = new MatTableDataSource(loadedEmailsList);
+        componentReference.emailsDataSource.sort = componentReference.loadedEmailsSortHandler;
 
         const digestUrl = `/emails/digest/${this.selectedTeamId}`;
         componentReference.http.get(digestUrl).subscribe(

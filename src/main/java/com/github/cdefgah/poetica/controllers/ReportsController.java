@@ -64,7 +64,7 @@ public class ReportsController extends  AbstractController {
         }
 
         String fileName = "resultsTable_" + reportFormat + "_" +
-                                                       encodingName + "_" + this.getTimeStampPartForFileName()  +".txt";
+                                                       encodingName + "_" + this.getTimeStampPartForFileName() +".txt";
 
         HttpHeaders header = this.getHttpHeaderForGeneratedFile(fileName);
 

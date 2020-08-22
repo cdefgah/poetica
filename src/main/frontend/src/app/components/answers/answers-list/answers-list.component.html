@@ -1,11 +1,7 @@
 <mat-toolbar>
   <span>Ответы</span>
   <span class="fill-remaining-space"></span>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="checkPrerequisitesAndDoImportAnswers()"
-  >
+  <button mat-raised-button color="primary" (click)="checkPrerequisitesAndDoImportAnswers()">
     Импортировать ответы из письма
   </button>
 </mat-toolbar>
@@ -13,15 +9,8 @@
   <p>
     <mat-form-field class="team-selection-field">
       <mat-label>Команда:</mat-label>
-      <mat-select
-        [(value)]="selectedTeamId"
-        placeholder="Команда"
-        (selectionChange)="actualTeamChanged($event)"
-      >
-        <mat-option
-          *ngFor="let teamId of allTeamIds; index as i"
-          [value]="teamId"
-        >
+      <mat-select [(value)]="selectedTeamId" placeholder="Команда" (selectionChange)="actualTeamChanged($event)">
+        <mat-option *ngFor="let teamId of allTeamIds; index as i" [value]="teamId">
           {{ teamTitleAndNumber[i] }}
         </mat-option>
       </mat-select>
@@ -29,12 +18,9 @@
   </p>
   <p>
     <mat-radio-group [(ngModel)]="selectedRoundAlias">
-      <mat-radio-button
-        class="round-selection-radio-button"
-        *ngFor="let selectedRoundAlias of allRoundAliases; index as i"
-        [value]="selectedRoundAlias"
-        (change)="actualRoundChanged($event)"
-      >
+      <mat-radio-button class="round-selection-radio-button"
+        *ngFor="let selectedRoundAlias of allRoundAliases; index as i" [value]="selectedRoundAlias"
+        (change)="actualRoundChanged($event)">
         {{ allRoundTitles[i] }}
       </mat-radio-button>
     </mat-radio-group>
@@ -43,18 +29,14 @@
 <div>
   <mat-tab-group>
     <mat-tab label="Все ответы">
-      <table
-        mat-table
-        [dataSource]="answersDataSource"
-        class="mat-elevation-z8"
-      >
+      <table mat-table [dataSource]="answersDataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Номер&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
         </ng-container>
 
         <ng-container matColumnDef="emailSentOn">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Время ответа&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Время ответа&nbsp;</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
@@ -71,36 +53,28 @@
         </ng-container>
 
         <ng-container matColumnDef="roundNumber">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Тур&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Тур&nbsp;</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.roundNumber | displayRound }}
           </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedAnswerColumns; let answer"
-          (click)="onAnswerRowClicked(row)"
+        <tr mat-row *matRowDef="let row; columns: displayedAnswerColumns; let answer" (click)="onAnswerRowClicked(row)"
           [ngClass]="{
             'highlight-answer-without-grade': answer.grade == 'None'
-          }"
-        ></tr>
+          }"></tr>
       </table>
     </mat-tab>
     <mat-tab label="Ответы без оценок">
-      <table
-        mat-table
-        [dataSource]="answersWithoutGradesDataSource"
-        class="mat-elevation-z8"
-      >
+      <table mat-table [dataSource]="answersWithoutGradesDataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Номер&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
         </ng-container>
 
         <ng-container matColumnDef="emailSentOn">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Время ответа&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Время ответа&nbsp;</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
@@ -117,19 +91,15 @@
         </ng-container>
 
         <ng-container matColumnDef="roundNumber">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Тур&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Тур&nbsp;</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.roundNumber | displayRound }}
           </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedAnswerColumns; let answer"
-          (click)="onAnswerRowClicked(row)"
-          class="highlight-answer-without-grade"
-        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedAnswerColumns; let answer" (click)="onAnswerRowClicked(row)"
+          class="highlight-answer-without-grade"></tr>
       </table>
     </mat-tab>
     <mat-tab label="Загруженные письма">
@@ -157,15 +127,15 @@
         </tr>
       </table>
       &nbsp;
-      <table mat-table [dataSource]="emailsDataSource" class="mat-elevation-z8">
+      <table mat-table [dataSource]="emailsDataSource" matSort class="mat-elevation-z8">
         <ng-container matColumnDef="sentOn">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Отправлено&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Отправлено&nbsp;</th>
           <td mat-cell *matCellDef="let email">
             {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
         <ng-container matColumnDef="importedOn">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             &nbsp;Загружено в систему&nbsp;
           </th>
           <td mat-cell *matCellDef="let email">
@@ -180,11 +150,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedEmailColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedEmailColumns"
-          (click)="onEmailRowClicked(row)"
-        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedEmailColumns" (click)="onEmailRowClicked(row)"></tr>
       </table>
     </mat-tab>
   </mat-tab-group>
