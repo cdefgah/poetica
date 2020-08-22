@@ -253,7 +253,10 @@ public final class Question {
 
     public String getQuestionWithAllProperties() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.externalNumber).append('.').append(title).append('\n').append(this.body).append("\n\n");
+
+        final String title2Return = this.isGraded() ? this.title : (this.title + " [ВНЕ ЗАЧЕТА]").trim();
+
+        sb.append(this.externalNumber).append('.').append(title2Return).append('\n').append(this.body).append("\n\n");
         sb.append("Ответ: ").append(this.authorsAnswer).append('\n');
         if (!this.comment.isEmpty()) {
             sb.append("Комментарий: ").append(this.comment).append('\n');
