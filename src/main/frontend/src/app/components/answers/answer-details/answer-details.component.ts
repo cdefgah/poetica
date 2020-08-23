@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
 import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import {
   MatDialog,
@@ -19,7 +19,7 @@ import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
   styleUrls: ['./answer-details.component.css'],
 })
 export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
-  implements OnInit {
+  implements OnInit, AfterViewInit {
   private static readonly KEY_DIALOG_ID = 'id';
 
   public static readonly DIALOG_GRADE_SET: number = 1;
@@ -29,6 +29,8 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   email: EmailDataModel = EmailDataModel.emptyEmail;
   team: TeamDataModel = TeamDataModel.emptyTeam;
   question: QuestionDataModel = QuestionDataModel.emptyQuestion;
+
+  questionNumberToDisplay: string;
 
   static getDialogConfigWithData(row: any): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
@@ -69,12 +71,16 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     debugString('dialogData is below:');
     debugObject(dialogData);
 
+    const componentReference = this;
+
     // получаем объект answer
     const answerDetailsUrl = `/answers/${answerId}`;
     this.httpClient.get(answerDetailsUrl).subscribe(
       (answerDetailsData: Map<string, any>) => {
         // получили, строим объект
         this.answer = AnswerDataModel.createAnswerFromMap(answerDetailsData);
+
+
 
         // получаем объект email
         const emailRequestUrl = `/emails/${this.answer.emailId}`;
@@ -91,6 +97,14 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
                 this.question = QuestionDataModel.createQuestionFromMap(
                   questionDetailData
                 );
+
+                // формируем отображаемый номер вопроса
+                const answersQuestionNumberString = componentReference.answer.questionNumber.toString();
+                if (componentReference.question.externalNumber === answersQuestionNumberString) {
+                  componentReference.questionNumberToDisplay = componentReference.question.externalNumber;
+                } else {
+                  componentReference.questionNumberToDisplay = `${componentReference.question.externalNumber}/${answersQuestionNumberString}`;
+                }
 
                 // получаем объект team
                 const teamRequestUrl = `/teams/${this.answer.teamId}`;
@@ -115,6 +129,9 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   ngOnInit(): void { }
+
+  ngAfterViewInit() {
+  }
 
   get dialogTitle(): string {
     return `Ответ [ ${this.answer.answerGrade2Display} ]`;

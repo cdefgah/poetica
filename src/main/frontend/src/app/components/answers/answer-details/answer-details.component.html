@@ -38,13 +38,7 @@
         <tr>
           <td>
             <!-- Если номер не составной, то показываем externalNumber. Иначе externalNumber и фактический номер вопроса через / -->
-            Задание #{{
-              question.externalNumber == answer.questionNumber.toString()
-                ? question.externalNumber
-                : question.externalNumber +
-                  "/" +
-                  answer.questionNumber.toString()
-            }}:
+            Задание #{{ questionNumberToDisplay }}:
           </td>
           <td>
             <div class="question-body">

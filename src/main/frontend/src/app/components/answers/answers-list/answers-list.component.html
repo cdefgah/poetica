@@ -19,9 +19,6 @@
         </mat-form-field>
       </td>
       <td>
-        При обновлении списков мы вызываем функцию проверки, которая сбрасывает все флаги в начальное состояние
-        И кнопка 'показать все команды' больше не показывается. Херня какая-то. Но уже час ночи и башка не работает.
-        Костылями закрывать не хочу. Займусь с утра.
         <div *ngIf="notGradedAnswersArePresent" class="not-graded-answers-warning">
           <div *ngIf="!displayingOnlyTeamsWithNotGradedAnswers">
             <p class="not-graded-answers-warning-message">Внимание, среди ответов команд есть ответы без оценок. Вы

@@ -67,8 +67,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   constructor(private cdRef: ChangeDetectorRef, private http: HttpClient, private dialog: MatDialog) {
     super();
-
-    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
   }
 
   ngOnInit() {
@@ -80,7 +78,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
     this.emailsDataSource.sort = this.loadedEmailsSortHandler;
 
-    this.cdRef.detectChanges();
+    const actionAllAnswersAreGraded = () => {
+      this.displayingOnlyTeamsWithNotGradedAnswers = false;
+      this.loadTeamsList(this.loadAllDisplayedLists, this, false);
+    };
+
+    const someAnswersAreNotGraded = () => {
+      this.displayingOnlyTeamsWithNotGradedAnswers = true;
+      this.loadTeamsList(this.loadAllDisplayedLists, this, true);
+    };
+
+    this.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
   }
 
   public checkPrerequisitesAndDoImportAnswers(): void {
@@ -132,6 +140,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       if (result) {
         // если диалог был принят (accepted)
         // обновляем страницу со списками
+        this.notGradedAnswersArePresent = true;
+        this.displayingOnlyTeamsWithNotGradedAnswers = false;
         this.loadAllDisplayedLists(this);
 
         debugString('Reloaded answers listed below:');
@@ -191,9 +201,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     if (!this.selectedTeamId) {
       return;
     }
-
-    // проверяем на наличие ответов без оценки
-    this.checkNotGradedAnswersPresence();
 
     const url = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
 
@@ -289,34 +296,33 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
   public turnOnDisplayingOnlyTeamsWithNonGradedAnswers() {
     this.displayingOnlyTeamsWithNotGradedAnswers = true;
-    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
+    this.loadTeamsList(this.loadAllDisplayedLists, this, true);
   }
 
   public turnOffDisplayingOnlyTeamsWithNonGradedAnswers() {
     this.displayingOnlyTeamsWithNotGradedAnswers = false;
-    this.loadTeamsList(this.loadAllDisplayedLists, this, this.displayingOnlyTeamsWithNotGradedAnswers);
+    this.loadTeamsList(this.loadAllDisplayedLists, this, false);
   }
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
   }
 
-  private checkNotGradedAnswersPresence() {
-    // сперва делаем запрос на наличие ответов без оценок
+  private checkNotGradedAnswersPresence(doIfNotGradedAnswersPresent: Function, doIfAllAnswersAreGraded: Function) {
     const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
 
     this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
       const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
 
       if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
-        // если нет ответов без оценок.
+        // если все ответы имеют оценку
         this.notGradedAnswersArePresent = false;
+        doIfAllAnswersAreGraded();
       } else {
         // если есть ответы без оценок.
         this.notGradedAnswersArePresent = true;
+        doIfNotGradedAnswersPresent();
       }
-
-      this.displayingOnlyTeamsWithNotGradedAnswers = false;
     },
       (error) => this.reportServerError(error)
     );
@@ -333,29 +339,40 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onAnswerRowClicked(selectedRow: any) {
-    debugString('Answer row clicked. Selected row is below.');
-    debugObject(selectedRow);
-
     const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
     const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
 
+    const componentReference = this;
     dialogRef.afterClosed().subscribe((result) => {
       if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
-        // если оценка была поставлена, то получаем заново таблицы
-        // TODO очень неоптимальный код тут.
-        // Из-за одной оценки грузить заново все ответы выбранной команды.
-        // Надо упростить.
-        this.loadAnswersList(this);
+        // если оценка была поставлена
+
+        // проверяем, включено-ли у нас отображение только команд, у которых нет оцененных ответов
+        if (componentReference.displayingOnlyTeamsWithNotGradedAnswers) {
+          // если да, то проверяем, остались-ли ответы без оценок в системе
+          const actionAllAnswersAreGraded = () => {
+            componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
+            componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
+          };
+
+          const someAnswersAreNotGraded = () => {
+            // загружаем команды, так как может быть более одной команды с ответами без оценок
+            // и чтобы список команд с ответами без оценок тоже изменился, надо загрузить команды
+            // TODO тут есть поле для оптимизации, и этим надо будет заняться попозже.
+            const doLoadAnswersList = () => { componentReference.loadAnswersList(componentReference) };
+
+            componentReference.loadTeamsList(doLoadAnswersList, componentReference, true);
+          };
+
+          componentReference.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
+        }
       }
     });
   }
 
   onEmailRowClicked(selectedRow: any) {
-    debugString('Email row clicked. Selected row is below.');
-    debugObject(selectedRow);
-
     const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
