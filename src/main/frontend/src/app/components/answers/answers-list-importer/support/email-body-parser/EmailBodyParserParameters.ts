@@ -11,8 +11,5 @@ export class EmailBodyParserParameters {
   emailValidationService: EmailValidationService;
   answerValidationService: AnswerValidationService;
 
-  teamFromEmailSubject: TeamDataModel;
-  roundNumber: string;
-
   httpClient: HttpClient;
 }

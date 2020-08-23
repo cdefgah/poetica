@@ -12,8 +12,6 @@ import { EmailValidationService } from '../../core/validators/EmailValidationSer
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
 import { AnswerValidationService } from '../../core/validators/AnswerValidationService';
 import { debugString, debugObject } from 'src/app/utils/Config';
-import { EmailSubjectParserParameters } from './support/email-subject-parser/EmailSubjectParserParameters';
-import { EmailSubjectParser } from './support/email-subject-parser/EmailSubjectParser';
 import { EmailBodyParsingResult } from './support/email-body-parser/EmailBodyParsingResult';
 import { EmailBodyParserParameters } from './support/email-body-parser/EmailBodyParserParameters';
 import { EmailBodyParser } from './support/email-body-parser/EmailBodyParser';
@@ -32,7 +30,7 @@ export class AnswersListImporterComponent
 
   get selectedRoundTitle(): string {
     if (this.selectedRoundNumber) {
-      const index = parseInt(this.selectedRoundNumber) - 1;
+      const index = parseInt(this.selectedRoundNumber, 10) - 1;
       return this.allRoundTitles[index];
     } else {
       return '???';
@@ -64,11 +62,11 @@ export class AnswersListImporterComponent
   }
 
   get IsFirstStepOk(): boolean {
-    return this.firstStepErrorMessage.length == 0;
+    return this.firstStepErrorMessage.length === 0;
   }
 
   get IsSecondStepOk(): boolean {
-    return this.secondStepErrorMessage.length == 0;
+    return this.secondStepErrorMessage.length === 0;
   }
 
   get errorPresent(): boolean {
@@ -205,12 +203,12 @@ export class AnswersListImporterComponent
   }
 
   private initializeDateHourAndMinuteSelectors() {
-    let currentDate: Date = new Date();
-    let currentHour = currentDate.getHours();
-    let currentMinute = currentDate.getMinutes();
+    const currentDate: Date = new Date();
+    const currentHour = currentDate.getHours();
+    const currentMinute = currentDate.getMinutes();
 
-    let currentHourString: string = (currentHour < 10 ? '0' : '') + currentHour;
-    let currentMinuteString: string =
+    const currentHourString: string = (currentHour < 10 ? '0' : '') + currentHour;
+    const currentMinuteString: string =
       (currentMinute < 10 ? '0' : '') + currentMinute;
 
     this.emailSentOnDate = currentDate;
@@ -228,7 +226,7 @@ export class AnswersListImporterComponent
     debugObject(event);
 
     // если перешли на нулевой шаг с любого
-    if (event.selectedIndex == 0) {
+    if (event.selectedIndex === 0) {
       // сбрасываем состояние всех контролирующих переменных
       // и выходим
       debugString('Switched to the first step. Resetting vars and exiting.');
@@ -239,10 +237,10 @@ export class AnswersListImporterComponent
     if (event.previouslySelectedIndex == 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
       debugString(
-        'Moving from the first step. Processing email subject and body.'
+        'Moving from the first step. Processing email body.'
       );
-      this.processEmailSubjectAndBody(
-        this.onSuccessfullyEmailSubjectParse,
+      this.processEmailBody(
+        this.onSuccessfullyEmailBodyParse,
         this.onEmailParsingFailure
       );
     } else if (event.previouslySelectedIndex == 1) {
@@ -260,61 +258,11 @@ export class AnswersListImporterComponent
     this.updateDisplayImportButton(event);
   }
 
-  private processEmailSubjectAndBody(
+  private processEmailBody(
     onSuccess: Function,
     onFailure: Function
   ): void {
-    debugString('processEmailSubjectAndBody: entering to the method.');
-
-    let emailSubjectParserParameters = new EmailSubjectParserParameters();
-
-    // сохраняем ссылку на этот компонент и передаём её в парсер.
-    // парсер затем передаст её в вызываемые функции onSuccess и onFailure.
-    // это нужно, чтобы внутри этих функций можно было сослаться на свойства этого компонента.
-    emailSubjectParserParameters.parentComponentObject = this;
-
-    emailSubjectParserParameters.emailSubject = this.emailSubject;
-    emailSubjectParserParameters.emailValidationService = this.emailValidationService;
-    emailSubjectParserParameters.teamValidationService = this.teamValidationService;
-
-    debugString('Initializing the emailSubjectParser object');
-
-    const emailSubjectParser = new EmailSubjectParser(
-      emailSubjectParserParameters,
-      onSuccess,
-      onFailure
-    );
-
-    debugString(
-      'Launching the email subject parser to do its job. If it succeed, it will continue parsing email body'
-    );
-    emailSubjectParser.parse();
-  }
-
-  /**
-   * При передаче ссылки на эту функцию в парсер, мы передаём ссылку на этот компонент.
-   * Это нужно для корректных ссылок на свойства текущего компонента,
-   * @param parentComponentObject ссылка на этот компонент, хранится в парсере и пробрасывается в вызов этого метода.
-   * @param teamObjectFromEmailSubject сформированный объект команды, на базе информации из темы письма.
-   * @param roundNumber номер раунда.
-   */
-  private onSuccessfullyEmailSubjectParse(
-    parentComponentObject: AnswersListImporterComponent,
-    teamObjectFromEmailSubject: TeamDataModel,
-    roundNumber: string
-  ) {
-    debugString(
-      'Email subject parser completed parsing successfully. Team object from the subject line is below.'
-    );
-    debugObject(teamObjectFromEmailSubject);
-    debugString(`Round number from the email subject is :${roundNumber}`);
-
-    parentComponentObject.teamFromEmailSubject = teamObjectFromEmailSubject;
-    parentComponentObject.selectedRoundNumber = roundNumber;
-
-    debugString(
-      `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
-    );
+    const parentComponentObject: AnswersListImporterComponent = this;
 
     debugString('Preparing email body parser for launch...');
 
@@ -327,18 +275,13 @@ export class AnswersListImporterComponent
     emailBodyParserParameters.answerValidationService =
       parentComponentObject.answerValidationService;
 
-    emailBodyParserParameters.teamFromEmailSubject =
-      parentComponentObject.teamFromEmailSubject;
-    emailBodyParserParameters.roundNumber =
-      parentComponentObject.selectedRoundNumber;
-
     emailBodyParserParameters.httpClient = parentComponentObject.httpClient;
 
     debugString('Creating emailBodyParser object');
     const emailBodyParser: EmailBodyParser = new EmailBodyParser(
       emailBodyParserParameters,
-      parentComponentObject.onSuccessfullyEmailBodyParse,
-      parentComponentObject.onEmailParsingFailure
+      onSuccess,
+      onFailure
     );
 
     debugString('Launching email body parsing ...');
@@ -423,8 +366,8 @@ export class AnswersListImporterComponent
         year,
         month,
         day,
-        parseInt(this.emailSentOnHour),
-        parseInt(this.emailSentOnMinute),
+        parseInt(this.emailSentOnHour, 10),
+        parseInt(this.emailSentOnMinute, 10),
         0,
         0
       );
@@ -434,7 +377,6 @@ export class AnswersListImporterComponent
       debugString(
         `Compound long-format date: ${this.compoundEmailSentOnDate.getTime()}`
       );
-      this.secondStepErrorMessage = ''; // нет никаких ошибок
 
       debugString('Checking email uniqueness...');
       this.validateEmailUniqueness(onEmailUniquenessCheckFailure);
@@ -450,15 +392,32 @@ export class AnswersListImporterComponent
     const roundNumber: string = this.selectedRoundNumber;
     const emailSentOn: number = this.compoundEmailSentOnDate.getTime();
 
+    debugString(' ====================== EMAIL UNIQUENESS CHECKING ============================ ');
+    debugString('teamId: ' + teamId);
+    debugString('roundNUmber: ' + roundNumber);
+    debugString('emailSentOn: ' + emailSentOn);
+
     const emailUniquenessCheckUrl = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
+    debugString('emailUniquenessCheckUrl:' + emailUniquenessCheckUrl);
+
+
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
       (resultFlag: string) => {
-        const emailIsUnique = '1';
-        if (resultFlag == emailIsUnique) {
-        } else {
+        debugString('received resultFlag: ' + resultFlag);
+        const resultFlagInNumericForm: number = parseInt(resultFlag, 10);
+        debugString('resultFlagInNumericForm: ' + resultFlagInNumericForm);
+
+        if (resultFlagInNumericForm < 0) {
+          debugString('Email is not unique...');
+
           const errorMessage =
             'В базе данных уже есть загруженное письмо с ответами от этой команды на этот раунд и на это-же время. Проверьте всё ещё раз, пожалуйста.';
           onEmailUniquenessCheckFailure(thisComponentReference, errorMessage);
+        } else {
+          // письмо уникальное
+          debugString('Email is unique...');
+
+          thisComponentReference.secondStepErrorMessage = '';
         }
       },
       (error) => {
@@ -489,7 +448,7 @@ export class AnswersListImporterComponent
     // кнопку показываем в том случае, если мы пришли на последний шаг
     // и у нас всё в порядке, то есть нет ошибок.
     this.displayImportButton =
-      stepChangeEvent.selectedIndex == 2 && this.allThingsAreOk;
+      stepChangeEvent.selectedIndex === 2 && this.allThingsAreOk;
   }
 
   cancelDialog() {
@@ -520,7 +479,7 @@ export class AnswersListImporterComponent
       if (!oneAnswer.roundNumber) {
         // если раунд не прописан при разборе письма (в теме может быть задан)
         // проставляем его явно
-        oneAnswer.roundNumber = parseInt(this.selectedRoundNumber);
+        oneAnswer.roundNumber = parseInt(this.selectedRoundNumber, 10);
       }
     });
     debugString('Answers after import preparation (check below):');
@@ -539,7 +498,7 @@ export class AnswersListImporterComponent
       email2Import.teamId = this.teamFromEmailBody.id;
       email2Import.subject = this.emailSubject;
       email2Import.body = this.emailBody;
-      email2Import.roundNumber = parseInt(this.selectedRoundNumber);
+      email2Import.roundNumber = parseInt(this.selectedRoundNumber, 10);
       email2Import.sentOn = this.compoundEmailSentOnDate.getTime();
       email2Import.importedOn = new Date().getTime();
       email2Import.questionNumbersSequence = this.questionNumbersSequence;
@@ -562,7 +521,7 @@ export class AnswersListImporterComponent
               `Email import request succeed. Now getting the id of saved email. It is: ${receivedEmailId}`
             );
 
-            const emailId: number = parseInt(receivedEmailId.toString());
+            const emailId: number = parseInt(receivedEmailId.toString(), 10);
             this.prepareAnswersToImport(emailId, email2Import.sentOn);
 
             debugString(

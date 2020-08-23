@@ -96,7 +96,7 @@ public class EmailsController extends AbstractController {
         query.setParameter("roundNumber", roundNumber);
         query.setParameter("emailSentOn", emailSentOn);
 
-        boolean isEmailUnique = query.getResultList().size() == 0;
+        boolean isEmailUnique = query.getResultList().isEmpty();
         final String emailIsUniqueFlag = "1";
         final String emailIsNotUniqueFlag = "-1";
 

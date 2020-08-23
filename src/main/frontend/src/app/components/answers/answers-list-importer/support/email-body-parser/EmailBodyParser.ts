@@ -30,9 +30,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   ) {
     super(parameters.emailBody, onSuccess, onFailure);
     this.parentComponentObject = parameters.parentComponentObject;
-    this.teamFromEmailSubject = parameters.teamFromEmailSubject;
-    this.roundNumber = parameters.roundNumber;
-
     this.emailValidationService = parameters.emailValidationService;
     this.answerValidationService = parameters.answerValidationService;
     this.httpClient = parameters.httpClient;
