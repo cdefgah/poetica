@@ -4,3 +4,25 @@
   padding: 5em;
   background: aliceblue;
 }
+
+table {
+  border-style: solid;
+  border-color: darkblue;
+  border-width: 1px;
+}
+
+.participant-name {
+  width: 25%;
+  font-family: sans-serif;
+  color: darkblue;
+  font-size: 1em;
+  padding: 1em;
+}
+
+.participant-description {
+  width: auto;
+  font-family: sans-serif;
+  color: darkblue;
+  font-size: 1em;
+  padding: 1em;
+}

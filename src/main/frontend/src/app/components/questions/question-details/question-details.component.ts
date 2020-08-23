@@ -146,10 +146,17 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
           ? this.question.title
           : '';
 
-      const updateGradedState = this.question.graded !== this.questionCopy.graded;
+      const updateQuestionTitle: boolean =
+        this.questionCopy.title !== this.question.title;
+
+      const updateGradedState = this.questionCopy.graded !== this.question.graded;
 
       const newQuestionBody: string =
         this.questionCopy.body !== this.question.body ? this.question.body : '';
+
+      const newAuthorsAnswer: string =
+        this.questionCopy.authorsAnswer !== this.question.authorsAnswer
+          ? this.question.authorsAnswer : '';
 
       const newQuestionSource: string =
         this.questionCopy.source !== this.question.source
@@ -164,23 +171,31 @@ export class QuestionDetailsComponent extends AbstractInteractiveComponentModel
       const updateComment: boolean =
         this.questionCopy.comment !== this.question.comment;
 
+      const newAuthorsInfo: string =
+        this.questionCopy.authorInfo !== this.question.authorInfo ? this.question.authorInfo : '';
+
       if (
-        newQuestionTitle.length > 0 ||
+        updateQuestionTitle ||
         updateGradedState ||
         newQuestionBody.length > 0 ||
+        newAuthorsAnswer.length > 0 ||
         newQuestionSource.length > 0 ||
-        updateComment
+        updateComment ||
+        newAuthorsInfo.length > 0
       ) {
         // данные изменились, обновляем их на сервере
         const requestUrl = `/questions/${this.question.id}`;
         const payload = new HttpParams()
+          .set('updateQuestionTitle', String(updateQuestionTitle))
           .set('newQuestionTitle', newQuestionTitle)
           .set('updateGradedState', String(updateGradedState))
           .set('newGradedState', String(this.question.graded))
           .set('newQuestionBody', newQuestionBody)
+          .set('newAuthorsAnswer', newAuthorsAnswer)
           .set('newQuestionSource', newQuestionSource)
           .set('updateComment', String(updateComment))
-          .set('newQuestionComment', newQuestionComment);
+          .set('newQuestionComment', newQuestionComment)
+          .set('newAuthorsInfo', newAuthorsInfo);
 
         this.http.put(requestUrl, payload).subscribe(
           () => {

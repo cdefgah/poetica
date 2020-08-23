@@ -348,26 +348,22 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     dialogRef.afterClosed().subscribe((result) => {
       if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
         // если оценка была поставлена
+        // если да, то проверяем, остались-ли ответы без оценок в системе
+        const actionAllAnswersAreGraded = () => {
+          componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
+          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
+        };
 
-        // проверяем, включено-ли у нас отображение только команд, у которых нет оцененных ответов
-        if (componentReference.displayingOnlyTeamsWithNotGradedAnswers) {
-          // если да, то проверяем, остались-ли ответы без оценок в системе
-          const actionAllAnswersAreGraded = () => {
-            componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
-            componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
-          };
+        const someAnswersAreNotGraded = () => {
+          // загружаем команды, так как может быть более одной команды с ответами без оценок
+          // и чтобы список команд с ответами без оценок тоже изменился, надо загрузить команды
+          // TODO тут есть поле для оптимизации, и этим надо будет заняться попозже.
+          const doLoadAnswersList = () => { componentReference.loadAnswersList(componentReference) };
 
-          const someAnswersAreNotGraded = () => {
-            // загружаем команды, так как может быть более одной команды с ответами без оценок
-            // и чтобы список команд с ответами без оценок тоже изменился, надо загрузить команды
-            // TODO тут есть поле для оптимизации, и этим надо будет заняться попозже.
-            const doLoadAnswersList = () => { componentReference.loadAnswersList(componentReference) };
+          componentReference.loadTeamsList(doLoadAnswersList, componentReference, true);
+        };
 
-            componentReference.loadTeamsList(doLoadAnswersList, componentReference, true);
-          };
-
-          componentReference.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
-        }
+        componentReference.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
       }
     });
   }

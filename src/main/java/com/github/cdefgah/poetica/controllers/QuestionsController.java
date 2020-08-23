@@ -57,6 +57,7 @@ public class QuestionsController extends AbstractController {
     }
 
     /**
+     * TODO привести JavaDoc в соответствие реальному положению вещей.
      * Обновляет содержимое вопроса (бескрылки).
      * Номер вопроса и признак 'зачётный/незачётный вопрос' обновлению не подлежат.
      * @param questionId уникальный идентификатор вопроса (бескрылки), который надо обновить.
@@ -69,18 +70,24 @@ public class QuestionsController extends AbstractController {
      */
     @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateQuestion(@PathVariable long questionId,
+                                                 @RequestParam("updateQuestionTitle") boolean updateQuestionTitle,
                                                  @RequestParam("newQuestionTitle") String newQuestionTitle,
                                                  @RequestParam("updateGradedState") boolean updateGradedState,
                                                  @RequestParam("newGradedState") boolean newGradedState,
                                                  @RequestParam("newQuestionBody") String newQuestionBody,
+                                                 @RequestParam("newAuthorsAnswer") String newAuthorsAnswer,
                                                  @RequestParam("newQuestionSource") String newQuestionSource,
                                                  @RequestParam("updateComment") boolean updateComment,
-                                                 @RequestParam("newQuestionComment") String newQuestionComment) {
+                                                 @RequestParam("newQuestionComment") String newQuestionComment,
+                                                 @RequestParam("newAuthorsInfo") String newAuthorsInfo) {
 
-        boolean updateTitle = !isStringEmpty(newQuestionTitle);
-        boolean updateBody = !isStringEmpty(newQuestionBody);
-        boolean updateSource = !isStringEmpty(newQuestionSource);
-        boolean updateHasRequested = updateTitle || updateGradedState || updateBody || updateSource || updateComment;
+        final boolean updateBody = !isStringEmpty(newQuestionBody);
+        final boolean updateSource = !isStringEmpty(newQuestionSource);
+        final boolean updateAuthorsAnswer = !isStringEmpty(newAuthorsAnswer);
+        final boolean updateAuthorsInfo = !isStringEmpty(newAuthorsInfo);
+
+        final boolean updateHasRequested = updateQuestionTitle || updateGradedState || updateBody
+                                           || updateAuthorsAnswer || updateSource || updateComment || updateAuthorsInfo;
 
         if (!updateHasRequested) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
@@ -88,14 +95,14 @@ public class QuestionsController extends AbstractController {
                     "к обновлению свойств вопроса не обновляется."));
         }
 
-        Question question = entityManager.find(Question.class, questionId);
+        final Question question = entityManager.find(Question.class, questionId);
         if (question == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
                     body(composeErrorMessage("Не удалось найти задание " +
                             "с указанным идентификатором:  " + questionId));
         }
 
-        if (updateTitle) {
+        if (updateQuestionTitle) {
             question.setTitle(newQuestionTitle);
         }
 
@@ -107,12 +114,20 @@ public class QuestionsController extends AbstractController {
             question.setBody(newQuestionBody);
         }
 
+        if (updateAuthorsAnswer) {
+            question.setAuthorsAnswer(newAuthorsAnswer);
+        }
+
         if (updateSource) {
             question.setSource(newQuestionSource);
         }
 
         if (updateComment) {
             question.setComment(newQuestionComment);
+        }
+
+        if (updateAuthorsInfo) {
+            question.setAuthorInfo(newAuthorsInfo);
         }
 
         entityManager.persist(question);

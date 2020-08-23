@@ -43,11 +43,11 @@
 }
 
 .highlight-answer-without-grade {
-  background: #f3d278;
+  background: bisque;
 }
 
 .not-graded-answers-warning {
-  background-color: #f3d278;
+  background-color: bisque;
   padding: 0.5em;
   text-align: center;
 }
