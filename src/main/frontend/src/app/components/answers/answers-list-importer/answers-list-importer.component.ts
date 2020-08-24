@@ -232,9 +232,13 @@ export class AnswersListImporterComponent
       debugString('Switched to the first step. Resetting vars and exiting.');
       this.resetStepperVariables(event);
       return;
+    } else if (event.selectedIndex === 1) {
+      // TODO - костыльный код, стыдно, товарищ, непременно переделай как дойдут руки!
+      // если пришли на второй шаг (неважно с какого, например с третьего), скрываем кнопку импорта
+      this.displayImportButton = false;
     }
 
-    if (event.previouslySelectedIndex == 0) {
+    if (event.previouslySelectedIndex === 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
       debugString(
         'Moving from the first step. Processing email body.'
@@ -243,7 +247,7 @@ export class AnswersListImporterComponent
         this.onSuccessfullyEmailBodyParse,
         this.onEmailParsingFailure
       );
-    } else if (event.previouslySelectedIndex == 1) {
+    } else if (event.previouslySelectedIndex === 1) {
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
       debugString(
         'Moving from the second step. Processing email date/time and round number'
@@ -252,10 +256,6 @@ export class AnswersListImporterComponent
         this.emailUniquenessCheckFailed
       );
     }
-
-    // пересчитываем признак, по которому мы определяем
-    // показывать или нет кнопку импорта ответов
-    this.updateDisplayImportButton(event);
   }
 
   private processEmailBody(
@@ -409,6 +409,7 @@ export class AnswersListImporterComponent
 
         if (resultFlagInNumericForm < 0) {
           debugString('Email is not unique...');
+          thisComponentReference.displayImportButton = false;
 
           const errorMessage =
             'В базе данных уже есть загруженное письмо с ответами от этой команды на этот раунд и на это-же время. Проверьте всё ещё раз, пожалуйста.';
@@ -416,7 +417,7 @@ export class AnswersListImporterComponent
         } else {
           // письмо уникальное
           debugString('Email is unique...');
-
+          thisComponentReference.displayImportButton = true;
           thisComponentReference.secondStepErrorMessage = '';
         }
       },
@@ -434,22 +435,18 @@ export class AnswersListImporterComponent
     debugString(
       `Email uniqueness check failed. Error message: ${errorMessage}`
     );
+
+    debugString('allThingsAreOk before assigning error message: ' + thisComponentReference.allThingsAreOk);
     thisComponentReference.secondStepErrorMessage = errorMessage;
+    debugString('allThingsAreOk after assigning error message: ' + thisComponentReference.allThingsAreOk);
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {
     this.firstStepErrorMessage = '';
     this.secondStepErrorMessage = '';
-    this.updateDisplayImportButton(stepChangeEvent);
+    this.displayImportButton = false;
   }
 
-  private updateDisplayImportButton(stepChangeEvent: any) {
-    // последний шаг в степпере имеет индекс 2 (0, 1, 2)
-    // кнопку показываем в том случае, если мы пришли на последний шаг
-    // и у нас всё в порядке, то есть нет ошибок.
-    this.displayImportButton =
-      stepChangeEvent.selectedIndex === 2 && this.allThingsAreOk;
-  }
 
   cancelDialog() {
     const confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(

@@ -76,7 +76,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
     // тут пропускаем строки до начала блока ответов, а то иногда в письмах бывает, в нарушение регламента
     // пишут разные пожелания и обращения.
-    this.skipLinesUnitlAnswersBlockStart();
+    this.skipLinesUntilAnswersBlockStart();
 
     // загружаем ответы
     const parsingResult: CalculationResult = this.parseAnswersBlock();
@@ -186,7 +186,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     );
   }
 
-  private skipLinesUnitlAnswersBlockStart(): void {
+  private skipLinesUntilAnswersBlockStart(): void {
     while (this.sourceTextLinesIterator.hasNextLine()) {
       const processingLine = this.sourceTextLinesIterator.nextLine();
       if (processingLine.startsWith('#')) {

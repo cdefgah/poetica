@@ -1,10 +1,6 @@
 <p mat-dialog-title>Импорт ответов</p>
 <mat-dialog-content>
-  <mat-horizontal-stepper
-    [linear]="true"
-    (selectionChange)="onStepChange($event)"
-    #stepper
-  >
+  <mat-horizontal-stepper [linear]="true" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step>
       <mat-tab-group>
         <mat-tab label="Текст письма">
@@ -15,12 +11,8 @@
                 <td>
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Тема письма</mat-label>
-                    <input
-                      matInput
-                      name="emailSubjectText"
-                      placeholder="Скопируйте тему письма сюда"
-                      [(ngModel)]="emailSubject"
-                    />
+                    <input matInput name="emailSubjectText" placeholder="Скопируйте тему письма сюда"
+                      [(ngModel)]="emailSubject" />
                   </mat-form-field>
                 </td>
               </tr>
@@ -28,14 +20,8 @@
                 <td>
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Содержание письма</mat-label>
-                    <textarea
-                      matInput
-                      rows="12"
-                      placeholder="Скопируйте содержание письма сюда"
-                      name="emailBodyText"
-                      required
-                      [(ngModel)]="emailBody"
-                    ></textarea>
+                    <textarea matInput rows="12" placeholder="Скопируйте содержание письма сюда" name="emailBodyText"
+                      required [(ngModel)]="emailBody"></textarea>
                   </mat-form-field>
                 </td>
               </tr>
@@ -47,19 +33,23 @@
         </mat-tab>
         <mat-tab label="Ожидаемый формат текста">
           <div class="table-container">
-            <p>1. В&nbsp;теме письма ожидается фраза:</p>
+            <p>Программа не контролирует соблюдение формата в теме письма.</p>
+            <p>Это сделано для упрощения массовой обработки писем от участников игры.</p>
+            <p>1. Согласно регламенту, в&nbsp;теме письма предполагается наличие фразы:</p>
             <p class="sample-one-line-text">
               Ответы команды &laquo;название команды&raquo;, регистрационный
               номер команды (предвар./основн.)
             </p>
             <p>
-              Название команды обязательно должно быть взято в&nbsp;кавычки
+              Согласно регламенту игры, название команды обязательно должно быть взято в&nbsp;кавычки
               и&nbsp;может быть написано транслитом.
             </p>
             <p>Пример:</p>
             <p class="sample-one-line-text">
               Otvety komandy &laquo;Moguchie Khomjaki&raquo;, 273 (osnovn.)
             </p>
+            <p>Соблюдение формата для темы письма желательно, но не обязательно. А вот соблюдение формата для
+              содержательной части письма программой строго контролируется. Так что будьте внимательны.</p>
             <p>
               2. Собственно ответы должны начинаться со&nbsp;служебной строки:
             </p>
@@ -145,16 +135,9 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
             <td>
               <mat-form-field>
                 <mat-label>На какой тур?</mat-label>
-                <mat-select
-                  required
-                  name="selectedRoundNumber"
-                  [(value)]="selectedRoundNumber"
-                  [(ngModel)]="selectedRoundNumber"
-                >
-                  <mat-option
-                    *ngFor="let roundAliasOption of allRoundAliases; index as i"
-                    [value]="roundAliasOption"
-                  >
+                <mat-select required name="selectedRoundNumber" [(value)]="selectedRoundNumber"
+                  [(ngModel)]="selectedRoundNumber">
+                  <mat-option *ngFor="let roundAliasOption of allRoundAliases; index as i" [value]="roundAliasOption">
                     {{ allRoundTitles[i] }}
                   </mat-option>
                 </mat-select>
@@ -165,34 +148,18 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
             <td>
               <mat-form-field>
                 <mat-label>Дата отправки письма</mat-label>
-                <input
-                  matInput
-                  [matDatepicker]="emailSentOnDatePicker"
-                  [(ngModel)]="emailSentOnDate"
-                  name="emailSentOnDate"
-                  required
-                />
-                <mat-datepicker-toggle
-                  matSuffix
-                  [for]="emailSentOnDatePicker"
-                  name="sentOnDatePicker"
-                  placeholder="Дата отправки"
-                ></mat-datepicker-toggle>
+                <input matInput [matDatepicker]="emailSentOnDatePicker" [(ngModel)]="emailSentOnDate"
+                  name="emailSentOnDate" required />
+                <mat-datepicker-toggle matSuffix [for]="emailSentOnDatePicker" name="sentOnDatePicker"
+                  placeholder="Дата отправки"></mat-datepicker-toggle>
                 <mat-datepicker #emailSentOnDatePicker></mat-datepicker>
               </mat-form-field>
             </td>
             <td>
               <mat-form-field>
                 <mat-label>Час отправки письма</mat-label>
-                <mat-select
-                  required
-                  name="emailSentOnHour"
-                  [(ngModel)]="emailSentOnHour"
-                >
-                  <mat-option
-                    *ngFor="let hourOption of hourOptions"
-                    [value]="hourOption"
-                  >
+                <mat-select required name="emailSentOnHour" [(ngModel)]="emailSentOnHour">
+                  <mat-option *ngFor="let hourOption of hourOptions" [value]="hourOption">
                     {{ hourOption }}
                   </mat-option>
                 </mat-select>
@@ -200,15 +167,8 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
               :
               <mat-form-field>
                 <mat-label>Минута отправки письма</mat-label>
-                <mat-select
-                  required
-                  name="emailSentOnMinute"
-                  [(ngModel)]="emailSentOnMinute"
-                >
-                  <mat-option
-                    *ngFor="let minuteOption of minuteOptions"
-                    [value]="minuteOption"
-                  >
+                <mat-select required name="emailSentOnMinute" [(ngModel)]="emailSentOnMinute">
+                  <mat-option *ngFor="let minuteOption of minuteOptions" [value]="minuteOption">
                     {{ minuteOption }}
                   </mat-option>
                 </mat-select>
@@ -227,9 +187,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
     <mat-step>
       <form>
         <ng-template matStepLabel>{{ lastStepTitle }}</ng-template>
-        <div
-          *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"
-        ></div>
+        <div *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"></div>
 
         <ng-template #processedDataBlock>
           <div class="table-container">
@@ -275,10 +233,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
                 </td>
               </ng-container>
               <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedAnswerColumns"
-              ></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedAnswerColumns"></tr>
             </table>
           </div>
         </ng-template>
@@ -303,12 +258,7 @@ Subject: Otvety komandy "Marsiane", 343 (osnovn.)
 </mat-dialog-content>
 <mat-dialog-actions>
   <span class="fill-remaining-space"></span>
-  <button
-    *ngIf="displayImportButton"
-    mat-raised-button
-    color="primary"
-    (click)="doImportAnswers()"
-  >
+  <button *ngIf="displayImportButton" mat-raised-button color="primary" (click)="doImportAnswers()">
     Импортировать ответы
   </button>
 

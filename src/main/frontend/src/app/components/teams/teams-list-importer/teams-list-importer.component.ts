@@ -217,6 +217,6 @@ export class TeamsListImporterComponent
     // последний шаг в степпере имеет индекс 1 (0, 1)
     // кнопку показываем в том случае, если мы пришли на последний шаг
     // и у нас всё в порядке, то есть нет ошибок.
-    this.displayImportButton = stepNumber == 1 && this.allThingsAreOk;
+    this.displayImportButton = stepNumber === 1 && this.allThingsAreOk;
   }
 }

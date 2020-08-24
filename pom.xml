@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.cdefgah</groupId>
 	<artifactId>poetica</artifactId>
-	<version>0.90.0</version>
+	<version>0.90</version>
 	<name>poetica</name>
 
 	<properties>
