@@ -238,7 +238,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
         foundTeamNumber = EmailBodyParser.parseInt(foundTeamNumberString);
       }
     } else {
-      foundTeamTitle = firstLine;
+      errorMessage = `Нарушение формата для первой строки блока ответов. Нет запятой, отделяющей номер команды от её названия "${firstLine}"`;
+      return new CalculationResult(null, errorMessage);
     }
 
     foundTeamTitle = EmailBodyParser.removeDoubleQuotations(foundTeamTitle);
