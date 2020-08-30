@@ -130,8 +130,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
-        // обновляем страницу со списками
-        this.loadAllDisplayedLists(this);
+        // TODO - загружаем только импортированные ответы и переключаемся на команду, чьи ответы были импортированы
+        // this.loadAllDisplayedLists(this);
 
         debugString('Reloaded answers listed below:');
         debugObject(this.answersDataSource);
@@ -185,6 +185,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   //#endregion
 
 
+
+  // TODO исключить глобальные переменные (поля классов) из всех методов. передача данных только через параметры вызова!!!!!
 
   loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean) {
 
