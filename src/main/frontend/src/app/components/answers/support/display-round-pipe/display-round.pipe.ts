@@ -5,9 +5,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class DisplayRoundPipe implements PipeTransform {
   transform(value: number): string {
-    if (value == 1) {
+    if (value === 1) {
       return 'Предварительный';
-    } else if (value == 2) {
+    } else if (value === 2) {
       return 'Окончательный';
     } else {
       return '???';

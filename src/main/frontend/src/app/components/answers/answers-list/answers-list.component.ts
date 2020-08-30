@@ -18,6 +18,8 @@ import { EmailDetailsComponent } from '../email-details/email-details.component'
 })
 export class AnswersListComponent extends AbstractInteractiveComponentModel
   implements OnInit, AfterViewInit {
+
+  //#region ComponentFields
   selectedTeamId: number;
   allTeamIds: number[];
   teamTitleAndNumber: string[];
@@ -61,11 +63,10 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     'importedOn',
     'questionNumbersSequence',
   ];
+  //#endregion
 
-  notGradedAnswersArePresent = false;
-  displayingOnlyTeamsWithNotGradedAnswers = false;
-
-  constructor(private cdRef: ChangeDetectorRef, private http: HttpClient, private dialog: MatDialog) {
+  //#region ConstructorsAndInits
+  constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
   }
 
@@ -77,20 +78,10 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.answersDataSource.sort = this.allAnswersSortHandler;
     this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
     this.emailsDataSource.sort = this.loadedEmailsSortHandler;
-
-    const actionAllAnswersAreGraded = () => {
-      this.displayingOnlyTeamsWithNotGradedAnswers = false;
-      this.loadTeamsList(this.loadAllDisplayedLists, this, false);
-    };
-
-    const someAnswersAreNotGraded = () => {
-      this.displayingOnlyTeamsWithNotGradedAnswers = true;
-      this.loadTeamsList(this.loadAllDisplayedLists, this, true);
-    };
-
-    this.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
   }
+  //#endregion
 
+  //#region ImportAnswers
   public checkPrerequisitesAndDoImportAnswers(): void {
     const questionsMaxNumberEndPointUrl = '/questions/max-number';
     this.http.get(questionsMaxNumberEndPointUrl).subscribe(
@@ -140,8 +131,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       if (result) {
         // если диалог был принят (accepted)
         // обновляем страницу со списками
-        this.notGradedAnswersArePresent = true;
-        this.displayingOnlyTeamsWithNotGradedAnswers = false;
         this.loadAllDisplayedLists(this);
 
         debugString('Reloaded answers listed below:');
@@ -149,8 +138,56 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       }
     });
   }
+  //#endregion
+
+  //#region EventHandlers
+  actualRoundChanged(event: MatRadioChange) {
+    this.selectedRoundAlias = event.value;
+  }
+
+  actualTeamChanged(event: MatSelectChange) {
+    this.selectedTeamId = event.value;
+  }
+
+  onAnswerRowClicked(selectedRow: any) {
+    const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
+      selectedRow
+    );
+    const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
+
+    const componentReference = this;
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
+        // если оценка была поставлена
+        // если да, то проверяем, остались-ли ответы без оценок в системе
+        const actionAllAnswersAreGraded = () => {
+          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
+        };
+      }
+    });
+  }
+
+  onEmailRowClicked(selectedRow: any) {
+    const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
+      selectedRow
+    );
+    const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
+
+    const componentReference = this;
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если письмо было удалено (+ все ответы из него)
+        // загружаем ответы заново и письма
+        componentReference.loadAllDisplayedLists(componentReference);
+      }
+    });
+  }
+  //#endregion
+
+
 
   loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean) {
+
     const url = onlyWithNotGradedAnswers ? '/teams/only-with-not-graded-answers' : '/teams/all';
 
     this.http.get(url).subscribe(
@@ -190,19 +227,19 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   loadAllDisplayedLists(componentReference: AnswersListComponent) {
-    componentReference.loadAnswersList(componentReference);
-    componentReference.loadEmailsList(componentReference);
+    // componentReference.loadAnswersList(componentReference);
+    // componentReference.loadEmailsList(componentReference);
   }
 
-  loadAnswersList(componentReference: AnswersListComponent) {
+  loadAnswersForTeam(componentReference: AnswersListComponent, teamId: number, roundAlias: string) {
     // Если команд нет в системе, просто выходим, нечего загружать
     // письма (и ответы) без команд не импортируются
     // а удалить команду, при наличии ответов нельзя
-    if (!this.selectedTeamId) {
+    if (!teamId) {
       return;
     }
 
-    const url = `/answers/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+    const url = `/answers/${teamId}/${roundAlias}`;
 
     componentReference.http.get(url).subscribe(
       (loadedAnswers: AnswerDataModel[]) => {
@@ -215,11 +252,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     );
   }
 
-  private separateAndSortLoadedAnswers(
-    loadedAnswers: AnswerDataModel[],
-    componentReference: AnswersListComponent
-  ) {
-
+  private separateAndSortLoadedAnswers(loadedAnswers: AnswerDataModel[], componentReference: AnswersListComponent) {
     const answersWithoutGradesList: AnswerDataModel[] = [];
 
     loadedAnswers.forEach((oneLoadedAnswer) => {
@@ -239,26 +272,20 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     componentReference.answersWithoutGradesDataSource.sort = componentReference.answersWithoutGradesSortHandler;
 
     // --- локальные функции ---
-    function compareAnswers(
-      oneAnswer: AnswerDataModel,
-      anotherAnswer: AnswerDataModel
-    ) {
+    function compareAnswers(oneAnswer: AnswerDataModel, anotherAnswer: AnswerDataModel) {
       if (oneAnswer.questionNumber < anotherAnswer.questionNumber) {
         return -1;
-      } else if (oneAnswer.questionNumber < anotherAnswer.questionNumber) {
+      } else if (oneAnswer.questionNumber > anotherAnswer.questionNumber) {
         return 1;
       } else {
         return compareEmailSentOnInTheAnswers(oneAnswer, anotherAnswer);
       }
     }
 
-    function compareEmailSentOnInTheAnswers(
-      oneAnswer: AnswerDataModel,
-      anotherAnswer: AnswerDataModel
-    ) {
+    function compareEmailSentOnInTheAnswers(oneAnswer: AnswerDataModel, anotherAnswer: AnswerDataModel) {
       if (oneAnswer.emailSentOn < anotherAnswer.emailSentOn) {
         return -1;
-      } else if (oneAnswer.emailSentOn < anotherAnswer.emailSentOn) {
+      } else if (oneAnswer.emailSentOn > anotherAnswer.emailSentOn) {
         return 1;
       } else {
         return 0;
@@ -267,22 +294,22 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     // ---------------------------------------------
   }
 
-  loadEmailsList(componentReference: AnswersListComponent) {
+  loadEmailsForTeam(componentReference: AnswersListComponent, teamId: number, roundAlias: string) {
     // Если команд нет в системе, просто выходим, нечего загружать
     // письма (и ответы) без команд не импортируются
     // а удалить команду, при наличии ответов нельзя
-    if (!this.selectedTeamId) {
+    if (!teamId) {
       return;
     }
 
-    const emailsUrl = `/emails/${this.selectedTeamId}/${this.selectedRoundAlias}`;
+    const emailsUrl = `/emails/${teamId}/${roundAlias}`;
 
     componentReference.http.get(emailsUrl).subscribe(
       (loadedEmailsList: EmailDataModel[]) => {
         componentReference.emailsDataSource = new MatTableDataSource(loadedEmailsList);
         componentReference.emailsDataSource.sort = componentReference.loadedEmailsSortHandler;
 
-        const digestUrl = `/emails/digest/${this.selectedTeamId}`;
+        const digestUrl = `/emails/digest/${teamId}`;
         componentReference.http.get(digestUrl).subscribe(
           (emailsCountDigest: EmailsCountDigest) => {
             componentReference.emailsCountDigest = emailsCountDigest;
@@ -294,93 +321,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     );
   }
 
-  public turnOnDisplayingOnlyTeamsWithNonGradedAnswers() {
-    this.displayingOnlyTeamsWithNotGradedAnswers = true;
-    this.loadTeamsList(this.loadAllDisplayedLists, this, true);
-  }
-
-  public turnOffDisplayingOnlyTeamsWithNonGradedAnswers() {
-    this.displayingOnlyTeamsWithNotGradedAnswers = false;
-    this.loadTeamsList(this.loadAllDisplayedLists, this, false);
-  }
-
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
-  }
-
-  private checkNotGradedAnswersPresence(doIfNotGradedAnswersPresent: Function, doIfAllAnswersAreGraded: Function) {
-    const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
-
-    this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
-      const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
-
-      if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
-        // если все ответы имеют оценку
-        this.notGradedAnswersArePresent = false;
-        doIfAllAnswersAreGraded();
-      } else {
-        // если есть ответы без оценок.
-        this.notGradedAnswersArePresent = true;
-        doIfNotGradedAnswersPresent();
-      }
-    },
-      (error) => this.reportServerError(error)
-    );
-  }
-
-  actualRoundChanged(event: MatRadioChange) {
-    this.selectedRoundAlias = event.value;
-    this.loadAllDisplayedLists(this);
-  }
-
-  actualTeamChanged(event: MatSelectChange) {
-    this.selectedTeamId = event.value;
-    this.loadAllDisplayedLists(this);
-  }
-
-  onAnswerRowClicked(selectedRow: any) {
-    const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
-      selectedRow
-    );
-    const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
-
-    const componentReference = this;
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
-        // если оценка была поставлена
-        // если да, то проверяем, остались-ли ответы без оценок в системе
-        const actionAllAnswersAreGraded = () => {
-          componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
-          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
-        };
-
-        const someAnswersAreNotGraded = () => {
-          // загружаем команды, так как может быть более одной команды с ответами без оценок
-          // и чтобы список команд с ответами без оценок тоже изменился, надо загрузить команды
-          // TODO тут есть поле для оптимизации, и этим надо будет заняться попозже.
-          const doLoadAnswersList = () => { componentReference.loadAnswersList(componentReference) };
-
-          componentReference.loadTeamsList(doLoadAnswersList, componentReference, true);
-        };
-
-        componentReference.checkNotGradedAnswersPresence(someAnswersAreNotGraded, actionAllAnswersAreGraded);
-      }
-    });
-  }
-
-  onEmailRowClicked(selectedRow: any) {
-    const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
-      selectedRow
-    );
-    const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
-
-    const componentReference = this;
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // если письмо было удалено (+ все ответы из него)
-        // загружаем ответы заново и письма
-        componentReference.loadAllDisplayedLists(componentReference);
-      }
-    });
   }
 }
