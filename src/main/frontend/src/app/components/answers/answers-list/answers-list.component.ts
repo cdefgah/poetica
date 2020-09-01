@@ -81,6 +81,50 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
   //#endregion
 
+  //#region EventHandlers
+  actualRoundChanged(event: MatRadioChange) {
+    this.selectedRoundAlias = event.value;
+  }
+
+  actualTeamChanged(event: MatSelectChange) {
+    this.selectedTeamId = event.value;
+  }
+
+  onAnswerRowClicked(selectedRow: any) {
+    const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
+      selectedRow
+    );
+    const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
+
+    const componentReference = this;
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
+        // если оценка была поставлена
+        // если да, то проверяем, остались-ли ответы без оценок в системе
+        const actionAllAnswersAreGraded = () => {
+          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
+        };
+      }
+    });
+  }
+
+  onEmailRowClicked(selectedRow: any) {
+    const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
+      selectedRow
+    );
+    const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
+
+    const componentReference = this;
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // если письмо было удалено (+ все ответы из него)
+        // загружаем ответы заново и письма
+        componentReference.loadAllDisplayedLists(componentReference);
+      }
+    });
+  }
+  //#endregion
+
   //#region ImportAnswers
   public checkPrerequisitesAndDoImportAnswers(): void {
     const questionsMaxNumberEndPointUrl = '/questions/max-number';
@@ -140,55 +184,26 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
   //#endregion
 
-  //#region EventHandlers
-  actualRoundChanged(event: MatRadioChange) {
-    this.selectedRoundAlias = event.value;
-  }
-
-  actualTeamChanged(event: MatSelectChange) {
-    this.selectedTeamId = event.value;
-  }
-
-  onAnswerRowClicked(selectedRow: any) {
-    const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
-      selectedRow
-    );
-    const dialogRef = this.dialog.open(AnswerDetailsComponent, dialogConfig);
-
-    const componentReference = this;
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
-        // если оценка была поставлена
-        // если да, то проверяем, остались-ли ответы без оценок в системе
-        const actionAllAnswersAreGraded = () => {
-          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
-        };
-      }
-    });
-  }
-
-  onEmailRowClicked(selectedRow: any) {
-    const dialogConfig = EmailDetailsComponent.getDialogConfigWithData(
-      selectedRow
-    );
-    const dialogRef = this.dialog.open(EmailDetailsComponent, dialogConfig);
-
-    const componentReference = this;
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // если письмо было удалено (+ все ответы из него)
-        // загружаем ответы заново и письма
-        componentReference.loadAllDisplayedLists(componentReference);
-      }
-    });
-  }
-  //#endregion
-
 
 
   // TODO исключить глобальные переменные (поля классов) из всех методов. передача данных только через параметры вызова!!!!!
+  // Если метод асинхронный, то нет резона что-то возвращать как return value.
+  // Возвращаемые значения передаются в функцию onSuccess(); в качестве параметров и никак не меняют глобальное состояние!
+  // Глобальное состояние меняется только в том случае, если вся цепочка вызовов функций отработала без ошибок и проблем.
 
-  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean) {
+  /**
+   * loadTeamsList передаёт в onSuccess отсортированный список объектов Team и id-команды, которая была выбрана до вызова метода.
+   * Если метод вызывается впервые, то id-команды равен undefined.
+   * в onSuccess проверяем, входит-ли id-команды в список объектов. (метод find())
+   * https://stackoverflow.com/questions/42580100/typescript-take-object-out-of-array-based-on-attribute-value
+   * срубает меня, пойду спать. Завтра продолжу, если буду в состоянии.
+   * 
+   * 
+   */
+
+  // --------------------------------------------------------------
+
+  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean): [number[], string[]] {
 
     const url = onlyWithNotGradedAnswers ? '/teams/only-with-not-graded-answers' : '/teams/all';
 
@@ -208,15 +223,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
           return 0;
         });
 
-        this.allTeamIds = [];
-        this.teamTitleAndNumber = [];
+        const allTeamIdentifiers: number[] = [];
+        const teamTitlesAndNumbers: string[] = [];
+
+        // this.allTeamIds = [];
+        // this.teamTitleAndNumber = [];
+        // this.selectedTeamId = this.allTeamIds[0];
 
         sortedTeamsList.forEach((oneTeam) => {
-          this.allTeamIds.push(oneTeam.id);
-          this.teamTitleAndNumber.push(`${oneTeam.title} (${oneTeam.number})`);
+          allTeamIdentifiers.push(oneTeam.id);
+          teamTitlesAndNumbers.push(`${oneTeam.title} (${oneTeam.number})`);
         });
-
-        this.selectedTeamId = this.allTeamIds[0];
 
         // если есть хоть одна команда - работаем дальше
         // иначе - ничего не грузим больше, нет смысла
