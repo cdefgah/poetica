@@ -66,15 +66,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   ];
   //#endregion
 
-  // --- temp - fields 
-
   displayingOnlyTeamsWithNotGradedAnswers = false;
-
   notGradedAnswersArePresent = false;
-  turnOnDisplayingOnlyTeamsWithNonGradedAnswers() { }
-  turnOffDisplayingOnlyTeamsWithNonGradedAnswers() { }
-
-
 
   //#region ConstructorsAndInits
   constructor(private http: HttpClient, private dialog: MatDialog) {
@@ -90,6 +83,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
     this.emailsDataSource.sort = this.loadedEmailsSortHandler;
 
+    this.checkNotGradedAnswersPresence();
+
     this.loadTeamsList(this, -1, false, this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
   }
   //#endregion
@@ -97,10 +92,20 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   //#region EventHandlers
   actualRoundChanged(event: MatRadioChange) {
     this.selectedRoundAlias = event.value;
+
+    this.loadTeamsList(this,
+      this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
+      this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
   }
 
   actualTeamChanged(event: MatSelectChange) {
+    debugString(`this.selectedTeamId BEFORE ASSIGNMENT: ${this.selectedTeamId}`);
     this.selectedTeamId = event.value;
+    debugString(`this.selectedTeamId AFTER ASSIGNMENT: ${this.selectedTeamId}`);
+
+    this.loadTeamsList(this,
+      this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
+      this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
   }
 
   onAnswerRowClicked(selectedRow: any) {
@@ -154,26 +159,43 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   private processAllTeamAnswersBecomeGraded(componentReference: AnswersListComponent, teamId: number): void {
     // этот метод вызывается при включённом режиме отображения только команд с ответами без оценок
     // в случаях, когда текущая выбрання команда получила оценки для всех ответов
+    debugString('Processing situation when all team answers become graded ..............................');
+
+    debugString(`componentReference.allTeamIds.length === ${componentReference.allTeamIds.length}`);
 
     // проверяем, сколько команд есть в поле выбора команды
     if (componentReference.allTeamIds.length === 1) {
       // если в списке команд только текущая команда
+      debugString(`There's only current team present, so we're switching to the displaying all teams`);
 
       // включаем отображение всех команд
       componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
+      componentReference.notGradedAnswersArePresent = false;
 
     } else {
       // если в списке команд кроме текущей есть и другие команды
+      debugString(`There are other teams list for the current displaying mode, removing current team from the list`);
+      debugString('allTeamIds BEFORE REMOVAL below');
+      debugObject(componentReference.allTeamIds);
+      debugString('allTeamIds BEFORE REMOVAL above');
 
       const index = componentReference.allTeamIds.indexOf(teamId);
+      debugString(`index of team id that should be removed ${index}`);
 
       // удаляем найденный элемент, не надо проверять index на -1, ибо элемент заведомо существует
       componentReference.allTeamIds.splice(index, 1); // удаляем из списка идентификаторов
       componentReference.teamTitleAndNumber.splice(index, 1); // удаляем из отображаемого списка
+
+      debugString('allTeamIds AFTER REMOVAL below');
+      debugObject(componentReference.allTeamIds);
+      debugString('allTeamIds AFTER REMOVAL above');
+
       componentReference.selectedTeamId = componentReference.allTeamIds[0]; // первую команду из списка ставим как выбранную
+      debugString(`current selectedTeamId is: ${componentReference.selectedTeamId}`);
     }
 
-    // загружаем ответы
+    debugString(`Now loading teams list and answers with emails for the team with id: ${componentReference.selectedTeamId}`);
+    // загружаем команды и ответы для команды, чей id указан в параметрах
     componentReference.loadTeamsList(componentReference,
       componentReference.selectedTeamId, componentReference.displayingOnlyTeamsWithNotGradedAnswers,
       componentReference.populateTeamSelectionFieldAndLoadAnswersWithEmails);
@@ -184,7 +206,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     debugString('Removing answer from not-graded list. Answer id: ' + answerId);
 
     const index = componentReference.answersWithoutGradesDataSource.data.findIndex(oneAnswer => oneAnswer.id === answerId);
-    debugString('Found index in data source' + index);
+    debugString('Found index in data source: ' + index);
 
     // удаляем найденный элемент, не надо проверять index на -1, ибо элемент заведомо существует
     componentReference.answersWithoutGradesDataSource.data.splice(index, 1);
@@ -273,6 +295,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   loadTeamsList(componentReference: AnswersListComponent, previouslySelectedTeamId: number, onlyWithNotGradedAnswers: boolean,
     onSuccess: (componentReference: AnswersListComponent, loadedTeams: TeamDataModel[], previouslySelectedTeamId: number) => void): void {
 
+    debugString(`Loading teams list and setting this team id as it is done: ${previouslySelectedTeamId}`);
+
     const url = onlyWithNotGradedAnswers ? '/teams/only-with-not-graded-answers' : '/teams/all';
 
     componentReference.http.get(url).subscribe(
@@ -298,6 +322,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   populateTeamSelectionFieldAndLoadAnswersWithEmails(componentReference: AnswersListComponent,
     loadedTeams: TeamDataModel[], previouslySelectedTeamId: number): void {
 
+    debugString(`Populating teams list and setting this team id as it is done: ${previouslySelectedTeamId}`);
+
     const allTeamIdentifiers: number[] = [];
     const teamTitlesAndNumbers: string[] = [];
 
@@ -314,8 +340,16 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       indexOfPreviouslySelectedTeamId = componentReference.allTeamIds.indexOf(previouslySelectedTeamId);
     }
 
+    debugString(`componentReference.allTeamIds is below:`);
+    debugObject(componentReference.allTeamIds);
+
+    debugString(`indexOfPreviouslySelectedTeamId: ${indexOfPreviouslySelectedTeamId}`);
+
     // если id ранее выбранной команды был в списке, выставляем его, иначе выставляем id первой команды из списка
-    componentReference.selectedTeamId = indexOfPreviouslySelectedTeamId >= 0 ? indexOfPreviouslySelectedTeamId : componentReference.allTeamIds[0];
+    componentReference.selectedTeamId = indexOfPreviouslySelectedTeamId >= 0 ?
+      componentReference.allTeamIds[indexOfPreviouslySelectedTeamId] : componentReference.allTeamIds[0];
+
+    debugString(`componentReference.selectedTeamId: ${componentReference.selectedTeamId}`);
 
     // загружаем ответы для команды
     componentReference.loadAnswersAndEmailsForTeam(componentReference, componentReference.selectedTeamId, componentReference.selectedRoundAlias);
@@ -416,4 +450,62 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
   }
+
+
+  //#region utility methods
+  private checkNotGradedAnswersPresence() {
+    const answerWithoutGradesCheckUri = '/answers/not-graded-presence';
+    this.http.get(answerWithoutGradesCheckUri).subscribe((teamIdInfo: any) => {
+      const foundTeamIdString: string = teamIdInfo ? teamIdInfo.toString() : '';
+
+      if (!(foundTeamIdString && foundTeamIdString.length > 0)) {
+        // если все ответы имеют оценку
+        this.notGradedAnswersArePresent = false;
+      } else {
+        // если есть ответы без оценок.
+        this.notGradedAnswersArePresent = true;
+      }
+    },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  turnOnDisplayingOnlyTeamsWithNonGradedAnswers() {
+    // включает режим отображения команд у которых есть ответы без оценок
+    if (this.displayingOnlyTeamsWithNotGradedAnswers) {
+      // если этот режим уже включён, просто выходим
+      return;
+    }
+
+    debugString('DISPLAYING ONLY TEAMS WITH NOT GRADED ANSWERS');
+    debugString(`this.selectedTeamId: ${this.selectedTeamId}`);
+
+    this.displayingOnlyTeamsWithNotGradedAnswers = true;
+
+    this.loadTeamsList(this,
+      this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
+      this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
+  }
+
+
+
+  turnOffDisplayingOnlyTeamsWithNonGradedAnswers() {
+    // выключает режим отображения команд у которых есть ответы без оценок
+    // и показывает все команды
+
+    if (!this.displayingOnlyTeamsWithNotGradedAnswers) {
+      // если этот режим уже выключён, просто выходим
+      return;
+    }
+
+    debugString('DISPLAYING ALL TEAMS');
+    debugString(`this.selectedTeamId: ${this.selectedTeamId}`);
+
+    this.displayingOnlyTeamsWithNotGradedAnswers = false;
+    this.loadTeamsList(this,
+      this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
+      this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
+  }
+
+  //#endregion
 }
