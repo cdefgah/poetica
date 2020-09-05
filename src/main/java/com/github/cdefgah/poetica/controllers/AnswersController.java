@@ -139,8 +139,8 @@ public class AnswersController extends AbstractController {
      */
     @RequestMapping(path = "/answers/not-graded-presence", method = RequestMethod.GET)
     public ResponseEntity<String> notGradedAnswersPresent() {
-        TypedQuery<Long> query = entityManager.createQuery("select distinct team.id from Team team, " +
-                                       "Answer answer where team.id=answer.teamId and answer.grade=:grade", Long.class);
+        TypedQuery<Long> query = entityManager.createQuery("select distinct answer.teamId from " +
+                                                                "Answer answer where answer.grade=:grade", Long.class);
         query.setParameter("grade", Grade.None);
         List<Long> resultList = query.getResultList();
         String foundTeamId = "";
@@ -149,5 +149,21 @@ public class AnswersController extends AbstractController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(foundTeamId);
+    }
+
+    /**
+     * Проверяет наличие ответов без оценок в базе для конкретной команды.
+     * @return Возвращает строку с символом 1, если ответы без оценок есть.
+     * Если нет ответов без оценок, возвращается пустая строка.
+     */
+    @RequestMapping(path = "/answers/not-graded-presence/{teamId}", method = RequestMethod.GET)
+    public ResponseEntity<String> notGradedAnswersPresentForTeam(@PathVariable long teamId) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) from " +
+                                     "Answer answer where answer.teamId=:teamId and answer.grade=:grade", Long.class);
+        query.setParameter("teamId", teamId);
+        query.setParameter("grade", Grade.None);
+        final long answersFound = query.getSingleResult();
+        final String resultValue = answersFound > 0 ? "1" : "";
+        return ResponseEntity.status(HttpStatus.OK).body(resultValue);
     }
 }

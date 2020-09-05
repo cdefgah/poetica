@@ -69,6 +69,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   // --- temp - fields 
 
   displayingOnlyTeamsWithNotGradedAnswers = false;
+
   notGradedAnswersArePresent = false;
   turnOnDisplayingOnlyTeamsWithNonGradedAnswers() { }
   turnOffDisplayingOnlyTeamsWithNonGradedAnswers() { }
@@ -126,10 +127,70 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
       // если была поставлена оценка ответу, у которого ранее не было оценки
       if (dialogResult.gradeSetToNonGradedAnswer) {
+        // удаляем ответ из списка ответов без оценки
+        componentReference.removeAnswerFromNotGradedAnswersList(componentReference, selectedRow.id);
 
-
+        // если включён режим отображения только команд с оценками без ответов
+        if (componentReference.displayingOnlyTeamsWithNotGradedAnswers) {
+          // проверяем, остаются-ли у команды ответы без оценок
+          // мы делаем запрос с сервера, так как локально в списках могут быть ответы только для какого-то тура
+          // и пустой список с ответами без оценок за какой-то тур совсем не означает, что ответов без оценок для этой команды больше нет
+          const url = `/answers/not-graded-presence/${selectedRow.teamId}`;
+          componentReference.http.get(url).subscribe(
+            (data: any) => {
+              const resultString: string = data ? data.toString() : '';
+              if (resultString.length === 0) {
+                // у команды больше нет ответов без оценок
+                componentReference.processAllTeamAnswersBecomeGraded(componentReference, selectedRow.teamId);
+              }
+            },
+            (error) => componentReference.reportServerError(error)
+          );
+        }
       }
     });
+  }
+
+  private processAllTeamAnswersBecomeGraded(componentReference: AnswersListComponent, teamId: number): void {
+    // этот метод вызывается при включённом режиме отображения только команд с ответами без оценок
+    // в случаях, когда текущая выбрання команда получила оценки для всех ответов
+
+    // проверяем, сколько команд есть в поле выбора команды
+    if (componentReference.allTeamIds.length === 1) {
+      // если в списке команд только текущая команда
+
+      // включаем отображение всех команд
+      componentReference.displayingOnlyTeamsWithNotGradedAnswers = false;
+
+    } else {
+      // если в списке команд кроме текущей есть и другие команды
+
+      const index = componentReference.allTeamIds.indexOf(teamId);
+
+      // удаляем найденный элемент, не надо проверять index на -1, ибо элемент заведомо существует
+      componentReference.allTeamIds.splice(index, 1); // удаляем из списка идентификаторов
+      componentReference.teamTitleAndNumber.splice(index, 1); // удаляем из отображаемого списка
+      componentReference.selectedTeamId = componentReference.allTeamIds[0]; // первую команду из списка ставим как выбранную
+    }
+
+    // загружаем ответы
+    componentReference.loadTeamsList(componentReference,
+      componentReference.selectedTeamId, componentReference.displayingOnlyTeamsWithNotGradedAnswers,
+      componentReference.populateTeamSelectionFieldAndLoadAnswersWithEmails);
+  }
+
+
+  private removeAnswerFromNotGradedAnswersList(componentReference: AnswersListComponent, answerId: number) {
+    debugString('Removing answer from not-graded list. Answer id: ' + answerId);
+
+    const index = componentReference.answersWithoutGradesDataSource.data.findIndex(oneAnswer => oneAnswer.id === answerId);
+    debugString('Found index in data source' + index);
+
+    // удаляем найденный элемент, не надо проверять index на -1, ибо элемент заведомо существует
+    componentReference.answersWithoutGradesDataSource.data.splice(index, 1);
+
+    // обновляем источник данных
+    componentReference.answersWithoutGradesDataSource._updateChangeSubscription();
   }
 
   onEmailRowClicked(selectedRow: any) {
