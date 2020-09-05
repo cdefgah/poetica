@@ -12,6 +12,7 @@ import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
+import { AnswerDetailsDialogResult } from './AnswerDetailsDialogResult';
 
 @Component({
   selector: 'app-answer-details',
@@ -21,8 +22,6 @@ import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
 export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit, AfterViewInit {
   private static readonly KEY_DIALOG_ID = 'id';
-
-  public static readonly DIALOG_GRADE_SET: number = 1;
 
   // инициализация пустыми объектами, чтобы связанные со свойствами этих объектов компоненты отрисовались корректно
   answer: AnswerDataModel = AnswerDataModel.emptyAnswer;
@@ -67,7 +66,7 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     debugString('Loading answerId in the dialog ...');
     const answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
 
-    debugString(`answerId = ${this.answer.id}`);
+    debugString(`answerId = ${answerId}`);
     debugString('dialogData is below:');
     debugObject(dialogData);
 
@@ -79,8 +78,6 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
       (answerDetailsData: Map<string, any>) => {
         // получили, строим объект
         this.answer = AnswerDataModel.createAnswerFromMap(answerDetailsData);
-
-
 
         // получаем объект email
         const emailRequestUrl = `/emails/${this.answer.emailId}`;
@@ -151,7 +148,9 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
           debugString('Answer has accepted ... request done successfully');
-          this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+          const acceptedAnswerGrade = 'Accepted';
+          const dialogResult: AnswerDetailsDialogResult = new AnswerDetailsDialogResult(this.answer.grade, acceptedAnswerGrade);
+          this.dialog.close(dialogResult);
         },
         (error) => this.reportServerError(error)
       );
@@ -167,7 +166,9 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
           debugString('Answer has declined ... request done successfully');
-          this.dialog.close(AnswerDetailsComponent.DIALOG_GRADE_SET);
+          const NotAcceptedAnswerGrade = 'NotAccepted';
+          const dialogResult: AnswerDetailsDialogResult = new AnswerDetailsDialogResult(this.answer.grade, NotAcceptedAnswerGrade);
+          this.dialog.close(dialogResult);
         },
         (error) => this.reportServerError(error)
       );
@@ -176,6 +177,6 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
 
   justCloseDialog() {
     debugString('Just closing dialog without affecting answer');
-    this.dialog.close();
+    this.dialog.close(new AnswerDetailsDialogResult('', ''));
   }
 }

@@ -10,6 +10,7 @@ import { EmailsCountDigest } from './support/EmailsCountDigest';
 import { AnswerDetailsComponent } from '../answer-details/answer-details.component';
 import { debugString, debugObject } from 'src/app/utils/Config';
 import { EmailDetailsComponent } from '../email-details/email-details.component';
+import { AnswerDetailsDialogResult } from '../answer-details/AnswerDetailsDialogResult';
 
 @Component({
   selector: 'app-answers-list',
@@ -65,6 +66,15 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   ];
   //#endregion
 
+  // --- temp - fields 
+
+  displayingOnlyTeamsWithNotGradedAnswers = false;
+  notGradedAnswersArePresent = false;
+  turnOnDisplayingOnlyTeamsWithNonGradedAnswers() { }
+  turnOffDisplayingOnlyTeamsWithNonGradedAnswers() { }
+
+
+
   //#region ConstructorsAndInits
   constructor(private http: HttpClient, private dialog: MatDialog) {
     super();
@@ -78,6 +88,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.answersDataSource.sort = this.allAnswersSortHandler;
     this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
     this.emailsDataSource.sort = this.loadedEmailsSortHandler;
+
+    this.loadTeamsList(this, -1, false, this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
   }
   //#endregion
 
@@ -91,6 +103,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   onAnswerRowClicked(selectedRow: any) {
+    debugString('== SELECTED ROW OBJECT IS BELOW ===');
+    debugObject(selectedRow);
+
     const dialogConfig = AnswerDetailsComponent.getDialogConfigWithData(
       selectedRow
     );
@@ -98,12 +113,21 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     const componentReference = this;
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === AnswerDetailsComponent.DIALOG_GRADE_SET) {
-        // если оценка была поставлена
-        // если да, то проверяем, остались-ли ответы без оценок в системе
-        const actionAllAnswersAreGraded = () => {
-          componentReference.loadTeamsList(componentReference.loadAllDisplayedLists, componentReference, false);
-        };
+      const dialogResult: AnswerDetailsDialogResult = result;
+      if (dialogResult.noChangesWereMade) {
+        // если никаких изменений не было, просто выходим
+        return;
+      }
+
+      // проставляем оценку в клиентском объекте
+      // с сервера ничего не загружаем, там данные уже поменялись
+      // при закрытии диалога
+      selectedRow.grade = dialogResult.gradeOnDialogClose;
+
+      // если была поставлена оценка ответу, у которого ранее не было оценки
+      if (dialogResult.gradeSetToNonGradedAnswer) {
+
+
       }
     });
   }
@@ -119,7 +143,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       if (result) {
         // если письмо было удалено (+ все ответы из него)
         // загружаем ответы заново и письма
-        componentReference.loadAllDisplayedLists(componentReference);
+        //componentReference.loadAllDisplayedLists(componentReference);
       }
     });
   }
@@ -184,34 +208,15 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
   //#endregion
 
-
-
-  // TODO исключить глобальные переменные (поля классов) из всех методов. передача данных только через параметры вызова!!!!!
-  // Если метод асинхронный, то нет резона что-то возвращать как return value.
-  // Возвращаемые значения передаются в функцию onSuccess(); в качестве параметров и никак не меняют глобальное состояние!
-  // Глобальное состояние меняется только в том случае, если вся цепочка вызовов функций отработала без ошибок и проблем.
-
-  /**
-   * loadTeamsList передаёт в onSuccess отсортированный список объектов Team и id-команды, которая была выбрана до вызова метода.
-   * Если метод вызывается впервые, то id-команды равен undefined.
-   * в onSuccess проверяем, входит-ли id-команды в список объектов. (метод find())
-   * https://stackoverflow.com/questions/42580100/typescript-take-object-out-of-array-based-on-attribute-value
-   * срубает меня, пойду спать. Завтра продолжу, если буду в состоянии.
-   * 
-   * 
-   */
-
-  // --------------------------------------------------------------
-
-  loadTeamsList(onSuccess: Function, componentReference: AnswersListComponent, onlyWithNotGradedAnswers: boolean): [number[], string[]] {
+  //#region ServerDataLoaders
+  loadTeamsList(componentReference: AnswersListComponent, previouslySelectedTeamId: number, onlyWithNotGradedAnswers: boolean,
+    onSuccess: (componentReference: AnswersListComponent, loadedTeams: TeamDataModel[], previouslySelectedTeamId: number) => void): void {
 
     const url = onlyWithNotGradedAnswers ? '/teams/only-with-not-graded-answers' : '/teams/all';
 
-    this.http.get(url).subscribe(
+    componentReference.http.get(url).subscribe(
       (unsortedTeamsList: TeamDataModel[]) => {
-
         const sortedTeamsList: TeamDataModel[] = unsortedTeamsList.sort((team1, team2) => {
-
           if (team1.title > team2.title) {
             return 1;
           }
@@ -223,34 +228,40 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
           return 0;
         });
 
-        const allTeamIdentifiers: number[] = [];
-        const teamTitlesAndNumbers: string[] = [];
-
-        // this.allTeamIds = [];
-        // this.teamTitleAndNumber = [];
-        // this.selectedTeamId = this.allTeamIds[0];
-
-        sortedTeamsList.forEach((oneTeam) => {
-          allTeamIdentifiers.push(oneTeam.id);
-          teamTitlesAndNumbers.push(`${oneTeam.title} (${oneTeam.number})`);
-        });
-
-        // если есть хоть одна команда - работаем дальше
-        // иначе - ничего не грузим больше, нет смысла
-        if (this.selectedTeamId) {
-          onSuccess(componentReference);
-        }
+        onSuccess(componentReference, sortedTeamsList, previouslySelectedTeamId);
       },
       (error) => this.reportServerError(error)
     );
   }
 
-  loadAllDisplayedLists(componentReference: AnswersListComponent) {
-    // componentReference.loadAnswersList(componentReference);
-    // componentReference.loadEmailsList(componentReference);
-  }
+  populateTeamSelectionFieldAndLoadAnswersWithEmails(componentReference: AnswersListComponent,
+    loadedTeams: TeamDataModel[], previouslySelectedTeamId: number): void {
 
-  loadAnswersForTeam(componentReference: AnswersListComponent, teamId: number, roundAlias: string) {
+    const allTeamIdentifiers: number[] = [];
+    const teamTitlesAndNumbers: string[] = [];
+
+    loadedTeams.forEach((oneTeam) => {
+      allTeamIdentifiers.push(oneTeam.id);
+      teamTitlesAndNumbers.push(`${oneTeam.title} (${oneTeam.number})`);
+    });
+
+    componentReference.allTeamIds = allTeamIdentifiers;
+    componentReference.teamTitleAndNumber = teamTitlesAndNumbers;
+
+    let indexOfPreviouslySelectedTeamId = -1;
+    if (previouslySelectedTeamId >= 0) {
+      indexOfPreviouslySelectedTeamId = componentReference.allTeamIds.indexOf(previouslySelectedTeamId);
+    }
+
+    // если id ранее выбранной команды был в списке, выставляем его, иначе выставляем id первой команды из списка
+    componentReference.selectedTeamId = indexOfPreviouslySelectedTeamId >= 0 ? indexOfPreviouslySelectedTeamId : componentReference.allTeamIds[0];
+
+    // загружаем ответы для команды
+    componentReference.loadAnswersAndEmailsForTeam(componentReference, componentReference.selectedTeamId, componentReference.selectedRoundAlias);
+  }
+  //#endregion
+
+  loadAnswersAndEmailsForTeam(componentReference: AnswersListComponent, teamId: number, roundAlias: string): void {
     // Если команд нет в системе, просто выходим, нечего загружать
     // письма (и ответы) без команд не импортируются
     // а удалить команду, при наличии ответов нельзя
@@ -262,10 +273,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     componentReference.http.get(url).subscribe(
       (loadedAnswers: AnswerDataModel[]) => {
-        componentReference.separateAndSortLoadedAnswers(
-          loadedAnswers,
-          componentReference
-        );
+        // разносим загруженные ответы по разным спискам (все,  без оценок)
+        componentReference.separateAndSortLoadedAnswers(loadedAnswers, componentReference);
+
+        // загружаем письма для команды
+        componentReference.loadEmailsForTeam(componentReference, teamId, roundAlias);
       },
       (error) => componentReference.reportServerError(error)
     );
