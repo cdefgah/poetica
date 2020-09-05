@@ -481,6 +481,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     debugString(`this.selectedTeamId: ${this.selectedTeamId}`);
 
     this.displayingOnlyTeamsWithNotGradedAnswers = true;
+    this.selectedRoundAlias = this.allRoundAliases[0];
 
     this.loadTeamsList(this,
       this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
@@ -502,6 +503,8 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     debugString(`this.selectedTeamId: ${this.selectedTeamId}`);
 
     this.displayingOnlyTeamsWithNotGradedAnswers = false;
+    this.selectedRoundAlias = this.allRoundAliases[0];
+
     this.loadTeamsList(this,
       this.selectedTeamId, this.displayingOnlyTeamsWithNotGradedAnswers,
       this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
