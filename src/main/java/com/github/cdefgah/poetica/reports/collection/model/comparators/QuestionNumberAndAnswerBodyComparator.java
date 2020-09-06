@@ -5,7 +5,6 @@ import com.github.cdefgah.poetica.model.Answer;
 import java.util.Comparator;
 
 public class QuestionNumberAndAnswerBodyComparator implements Comparator<Answer> {
-
     @Override
     public int compare(Answer firstAnswer, Answer secondAnswer) {
         if (firstAnswer.getQuestionNumber() == secondAnswer.getQuestionNumber()) {

@@ -17,11 +17,6 @@ public class MediumResultTableReportView extends AbstractResultTableReportView {
         final String twoSpaces = oneSpace + oneSpace;
         final StringBuilder sb = new StringBuilder();
 
-        final String notGradedQuestionsMessage = getNotGradedQuestionsMessage();
-        if (!notGradedQuestionsMessage.isEmpty()) {
-            sb.append(notGradedQuestionsMessage).append("\n\n");
-        }
-
         // заголовок блока
         sb.append(getBlockTitle(isMainRound)).append("\n");
 

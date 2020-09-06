@@ -1,14 +1,14 @@
 package com.github.cdefgah.poetica.reports.restable;
 
 import com.github.cdefgah.poetica.model.Team;
-import com.github.cdefgah.poetica.reports.AbstractReportView;
+import com.github.cdefgah.poetica.reports.ReportWithConsistencyCheckView;
 import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 
 import javax.persistence.TypedQuery;
 import java.util.Collection;
 import java.util.Collections;
 
-abstract class AbstractResultTableReportView extends AbstractReportView {
+abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckView {
 
     protected final int maxTeamNumberLength = Team.getMaxTeamNumberValueLength();
 
@@ -49,9 +49,14 @@ abstract class AbstractResultTableReportView extends AbstractReportView {
         maxTeamRatingLengthForMainRound = getMaxTeamRatingValueLength(true);
     }
 
-    public String getReportText() {
-        return "Московское время генерации отчёта: " + reportModel.getReportGeneratedOnMSKTime() + "\n\n" +
-                getRoundBlockText(false) +
+    @Override
+    protected String getReportTitleForConsistencyReportHeader() {
+        return "Таблица результатов";
+    }
+
+    @Override
+    public String getMainReportText() {
+        return getRoundBlockText(false) +
                 "\n" +
                 getRoundBlockText(true);
     }

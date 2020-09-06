@@ -3,13 +3,13 @@ package com.github.cdefgah.poetica.reports.restable.model;
 import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
-import com.github.cdefgah.poetica.reports.AbstractReportModel;
+import com.github.cdefgah.poetica.reports.ReportWithConsistencyCheckModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
 
-public class ResultTableReportModel extends AbstractReportModel {
+public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
 
     /**
      * Строки для блока отчёта за предварительный тур.
@@ -38,7 +38,9 @@ public class ResultTableReportModel extends AbstractReportModel {
 
     public ResultTableReportModel(EntityManager entityManager) {
         super(entityManager);
+    }
 
+    protected void buildMainReport() {
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
         initQuestionsGradesMap();
 
@@ -46,7 +48,6 @@ public class ResultTableReportModel extends AbstractReportModel {
 
         // первый проход, проставляем отметки о взятых вопросах и обновляем рейтинг вопросов
         for (Team team : teamsList) {
-
             // TODO - передавать null в параметрах нехорошо, переделать
             ReportRowModel preliminaryRoundBlockReportRow =
                     new ReportRowModel(minQuestionNumber,
