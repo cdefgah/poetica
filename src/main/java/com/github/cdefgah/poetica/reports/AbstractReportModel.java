@@ -1,13 +1,11 @@
 package com.github.cdefgah.poetica.reports;
 
-import com.github.cdefgah.poetica.model.Grade;
 import com.github.cdefgah.poetica.model.Question;
 import com.github.cdefgah.poetica.model.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -61,6 +59,12 @@ public abstract class AbstractReportModel {
 
     public int getMaxQuestionNumber() {
         return maxQuestionNumber;
+    }
+
+    protected List<Team> getParticipatedTeams() {
+        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
+                "Email email where team.id=email.teamId", Team.class);
+        return query.getResultList();
     }
 
     /**

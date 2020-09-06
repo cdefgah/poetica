@@ -39,6 +39,8 @@ public class ReportsController extends  AbstractController {
 
         final String reportText;
         final ResultTableReportModel reportModel = new ResultTableReportModel(this.entityManager);
+        reportModel.generateReport();
+
         switch (reportFormat) {
             case fullFormat:
                 reportText = (new FullResultTableReportView(reportModel)).getReportText();
@@ -139,6 +141,8 @@ public class ReportsController extends  AbstractController {
     public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
 
         final CollectionReportModel reportModel = new CollectionReportModel(entityManager);
+        reportModel.generateReport();
+
         final CollectionReportView report = new CollectionReportView(reportModel);
 
         final String reportText = report.getReportText();

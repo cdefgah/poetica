@@ -1,7 +1,7 @@
 package com.github.cdefgah.poetica.reports.collection.model;
 
 import com.github.cdefgah.poetica.model.Answer;
-import com.github.cdefgah.poetica.reports.ReportWithConsistencyCheck;
+import com.github.cdefgah.poetica.reports.ReportWithConsistencyCheckModel;
 import com.github.cdefgah.poetica.reports.collection.model.comparators.QuestionNumberAnswerBodyAndCommentComparator;
 
 import javax.persistence.EntityManager;
@@ -9,24 +9,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CollectionReportModel extends ReportWithConsistencyCheck {
+public final class CollectionReportModel extends ReportWithConsistencyCheckModel {
 
-    private final List<AnswerSummaryBlock> answerSummaryBlocks = new ArrayList<>();
+    private List<AnswerSummaryBlock> answerSummaryBlocks = new ArrayList<>();
 
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
-
-        if (this.isReportModelConsistent()) {
-            // если в отчёте нет ошибок - считаем дальше
-            buildMainReport();
-        }
     }
 
     public List<AnswerSummaryBlock> getAnswerSummaryBlocks() {
         return Collections.unmodifiableList(answerSummaryBlocks);
     }
 
-    private void buildMainReport() {
+    protected void buildMainReport() {
         // сортируем список ответов по номеру и телу ответа вместе с комментарием
         this.allRecentAnswersList.sort(new QuestionNumberAnswerBodyAndCommentComparator());
 

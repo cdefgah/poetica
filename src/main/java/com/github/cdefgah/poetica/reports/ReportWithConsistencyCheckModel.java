@@ -12,20 +12,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class ReportWithConsistencyCheck extends AbstractReportModel {
+public abstract class ReportWithConsistencyCheckModel extends AbstractReportModel {
 
     /**
      * Чтобы избежать ненужных обращений в базу, когда надо получить объект команды по id.
      * Количество команд небольшое (несколько десятков), так что этот способ не создаст проблем.
      */
-    protected final Map<Long, Team> participatedTeamsMap;
+    private Map<Long, Team> participatedTeamsMap;
 
     private final List<ConsistencyReportRow> consistencyReportRows = new ArrayList<>();
 
     protected final List<Answer> allRecentAnswersList = new ArrayList<>();
 
-    public ReportWithConsistencyCheck(EntityManager entityManager) {
+    public ReportWithConsistencyCheckModel(EntityManager entityManager) {
         super(entityManager);
+    }
+
+    public void generateReport() {
+        // преобразуем список команд-участников в map
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
 
         populateAnswersList();
@@ -36,7 +40,14 @@ public abstract class ReportWithConsistencyCheck extends AbstractReportModel {
 
         // проверяем корректность исходных данных
         buildConsistencyReport();
+
+        if (this.isReportModelConsistent()) {
+            // если в отчёте нет ошибок - строим отчёт
+            buildMainReport();
+        }
     }
+
+    protected abstract void buildMainReport();
 
     private void buildConsistencyReport() {
         // сортируем список ответов по номеру и телу ответа (без комментария)
@@ -64,12 +75,6 @@ public abstract class ReportWithConsistencyCheck extends AbstractReportModel {
         if (consistencyReportRow.isNotConsistent()) {
             this.consistencyReportRows.add(consistencyReportRow);
         }
-    }
-
-    protected List<Team> getParticipatedTeams() {
-        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
-                "Email email where team.id=email.teamId", Team.class);
-        return query.getResultList();
     }
 
     public boolean isReportModelConsistent() {
