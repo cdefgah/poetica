@@ -10,7 +10,7 @@
     <tr>
       <td class="team-selection-cell">
         <mat-form-field class="team-selection-field">
-          <mat-label>Команда:</mat-label>
+          <mat-label>Команда{{displayingOnlyTeamsWithNotGradedAnswers ? ' с ответами без оценок': ''}}:</mat-label>
           <mat-select [(value)]="selectedTeamId" placeholder="Команда" (selectionChange)="actualTeamChanged($event)">
             <mat-option *ngFor="let teamId of allTeamIds; index as i" [value]="teamId">
               {{ teamTitleAndNumber[i] }}
