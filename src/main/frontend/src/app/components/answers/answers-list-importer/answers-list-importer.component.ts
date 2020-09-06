@@ -18,6 +18,7 @@ import { EmailBodyParser } from './support/email-body-parser/EmailBodyParser';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
+import { AnswersImporterDialogResult } from './AnswersImporterDialogResult';
 
 @Component({
   selector: 'app-answers-list-importer',
@@ -400,7 +401,6 @@ export class AnswersListImporterComponent
     const emailUniquenessCheckUrl = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
     debugString('emailUniquenessCheckUrl:' + emailUniquenessCheckUrl);
 
-
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
       (resultFlag: string) => {
         debugString('received resultFlag: ' + resultFlag);
@@ -460,7 +460,7 @@ export class AnswersListImporterComponent
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)
-        this.dialog.close(false);
+        this.dialog.close(new AnswersImporterDialogResult(false, -1, ''));
       }
     });
   }
@@ -530,7 +530,7 @@ export class AnswersListImporterComponent
               .subscribe(
                 (data) => {
                   debugString('Request succeed. Closing the import dialog.');
-                  this.dialog.close(true);
+                  this.dialog.close(new AnswersImporterDialogResult(true, this.teamFromEmailBody.id, this.selectedRoundNumber));
                 },
                 (error) => {
                   debugString('Request failed. Error is below:');

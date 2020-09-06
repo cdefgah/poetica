@@ -11,6 +11,7 @@ import { AnswerDetailsComponent } from '../answer-details/answer-details.compone
 import { debugString, debugObject } from 'src/app/utils/Config';
 import { EmailDetailsComponent } from '../email-details/email-details.component';
 import { AnswerDetailsDialogResult } from '../answer-details/AnswerDetailsDialogResult';
+import { AnswersImporterDialogResult } from '../answers-list-importer/AnswersImporterDialogResult';
 
 @Component({
   selector: 'app-answers-list',
@@ -308,14 +309,11 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       AnswersListImporterComponent,
       importDialogConfig
     );
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // если диалог был принят (accepted)
-        // TODO - загружаем только импортированные ответы и переключаемся на команду, чьи ответы были импортированы
-        // this.loadAllDisplayedLists(this);
-
-        debugString('Reloaded answers listed below:');
-        debugObject(this.answersDataSource);
+    const componentReference = this;
+    dialogRef.afterClosed().subscribe((result: AnswersImporterDialogResult) => {
+      if (result.dialogAccepted) {
+        debugString('Answers Import Dialog accepted ...');
+        componentReference.loadAnswersAndEmailsForTeam(componentReference, result.teamId, result.roundAlias);
       }
     });
   }
