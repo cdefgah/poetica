@@ -127,7 +127,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
       // проставляем оценку в клиентском объекте
       // с сервера ничего не загружаем, там данные уже поменялись
-      // при закрытии диалога
+      // при закрытии диалога (в однопользовательском режиме мы можем себе это позволить)
       selectedRow.grade = dialogResult.gradeOnDialogClose;
 
       // если была поставлена оценка ответу, у которого ранее не было оценки
@@ -151,14 +151,19 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
             },
             (error) => componentReference.reportServerError(error)
           );
+        } else {
+          // если включён режим отображения всех команд
+          if (componentReference.notGradedAnswersArePresent) {
+            // плюс до оценки ответа был выставлен флаг о наличии ответов без оценки
+            // обновляем флаг о наличии ответов без оценки
+            componentReference.checkNotGradedAnswersPresence();
+          }
         }
       }
     });
   }
 
   private processAllTeamAnswersBecomeGraded(componentReference: AnswersListComponent, teamId: number): void {
-    // этот метод вызывается при включённом режиме отображения только команд с ответами без оценок
-    // в случаях, когда текущая выбранная команда получила оценки для всех ответов
     debugString('Processing situation when all team answers become graded ..............................');
 
     debugString(`componentReference.allTeamIds.length === ${componentReference.allTeamIds.length}`);
@@ -193,6 +198,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
       componentReference.selectedTeamId = componentReference.allTeamIds[0]; // первую команду из списка ставим как выбранную
       debugString(`current selectedTeamId is: ${componentReference.selectedTeamId}`);
     }
+
 
     debugString(`Now loading teams list and answers with emails for the team with id: ${componentReference.selectedTeamId}`);
     // загружаем команды и ответы для команды, чей id указан в параметрах
