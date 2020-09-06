@@ -313,7 +313,20 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     dialogRef.afterClosed().subscribe((result: AnswersImporterDialogResult) => {
       if (result.dialogAccepted) {
         debugString('Answers Import Dialog accepted ...');
-        componentReference.loadAnswersAndEmailsForTeam(componentReference, result.teamId, result.roundAlias);
+        // выставляем команду и раунд, согласно информации из диалога импорта
+        componentReference.selectedTeamId = result.teamId;
+        componentReference.selectedRoundAlias = result.roundAlias;
+
+        // если до импорта у нас не был выставлен флаг о том,
+        // что у нас есть ответы без оценок
+        if (!componentReference.notGradedAnswersArePresent) {
+          // то выставляем его
+          componentReference.notGradedAnswersArePresent = true;
+        }
+
+        // загружаем ответы команды
+        componentReference.loadAnswersAndEmailsForTeam(componentReference,
+          componentReference.selectedTeamId, componentReference.selectedRoundAlias);
       }
     });
   }
