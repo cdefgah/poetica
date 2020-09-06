@@ -63,12 +63,6 @@ public abstract class AbstractReportModel {
         return maxQuestionNumber;
     }
 
-    protected List<Team> getParticipatedTeams() {
-        TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
-                "Email email where team.id=email.teamId", Team.class);
-        return query.getResultList();
-    }
-
     /**
      * Отдаёт список номеров внезачётных заданий.
      * @return список номеров внезачётных заданий.
