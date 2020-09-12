@@ -1,1 +1,4 @@
+This application created to help managing poetry contest. 
+The contest is being carried out in Russian and for this reason the application description, interface and documentation are in Russian only.
+
 Application icon and favicon made by Freepik from www.flaticon.com
