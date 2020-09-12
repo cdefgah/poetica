@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MessageBoxComponent } from './message-box.component';
@@ -8,9 +13,9 @@ describe('MessageBoxComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MessageBoxComponent ]
+      declarations: [MessageBoxComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

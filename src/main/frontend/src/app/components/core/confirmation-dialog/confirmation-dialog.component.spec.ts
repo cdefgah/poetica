@@ -1,8 +1,13 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
 
-import { ConfirmationDialogComponent } from "./confirmation-dialog.component";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-describe("ConfirmationDialogComponent", () => {
+import { ConfirmationDialogComponent } from './confirmation-dialog.component';
+
+describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;
   let fixture: ComponentFixture<ConfirmationDialogComponent>;
 
@@ -18,7 +23,7 @@ describe("ConfirmationDialogComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

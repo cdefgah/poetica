@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: GPL-3.0-only
+Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com> -->
+
 <mat-toolbar color="primary">
   <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Main menu">
     <mat-icon>menu</mat-icon>
@@ -25,9 +28,7 @@
 </mat-toolbar>
 
 <div [ngSwitch]="windowState">
-  <app-questions-list
-    *ngSwitchCase="appWindowState.Questions"
-  ></app-questions-list>
+  <app-questions-list *ngSwitchCase="appWindowState.Questions"></app-questions-list>
 
   <app-teams-list *ngSwitchCase="appWindowState.Teams"> </app-teams-list>
   <app-answers-list *ngSwitchCase="appWindowState.Answers"></app-answers-list>

@@ -1,9 +1,13 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 package com.github.cdefgah.poetica.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

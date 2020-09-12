@@ -1,8 +1,13 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
 
-import { AnswersListComponent } from "./answers-list.component";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-describe("AnswersListComponent", () => {
+import { AnswersListComponent } from './answers-list.component';
+
+describe('AnswersListComponent', () => {
   let component: AnswersListComponent;
   let fixture: ComponentFixture<AnswersListComponent>;
 
@@ -18,7 +23,7 @@ describe("AnswersListComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

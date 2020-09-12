@@ -250,10 +250,8 @@ public final class Question {
     }
 
     public String getQuestionBodyOnly() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.externalNumber).append('.').
-                append(getQuestionTitleForReport()).append('\n').append(this.body).append('\n');
-        return sb.toString();
+        return this.externalNumber + '.' +
+                getQuestionTitleForReport() + '\n' + this.body + '\n';
     }
 
     public String getQuestionWithAllProperties() {

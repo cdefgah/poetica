@@ -1,4 +1,7 @@
-import { HttpClient } from "@angular/common/http";
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
 
 /**
  * Абстрактный класс для разных валидаций моделей данных.
@@ -7,7 +10,7 @@ export abstract class AbstractModelValidationService {
   // используется в случае поломок, для хранения описания, что сломалось
   protected _brokenStateDescription: string = "";
 
-  constructor() {}
+  constructor() { }
 
   protected setBrokenInternalState(description: string) {
     this._brokenStateDescription = description;

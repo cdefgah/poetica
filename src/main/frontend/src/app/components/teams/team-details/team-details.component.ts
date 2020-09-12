@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { Component, OnInit, Inject } from '@angular/core';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import {
@@ -9,7 +14,6 @@ import {
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
-import { debugString, debugObject } from 'src/app/utils/Config';
 
 @Component({
   selector: 'app-team-details',

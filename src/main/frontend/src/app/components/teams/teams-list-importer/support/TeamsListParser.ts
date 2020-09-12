@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
 import { TeamsListParserParameters } from './TeamsListParserParameters';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';

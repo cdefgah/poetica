@@ -1,5 +1,8 @@
-import { logging } from 'protractor';
-import { debugString } from '../utils/Config';
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 
 /**
  * Модель данных ответа на вопрос (бескрылку).

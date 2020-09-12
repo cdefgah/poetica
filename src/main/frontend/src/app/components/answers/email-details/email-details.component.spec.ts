@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EmailDetailsComponent } from './email-details.component';
@@ -8,9 +13,9 @@ describe('EmailDetailsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EmailDetailsComponent ]
+      declarations: [EmailDetailsComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

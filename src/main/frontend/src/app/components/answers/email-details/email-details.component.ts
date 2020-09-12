@@ -1,23 +1,28 @@
-import { Component, OnInit, Inject } from "@angular/core";
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
+import { Component, OnInit, Inject } from '@angular/core';
 import {
   MatDialogConfig,
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialog,
-} from "@angular/material/dialog";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { AbstractInteractiveComponentModel } from "../../core/base/AbstractInteractiveComponentModel";
-import { EmailDataModel } from "src/app/data-model/EmailDataModel";
-import { debugString, debugObject } from "src/app/utils/Config";
+} from '@angular/material/dialog';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
+import { debugString, debugObject } from 'src/app/utils/Config';
 
 @Component({
-  selector: "app-email-details",
-  templateUrl: "./email-details.component.html",
-  styleUrls: ["./email-details.component.css"],
+  selector: 'app-email-details',
+  templateUrl: './email-details.component.html',
+  styleUrls: ['./email-details.component.css'],
 })
 export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   implements OnInit {
-  private static readonly KEY_DIALOG_ID = "id";
+  private static readonly KEY_DIALOG_ID = 'id';
 
   email: EmailDataModel = EmailDataModel.emptyEmail;
 
@@ -26,7 +31,7 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.width = "62%";
+    dialogConfig.width = '62%';
 
     dialogConfig.data = new Map<string, any>();
 
@@ -47,15 +52,15 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    debugString("Loading emailId in the dialog ...");
-    var emailId = dialogData[EmailDetailsComponent.KEY_DIALOG_ID];
+    debugString('Loading emailId in the dialog ...');
+    let emailId = dialogData[EmailDetailsComponent.KEY_DIALOG_ID];
 
     debugString(`emailId = ${this.email.id}`);
-    debugString("dialogData is below:");
+    debugString('dialogData is below:');
     debugObject(dialogData);
 
     // получаем объект email
-    const emailRequestUrl: string = `/emails/${emailId}`;
+    const emailRequestUrl = `/emails/${emailId}`;
     this.httpClient.get(emailRequestUrl).subscribe(
       (emailDetailsData: Map<string, any>) => {
         // получили, строим объект
@@ -65,21 +70,21 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
     );
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
   }
 
   deleteEmailWithAllImportedAnswers() {
-    var confirmationMessage: string = `Удалить это письмо и все импортированные из него ответы ?`;
+    let confirmationMessage = `Удалить это письмо и все импортированные из него ответы ?`;
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
-      var requestUrl = `/emails/delete/${this.email.id.toString()}`;
+      let requestUrl = `/emails/delete/${this.email.id.toString()}`;
       this.httpClient.delete(requestUrl).subscribe(
         (data: any) => {
-          debugString("Email has been deleted ... request done successfully");
+          debugString('Email has been deleted ... request done successfully');
           this.dialog.close(true); // true означает, что были изменения
         },
         (error) => this.reportServerError(error)
@@ -88,7 +93,7 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   justCloseDialog() {
-    debugString("Just closing dialog without affecting email");
+    debugString('Just closing dialog without affecting email');
     this.dialog.close(false); // false означает, что изменений не было (письма не удаляли)
   }
 }

@@ -1,8 +1,11 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
-import { TeamValidationService } from 'src/app/components/core/validators/TeamValidationService';
 import { AnswerValidationService } from 'src/app/components/core/validators/AnswerValidationService';
 import { HttpClient } from '@angular/common/http';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 
 export class EmailBodyParserParameters {
   parentComponentObject: any;

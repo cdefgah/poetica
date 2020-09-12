@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import {
@@ -36,7 +41,7 @@ export class TeamsListImporterComponent
   }
 
   get IsFirstStepOk(): boolean {
-    return this.firstStepErrorMessage.trim().length == 0;
+    return this.firstStepErrorMessage.trim().length === 0;
   }
 
   get errorPresent(): boolean {
@@ -166,7 +171,7 @@ export class TeamsListImporterComponent
       return;
     }
 
-    if (event.previouslySelectedIndex == 0) {
+    if (event.previouslySelectedIndex === 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем список команд
       debugString('Moving from the first step. Processing teams list.');
 

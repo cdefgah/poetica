@@ -1,10 +1,15 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 export class StringBuilder {
-  private static readonly newline = "\n";
+  private static readonly newline = '\n';
   private contentLines: string[] = [];
 
-  public addString(string: string) {
-    if (string && string.length > 0) {
-      this.contentLines.push(string);
+  public addString(stringValue: string) {
+    if (stringValue && stringValue.length > 0) {
+      this.contentLines.push(stringValue);
     }
   }
 

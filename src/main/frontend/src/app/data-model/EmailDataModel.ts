@@ -1,22 +1,14 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 export class EmailDataModel {
-  public static emptyEmail: EmailDataModel = new EmailDataModel();
 
-  public static createEmailFromMap(
-    mapWithValues: Map<string, any>
-  ): EmailDataModel {
-    var email = new EmailDataModel();
-
-    email.id = mapWithValues["id"];
-    email.teamId = mapWithValues["teamId"];
-    email.roundNumber = mapWithValues["roundNumber"];
-    email.subject = mapWithValues["subject"];
-    email.body = mapWithValues["body"];
-    email.sentOn = mapWithValues["sentOn"];
-    email.importedOn = mapWithValues["importedOn"];
-    email.questionNumbersSequence = mapWithValues["questionNumbersSequence"];
-
-    return email;
+  get isSubjectPresent(): boolean {
+    return this.subject && this.subject.length > 0;
   }
+  public static emptyEmail: EmailDataModel = new EmailDataModel();
 
   id: number;
   teamId: number;
@@ -27,7 +19,18 @@ export class EmailDataModel {
   importedOn: any;
   questionNumbersSequence: string;
 
-  get isSubjectPresent(): boolean {
-    return this.subject && this.subject.length > 0;
+  public static createEmailFromMap(mapWithValues: Map<string, any>): EmailDataModel {
+    const email = new EmailDataModel();
+
+    email.id = mapWithValues['id'];
+    email.teamId = mapWithValues['teamId'];
+    email.roundNumber = mapWithValues['roundNumber'];
+    email.subject = mapWithValues['subject'];
+    email.body = mapWithValues['body'];
+    email.sentOn = mapWithValues['sentOn'];
+    email.importedOn = mapWithValues['importedOn'];
+    email.questionNumbersSequence = mapWithValues['questionNumbersSequence'];
+
+    return email;
   }
 }

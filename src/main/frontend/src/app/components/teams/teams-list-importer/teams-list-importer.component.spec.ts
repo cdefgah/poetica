@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TeamsListImporterComponent } from './teams-list-importer.component';
@@ -8,9 +13,9 @@ describe('TeamsListImporterComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TeamsListImporterComponent ]
+      declarations: [TeamsListImporterComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,10 +1,9 @@
+<!-- SPDX-License-Identifier: GPL-3.0-only
+Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com> -->
+
 <p mat-dialog-title>Импорт команд</p>
 <mat-dialog-content>
-  <mat-horizontal-stepper
-    [linear]="true"
-    (selectionChange)="onStepChange($event)"
-    #stepper
-  >
+  <mat-horizontal-stepper [linear]="true" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step>
       <mat-tab-group>
         <mat-tab label="Текст со списком команд">
@@ -13,14 +12,8 @@
             <div>
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Текст со списком команд</mat-label>
-                <textarea
-                  matInput
-                  rows="12"
-                  placeholder="Скопируйте список команд сюда"
-                  name="textWithTeamsList"
-                  required
-                  [(ngModel)]="textWithTeamsList"
-                ></textarea>
+                <textarea matInput rows="12" placeholder="Скопируйте список команд сюда" name="textWithTeamsList"
+                  required [(ngModel)]="textWithTeamsList"></textarea>
               </mat-form-field>
             </div>
             <div>
@@ -46,10 +39,8 @@
             </p>
             <p>Пример правильно записанного элемента списка:</p>
             <p class="sample-one-line-text">123, Команда Ивана Петрова</p>
-            <P
-              >Пример нескольких правильно записанных элементов списка
-              команд:</P
-            >
+            <P>Пример нескольких правильно записанных элементов списка
+              команд:</P>
             <pre>
               50, Команда Ивана Бездомного
               59, Команда Васисуалия Лоханкина
@@ -63,9 +54,7 @@
     <mat-step>
       <form>
         <ng-template matStepLabel>{{ lastStepTitle }}</ng-template>
-        <div
-          *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"
-        ></div>
+        <div *ngIf="allThingsAreOk; then processedDataBlock; else errorsBlock"></div>
 
         <ng-template #processedDataBlock>
           <div class="table-container">
@@ -90,10 +79,7 @@
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedTeamColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedTeamColumns"
-              ></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedTeamColumns"></tr>
             </table>
           </div>
         </ng-template>
@@ -118,12 +104,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <span class="fill-remaining-space"></span>
-  <button
-    *ngIf="displayImportButton"
-    mat-raised-button
-    color="primary"
-    (click)="doImportTeams()"
-  >
+  <button *ngIf="displayImportButton" mat-raised-button color="primary" (click)="doImportTeams()">
     Импортировать команды
   </button>
 

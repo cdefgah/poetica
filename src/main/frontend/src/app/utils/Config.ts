@@ -1,5 +1,10 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 export class Config {
-  constructor(public readonly debugMode: boolean) {}
+  constructor(public readonly debugMode: boolean) { }
 }
 export let GlobalConfig = new Config(true);
 

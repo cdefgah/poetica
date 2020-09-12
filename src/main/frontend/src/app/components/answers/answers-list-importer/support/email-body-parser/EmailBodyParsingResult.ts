@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 

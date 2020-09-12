@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ */
+
 export abstract class AbstractBareComponent {
   /**
    * Читает значения из словаря, если ключа нет, возвращает пустую строку.

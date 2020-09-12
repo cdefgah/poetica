@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: GPL-3.0-only
+Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com> -->
+
 <p mat-dialog-title>Импортированное письмо</p>
 <mat-dialog-content>
   <table>
@@ -41,11 +44,7 @@
   </button>
 
   <span class="fill-remaining-space"></span>
-  <button
-    mat-raised-button
-    color="accent"
-    (click)="deleteEmailWithAllImportedAnswers()"
-  >
+  <button mat-raised-button color="accent" (click)="deleteEmailWithAllImportedAnswers()">
     Удалить письмо вместе с импортированными из него ответами
   </button>
 </mat-dialog-actions>
