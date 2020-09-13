@@ -12,8 +12,14 @@ import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Прототип для всех REST-контроллеров.
+ */
 abstract class AbstractController {
 
+    /**
+     * Для формирования строки с датой и временем в именах сгенерированных файлов.
+     */
     private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss");
 
     /**
@@ -57,6 +63,10 @@ abstract class AbstractController {
         return header;
     }
 
+    /**
+     * Формирует строку с датой и временем, которая будет испрользоваться как часть имени сгенерированного файла.
+     * @return строка с датой и временем, для формирования имени сгенерированных файлов.
+     */
     protected String getTimeStampPartForFileName() {
         return fileNameTimeStampDateFormat.format(new Date());
     }

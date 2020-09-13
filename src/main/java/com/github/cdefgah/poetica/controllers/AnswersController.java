@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+
+/**
+ * Контроллер для обработки запросов с ответами на задания.
+ */
 @RestController
 @Transactional
 public class AnswersController extends AbstractController {
