@@ -11,7 +11,7 @@
 * [Java SE (Standard Edition) SDK](http://java.sun.com) версии не ниже 1.8
 * [Node.JS](https://nodejs.org/en/) актуальной версии либо LTS
 * [Angular](https://angular.io/), с версией не ниже 10.0
-* [Apache Maven](https://maven.apache.org/) актуальной версии. Пропишите путь к папке `bin` в Apache Maven в системную переменную `PATH`, чтобы команда `mvn` была доступна из любой папки.
+* [Apache Maven](https://maven.apache.org/) актуальной версии. Пропишите путь к папке `bin` в Apache Maven в системную переменную окружения `PATH`, чтобы команда `mvn` была доступна из любой папки.
 
 В папке проекта в терминале дайте команду:
 
