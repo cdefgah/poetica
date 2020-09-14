@@ -7,10 +7,16 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -26,12 +32,22 @@ import java.util.Optional;
 @Transactional
 public class AnswersController extends AbstractController {
 
+    /**
+     * Отдаёт по запросу таблицу с максимальными размерами полей в модели данных.
+     * @return таблица с максимальными размерами полей в модели данных.
+     */
     @RequestMapping(path = "/answers/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Answer.getModelConstraintsMap(), HttpStatus.OK);
     }
 
 
+    /**
+     * Импортирует ответы в базу данных.
+     * @param answersToImport массив с ответами.
+     * @return Если всё прошло нормально, возвращает пустую строку и HTTP.OK. В случае ошибки возвращает
+     * строку с текстом ошибки и HTTP.BAD_REQUEST.
+     */
     @RequestMapping(path = "/answers/import", method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
@@ -51,6 +67,12 @@ public class AnswersController extends AbstractController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
+    /**
+     * Получает уникальный идентификатор вопроса (задания) по его номеру.
+     * @param questionNumber номер задания.
+     * @return Если найден, то возвращает уникальный идентификатор задания, обёрнутый в Optional.
+     * Если не найден, то возвращает Optional.empty().
+     */
     private Optional<Long> getQuestionIdByQuestionNumber(int questionNumber) {
         TypedQuery<Long> query =
                 entityManager.createQuery("select id FROM Question question WHERE " +
@@ -97,12 +119,21 @@ public class AnswersController extends AbstractController {
         return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
     }
 
+    /**
+     * Проверяет, есть-ли в базе хотя-бы один ответ.
+     * @return true, если есть, false - в противном случае.
+     */
     @RequestMapping(path = "/answers/present", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Boolean> areAnswersPresent() {
         TypedQuery<Long> query = entityManager.createQuery("select count(*) FROM Email email", Long.class);
         return ResponseEntity.status(HttpStatus.OK).body(query.getSingleResult() > 0);
     }
 
+    /**
+     * Отдаёт ответ по запросу, по его уникальному идентификатору.
+     * @param answerId уникальный идентификатор ответа.
+     * @return объект ответа, если найден вместе с HTTP.OK. Если не найден, то возвращается HTTP.NOT_FOUND.
+     */
     @RequestMapping(path = "/answers/{answerId}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Answer> getAnswerById(@PathVariable long answerId) {
         Answer answer = entityManager.find(Answer.class, answerId);
@@ -113,6 +144,12 @@ public class AnswersController extends AbstractController {
         }
     }
 
+    /**
+     * Помечает ответ как принятый (зачтённый).
+     * @param answerId уникальный идентифкатор ответа в базе данных.
+     * @return возвращает HTTP.OK если всё в порядке. Иначе возвращает NOT_FOUND, если не удалось найти ответ
+     * по переданному в параметрах запроса идентификатору.
+     */
     @RequestMapping(path = "/answers/accept", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> acceptAnswer(@RequestParam("answerId") long answerId) {
         Answer answer = entityManager.find(Answer.class, answerId);
@@ -127,6 +164,12 @@ public class AnswersController extends AbstractController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Помечает ответ как не принятый (не зачтённый).
+     * @param answerId уникальный идентифкатор ответа в базе данных.
+     * @return возвращает HTTP.OK если всё в порядке. Иначе возвращает NOT_FOUND, если не удалось найти ответ
+     * по переданному в параметрах запроса идентификатору.
+     */
     @RequestMapping(path = "/answers/decline", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> declineAnswer(@RequestParam("answerId") long answerId) {
         Answer answer = entityManager.find(Answer.class, answerId);

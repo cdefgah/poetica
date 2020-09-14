@@ -35,16 +35,11 @@ export class TeamDataModel {
    */
   title = '';
 
-  public static createTeamByNumberAndTitle(
-    teamNumber: number,
-    teamTitle: string
-  ): TeamDataModel {
+  public static createTeamByNumberAndTitle(teamNumber: number, teamTitle: string): TeamDataModel {
     return new TeamDataModel(teamNumber, teamTitle);
   }
 
-  public static createTeamFromMap(
-    mapWithValues: Map<string, any>
-  ): TeamDataModel {
+  public static createTeamFromMap(mapWithValues: Map<string, any>): TeamDataModel {
     const team = TeamDataModel.createtTeam();
     team.setValuesFromMap(mapWithValues);
     return team;

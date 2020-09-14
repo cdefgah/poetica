@@ -15,13 +15,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 
+/**
+ * Отвечает за управление настройками программы.
+ */
 @RestController
 @Transactional
 public class ConfigurationController extends AbstractController {
 
+    /**
+     * Конфигурация программы.
+     */
     @Autowired
     private Configuration configuration;
 
+    /**
+     * Отдаёт по запросу перечень поддерживаемых кодировок символов.
+     * @return массив с именами поддерживаемых кодировок символов.
+     */
     @RequestMapping(path = "/configuration/supported-report-encodings",
             method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<CharsetEncodingEntity[]> getSupportedReportEncodings() {

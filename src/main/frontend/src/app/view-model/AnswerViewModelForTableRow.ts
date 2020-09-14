@@ -14,6 +14,4 @@ export class AnswerViewModelForTableRow extends AbstractViewModel {
         super();
         this.answerDataModel = answerDataModel;
     }
-
-
 }

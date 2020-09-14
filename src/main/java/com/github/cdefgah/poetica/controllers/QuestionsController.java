@@ -35,6 +35,10 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(query.getSingleResult(), HttpStatus.OK);
     }
 
+    /**
+     * Отдаёт по запросу таблицу с максимальными размерами полей в модели данных.
+     * @return таблица с максимальными размерами полей в модели данных.
+     */
     @RequestMapping(path = "/questions/model-constraints", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, String>> getModelConstraints() {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
