@@ -15,6 +15,7 @@ import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import com.github.cdefgah.poetica.reports.summary.SummaryReportView;
 import com.github.cdefgah.poetica.reports.summary.model.SummaryReportModel;
 import com.github.cdefgah.poetica.utils.AppVersion;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -31,10 +32,19 @@ import javax.persistence.TypedQuery;
 import java.nio.charset.Charset;
 import java.util.List;
 
+/**
+ * Контроллер, отвечает за генерацию отчётов.
+ */
 @RestController
 @Transactional
 public class ReportsController extends  AbstractController {
 
+    /**
+     * Отдаёт текстовый файл с отчётом "Таблица результатов".
+     * @param reportFormat формат отчёта.
+     * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
+     * @return текстовый файл с отчётом "Таблица результатов".
+     */
     @RequestMapping(path = "/reports/results-table/{reportFormat}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> getResultsTableReport(@PathVariable String reportFormat,
                                                                                     @PathVariable String encodingName) {
@@ -77,6 +87,10 @@ public class ReportsController extends  AbstractController {
                 .body(resource);
     }
 
+    /**
+     * Отдаёт список со всем заданиями из базы данных.
+     * @return список со всем заданиями из базы данных.
+     */
     private List<Question> getAllQuestionObjects() {
         TypedQuery<Question> query = entityManager.
                 createQuery("select question from Question question", Question.class);
@@ -84,6 +98,11 @@ public class ReportsController extends  AbstractController {
         return query.getResultList();
     }
 
+    /**
+     * Формирует и выгружает отчёт с заданиями без авторских ответов (для публикации).
+     * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
+     * @return текстовый файл с содержимым отчёта.
+     */
     @RequestMapping(path = "/reports/questions-without-answers/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportQuestionsWithoutAnswersReport(@PathVariable String encodingName) {
 
@@ -108,6 +127,11 @@ public class ReportsController extends  AbstractController {
                 .body(resource);
     }
 
+    /**
+     * Формирует и выгружает отчёт с заданиями с авторскими ответами (для публикации).
+     * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
+     * @return текстовый файл с содержимым отчёта.
+     */
     @RequestMapping(path = "/reports/questions-with-answers/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportQuestionsWithAnswersReport(@PathVariable String encodingName) {
 
@@ -132,15 +156,19 @@ public class ReportsController extends  AbstractController {
                 .body(resource);
     }
 
+    /**
+     * Отдаёт текущий номер версии приложения.
+     * @return текущий номер версии приложения.
+     */
     @RequestMapping(path = "/reports/app-version", method = RequestMethod.GET, produces = "text/plain")
     public ResponseEntity<String> getAppVersion() {
         return ResponseEntity.ok().body(AppVersion.CURRENT_VERSION);
     }
 
     /**
-     * Отчёт "Собрание сочинений".
-     * @param encodingName кодировка отчёта.
-     * @return объект ответа HTTP с отчётом.
+     * Формирует и отдаёт отчёт "Собрание сочинений" в виде текстового файла.
+     * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
+     * @return текстовый файл с содержимым отчёта.
      */
     @RequestMapping(path = "/reports/collection/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportCollectionReport(@PathVariable String encodingName) {
@@ -165,9 +193,9 @@ public class ReportsController extends  AbstractController {
     }
 
     /**
-     * Отчёт "Сводка".
-     * @param encodingName кодировка отчёта.
-     * @return объект ответа HTTP с отчётом.
+     * Формирует и отдаёт текстовый файл с отчётом "Сводка".
+     * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
+     * @return текстовый файл с отчётом "Сводка".
      */
     @RequestMapping(path = "/reports/summary/{roundNumber}/{encodingName}", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportSummaryReport(@PathVariable int roundNumber,

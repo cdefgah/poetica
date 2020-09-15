@@ -7,6 +7,7 @@ package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,10 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>(Question.getModelConstraintsMap(), HttpStatus.OK);
     }
 
+    /**
+     * Отдаёт максимальный номер зарегистрированного в системе задания.
+     * @return максимальный номер зарегистрированного в системе задания.
+     */
     @RequestMapping(path = "/questions/max-number", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Integer> getMaxQuestionNumber() {
         TypedQuery<Integer> query =
@@ -65,17 +70,21 @@ public class QuestionsController extends AbstractController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
+
     /**
-     * TODO привести JavaDoc в соответствие реальному положению вещей.
-     * Обновляет содержимое вопроса (бескрылки).
-     * Номер вопроса и признак 'зачётный/незачётный вопрос' обновлению не подлежат.
-     * @param questionId уникальный идентификатор вопроса (бескрылки), который надо обновить.
-     * @param newQuestionBody новое содержимое вопроса, если содержимое обновлять не надо, передаётся пустым.
-     * @param newQuestionSource новый источник вопроса, если источник обновлять не надо, передаётся пустым.
-     * @param updateComment true, если надо обновить комментарий. В противном случае параметр newComment во внимание
-     *                      не принимается.
-     * @param newQuestionComment новый комментарий к вопросу, принимается во внимание только если updateComment равен true.
-     * @return Http OK если всё в порядке, иначе http-код ошибки + сообщение.
+     * Обновляет содержимое задания.
+     * @param questionId уникальный идентификатор задания в базе данных.
+     * @param updateQuestionTitle флаг, если true, то обновляем заголовок задания.
+     * @param newQuestionTitle новый заголовок задания.
+     * @param updateGradedState флаг, если true, то обновляем признак "Зачётный/Внезачётный" для задания.
+     * @param newGradedState новое признак "Зачётный/Внезачётный" для задания.
+     * @param newQuestionBody новое содержимое тела задания.
+     * @param newAuthorsAnswer новое содержимое авторского ответа.
+     * @param newQuestionSource новое содержимое блока информации об источнике для задания.
+     * @param updateComment флаг, если true, обновляем комментарий к заданию.
+     * @param newQuestionComment новое содержимое комментария к заданию.
+     * @param newAuthorsInfo новое содержимое блока с информацией об авторе задания.
+     * @return Если всё в порядке, ничего не возвращает кроме HTTP.OK.
      */
     @RequestMapping(path = "/questions/{questionId}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateQuestion(@PathVariable long questionId,
@@ -143,6 +152,10 @@ public class QuestionsController extends AbstractController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Проверяет наличие зачётных заданий в системе.
+     * @return возвращает true, если зачётные задания в системе представлены.
+     */
     @RequestMapping(path = "/questions/graded-present", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Boolean> getGradedQuestionsPresent() {
         TypedQuery<Long> query =
@@ -248,6 +261,10 @@ public class QuestionsController extends AbstractController {
         return query.getResultList();
     }
 
+    /**
+     * Экспортирует список заданий (в формате механизма для их импорта).
+     * @return текстовый файл с эскпортируемыми заданиями в формате импортера заданий.
+     */
     @RequestMapping(path = "/questions/export", method = RequestMethod.GET)
     public ResponseEntity<Resource> exportQuestions() {
 
