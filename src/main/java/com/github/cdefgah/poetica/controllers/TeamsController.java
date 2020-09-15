@@ -143,36 +143,6 @@ public class TeamsController extends AbstractController {
     }
 
     /**
-     * Проверяет, является ли номер команды уникальным.
-     * @param teamNumber номер команды, который проверям на уникальность.
-     * @param processingTeamId уникальный идентификатор команды, для которой выполняется эта проверка.
-     * @return true, если номер команды уникальный.
-     */
-    private boolean isNumberUnique(int teamNumber, long processingTeamId) {
-        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
-                "team where team.number=:teamNumber and team.id<>:processingTeamId", Long.class);
-
-        query.setParameter("teamNumber", teamNumber);
-        query.setParameter("processingTeamId", processingTeamId);
-        return query.getSingleResult() == 0;
-    }
-
-    /**
-     * Проверяет, является-ли название команды уникальным.
-     * @param teamTitle название команды.
-     * @param processingTeamId уникальный идентификатор команды, для которой выполняется эта проверка.
-     * @return true, если название команды уникально.
-     */
-    private boolean isTitleUnique(String teamTitle, long processingTeamId) {
-        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
-                "team where team.titleInLowerCase=:titleInLowerCase and team.id<>:processingTeamId", Long.class);
-
-        query.setParameter("titleInLowerCase", teamTitle.toLowerCase());
-        query.setParameter("processingTeamId", processingTeamId);
-        return query.getSingleResult() == 0;
-    }
-
-    /**
      * Отдаёт список команд по запросу.
      * @return список команд.
      */
@@ -321,17 +291,6 @@ public class TeamsController extends AbstractController {
     }
 
     /**
-     * Проверяет, нет-ли у команды зарегистрированных в системе ответов.
-     * @param teamId уникальный идентификатор команды.
-     * @return true, если у команды нет зарегистрированных ответов на задания.
-     */
-    private boolean thisTeamHasNoAnswers(long teamId) {
-        Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
-        query.setParameter("teamId", teamId);
-        return query.getResultList().isEmpty();
-    }
-
-    /**
      * Отдаёт список команд, у которых есть ответы без оценок.
      * @return список команд, у которых есть ответы без оценок.
      */
@@ -342,5 +301,46 @@ public class TeamsController extends AbstractController {
         query.setParameter("grade", Grade.None);
 
         return ResponseEntity.status(HttpStatus.OK).body(query.getResultList());
+    }
+
+    /**
+     * Проверяет, является ли номер команды уникальным.
+     * @param teamNumber номер команды, который проверям на уникальность.
+     * @param processingTeamId уникальный идентификатор команды, для которой выполняется эта проверка.
+     * @return true, если номер команды уникальный.
+     */
+    private boolean isNumberUnique(int teamNumber, long processingTeamId) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
+                "team where team.number=:teamNumber and team.id<>:processingTeamId", Long.class);
+
+        query.setParameter("teamNumber", teamNumber);
+        query.setParameter("processingTeamId", processingTeamId);
+        return query.getSingleResult() == 0;
+    }
+
+    /**
+     * Проверяет, является-ли название команды уникальным.
+     * @param teamTitle название команды.
+     * @param processingTeamId уникальный идентификатор команды, для которой выполняется эта проверка.
+     * @return true, если название команды уникально.
+     */
+    private boolean isTitleUnique(String teamTitle, long processingTeamId) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
+                "team where team.titleInLowerCase=:titleInLowerCase and team.id<>:processingTeamId", Long.class);
+
+        query.setParameter("titleInLowerCase", teamTitle.toLowerCase());
+        query.setParameter("processingTeamId", processingTeamId);
+        return query.getSingleResult() == 0;
+    }
+
+    /**
+     * Проверяет, нет-ли у команды зарегистрированных в системе ответов.
+     * @param teamId уникальный идентификатор команды.
+     * @return true, если у команды нет зарегистрированных ответов на задания.
+     */
+    private boolean thisTeamHasNoAnswers(long teamId) {
+        Query query = entityManager.createQuery("from Answer a where a.teamId=:teamId", Answer.class);
+        query.setParameter("teamId", teamId);
+        return query.getResultList().isEmpty();
     }
 }

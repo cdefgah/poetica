@@ -88,17 +88,6 @@ public class ReportsController extends  AbstractController {
     }
 
     /**
-     * Отдаёт список со всем заданиями из базы данных.
-     * @return список со всем заданиями из базы данных.
-     */
-    private List<Question> getAllQuestionObjects() {
-        TypedQuery<Question> query = entityManager.
-                createQuery("select question from Question question", Question.class);
-
-        return query.getResultList();
-    }
-
-    /**
      * Формирует и выгружает отчёт с заданиями без авторских ответов (для публикации).
      * @param encodingName системное имя кодировки символов, которая должна использоваться при генерации файла.
      * @return текстовый файл с содержимым отчёта.
@@ -219,5 +208,16 @@ public class ReportsController extends  AbstractController {
                 .contentLength(resource.contentLength())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
+    }
+
+    /**
+     * Отдаёт список со всем заданиями из базы данных.
+     * @return список со всем заданиями из базы данных.
+     */
+    private List<Question> getAllQuestionObjects() {
+        TypedQuery<Question> query = entityManager.
+                createQuery("select question from Question question", Question.class);
+
+        return query.getResultList();
     }
 }

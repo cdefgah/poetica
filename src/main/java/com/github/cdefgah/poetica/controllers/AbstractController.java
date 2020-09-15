@@ -38,6 +38,7 @@ abstract class AbstractController {
     }
 
     /**
+     * TODO - переделать этот механизм, он костыльный и неправильный.
      * Формирует сообщение об ошибке с префиксом, чтобы на клиенте отличать сообщения об ошибках штатные,
      * и сообщения об ошибках нештатные.
      * @param rawErrorMessage исходное сообщение об ошибке.
@@ -46,7 +47,6 @@ abstract class AbstractController {
     protected static String composeErrorMessage(String rawErrorMessage) {
         return "Внимание: " + rawErrorMessage;
     }
-
 
     /**
      * Формирует HTTP заголовки для выгрузки файла.

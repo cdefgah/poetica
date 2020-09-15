@@ -68,30 +68,6 @@ public class AnswersController extends AbstractController {
     }
 
     /**
-     * Получает уникальный идентификатор вопроса (задания) по его номеру.
-     * @param questionNumber номер задания.
-     * @return Если найден, то возвращает уникальный идентификатор задания, обёрнутый в Optional.
-     * Если не найден, то возвращает Optional.empty().
-     */
-    private Optional<Long> getQuestionIdByQuestionNumber(int questionNumber) {
-        TypedQuery<Long> query =
-                entityManager.createQuery("select id FROM Question question WHERE " +
-                        "question.lowestInternalNumber<=:requestedQuestionNumber AND " +
-                        "question.highestInternalNumber>=:requestedQuestionNumber", Long.class);
-
-        query.setParameter("requestedQuestionNumber", questionNumber);
-
-        try {
-            return Optional.of(query.getSingleResult());
-
-        } catch(NoResultException noResultException) {
-            // сюда управление в принципе не может быть передано, но мы обрабатываем всё равно
-            return Optional.empty();
-        }
-    }
-
-
-    /**
      * Отдаёт все ответы для указанной команды и раунда.
      * @param teamId идентификатор команды.
      * @param roundOption номер раунда. Если передан 0 - то забираем всё.
@@ -217,5 +193,28 @@ public class AnswersController extends AbstractController {
         final long answersFound = query.getSingleResult();
         final String resultValue = answersFound > 0 ? "1" : "";
         return ResponseEntity.status(HttpStatus.OK).body(resultValue);
+    }
+
+    /**
+     * Получает уникальный идентификатор вопроса (задания) по его номеру.
+     * @param questionNumber номер задания.
+     * @return Если найден, то возвращает уникальный идентификатор задания, обёрнутый в Optional.
+     * Если не найден, то возвращает Optional.empty().
+     */
+    private Optional<Long> getQuestionIdByQuestionNumber(int questionNumber) {
+        TypedQuery<Long> query =
+                entityManager.createQuery("select id FROM Question question WHERE " +
+                        "question.lowestInternalNumber<=:requestedQuestionNumber AND " +
+                        "question.highestInternalNumber>=:requestedQuestionNumber", Long.class);
+
+        query.setParameter("requestedQuestionNumber", questionNumber);
+
+        try {
+            return Optional.of(query.getSingleResult());
+
+        } catch(NoResultException noResultException) {
+            // сюда управление в принципе не может быть передано, но мы обрабатываем всё равно
+            return Optional.empty();
+        }
     }
 }

@@ -237,31 +237,6 @@ public class QuestionsController extends AbstractController {
     }
 
     /**
-     * Возвращает true, если на вопрос дан ответ.
-     * @param questionId уникальный идентификатор вопроса.
-     * @return true, если на вопрос дан ответ в системе.
-     */
-    private boolean thisQuestionIsAnswered(long questionId) {
-        Query query = entityManager.createQuery("from Answer a where a.questionId=:questionId", Answer.class);
-        query.setParameter("questionId", questionId);
-        return !query.getResultList().isEmpty();
-    }
-
-    /**
-     * Возвращает список вопросов (бескрылок).
-     * @param onlyGradedQuestions true, если мы запрашиваем список зачётных вопросов (бескрылок).
-     *                                  Для внезачётных - false.
-     * @return список запрошенных вопросов (бескрылок).
-     */
-    private List<Question> getQuestionsList(boolean onlyGradedQuestions) {
-        TypedQuery<Question> query =
-                entityManager.createQuery("select question from Question " +
-                        "question where question.graded=:graded", Question.class);
-        query.setParameter("graded", onlyGradedQuestions);
-        return query.getResultList();
-    }
-
-    /**
      * Экспортирует список заданий (в формате механизма для их импорта).
      * @return текстовый файл с эскпортируемыми заданиями в формате импортера заданий.
      */
@@ -288,5 +263,30 @@ public class QuestionsController extends AbstractController {
                 .contentLength(resource.contentLength())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
+    }
+
+    /**
+     * Возвращает true, если на вопрос дан ответ.
+     * @param questionId уникальный идентификатор вопроса.
+     * @return true, если на вопрос дан ответ в системе.
+     */
+    private boolean thisQuestionIsAnswered(long questionId) {
+        Query query = entityManager.createQuery("from Answer a where a.questionId=:questionId", Answer.class);
+        query.setParameter("questionId", questionId);
+        return !query.getResultList().isEmpty();
+    }
+
+    /**
+     * Возвращает список вопросов (бескрылок).
+     * @param onlyGradedQuestions true, если мы запрашиваем список зачётных вопросов (бескрылок).
+     *                                  Для внезачётных - false.
+     * @return список запрошенных вопросов (бескрылок).
+     */
+    private List<Question> getQuestionsList(boolean onlyGradedQuestions) {
+        TypedQuery<Question> query =
+                entityManager.createQuery("select question from Question " +
+                        "question where question.graded=:graded", Question.class);
+        query.setParameter("graded", onlyGradedQuestions);
+        return query.getResultList();
     }
 }
