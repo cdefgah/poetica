@@ -5,19 +5,35 @@
 
 package com.github.cdefgah.poetica.model.config;
 
+/**
+ * Представляет собой сущность с информацией о кодировке.
+ */
 public final class CharsetEncodingEntity {
     private String humanReadableTitle;
     private String systemName;
 
+    /**
+     * Конструктор класса.
+     * @param humanReadableTitle название кодировки для отображения в пользовтельском интерфейсе.
+     * @param systemName системное название кодировки.
+     */
     public CharsetEncodingEntity(String humanReadableTitle, String systemName) {
         this.humanReadableTitle = humanReadableTitle;
         this.systemName = systemName;
     }
 
+    /**
+     * Отдаёт название кодировки для отображения в пользовательском интерфейсе.
+     * @return название кодировки для отображения в пользовательском интерфейсе.
+     */
     public String getHumanReadableTitle() {
         return humanReadableTitle;
     }
 
+    /**
+     * Отдаёт системное наименование кодировки.
+     * @return системное название кодировки.
+     */
     public String getSystemName() {
         return systemName;
     }

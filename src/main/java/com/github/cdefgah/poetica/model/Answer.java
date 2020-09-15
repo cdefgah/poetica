@@ -12,12 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Класс ответа на вопрос (бескрылку).
+ * Класс ответа на задание.
  */
 @Entity
 @Table(name = "Answers")
 public final class Answer {
 
+    /**
+     * Ограничения на размер полей.
+     */
     private static class ModelConstraints {
         static final int MAX_BODY_LENGTH = 1024;
         static final int MAX_COMMENT_LENGTH = 256;

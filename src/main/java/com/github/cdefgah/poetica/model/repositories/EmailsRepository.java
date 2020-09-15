@@ -9,6 +9,10 @@ import com.github.cdefgah.poetica.model.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
+/**
+ * Репозиторий для работы с письмами.
+ */
 @Repository
 public interface EmailsRepository extends JpaRepository<Email, Long> {
 

@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 
+/**
+ * Репозиторий для работы с командами.
+ */
 @Repository
 public interface TeamsRepository extends JpaRepository<Team, Long> {
 

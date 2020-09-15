@@ -9,6 +9,10 @@ import com.github.cdefgah.poetica.model.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
+/**
+ * Репозиторий для работы с заданиями.
+ */
 @Repository
 public interface QuestionsRepository extends JpaRepository<Question, Long> {
 
