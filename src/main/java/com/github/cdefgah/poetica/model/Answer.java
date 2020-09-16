@@ -26,6 +26,9 @@ public final class Answer {
         static final int MAX_COMMENT_LENGTH = 256;
     }
 
+    /**
+     * Содержит ограничения на размер полей.
+     */
     private static final Map<String, String> modelConstraintsMap;
 
     static
@@ -36,6 +39,10 @@ public final class Answer {
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
 
+    /**
+     * Отдаёт информацию об ограничениях на размер полей.
+     * @return информация об ограничениях на размер полей.
+     */
     public static Map<String, String> getModelConstraintsMap() {
         return modelConstraintsMap;
     }
@@ -59,12 +66,21 @@ public final class Answer {
     @Column(nullable = false)
     private Long questionId;
 
+    /**
+     * Номер вопроса.
+     */
     @Column(nullable = false)
     private int questionNumber;
 
+    /**
+     * Уникальный идентификатор письма, в котором пришёл этот ответ.
+     */
     @Column(nullable = false)
     private Long emailId;
 
+    /**
+     * Номер тура (раунда) на который было прислано письмо с этим ответом.
+     */
     @Column(nullable = false)
     private int roundNumber;
 
@@ -94,86 +110,162 @@ public final class Answer {
      */
     private long emailSentOn;
 
+    /**
+     * Отдаёт уникальный идентификатор ответа.
+     * @return уникальный идентификатор ответа.
+     */
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    /**
+     * Отдаёт уникальный идентификатор команды, приславшей ответ.
+     * @return уникальный идентификатор команды, приславшей ответ.
+     */
     public Long getTeamId() {
         return teamId;
     }
 
+    /**
+     * Устанавливает уникальный идентификатор команды, приславшей ответ.
+     * @param teamId уникальный идентификатор команды, приславшей ответ.
+     */
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
     }
 
+    /**
+     * Отдаёт уникальный идентификатор вопроса (задания), на который дан ответ.
+     * @return уникальный идентификатор вопроса (задания), на который дан ответ.
+     */
     public Long getQuestionId() {
         return questionId;
     }
 
+    /**
+     * Устанавливает уникальный идентификатор вопроса (задания), на который дан ответ.
+     * @param questionId уникальный идентификатор вопроса (задания), на который дан ответ.
+     */
     public void setQuestionId(Long questionId) {
         this.questionId = questionId;
     }
 
+    /**
+     * Отдаёт уникальный идентификатор письма, в котором пришёл этот ответ.
+     * @return уникальный идентификатор письма, в котором пришёл этот ответ.
+     */
     public Long getEmailId() {
         return emailId;
     }
 
+    /**
+     * Устанавливает уникальный идентификатор письма, в котором пришёл этот ответ.
+     * @param emailId уникальный идентификатор письма, в котором пришёл этот ответ.
+     */
     public void setEmailId(Long emailId) {
         this.emailId = emailId;
     }
 
+    /**
+     * Возвращает номер раунда (тура), на который было прислано письмо с этим ответом.
+     * @return номер раунда (тура), на который было прислано письмо с этим ответом.
+     */
     public int getRoundNumber() {
         return roundNumber;
     }
 
+    /**
+     * Устанавливает номер раунда (тура), на который было прислано письмо с этим ответом.
+     * @param roundNumber номер раунда (тура), на который было прислано письмо с этим ответом.
+     */
     public void setRoundNumber(int roundNumber) {
         this.roundNumber = roundNumber;
     }
 
+    /**
+     * Отдаёт содержимое тела ответа.
+     * @return содержимое тела ответа.
+     */
     public String getBody() {
         return body;
     }
 
+    /**
+     * Устанавливает содержимое тела ответа.
+     * @param body содержимое тела ответа.
+     */
     public void setBody(String body) {
         this.body = body;
     }
 
+    /**
+     * Отдаёт комментарий к ответу.
+     * @return комментарий к ответу.
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * Устанавливает комментарий к ответу.
+     * @param comment комментарий к ответу.
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
+    /**
+     * Отдаёт оценку ответа.
+     * @return оценка ответа.
+     */
     public Grade getGrade() {
         return grade;
     }
 
+    /**
+     * Устанавливает оценку для ответа.
+     * @param grade оценка для ответа.
+     */
     public void setGrade(Grade grade) {
         this.grade = grade;
     }
 
+    /**
+     * Отдаёт номер вопроса (задания), на который дан ответ.
+     * @return номер вопроса (задания), на который дан ответ.
+     */
     public int getQuestionNumber() {
         return questionNumber;
     }
 
+    /**
+     * Устанавливает номер вопроса (задания), на который дан ответ.
+     * @param questionNumber номер вопроса (задания), на который дан ответ.
+     */
     public void setQuestionNumber(int questionNumber) {
         this.questionNumber = questionNumber;
     }
 
+    /**
+     * Отдаёт время отправки письма в миллисекундах.
+     * @return время отправки письма в миллисекундах.
+     */
     public long getEmailSentOn() {
         return emailSentOn;
     }
 
+    /**
+     * Устанавливает время отправки письма в миллисекундах.
+     * @param emailSentOn время отправки письма в миллисекундах.
+     */
     public void setEmailSentOn(long emailSentOn) {
         this.emailSentOn = emailSentOn;
     }
 
+    /**
+     * Отдаёт содержимое тела ответа вместе с комментарием.
+     * @return содержимое тела ответа вместе с комментарием.
+     */
     public String getBodyWithComment() {
         String answerComment = this.comment != null ? this.comment : "";
         if (answerComment.isEmpty()) {
@@ -183,6 +275,10 @@ public final class Answer {
         }
     }
 
+    /**
+     * Возвращает true, если ответ зачтён.
+     * @return true, если ответ зачтён.
+     */
     public boolean isAccepted() {
         return this.grade == Grade.Accepted;
     }
