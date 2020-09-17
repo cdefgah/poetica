@@ -12,7 +12,12 @@ import com.github.cdefgah.poetica.reports.ReportWithConsistencyCheckModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
 

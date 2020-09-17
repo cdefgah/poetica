@@ -7,7 +7,12 @@ package com.github.cdefgah.poetica.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +25,17 @@ import java.util.Objects;
 @Table(name = "Teams")
 public final class Team {
 
+    /**
+     * Информация об ограничениях на длину полей.
+     */
     private static class ModelConstraints {
         static final int MAX_TITLE_LENGTH = 256;
         static final int MAX_NUMBER_VALUE = 99999;
     }
 
+    /**
+     * Используется для выполнения запроса информации об ограничениях на длину полей.
+     */
     private static final Map<String, String> modelConstraintsMap;
 
     static
@@ -56,16 +67,23 @@ public final class Team {
 
     /**
      * Название команды в нижнем регистре, для поиска.
-     * Это поле нужно, так как SQLite не поддерживает LOWER для unicode-строк, а только для латиинницы.
+     * Это поле нужно, так как SQLite не поддерживает LOWER для unicode-строк, а только для латинницы.
      */
     @JsonIgnore
     @Column(length = 64, nullable = false, unique=true)
     private String titleInLowerCase;
 
+    /**
+     * Конструктор класса.
+     */
     public Team() {
 
     }
 
+    /**
+     * Отдаёт максимальную длину в символах для номера команды.
+     * @return максимальная длина в символах для номера команды.
+     */
     public static int getMaxTeamNumberValueLength() {
         return String.valueOf(ModelConstraints.MAX_NUMBER_VALUE).length();
     }
@@ -140,18 +158,34 @@ public final class Team {
         return Objects.hash(id);
     }
 
+    /**
+     * Отдаёт информацию об ограничениях на размер полей.
+     * @return информация об ограничениях на размер полей.
+     */
     public static Map<String, String> getModelConstraintsMap() {
         return modelConstraintsMap;
     }
 
+    /**
+     * Отдаёт название команды в нижнем регистре.
+     * @return название команды в нижнем регистре.
+     */
     public String getTitleInLowerCase() {
         return titleInLowerCase;
     }
 
+    /**
+     * Устанавливает название команды в нижнем регистре.
+     * @param titleInLowerCase название команды в нижнем регистре.
+     */
     public void setTitleInLowerCase(String titleInLowerCase) {
         this.titleInLowerCase = titleInLowerCase;
     }
 
+    /**
+     * Отдаёт текстовое представление экземпляра класса согласно требованиям импортёра команд.
+     * @return текстовое представление экземпляра класса согласно требованиям импортёра команд.
+     */
     public String getTextRepresentationForImporter() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.number).append(',').append(this.title).append('\n');
