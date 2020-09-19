@@ -14,18 +14,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Модель отчёта "Собрание сочинений".
+ */
 public final class CollectionReportModel extends ReportWithConsistencyCheckModel {
 
-    private List<AnswerSummaryBlock> answerSummaryBlocks = new ArrayList<>();
+    /**
+     * Список блоков данных с информацией по ответам.
+     */
+    private final List<AnswerSummaryBlock> answerSummaryBlocks = new ArrayList<>();
 
+    /**
+     * Конструктор класса.
+     * @param entityManager менеджер сущностей для работы с базой данных.
+     */
     public CollectionReportModel(EntityManager entityManager) {
         super(entityManager);
     }
 
+    /**
+     * Отдаёт неизменяемый список блоков данных с информацией по ответам.
+     * @return неизменяемый список блоков данных с информацией по ответам.
+     */
     public List<AnswerSummaryBlock> getAnswerSummaryBlocks() {
         return Collections.unmodifiableList(answerSummaryBlocks);
     }
 
+    /**
+     * Строит отчёт.
+     */
     protected void buildMainReport() {
         // сортируем список ответов по номеру и телу ответа вместе с комментарием
         this.allRecentAnswersList.sort(new QuestionNumberAnswerBodyAndCommentComparator());
@@ -84,15 +101,40 @@ public final class CollectionReportModel extends ReportWithConsistencyCheckModel
 
 
     // ==========================================================================================================
+
+    /**
+     * Блок с информацией об ответах.
+     */
     public static final class AnswerSummaryBlock {
+        /**
+         * Номер вопроса (задания).
+         */
         private final int questionNumber;
+
+        /**
+         * Список зачтённых ответов.
+         */
         private final List<AnswerSummaryRow> acceptedAnswers = new ArrayList<>();
+
+        /**
+         * Список незачтённых ответов.
+         */
         private final List<AnswerSummaryRow> declinedAnswers = new ArrayList<>();
 
+        /**
+         * Конструктор класса.
+         * @param questionNumber номер вопроса (задания).
+         */
         public AnswerSummaryBlock(int questionNumber) {
             this.questionNumber = questionNumber;
         }
 
+        /**
+         * Регистрирует ответ.
+         * @param answerBodyWithComment тело ответа вместе с комментарием к нему.
+         * @param totalCount общее количество таких-же ответов.
+         * @param isAccepted true, если ответ зачтён.
+         */
         public void registerAnswer(String answerBodyWithComment, int totalCount, boolean isAccepted) {
             if (isAccepted) {
                 this.acceptedAnswers.add(new AnswerSummaryRow(answerBodyWithComment, totalCount));
@@ -101,45 +143,82 @@ public final class CollectionReportModel extends ReportWithConsistencyCheckModel
             }
         }
 
+        /**
+         * Отдаёт номер вопроса (задания).
+         * @return номер вопроса (задания).
+         */
         public int getQuestionNumber() {
             return questionNumber;
         }
 
+        /**
+         * Отдаёт неизменяемый список зачтённых заданий.
+         * @return неизменяемый список зачтённых заданий.
+         */
         public List<AnswerSummaryRow> getAcceptedAnswers() {
             return Collections.unmodifiableList(acceptedAnswers);
         }
 
+        /**
+         * Отдаёт неизменяемый список незачтённых заданий.
+         * @return неизменяемый список незачтённых заданий.
+         */
         public List<AnswerSummaryRow> getDeclinedAnswers() {
             return Collections.unmodifiableList(declinedAnswers);
         }
 
         // =====================================================================================================
+
+        /**
+         * Строка с информацией об ответе с комментарием к нему и количестве таких-же ответов с таким-же комментарием.
+         */
         public static final class AnswerSummaryRow {
+
+            /**
+             * Тело ответа с комментарием.
+             */
             private final String answerBodyWithComment;
+
+            /**
+             * Общее количество таких-же ответов с комментарием.
+             */
             private final int totalCount;
 
+            /**
+             * Конструктор класса.
+             * @param answerBodyWithComment Тело ответа с комментарием.
+             * @param totalCount Общее количество таких-же ответов с комментарием.
+             */
             public AnswerSummaryRow(String answerBodyWithComment, int totalCount) {
                 this.answerBodyWithComment = answerBodyWithComment;
                 this.totalCount = totalCount;
             }
 
+            /**
+             * Отдаёт строку с телом ответа с комментарием.
+             * @return строка с телом ответа с комментарием.
+             */
             public String getAnswerBodyWithComment() {
                 return answerBodyWithComment;
             }
 
+            /**
+             * Отдаёт общее количество таких-же ответом с таким-же комментарием.
+             * @return общее количество таких-же ответом с таким-же комментарием.
+             */
             public int getTotalCount() {
                 return totalCount;
             }
 
+            /**
+             * Отдаёт строковое представление объекта.
+             * @return строковое представление объекта.
+             */
             @Override
             public String toString() {
                if (totalCount > 1) {
-                   // выдача с хэш-кодом строки, чтобы видеть идентичные строки. Нужна иногда для отладки
-                   // return this.answerBodyWithComment + " [" + totalCount + "]" + " " + Objects.hash(this.answerBodyWithComment);
                    return this.answerBodyWithComment + " [" + totalCount + "]";
                } else {
-                   // выдача с хэш-кодом строки, чтобы видеть идентичные строки. Нужна иногда для отладки
-                   // return this.answerBodyWithComment  + " " + Objects.hash(this.answerBodyWithComment);
                    return this.answerBodyWithComment;
                }
             }

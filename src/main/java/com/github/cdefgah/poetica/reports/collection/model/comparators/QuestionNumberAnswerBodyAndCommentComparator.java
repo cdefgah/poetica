@@ -9,7 +9,17 @@ import com.github.cdefgah.poetica.model.Answer;
 
 import java.util.Comparator;
 
+/**
+ * Компаратор для сортировки по номеру вопроса, и по его содержимому, с комментарием.
+ */
 public class QuestionNumberAnswerBodyAndCommentComparator implements Comparator<Answer> {
+
+    /**
+     * Если параметры равны, вовзаращает 0. Если первый больше второго, возвращает 1, иначе возвращает -1.
+     * @param firstAnswer первый ответ.
+     * @param secondAnswer второй ответ.
+     * @return Если параметры равны, вовзаращает 0. Если первый больше второго, возвращает 1, иначе возвращает -1.
+     */
     @Override
     public int compare(Answer firstAnswer, Answer secondAnswer) {
         if (firstAnswer.getQuestionNumber() == secondAnswer.getQuestionNumber()) {

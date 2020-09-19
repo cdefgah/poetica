@@ -10,17 +10,32 @@ import com.github.cdefgah.poetica.reports.collection.model.CollectionReportModel
 
 import java.util.List;
 
+/**
+ * Представление отчёта "Собрание сочинений".
+ */
 public class CollectionReportView extends ReportWithConsistencyCheckView {
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель отчёта "Собрание сочинений".
+     */
     public CollectionReportView(CollectionReportModel reportModel) {
         super(reportModel);
     }
 
+    /**
+     * Отдаёт название отчёта.
+     * @return название отчёта.
+     */
     @Override
     protected String getReportTitleForConsistencyReportHeader() {
         return "Собрание сочинений";
     }
 
+    /**
+     * Отдаёт содержимое отчёта.
+     * @return содержимое отчёта.
+     */
     @Override
     protected String getMainReportText() {
         CollectionReportModel collectionReportModel = (CollectionReportModel)reportModel;
