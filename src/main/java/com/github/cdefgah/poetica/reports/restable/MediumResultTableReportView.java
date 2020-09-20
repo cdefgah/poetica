@@ -12,10 +12,19 @@ import java.util.Map;
 
 public class MediumResultTableReportView extends AbstractResultTableReportView {
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта "Таблица результатов".
+     */
     public MediumResultTableReportView(ResultTableReportModel reportModel) {
         super(reportModel);
     }
 
+    /**
+     * Формирует блок данных отчёта для того или иного раунда игры.
+     * @param isMainRound true, если нужны данные для основного раунда (тура).
+     * @return блок данных отчёта для того или иного раунда игры.
+     */
     @Override
     protected String getRoundBlockText(boolean isMainRound) {
         final String oneSpace = " ";

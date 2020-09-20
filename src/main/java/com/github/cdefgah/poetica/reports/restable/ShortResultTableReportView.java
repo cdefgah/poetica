@@ -13,10 +13,19 @@ import java.util.Map;
 // TODO код в отчётах повторяется, вынести за скобки повторящийся код
 public class ShortResultTableReportView  extends AbstractResultTableReportView {
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта "Таблица результатов".
+     */
     public ShortResultTableReportView(ResultTableReportModel reportModel) {
         super(reportModel);
     }
 
+    /**
+     * Формирует блок данных отчёта для того или иного раунда игры.
+     * @param isMainRound true, если нужны данные для основного раунда (тура).
+     * @return блок данных отчёта для того или иного раунда игры.
+     */
     @Override
     protected String getRoundBlockText(boolean isMainRound) {
         final String oneSpace = " ";

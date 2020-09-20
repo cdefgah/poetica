@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Прототип модели для всех отчётов с проверкой непротиворечивости данных.
+ */
 public abstract class ReportWithConsistencyCheckModel extends AbstractReportModel {
 
     /**
@@ -25,14 +28,27 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
      */
     private Map<Long, Team> participatedTeamsMap;
 
+    /**
+     * Список строк отчёта о найденных противоречиях в данных.
+     */
     private final List<ConsistencyReportRow> consistencyReportRows = new ArrayList<>();
 
+    /**
+     * Список самых последних ответов.
+     */
     protected final List<Answer> allRecentAnswersList = new ArrayList<>();
 
+    /**
+     * Конструктор класса.
+     * @param entityManager менеджер сущностей для работы с базой данных.
+     */
     public ReportWithConsistencyCheckModel(EntityManager entityManager) {
         super(entityManager);
     }
 
+    /**
+     * Формирует отчёт.
+     */
     public void generateReport() {
         // преобразуем список команд-участников в map
         participatedTeamsMap = getParticipatedTeams().stream().collect(Collectors.toMap(Team::getId, team -> team));
@@ -52,8 +68,14 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
         }
     }
 
+    /**
+     * Формирует основную часть отчёта.
+     */
     protected abstract void buildMainReport();
 
+    /**
+     * Формирует отчёт о противоречивости данных.
+     */
     private void buildConsistencyReport() {
         // сортируем список ответов по номеру и телу ответа (без комментария)
         this.allRecentAnswersList.sort(new QuestionNumberAndAnswerBodyComparator());
@@ -82,14 +104,25 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
         }
     }
 
+    /**
+     * Возвращает true, если данные непротиворечивы и всё в порядке.
+     * @return true, если данные непротиворечивы и всё в порядке.
+     */
     public boolean isReportModelConsistent() {
         return this.consistencyReportRows.isEmpty();
     }
 
+    /**
+     * Возвращает неизменяемый список строк с данными отчёта о противоречивости данных.
+     * @return неизменяемый список строк с данными отчёта о противоречивости данных.
+     */
     public List<ConsistencyReportRow> getConsistencyReportRows() {
         return Collections.unmodifiableList(consistencyReportRows);
     }
 
+    /**
+     * Заполняет список ответов.
+     */
     private void populateAnswersList() {
         for (int questionNumber = this.minQuestionNumber; questionNumber <= this.maxQuestionNumber; questionNumber++) {
             for (Team team : participatedTeamsMap.values()) {
@@ -131,12 +164,31 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
      * Содержит блок информации о рассогласовании в оценках одного и того-же ответа.
      */
     public class ConsistencyReportRow {
+
+        /**
+         * Номер задания.
+         */
         private final int questionNumber;
+
+        /**
+         * Текст ответа.
+         */
         private final String answerBody;
 
+        /**
+         * Список команд, для которых этот ответ был зачтён.
+         */
         private final List<Team> answerAcceptedFor = new ArrayList<>();
+
+        /**
+         * Список команд, для которых этот ответ не был зачтён.
+         */
         private final List<Team> answerDeclinedFor = new ArrayList<>();
 
+        /**
+         * Конструктор класса.
+         * @param answer ответ.
+         */
         public ConsistencyReportRow(Answer answer) {
             this.questionNumber = answer.getQuestionNumber();
             this.answerBody = answer.getBody();
@@ -151,6 +203,10 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
             return !(this.questionNumber == answer.getQuestionNumber() && this.answerBody.equals(answer.getBody()));
         }
 
+        /**
+         * Регистрирует информацию о команде, предоставившей ответ.
+         * @param answer ответ.
+         */
         public void registerTeamFromAnswer(Answer answer) {
             final Team team = participatedTeamsMap.get(answer.getTeamId());
             assert team != null;
@@ -162,22 +218,42 @@ public abstract class ReportWithConsistencyCheckModel extends AbstractReportMode
             }
         }
 
+        /**
+         * Возвращает true, если есть противоречия в данных.
+         * @return true, если есть противоречия в данных.
+         */
         public boolean isNotConsistent() {
             return !(this.answerAcceptedFor.isEmpty() || this.answerDeclinedFor.isEmpty());
         }
 
+        /**
+         * Возвращает номер задания.
+         * @return номер задания.
+         */
         public int getQuestionNumber() {
             return questionNumber;
         }
 
+        /**
+         * Возвращает тело ответа.
+         * @return тело ответа.
+         */
         public String getAnswerBody() {
             return answerBody;
         }
 
+        /**
+         * Возвращает неизменяемый список команд, для которых ответ был зачтён.
+         * @return неизменяемый список команд, для которых ответ был зачтён.
+         */
         public List<Team> getAnswerAcceptedFor() {
             return Collections.unmodifiableList(answerAcceptedFor);
         }
 
+        /**
+         * Возвращает неизменяемый список команд, для которых ответ не был зачтён.
+         * @return неизменяемый список команд, для которых ответ не был зачтён.
+         */
         public List<Team> getAnswerDeclinedFor() {
             return Collections.unmodifiableList(answerDeclinedFor);
         }

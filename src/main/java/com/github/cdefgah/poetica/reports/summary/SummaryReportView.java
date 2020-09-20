@@ -8,12 +8,23 @@ package com.github.cdefgah.poetica.reports.summary;
 import com.github.cdefgah.poetica.reports.AbstractReportView;
 import com.github.cdefgah.poetica.reports.summary.model.SummaryReportModel;
 
+/**
+ * Представление отчёта "Сводка".
+ */
 public class SummaryReportView extends AbstractReportView {
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта "Сводка".
+     */
     public SummaryReportView(SummaryReportModel reportModel) {
         super(reportModel);
     }
 
+    /**
+     * Формирует текст с телом отчёта.
+     * @return текст с телом отчёта.
+     */
     public String getReportText() {
         final StringBuilder sb = new StringBuilder();
 

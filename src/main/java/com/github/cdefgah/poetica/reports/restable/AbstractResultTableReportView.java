@@ -13,28 +13,52 @@ import javax.persistence.TypedQuery;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * Абстрактный класс представления для отчёта "Таблица результатов".
+ */
 abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckView {
 
+    /**
+     * Максимальная длина номера команды в символах.
+     */
     protected final int maxTeamNumberLength = Team.getMaxTeamNumberValueLength();
 
+    /**
+     * Максимальная длина номера задания в символах.
+     */
     protected final int maxQuestionNumberLength;
 
+    /**
+     * Максимальная длина в символах сводки о зачтённых ответах.
+     */
     protected final int maxTakenAnswersDigestLength;
 
+    /**
+     * Максимальная длина в символах строки с рейтингом команды в предыдущем туре (раунде).
+     */
     private final int maxTeamRatingLengthForPreliminaryRound;
 
+    /**
+     * Максимальная длина в символах строки с рейтингом команды в основном туре (раунде).
+     */
     private final int maxTeamRatingLengthForMainRound;
 
+    /**
+     * Максимальная длина строки в символах с рейтином задания.
+     */
     protected final int maxQuestionRatingLength;
 
-    // ширина колонки, в которой показываются номера вопросов
-    // отметки + -
-    // и рейтинг вопросов
-    // вычисляется как максимум между
-    // максимальной длиной в символах максимального вопроса
-    // и максимальной длиной в символах максимального рейтинга
+    /**
+     * Ширина колонки, в которой показываются номера вопросов и отметки + -.
+     * Вычисляется как максимум между максимальной длиной в символах максимального вопроса
+     * и максимальной длиной в символах максимального рейтинга.
+     */
     protected final int blockBodyColumnLength;
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта "Таблица результатов".
+     */
     public AbstractResultTableReportView(ResultTableReportModel reportModel) {
         super(reportModel);
 
@@ -54,11 +78,19 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
         maxTeamRatingLengthForMainRound = getMaxTeamRatingValueLength(true);
     }
 
+    /**
+     * Отдаёт заголовок отчёта.
+     * @return заголовок отчёта.
+     */
     @Override
     protected String getReportTitleForConsistencyReportHeader() {
         return "Таблица результатов";
     }
 
+    /**
+     * Отдаёт текст с телом отчёта.
+     * @return текст с телом отчёта.
+     */
     @Override
     public String getMainReportText() {
         return getRoundBlockText(false) +
@@ -66,8 +98,18 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
                 getRoundBlockText(true);
     }
 
+    /**
+     * Возвращает текст для части отчёта за указанный раунд (тур).
+     * @param isMainRound true, если нужны данные для основного раунда (тура).
+     * @return текст для части отчёта за указанный раунд (тур).
+     */
     protected abstract String getRoundBlockText(boolean isMainRound);
 
+    /**
+     * Возвращает максимальную длину строки с рейтингом команды.
+     * @param isMainRound true, если речь идёт об основном раунде (туре).
+     * @return максимальная длина строки с рейтингом команды.
+     */
     protected int getMaxTeamRatingLength(boolean isMainRound) {
         return isMainRound ? this.maxTeamRatingLengthForMainRound : this.maxTeamRatingLengthForPreliminaryRound;
     }
@@ -86,6 +128,13 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
         return getRightAlignedText(placeHolderLength, String.valueOf(number), '0');
     }
 
+    /**
+     * Возвращает текст, выравненный по правому краю колонки.
+     * @param placeHolderLength размер колонки, в которую должно поместиться число.
+     * @param text текст, который надо поместить в колонку.
+     * @param spacerSymbol символ для заполнения пустого пространства.
+     * @return строка с выровненным по правому краю текстом.
+     */
     private String getRightAlignedText(int placeHolderLength, String text, char spacerSymbol) {
         final int lengthDelta = placeHolderLength - text.length();
         if (lengthDelta > 0) {
@@ -95,10 +144,20 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
         }
     }
 
-    protected String getBlockTitle(boolean isTheMainRound) {
-        return "ЗАЧЁТ  " + (isTheMainRound ? "Основной" : "Предварительный");
+    /**
+     * Возвращает заголовок блока  отчёта.
+     * @param isMainRound true, если речь идёт о блоке данных для основного раунда (тура).
+     * @return заголовок блока  отчёта.
+     */
+    protected String getBlockTitle(boolean isMainRound) {
+        return "ЗАЧЁТ  " + (isMainRound ? "Основной" : "Предварительный");
     }
 
+    /**
+     * Возвращает список строк отчёта.
+     * @param isMainRound true, если речь идёт о блоке данных для основного раунда (тура).
+     * @return список строк отчёта.
+     */
     protected Collection<ResultTableReportModel.ReportRowModel> getReportModelRows(boolean isMainRound) {
         final ResultTableReportModel resultTableReportModel = (ResultTableReportModel)reportModel;
 
@@ -106,6 +165,11 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
                         resultTableReportModel.getPreliminaryRoundBlockReportRows();
     }
 
+    /**
+     * Рассчитывает и возвращает максимальную длину строки с рейтингом команды.
+     * @param isMainRound true, если речь идёт о данных для основного раунда (тура).
+     * @return максимальная длина строки с рейтингом команды.
+     */
     private int getMaxTeamRatingValueLength(boolean isMainRound) {
         final ResultTableReportModel resultTableReportModel = (ResultTableReportModel)reportModel;
 
@@ -130,6 +194,10 @@ abstract class AbstractResultTableReportView extends ReportWithConsistencyCheckV
         return String.valueOf(maxValueObjectNumber).length();
     }
 
+    /**
+     * Рассчитывает и возвращает максимальную длину в символах для рейтинга задания.
+     * @return максимальная длина в символах для рейтинга задания.
+     */
     private int getMaxQuestionRatingLength() {
         // рейтинг вопроса вычисляется как = 1 + (число команд не взявших вопрос).
         final String queryString = "select count(*) FROM Team team";

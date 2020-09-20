@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+
+/**
+ * Прототип для всех классов моделей отчётов.
+ */
 public abstract class AbstractReportModel {
 
     /**
@@ -26,12 +30,25 @@ public abstract class AbstractReportModel {
      */
     protected final EntityManager entityManager;
 
+    /**
+     * Строка с временем генерации отчёта (Московское время).
+     */
     private final String reportGeneratedOnMSKTime;
 
+    /**
+     * Минимальной номер вопроса (задания).
+     */
     protected final int minQuestionNumber;
 
+    /**
+     * Максимальный номер вопроса (задания).
+     */
     protected final int maxQuestionNumber;
 
+    /**
+     * Конструктор класса.
+     * @param entityManager менеджер сущностей для работы с базой данных.
+     */
     public AbstractReportModel(EntityManager entityManager) {
         this.entityManager = entityManager;
 
@@ -41,6 +58,10 @@ public abstract class AbstractReportModel {
         reportGeneratedOnMSKTime = getReportTimeString();
     }
 
+    /**
+     * Формирует и возвращает строку с временем генерации отчёта.
+     * @return строка с временем генерации отчёта.
+     */
     private String getReportTimeString() {
         final LocalDateTime today = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         final DayOfWeek dayOfWeek = today.getDayOfWeek();
@@ -50,22 +71,42 @@ public abstract class AbstractReportModel {
         return dayOfWeekDisplayName + ", " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 
+    /**
+     * Возвращает ссылку на менеджер сущностей.
+     * @return ссылка на менеджер сущностей.
+     */
     public EntityManager getEntityManager() {
         return this.entityManager;
     }
 
+    /**
+     * Возвращает строку с временем генерации отчёта.
+     * @return строка с временем генерации отчёта.
+     */
     public String getReportGeneratedOnMSKTime() {
         return reportGeneratedOnMSKTime;
     }
 
+    /**
+     * Возвращает минимальный номер задания.
+     * @return минимальный номер задания.
+     */
     public int getMinQuestionNumber() {
         return minQuestionNumber;
     }
 
+    /**
+     * Возвращаем максимальный номер задания.
+     * @return максимальный номер задания.
+     */
     public int getMaxQuestionNumber() {
         return maxQuestionNumber;
     }
 
+    /**
+     * Возвращает список команд, которые принимали участие в игре (присылали письма с ответами).
+     * @return список команд, которые принимали участие в игре (присылали письма с ответами).
+     */
     protected List<Team> getParticipatedTeams() {
         TypedQuery<Team> query = entityManager.createQuery("select distinct team from Team team, " +
                 "Email email where team.id=email.teamId", Team.class);
@@ -103,6 +144,10 @@ public abstract class AbstractReportModel {
         return questionNumbersList;
     }
 
+    /**
+     * Рассчитывает и возвращает максимальный номер задания.
+     * @return максимальный номер задания.
+     */
     private int calculateMaxQuestionNumber() {
         TypedQuery<Integer> query = entityManager.createQuery("select max(question.lowestInternalNumber) " +
                         "FROM Question question",
@@ -111,6 +156,10 @@ public abstract class AbstractReportModel {
         return resultValue != null ? resultValue : 0;
     }
 
+    /**
+     * Рассчитывает и возвращает минимальный номер задания.
+     * @return минимальный номер задания.
+     */
     private int calculateMinQuestionNumber() {
         TypedQuery<Integer> query = entityManager.createQuery("select min(question.lowestInternalNumber) " +
                         "FROM Question question",

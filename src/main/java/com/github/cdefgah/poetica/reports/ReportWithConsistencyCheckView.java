@@ -9,12 +9,23 @@ import com.github.cdefgah.poetica.model.Team;
 
 import java.util.List;
 
+/**
+ * Прототип класса для представлений отчётов с проверкой непротиворечивости данных.
+ */
 public abstract class ReportWithConsistencyCheckView extends AbstractReportView {
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта.
+     */
     public ReportWithConsistencyCheckView(ReportWithConsistencyCheckModel reportModel) {
         super(reportModel);
     }
 
+    /**
+     * Формирует и отдаёт текст отчёта.
+     * @return текст отчёта.
+     */
     public String getReportText() {
         ReportWithConsistencyCheckModel reportWithConsistencyCheckModel = (ReportWithConsistencyCheckModel)reportModel;
         StringBuilder sb = new StringBuilder();
@@ -35,10 +46,22 @@ public abstract class ReportWithConsistencyCheckView extends AbstractReportView 
         return sb.toString();
     }
 
+    /**
+     * Возвращает заголовок отчёта о непротиворечивости данных.
+     * @return заголовок отчёта о непротиворечивости данных.
+     */
     protected abstract String getReportTitleForConsistencyReportHeader();
 
+    /**
+     * Возвращает текст основного отчёта.
+     * @return текст основного отчёта.
+     */
     protected abstract String getMainReportText();
 
+    /**
+     * Возвращает текст для отчёта о непротиворечивости данных.
+     * @return текст для отчёта о непротиворечивости данных.
+     */
     protected String getConsistencyReportText() {
         ReportWithConsistencyCheckModel collectionReportModel = (ReportWithConsistencyCheckModel)reportModel;
 

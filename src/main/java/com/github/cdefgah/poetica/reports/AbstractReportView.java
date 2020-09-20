@@ -9,6 +9,9 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Прототип для всех классов-представлений отчётов.
+ */
 public class AbstractReportView {
 
     /**
@@ -16,8 +19,15 @@ public class AbstractReportView {
      */
     protected final EntityManager entityManager;
 
+    /**
+     * Модель данных отчёта.
+     */
     protected AbstractReportModel reportModel;
 
+    /**
+     * Конструктор класса.
+     * @param reportModel модель данных отчёта.
+     */
     public AbstractReportView(AbstractReportModel reportModel) {
         this.reportModel = reportModel;
         this.entityManager = reportModel.getEntityManager();

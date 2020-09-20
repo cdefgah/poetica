@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Модель класса отчёта "Таблица результатов".
+ */
 public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
 
     /**
@@ -46,10 +49,17 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
      */
     private final Map<Integer, Integer> mainRoundQuestionsRatingMap = new HashMap<>();
 
+    /**
+     * Конструктор класса.
+     * @param entityManager менеджер сущностей для взаимодействия с базой данных.
+     */
     public ResultTableReportModel(EntityManager entityManager) {
         super(entityManager);
     }
 
+    /**
+     * Строит отчёт.
+     */
     protected void buildMainReport() {
         initializeQuestionsRatingMaps(minQuestionNumber, maxQuestionNumber);
         initQuestionsGradesMap();
@@ -81,14 +91,25 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
         Collections.sort(mainRoundBlockReportRows);
     }
 
+    /**
+     * Формирует блок данных отчёта за предварительный тур (раунд).
+     * @return список строк отчёта с информацией за предварительный раунд.
+     */
     public Collection<ReportRowModel> getPreliminaryRoundBlockReportRows() {
         return Collections.unmodifiableCollection(preliminaryRoundBlockReportRows);
     }
 
+    /**
+     * Формирует блок данных отчёта за основной тур (раунд).
+     * @return список строк отчёта с информацией за основной раунд.
+     */
     public Collection<ReportRowModel> getMainRoundBlockReportRows() {
         return Collections.unmodifiableCollection(mainRoundBlockReportRows);
     }
 
+    /**
+     * Формирует таблицу для быстрого получения оценки ответа по номеру задания.
+     */
     private  void initQuestionsGradesMap() {
         final TypedQuery<Question> query = entityManager.createQuery("select question from Question question",
                                                                                                         Question.class);
@@ -121,30 +142,64 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
         }
     }
 
+    /**
+     * Отдаёт неизменяемую таблицу с информацией о рейтингах заданий.
+     * @param isMainRound true, если нужны рейтинги заданий за основной тур игры.
+     * @return неизменяемая таблица с рейтингами заданий.
+     */
     public Map<Integer, Integer> getQuestionsRatingMap(boolean isMainRound) {
         return Collections.unmodifiableMap(isMainRound ?
                 this.mainRoundQuestionsRatingMap : this.preliminaryRoundQuestionsRatingMap);
     }
 
+    /**
+     * Отдаёт неизменяемую таблицу с информацией об оценках заданий.
+     * @return неизменяемая таблица с информацией об оценках заданий.
+     */
     public Map<Integer, Boolean> getAllQuestionGradesMap() {
         return Collections.unmodifiableMap(allQuestionGradesMap);
     }
 
     // ===========================================================================================================
+
+    /**
+     * Представляет собой модель данных для строки отчёта.
+     */
     public class ReportRowModel implements Comparable<ReportRowModel> {
 
+        /**
+         * Номер команды.
+         */
         private final int teamNumber;
 
+        /**
+         * Оценки ответов команды (true - зачтён).
+         */
         private final boolean[] answerFlags;
 
+        /**
+         * Количество зачтённых ответов в текущем туре (раунде).
+         */
         private final int amountOfTakenAnswersInThisRound;
 
+        /**
+         * Количество зачтённых ответов в предыдущем туре (раунде).
+         */
         private int amountOfTakenAnswersInPreviousRound;
 
+        /**
+         * Рейтинг команды.
+         */
         private int teamRating;
 
+        /**
+         * Название команды.
+         */
         private final String teamTitle;
 
+        /**
+         * true, если строка отчёта содержит информацию по основному туру (раунду).
+         */
         private final boolean isMainRound;
 
         /**
@@ -223,6 +278,13 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
             }
         }
 
+        /**
+         * Возвращает true, если ответ был зачтён.
+         * @param questionNumber номер задания.
+         * @param teamId уникальный идентификатор команды.
+         * @param roundNumber номер тура (раунда).
+         * @return true, если ответ был зачтён.
+         */
         private boolean isAnswerAccepted(int questionNumber, long teamId, int roundNumber) {
             TypedQuery<Long> query =
                     entityManager.createQuery("select count(*) from Answer answer " +
@@ -238,7 +300,10 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
             return query.getSingleResult() > 0;
         }
 
-        void recalculateTeamRating() {
+        /**
+         * Обновляет рейтинг команды.
+         */
+        private void recalculateTeamRating() {
             final Map<Integer, Integer> actualRatingMap = isMainRound ? mainRoundQuestionsRatingMap :
                     preliminaryRoundQuestionsRatingMap;
             teamRating = 0;
@@ -253,30 +318,60 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
             }
         }
 
+        /**
+         * Возвращает номер команды.
+         * @return номер команды.
+         */
         public int getTeamNumber() {
             return teamNumber;
         }
 
+        /**
+         * Отдаёт массив флагов с оценками ответов.
+         * @return массив флагов с оценками ответов.
+         */
         public boolean[] getAnswerFlags() {
             return answerFlags;
         }
 
+        /**
+         * Возвращает количество зачтённых ответов в текущем раунде (туре).
+         * @return количество зачтённых ответов в текущем раунде (туре).
+         */
         public int getAmountOfTakenAnswersInThisRound() {
             return amountOfTakenAnswersInThisRound;
         }
 
+        /**
+         * Отдаёт количество зачтённых ответов в предыдущем раунде (туре).
+         * @return количество зачтённых ответов в предыдущем раунде (туре).
+         */
         public int getAmountOfTakenAnswersInPreviousRound() {
             return amountOfTakenAnswersInPreviousRound;
         }
 
+        /**
+         * Возвращает рейтинг команды.
+         * @return рейтинг команды.
+         */
         public int getTeamRating() {
             return teamRating;
         }
 
+        /**
+         * Возвращает название команды.
+         * @return название команды.
+         */
         public String getTeamTitle() {
             return teamTitle;
         }
 
+        /**
+         * Выполняет сравнение двух строк отчёта.
+         * @param anotherRowModel другая срока отчёта для сравнения с текущей.
+         * @return 0, если строки равны, -1, если текущая строка меньше, чем переданная в параметрах,
+         * и 1 - если текущая строка больше, чем переданная в параметрах.
+         */
         @Override
         public int compareTo(ReportRowModel anotherRowModel) {
             /*
@@ -312,10 +407,12 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
                         return -1 * Integer.compare(this.teamRating, anotherRowModel.teamRating);
                     }
                 } else {
-                    return -1 * Integer.compare(this.amountOfTakenAnswersInPreviousRound, anotherRowModel.amountOfTakenAnswersInPreviousRound);
+                    return -1 * Integer.compare(this.amountOfTakenAnswersInPreviousRound,
+                                                                   anotherRowModel.amountOfTakenAnswersInPreviousRound);
                 }
             } else {
-                return -1 * Integer.compare(this.amountOfTakenAnswersInThisRound, anotherRowModel.amountOfTakenAnswersInThisRound);
+                return -1 * Integer.compare(this.amountOfTakenAnswersInThisRound,
+                                                                       anotherRowModel.amountOfTakenAnswersInThisRound);
             }
         }
     }
