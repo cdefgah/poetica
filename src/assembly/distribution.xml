@@ -1,0 +1,24 @@
+<assembly>
+  <id>distrib</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>target/</directory>
+      <outputDirectory>./</outputDirectory>
+      <includes>
+        <include>poetica.dat</include>
+		<include>*.bat</include>
+        <include>*.sh</include>
+        <include>readme.txt</include>
+        <include>whatsnew.txt</include>
+		<include>**/config/*.*</include>
+        <include>**/initial-data/*.*</include>
+      </includes>
+      <excludes>
+        <exclude>classes/</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly>
