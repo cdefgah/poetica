@@ -126,15 +126,11 @@ export class TeamsListImporterComponent
     teamsListParserParameters.httpClient = this.httpClient;
     teamsListParserParameters.textWithTeamsList = this.textWithTeamsList;
 
-    console.log("INITIALIZING teamslistparser");
-
     const parser: TeamsListParser = new TeamsListParser(
       teamsListParserParameters,
       onSuccess,
       onFailure
     );
-
-    console.log('calling parser.processText();');
 
     parser.processText();
   }

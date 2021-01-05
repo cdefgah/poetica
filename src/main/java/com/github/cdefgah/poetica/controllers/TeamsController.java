@@ -34,11 +34,6 @@ import java.util.Map;
 public class TeamsController extends AbstractController {
 
     /**
-     * Признак отсутствия уникального идентифкатора команды.
-     */
-    private static final long NO_TEAM_ID = 0;
-
-    /**
      * Отдаёт по запросу таблицу с максимальными размерами полей в модели данных.
      * @return таблица с максимальными размерами полей в модели данных.
      */
@@ -69,14 +64,14 @@ public class TeamsController extends AbstractController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!isNumberUnique(teamNumber, NO_TEAM_ID)) {
+        if (isTeamNumberPresent(teamNumber)) {
             return new ResponseEntity<>(composeErrorMessage("В базе данных уже существует " +
                             "команда с таким номером: " +
                     teamNumber),
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (!isTitleUnique(teamTitle, NO_TEAM_ID)) {
+        if (isTeamTitlePresent(teamTitle)) {
             return new ResponseEntity<>(composeErrorMessage("В базе данных уже " +
                             "существует команда с таким названием: " +
                     teamTitle),
@@ -135,6 +130,11 @@ public class TeamsController extends AbstractController {
             if (isTitleUnique(newTeamTitle, teamId)) {
                 team.setTitle(newTeamTitle);
                 team.setTitleInLowerCase(newTeamTitle.toLowerCase());
+            } else {
+                return new ResponseEntity<>(composeErrorMessage("В базе данных уже существует " +
+                        "команда с таким названием: " +
+                        newTeamTitle),
+                        HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -202,7 +202,7 @@ public class TeamsController extends AbstractController {
                 validationErrors.add("В базе уже есть команда с номером: " + team.getNumber());
             }
 
-            if (isTitlePresent(team.getTitle())) {
+            if (isTeamTitlePresent(team.getTitle())) {
                 validationErrors.add("В базе уже есть команда с названием: " + team.getTitle());
             }
         }
@@ -335,7 +335,7 @@ public class TeamsController extends AbstractController {
      * @param teamTitle название команды.
      * @return true, если название команды есть в базе данных.
      */
-    private boolean isTitlePresent(String teamTitle) {
+    private boolean isTeamTitlePresent(String teamTitle) {
         TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
                                                     "team where team.titleInLowerCase=:titleInLowerCase", Long.class);
 

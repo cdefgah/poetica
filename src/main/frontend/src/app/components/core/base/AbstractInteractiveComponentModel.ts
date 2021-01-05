@@ -23,7 +23,7 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
       console.dir(errorObject);
       console.log('===========================================');
 
-      const rawErrorMessage: string = String(errorObject.message);
+      const rawErrorMessage: string = errorObject.error !== undefined ? String(errorObject.error) : String(errorObject.message);
 
       // TODO переделать на пристойный механизм обработки ошибок, а это это какая-то печаль и непристойность
       const prefixToCheck = 'Внимание: '; // наличие этого префикса говорит о том, что ошибка штатная (не катастрофа).
