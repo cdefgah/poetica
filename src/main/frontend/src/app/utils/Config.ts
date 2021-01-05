@@ -16,9 +16,9 @@ export function debugString(debugMessage: string) {
 
 export function debugObject(object2Debug: any) {
   if (GlobalConfig.debugMode) {
-    console.log('Object properties in canonical form:');
+    console.log('...Object properties in canonical form:');
     console.dir(object2Debug);
-    console.log('Object properties in the table form:');
+    console.log('...Object properties in the table form:');
     console.table(object2Debug);
   }
 }

@@ -64,6 +64,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       const teamTitleValidationMessage: string = this.parameters.teamValidationService.checkTeamTitleAndGetValidationMessage(
         teamTitle
       );
+
       if (teamTitleValidationMessage && teamTitleValidationMessage.length > 0) {
         this.onFailure(
           this.parameters.parentComponentObject,

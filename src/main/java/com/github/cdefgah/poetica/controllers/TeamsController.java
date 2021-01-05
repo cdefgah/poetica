@@ -198,11 +198,11 @@ public class TeamsController extends AbstractController {
     public ResponseEntity<List<String>> validateTeamNumbersAndTitles(@RequestBody Team[] teamsToImport) {
         List<String> validationErrors = new ArrayList<>();
         for (Team team: teamsToImport) {
-            if (!isNumberUnique(team.getNumber(), team.getId())) {
+            if (isTeamNumberPresent(team.getNumber())) {
                 validationErrors.add("В базе уже есть команда с номером: " + team.getNumber());
             }
 
-            if (!isTitleUnique(team.getTitle(), team.getId())) {
+            if (isTitlePresent(team.getTitle())) {
                 validationErrors.add("В базе уже есть команда с названием: " + team.getTitle());
             }
         }
@@ -304,6 +304,18 @@ public class TeamsController extends AbstractController {
     }
 
     /**
+     * Проверяет, представлен-ли указанный номер команды в базе.
+     * @param teamNumber номер команды.
+     * @return true, если указанный номер команды в базе представлен.
+     */
+    private boolean isTeamNumberPresent(int teamNumber) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
+                                                                    "team where team.number=:teamNumber", Long.class);
+        query.setParameter("teamNumber", teamNumber);
+        return query.getSingleResult() > 0;
+    }
+
+    /**
      * Проверяет, является ли номер команды уникальным.
      * @param teamNumber номер команды, который проверям на уникальность.
      * @param processingTeamId уникальный идентификатор команды, для которой выполняется эта проверка.
@@ -316,6 +328,19 @@ public class TeamsController extends AbstractController {
         query.setParameter("teamNumber", teamNumber);
         query.setParameter("processingTeamId", processingTeamId);
         return query.getSingleResult() == 0;
+    }
+
+    /**
+     * Проверяет, представлено-ли название команды в базе данных.
+     * @param teamTitle название команды.
+     * @return true, если название команды есть в базе данных.
+     */
+    private boolean isTitlePresent(String teamTitle) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(*) from Team " +
+                                                    "team where team.titleInLowerCase=:titleInLowerCase", Long.class);
+
+        query.setParameter("titleInLowerCase", teamTitle.toLowerCase());
+        return query.getSingleResult() > 0;
     }
 
     /**

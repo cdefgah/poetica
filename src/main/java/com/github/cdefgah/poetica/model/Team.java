@@ -191,4 +191,14 @@ public final class Team {
         sb.append(this.number).append(',').append(this.title).append('\n');
         return sb.toString();
     }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "id=" + id +
+                ", number=" + number +
+                ", title='" + title + '\'' +
+                ", titleInLowerCase='" + titleInLowerCase + '\'' +
+                '}';
+    }
 }
