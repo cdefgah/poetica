@@ -3,7 +3,7 @@
  * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { EmailDetailsComponent } from './email-details.component';
 
@@ -11,7 +11,7 @@ describe('EmailDetailsComponent', () => {
   let component: EmailDetailsComponent;
   let fixture: ComponentFixture<EmailDetailsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [EmailDetailsComponent]
     })

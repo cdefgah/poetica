@@ -3,7 +3,7 @@
  * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { MessageBoxComponent } from './message-box.component';
 
@@ -11,7 +11,7 @@ describe('MessageBoxComponent', () => {
   let component: MessageBoxComponent;
   let fixture: ComponentFixture<MessageBoxComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MessageBoxComponent]
     })

@@ -3,7 +3,7 @@
  * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AnswersListComponent } from './answers-list.component';
 
@@ -11,7 +11,7 @@ describe('AnswersListComponent', () => {
   let component: AnswersListComponent;
   let fixture: ComponentFixture<AnswersListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AnswersListComponent],
     }).compileComponents();
