@@ -10,7 +10,7 @@
 
 * [Java SE (Standard Edition) SDK](http://java.sun.com) версии не ниже 1.8;
 * [Node.JS](https://nodejs.org/en/) актуальной версии, либо LTS (Long Term Support);
-* [Angular](https://angular.io/), с версией не ниже 10.0;
+* [Angular](https://angular.io/), с версией не ниже 11.0.5;
 * [Apache Maven](https://maven.apache.org/) актуальной версии. Пропишите путь к папке `bin` в Apache Maven в системную переменную окружения `PATH`, чтобы команда `mvn` была доступна из любой папки.
 
 Если это первая сборка проекта, то перейдите в папку `src/main/frontend`, откройте терминал в этой папке и дайте команду:
