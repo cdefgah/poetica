@@ -18,17 +18,17 @@ export class TeamDataModel {
    * Используется в случаях, когда нет информации о команде,
    * чтобы не создавать новых экземпляров класса.
    */
-  public static readonly emptyTeam: TeamDataModel = TeamDataModel.createtTeam();
+  public static readonly emptyTeam: TeamDataModel = new TeamDataModel();
 
   /**
    * Идентификатор записи в базе данных.
    */
-  id: number;
+  id: number = null;
 
   /**
    * Уникальный номер команды.
    */
-  number = -1;
+  number: number = null;
 
   /**
    * Уникальное название команды.
@@ -36,33 +36,38 @@ export class TeamDataModel {
   title = '';
 
   public static createTeamByNumberAndTitle(teamNumber: number, teamTitle: string): TeamDataModel {
-    return new TeamDataModel(teamNumber, teamTitle);
+    const team = new TeamDataModel();
+    team.number = teamNumber;
+    team.title = teamTitle;
+    return team;
   }
 
   public static createTeamFromMap(mapWithValues: Map<string, any>): TeamDataModel {
-    const team = TeamDataModel.createtTeam();
+    const team = new TeamDataModel();
     team.setValuesFromMap(mapWithValues);
     return team;
   }
 
-  public static createtTeam(): TeamDataModel {
-    return new TeamDataModel(-1, '');
+  public setValuesFromMap(initialMap: Map<string, any>) {
+    this.id = initialMap['id'];
+    this.number = initialMap['number'];
+    this.title = initialMap['title'];
   }
 
   /**
    * Конструктор класса.
-   * @param number уникальный номер команды.
-   * @param title название команды.
    */
-  private constructor(teamNumber: number, teamTitle?: string) {
-    this.number = teamNumber;
-    this.title = teamTitle ? teamTitle : '';
+  public constructor() {
+
   }
 
-  private setValuesFromMap(initialMap: Map<string, any>) {
-    this.id = initialMap['id'];
-    this.number = initialMap['number'];
-    this.title = initialMap['title'];
+  public getObjectCopy(): TeamDataModel {
+    const objectCopy = new TeamDataModel();
+    objectCopy.id = this.id;
+    objectCopy.number = this.number;
+    objectCopy.title = this.title;
+
+    return objectCopy;
   }
 
   public toString(): string {

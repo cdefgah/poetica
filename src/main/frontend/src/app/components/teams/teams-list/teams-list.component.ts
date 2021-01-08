@@ -12,6 +12,7 @@ import { TeamValidationService } from '../../core/validators/TeamValidationServi
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { TeamsListImporterComponent } from '../teams-list-importer/teams-list-importer.component';
 import { MatTableDataSource, MatSort } from '@angular/material';
+import { DialogResultFlags } from '../../../utils/DialogResultFlags';
 
 @Component({
   selector: 'app-teams-list',
@@ -56,7 +57,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     );
     const dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
-      if (result !== TeamDetailsComponent.DIALOG_RESULT_DECLINED) {
+      if (result === DialogResultFlags.ChangesMade) {
         // если диалог был принят (accepted), либо была удалена запись о команде
         // обновляем таблицу со списком команд
         this.loadTeamsList();

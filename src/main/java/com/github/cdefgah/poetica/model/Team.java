@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-only
- * Copyright (c) 2020 by Rafael Osipov <rafael.osipov@outlook.com>
+ * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
 package com.github.cdefgah.poetica.model;
@@ -186,6 +186,7 @@ public final class Team {
      * Отдаёт текстовое представление экземпляра класса согласно требованиям импортёра команд.
      * @return текстовое представление экземпляра класса согласно требованиям импортёра команд.
      */
+    @JsonIgnore
     public String getTextRepresentationForImporter() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.number).append(',').append(this.title).append('\n');

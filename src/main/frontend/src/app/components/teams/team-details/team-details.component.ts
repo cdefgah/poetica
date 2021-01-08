@@ -4,7 +4,7 @@
  */
 
 import { Component, OnInit, Inject } from '@angular/core';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
+
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -14,6 +14,8 @@ import {
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
+import { DialogResultFlags } from '../../../utils/DialogResultFlags';
 
 @Component({
   selector: 'app-team-details',
@@ -25,25 +27,15 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
   private static readonly KEY_DIALOG_ID = 'id';
   private static readonly KEY_DIALOG_MODEL_VALIDATOR_SERVICE = 'modelValidatorService';
 
-  public static readonly DIALOG_RESULT_ACCEPTED: number = 1;
-  public static readonly DIALOG_RESULT_DECLINED: number = 2;
-  public static readonly DIALOG_RESULT_DELETE_ACTION: number = 3;
-
   public readonly modelValidatorService: TeamValidationService;
 
   dialogTitle: string;
-
-  teamId: number;
 
   team: TeamDataModel;
   teamCopy: TeamDataModel;
 
   teamNumberIsIncorrect = false;
   teamTitleIsIncorrect = false;
-
-  serverResponse: any;
-
-  isExistingRecord: boolean;
 
   static getDialogConfigWithData(modelValidatorService: TeamValidationService, row?: any): MatDialogConfig {
 
@@ -81,28 +73,28 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
   ) {
     super();
     this.modelValidatorService = dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
-    this.teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
+
+    // создаём объект, который затем, либо заполняем данными с сервера (редактирование существующей записи)
+    // либо заполняем вручную, при создании новый команды, например.
+    this.team = new TeamDataModel();
+    this.team.id = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
   }
 
   ngOnInit(): void {
-    if (this.teamId) {
+    if (this.team.id) {
       // редактируем существующее задание
-      this.isExistingRecord = true;
-      const url = `/teams/${this.teamId}`;
+      const url = `/teams/${this.team.id}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
-          this.team = TeamDataModel.createTeamFromMap(data);
-          this.teamCopy = TeamDataModel.createTeamFromMap(data);
+          this.team.setValuesFromMap(data);
+          this.teamCopy = this.team.getObjectCopy();
 
           this.dialogTitle = this.getDialogTitle(this.team);
         },
         (error) => this.reportServerError(error)
       );
     } else {
-      // создаём объект новой команды и заголовок диалога для новой команды
-      this.team = TeamDataModel.createtTeam();
-      this.team.number = null;
-      this.isExistingRecord = false;
+      // объект новой команды уже создан, проставляем нужный флаг и формируем заголовок диалога для новой команды
       this.dialogTitle = this.getDialogTitle();
     }
    }
@@ -121,10 +113,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
           .set('teamTitle', this.team.title.trim());
 
         this.http.post('/teams', payload).subscribe(
-          (data) => {
-            this.serverResponse = data;
-            this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
-          },
+          () => this.dialog.close(DialogResultFlags.ChangesMade),
           (error) => this.reportServerError(error)
         );
       } else {
@@ -143,22 +132,20 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
             .set('newTeamTitle', newTeamTitle);
 
           this.http.put(requestUrl, payload).subscribe(
-            () => {
-              this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_ACCEPTED);
-            },
+            () => this.dialog.close(DialogResultFlags.ChangesMade),
             (error) => this.reportServerError(error)
           );
         } else {
           // никаких изменений не было
           // закрываем и не делаем лишнего запроса для обновления данных с сервера
-          this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DECLINED);
+          this.dialog.close(DialogResultFlags.NoChangesMade);
         }
       }
     }
   }
 
   cancelDialog() {
-    this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DECLINED);
+    this.dialog.close(DialogResultFlags.NoChangesMade);
   }
 
   deleteRecord() {
@@ -168,12 +155,14 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
       // если диалог был принят (accepted)
       const url = `/teams/${this.team.id}`;
       this.http.delete(url).subscribe(
-        (data: any) => {
-          this.dialog.close(TeamDetailsComponent.DIALOG_RESULT_DELETE_ACTION);
-        },
+        () => this.dialog.close(DialogResultFlags.ChangesMade),
         (error) => this.reportServerError(error)
       );
     });
+  }
+
+  get isExistingRecord(): boolean {
+    return this.team.id ? true : false;
   }
 
   private getDialogTitle(teamObject?: TeamDataModel): string {
