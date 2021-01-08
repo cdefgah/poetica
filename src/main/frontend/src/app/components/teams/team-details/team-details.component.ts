@@ -33,6 +33,8 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
 
   dialogTitle: string;
 
+  teamId: number;
+
   team: TeamDataModel;
   teamCopy: TeamDataModel;
 
@@ -78,25 +80,15 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
     public otherDialog: MatDialog
   ) {
     super();
+    this.modelValidatorService = dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
+    this.teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
+  }
 
-    // инициализируем объект team сразу первой строчкой
-    // так как к нему подключены (bind)
-    // свойства в html-template комепонента
-    // и если не проинициализировать объект сразу
-    // то компонент может попытаться (асинхронно) получить свойство
-    // объекта, который мы ещё не проинициализировали,
-    // например в случаях, когда get запрос ещё не закончил выполняться
-    this.team = TeamDataModel.emptyTeam;
-
-    this.modelValidatorService =
-      dialogData[TeamDetailsComponent.KEY_DIALOG_MODEL_VALIDATOR_SERVICE];
-
-    const teamId = dialogData[TeamDetailsComponent.KEY_DIALOG_ID];
-
-    if (teamId) {
+  ngOnInit(): void {
+    if (this.teamId) {
       // редактируем существующее задание
       this.isExistingRecord = true;
-      const url = `/teams/${teamId}`;
+      const url = `/teams/${this.teamId}`;
       this.http.get(url).subscribe(
         (data: Map<string, any>) => {
           this.team = TeamDataModel.createTeamFromMap(data);
@@ -113,9 +105,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
       this.isExistingRecord = false;
       this.dialogTitle = this.getDialogTitle();
     }
-  }
-
-  ngOnInit(): void { }
+   }
 
   protected getMessageDialogReference(): MatDialog {
     return this.otherDialog;
