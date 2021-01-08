@@ -104,8 +104,7 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
   }
 
   acceptDialog() {
-    this.resetValidationFlags();
-    if (this.validateFields()) {
+    if (this.formValidationPassed()) {
       if (!this.team.id) {
         // добавляем новую запись
         const payload = new HttpParams()
@@ -177,7 +176,9 @@ export class TeamDetailsComponent extends AbstractInteractiveComponentModel impl
    * Выполняет проверку корректности заполнения полей.
    * @returns true, если поля заполнены корректно, иначе false.
    */
-  private validateFields(): boolean {
+  private formValidationPassed(): boolean {
+    this.resetValidationFlags();
+
     this.teamNumberIsIncorrect = !this.modelValidatorService.isTeamNumberCorrect(String(this.team.number));
     this.teamTitleIsIncorrect = !this.modelValidatorService.isTeamTitleCorrect(this.team.title);
 
