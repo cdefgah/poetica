@@ -6,7 +6,7 @@
 import { QuestionDataModel } from '../data-model/QuestionDataModel';
 import { AbstractViewModel } from './AbstractViewModel';
 
-export class QuestionViewModelForTableRow extends AbstractViewModel {
+export class QuestionViewModel extends AbstractViewModel {
   private readonly questionDataModel: QuestionDataModel;
 
   constructor(questionDataModel: QuestionDataModel) {

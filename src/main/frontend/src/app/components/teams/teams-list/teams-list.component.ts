@@ -13,6 +13,8 @@ import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { TeamsListImporterComponent } from '../teams-list-importer/teams-list-importer.component';
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { DialogResultFlags } from '../../../utils/DialogResultFlags';
+import { TeamViewModel } from '../../../view-model/TeamViewModel';
+import { debugObject } from 'src/app/utils/Config';
 
 @Component({
   selector: 'app-teams-list',
@@ -38,7 +40,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
 
   displayedColumns: string[] = ['number', 'title'];
 
-  teamsListDataSource: MatTableDataSource<TeamDataModel> = new MatTableDataSource([]);
+  teamsListDataSource: MatTableDataSource<TeamViewModel> = new MatTableDataSource([]);
 
   ngOnInit() { }
 
@@ -53,7 +55,7 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
   openDetailsDialog(selectedRow?: any) {
     const dialogConfig = TeamDetailsComponent.getDialogConfigWithData(
       this.teamValidationService,
-      selectedRow
+      selectedRow?.teamDataModel
     );
     const dialogRef = this.dialog.open(TeamDetailsComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((result) => {
@@ -69,7 +71,12 @@ export class TeamsListComponent extends AbstractInteractiveComponentModel
     const url = '/teams/all';
     this.http.get(url).subscribe(
       (teamsList: TeamDataModel[]) => {
-        this.teamsListDataSource = new MatTableDataSource(teamsList);
+        const rows: TeamViewModel[] = [];
+        teamsList.forEach((oneElement) => {
+          rows.push(new TeamViewModel(oneElement));
+        });
+
+        this.teamsListDataSource = new MatTableDataSource(rows);
         this.teamsListDataSource.sort = this.teamsSortHandler;
       },
       (error) => this.reportServerError(error)

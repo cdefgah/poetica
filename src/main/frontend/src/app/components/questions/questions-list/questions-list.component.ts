@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatRadioChange } from '@angular/material';
 import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
-import { QuestionViewModelForTableRow } from 'src/app/view-model/QuestionViewModelForTableRow';
+import { QuestionViewModel } from 'src/app/view-model/QuestionViewModel';
 import { QuestionsListImporterComponent } from '../questions-list-importer/questions-list-importer.component';
 import { QuestionDetailsComponent } from '../question-details/question-details.component';
 import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
@@ -22,8 +22,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   // эти псевдонимы также используются для формирования строки http-запроса, не меняйте их.
   private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = 'all';
   private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = 'credited';
-  private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS =
-    'not-credited';
+  private static readonly DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS = 'not-credited';
 
   displayModeAliases: string[] = [
     QuestionsListComponent.DISPLAY_MODE_ALIAS_ALL_QUESTIONS,
@@ -43,7 +42,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     'comment',
   ];
 
-  dataSource: QuestionViewModelForTableRow[];
+  dataSource: QuestionViewModel[];
 
   totalQuestionsAmount: number;
 
@@ -81,7 +80,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
         this.dataSource = [];
         receivedDataStructures.forEach((oneDataStructure) => {
           this.dataSource.push(
-            new QuestionViewModelForTableRow(oneDataStructure)
+            new QuestionViewModel(oneDataStructure)
           );
         });
 
