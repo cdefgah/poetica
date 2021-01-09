@@ -265,9 +265,8 @@ export class AnswersListImporterComponent
   }
 
   private processEmailBody(
-    onSuccess: Function,
-    onFailure: Function
-  ): void {
+    onSuccess: (parentComponentReference: AnswersListImporterComponent, parsingResult: EmailBodyParsingResult) => void,
+    onFailure: (parentComponentObject: AnswersListImporterComponent, errorMessage: string) => void): void {
     const parentComponentObject: AnswersListImporterComponent = this;
 
     debugString('Preparing email body parser for launch...');
@@ -295,7 +294,7 @@ export class AnswersListImporterComponent
   }
 
   private onSuccessfullyEmailBodyParse(
-    parentComponentObject: any,
+    parentComponentObject: AnswersListImporterComponent,
     parsingResult: EmailBodyParsingResult
   ) {
     parentComponentObject.answers = parsingResult.answers;

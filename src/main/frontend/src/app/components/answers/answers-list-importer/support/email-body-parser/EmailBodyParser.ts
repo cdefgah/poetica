@@ -13,7 +13,8 @@ import { StringBuilder } from '../../../../../utils/StringBuilder';
 import { EmailBodyParsingResult } from './EmailBodyParsingResult';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { debugString } from 'src/app/utils/Config';
+import { debugString } from '../../../../../utils/Config';
+import { AnswersListImporterComponent } from '../../answers-list-importer.component';
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private static readonly answersBlockPrefix: string = '***';
@@ -30,9 +31,8 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
 
   constructor(
     parameters: EmailBodyParserParameters,
-    onSuccess: Function,
-    onFailure: Function
-  ) {
+    onSuccess: (parentComponentObject: AnswersListImporterComponent, parsingResult: EmailBodyParsingResult) => void,
+    onFailure: (parentComponentObject: AnswersListImporterComponent, errorMessage: string) => void) {
     super(parameters.emailBody, onSuccess, onFailure);
     this.parentComponentObject = parameters.parentComponentObject;
     this.emailValidationService = parameters.emailValidationService;

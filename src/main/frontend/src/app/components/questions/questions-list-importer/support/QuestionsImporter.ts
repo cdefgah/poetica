@@ -3,7 +3,6 @@ import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDa
 import { QuestionValidationService } from 'src/app/components/core/validators/QuestionValidationService';
 import { StringBuilder } from 'src/app/utils/StringBuilder';
 import { QuestionsListImporterComponent } from '../questions-list-importer.component';
-import { debugString } from 'src/app/utils/Config';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
@@ -50,8 +49,8 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     importerComponentReference: QuestionsListImporterComponent,
     sourceText: string,
     questionModelValidatorService: QuestionValidationService,
-    onSuccess: Function,
-    onFailure: Function
+    onSuccess: (importerComponentReference: QuestionsListImporterComponent, questionsList: QuestionDataModel[]) => void,
+    onFailure: (importerComponentReference: QuestionsListImporterComponent, errorMessage: string) => void
   ) {
     super(sourceText, onSuccess, onFailure);
     this.questionModelValidatorService = questionModelValidatorService;

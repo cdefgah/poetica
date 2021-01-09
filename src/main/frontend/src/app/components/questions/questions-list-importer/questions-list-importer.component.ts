@@ -95,19 +95,19 @@ export class QuestionsListImporterComponent
   }
 
   onStepChange(event: any) {
-    if (event.previouslySelectedIndex == 0) {
+    if (event.previouslySelectedIndex === 0) {
       this.foundError = '';
       this.processSourceText();
 
-      this.dataIsReadyForImport = this.foundError.length == 0;
-    } else if (event.previouslySelectedIndex == 1) {
+      this.dataIsReadyForImport = this.foundError.length === 0;
+    } else if (event.previouslySelectedIndex === 1) {
       // если вернулись назад
       this.dataIsReadyForImport = false;
     }
   }
 
   private processSourceText(): void {
-    let questionsImporter = new QuestionsImporter(
+    const questionsImporter = new QuestionsImporter(
       this,
       this.sourceText,
       this.questionValidationService,
