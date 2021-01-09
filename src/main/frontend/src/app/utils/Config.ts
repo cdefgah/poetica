@@ -3,10 +3,11 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
+// TODO Сделать более удобный механизм логирования
 export class Config {
   constructor(public readonly debugMode: boolean) { }
 }
-export let GlobalConfig = new Config(true);
+export const GlobalConfig = new Config(true);
 
 export function debugString(debugMessage: string) {
   if (GlobalConfig.debugMode) {

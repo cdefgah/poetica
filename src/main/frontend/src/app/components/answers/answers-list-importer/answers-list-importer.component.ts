@@ -177,7 +177,6 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region Errors handling
-
   _firstStepErrorMessage: string;
   _secondStepErrorMessage: string;
   //#endregion
@@ -274,11 +273,9 @@ export class AnswersListImporterComponent
     const emailBodyParserParameters: EmailBodyParserParameters = new EmailBodyParserParameters();
     emailBodyParserParameters.parentComponentObject = parentComponentObject;
     emailBodyParserParameters.emailBody = parentComponentObject.emailBody;
-    emailBodyParserParameters.emailValidationService =
-      parentComponentObject.emailValidationService;
+    emailBodyParserParameters.emailValidationService = parentComponentObject.emailValidationService;
 
-    emailBodyParserParameters.answerValidationService =
-      parentComponentObject.answerValidationService;
+    emailBodyParserParameters.answerValidationService = parentComponentObject.answerValidationService;
 
     emailBodyParserParameters.httpClient = parentComponentObject.httpClient;
 

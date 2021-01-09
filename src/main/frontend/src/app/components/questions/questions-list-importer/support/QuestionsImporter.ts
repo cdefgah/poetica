@@ -95,6 +95,11 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     // загружаем содержимое вопроса
     question.body = this.loadSegmentText('');
 
+    // проверяем наличие собственно задания
+    if (!this.validateQuestionBodyPresence(question)) {
+      return false;
+    }
+
     // после сегмента с содержимым вопроса ожидаем сегмент с авторским ответом
     if (!this.validateAuthorsAnswerSegmentPresence(question)) {
       return false;
@@ -132,6 +137,21 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   private removeSegmentPrefix(stringWithSegmentPrefix: string): string {
     const segmentPrefixLength = 3;
     return stringWithSegmentPrefix.substring(segmentPrefixLength);
+  }
+
+  private validateQuestionBodyPresence(question: QuestionDataModel): boolean {
+    if (question.body && question.body.length > 0) {
+      return true;
+    } else {
+      this.allThingsOk = false;
+
+      const sentenceAboutTitle  = question.title && question.title.length  ? ' Заголовок указан, а вот содержимого нет.' : '';
+      this.onFailure(
+        this.parentComponentObject,
+        `Не указано содержимое для вопроса (задания) номер: ${question.externalNumber}.${sentenceAboutTitle} ${QuestionsImporter.rtfmMessage}`
+      );
+      return false;
+    }
   }
 
   private validateAuthorsAnswerSegmentPresence(question: QuestionDataModel): boolean {
