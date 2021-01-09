@@ -26,4 +26,10 @@ describe('TeamDetailsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('Testing Component Method', () => {
+    
+
+    // expect(component.hiPackt()).toBe("Hello Packt");
+   });
 });
