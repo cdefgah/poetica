@@ -119,7 +119,9 @@ export class TeamsListImporterComponent
     });
   }
 
-  processTextWithTeamsList(onSuccess: Function, onFailure: Function) {
+  processTextWithTeamsList(onSuccess: (importerComponentReference: TeamsListImporterComponent, teams2Import: TeamDataModel[]) => void,
+                           onFailure: (importerComponentReference: TeamsListImporterComponent, errorMessage: string) => void) {
+
     const teamsListParserParameters: TeamsListParserParameters = new TeamsListParserParameters();
     teamsListParserParameters.parentComponentObject = this;
     teamsListParserParameters.teamValidationService = this._teamValidationService;
