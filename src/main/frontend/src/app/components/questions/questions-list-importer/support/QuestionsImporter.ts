@@ -76,7 +76,12 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     if (this.allThingsOk) {
-      this.onSuccess(this.parentComponentObject, this.questions);
+      if (this.questions.length > 0) {
+        this.onSuccess(this.parentComponentObject, this.questions);
+      } else {
+        this.allThingsOk = false;
+        this.onFailure(this.parentComponentObject, 'Забыли указать текст с загружаемыми заданиями (вопросами).');
+      }
     }
   }
 
