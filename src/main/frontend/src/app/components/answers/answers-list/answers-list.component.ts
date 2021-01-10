@@ -6,16 +6,16 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatRadioChange, MatDialog, MatSelectChange, MatSort, MatTableDataSource } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
-import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
-import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
 import { AnswersListImporterComponent } from '../answers-list-importer/answers-list-importer.component';
-import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import { EmailsCountDigest } from './support/EmailsCountDigest';
 import { AnswerDetailsComponent } from '../answer-details/answer-details.component';
 import { EmailDetailsComponent } from '../email-details/email-details.component';
 import { AnswerDetailsDialogResult } from '../answer-details/AnswerDetailsDialogResult';
 import { AnswersImporterDialogResult } from '../answers-list-importer/AnswersImporterDialogResult';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { AnswerDataModel } from '../../../data-model/AnswerDataModel';
+import { EmailDataModel } from '../../../data-model/EmailDataModel';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
 
 @Component({
   selector: 'app-answers-list',

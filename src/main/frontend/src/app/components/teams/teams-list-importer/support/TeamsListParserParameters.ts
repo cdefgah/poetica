@@ -3,8 +3,8 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { TeamValidationService } from 'src/app/components/core/validators/TeamValidationService';
 import { HttpClient } from '@angular/common/http';
+import { TeamValidationService } from '../../../core/validators/TeamValidationService';
 
 export class TeamsListParserParameters {
   parentComponentObject: any;

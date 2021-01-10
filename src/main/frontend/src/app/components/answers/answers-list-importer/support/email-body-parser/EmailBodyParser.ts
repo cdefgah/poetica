@@ -3,17 +3,17 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
 import { EmailBodyParserParameters } from './EmailBodyParserParameters';
 import { HttpClient } from '@angular/common/http';
-import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
-import { AnswerValidationService } from 'src/app/components/core/validators/AnswerValidationService';
 import { CalculationResult } from '../CalculationResult';
 import { StringBuilder } from '../../../../../utils/StringBuilder';
 import { EmailBodyParsingResult } from './EmailBodyParsingResult';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
-import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { AnswersListImporterComponent } from '../../answers-list-importer.component';
+import { AbstractMultiLineDataImporter } from '../../../../../utils/AbstractMultiLineDataImporter';
+import { TeamDataModel } from '../../../../../data-model/TeamDataModel';
+import { EmailValidationService } from '../../../../core/validators/EmailValidationService';
+import { AnswerValidationService } from '../../../../core/validators/AnswerValidationService';
+import { AnswerDataModel } from '../../../../../data-model/AnswerDataModel';
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private static readonly answersBlockPrefix: string = '***';
@@ -94,10 +94,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   }
 
   // TODO переделать этот callback-hell на async-await
-  private doValidationWithServerData(
-    parserObjectReference: EmailBodyParser,
-    loadedAnswers: AnswerDataModel[]
-  ) {
+  private doValidationWithServerData(parserObjectReference: EmailBodyParser, loadedAnswers: AnswerDataModel[]) {
     // сперва проверяем корректность названия команды из письма
     const teamNumber: number = parserObjectReference.team.number;
 

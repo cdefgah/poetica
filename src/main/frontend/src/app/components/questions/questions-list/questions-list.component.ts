@@ -6,12 +6,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatRadioChange } from '@angular/material';
-import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
-import { QuestionViewModel } from 'src/app/view-model/QuestionViewModel';
 import { QuestionsListImporterComponent } from '../questions-list-importer/questions-list-importer.component';
 import { QuestionDetailsComponent } from '../question-details/question-details.component';
-import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { QuestionDataModel } from '../../../data-model/QuestionDataModel';
+import { QuestionViewModel } from '../../../view-model/QuestionViewModel';
 
 @Component({
   selector: 'app-questions-list',

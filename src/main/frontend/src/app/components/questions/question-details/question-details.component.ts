@@ -11,10 +11,10 @@ import {
   MatDialog,
 } from '@angular/material/dialog';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
-import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
 import { MatRadioChange } from '@angular/material/radio';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+import { QuestionDataModel } from '../../../data-model/QuestionDataModel';
 
 @Component({
   selector: 'app-question-details',

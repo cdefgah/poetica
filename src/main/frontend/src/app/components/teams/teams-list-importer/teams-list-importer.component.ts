@@ -13,10 +13,10 @@ import {
 } from '@angular/material/dialog';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
 import { TeamsListParserParameters } from './support/TeamsListParserParameters';
 import { TeamsListParser } from './support/TeamsListParser';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
 
 @Component({
   selector: 'app-teams-list-importer',

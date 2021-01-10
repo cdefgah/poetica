@@ -1,8 +1,8 @@
-import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
-import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
-import { QuestionValidationService } from 'src/app/components/core/validators/QuestionValidationService';
-import { StringBuilder } from 'src/app/utils/StringBuilder';
 import { QuestionsListImporterComponent } from '../questions-list-importer.component';
+import { QuestionDataModel } from '../../../../data-model/QuestionDataModel';
+import { QuestionValidationService } from '../../../core/validators/QuestionValidationService';
+import { AbstractMultiLineDataImporter } from '../../../../utils/AbstractMultiLineDataImporter';
+import { StringBuilder } from '../../../../utils/StringBuilder';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
@@ -289,7 +289,7 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
     const colonSymbolPosition: number = sourceStringLine.indexOf(':');
 
-    if (colonSymbolPosition == -1) {
+    if (colonSymbolPosition === -1) {
       this.allThingsOk = false;
       this.onFailure(this.parentComponentObject, `В начале строки должен быть символ двоеточия. Строка: ${sourceStringLine}`);
       return false;

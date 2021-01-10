@@ -9,11 +9,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { TeamDetailsComponent } from '../team-details/team-details.component';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { TeamsListImporterComponent } from '../teams-list-importer/teams-list-importer.component';
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { DialogResultFlags } from '../../../utils/DialogResultFlags';
 import { TeamViewModel } from '../../../view-model/TeamViewModel';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
 
 @Component({
   selector: 'app-teams-list',

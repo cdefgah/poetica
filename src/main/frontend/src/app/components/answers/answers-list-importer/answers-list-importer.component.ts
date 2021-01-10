@@ -12,17 +12,18 @@ import {
   MatDialog,
 } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
-import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import { EmailValidationService } from '../../core/validators/EmailValidationService';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
 import { AnswerValidationService } from '../../core/validators/AnswerValidationService';
 import { EmailBodyParsingResult } from './support/email-body-parser/EmailBodyParsingResult';
 import { EmailBodyParserParameters } from './support/email-body-parser/EmailBodyParserParameters';
 import { EmailBodyParser } from './support/email-body-parser/EmailBodyParser';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
-import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
 import { AnswersImporterDialogResult } from './AnswersImporterDialogResult';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
+import { AnswerDataModel } from '../../../data-model/AnswerDataModel';
+import { EmailDataModel } from '../../../data-model/EmailDataModel';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
+
 
 @Component({
   selector: 'app-answers-list-importer',

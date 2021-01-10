@@ -4,7 +4,6 @@
  */
 
 import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
-import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/AbstractInteractiveComponentModel';
 import {
   MatDialog,
   MatDialogConfig,
@@ -12,11 +11,12 @@ import {
   MatDialogRef,
 } from '@angular/material';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
-import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
 import { AnswerDetailsDialogResult } from './AnswerDetailsDialogResult';
+import { AnswerDataModel } from '../../../data-model/AnswerDataModel';
+import { EmailDataModel } from '../../../data-model/EmailDataModel';
+import { TeamDataModel } from '../../../data-model/TeamDataModel';
+import { QuestionDataModel } from '../../../data-model/QuestionDataModel';
+import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 
 @Component({
   selector: 'app-answer-details',

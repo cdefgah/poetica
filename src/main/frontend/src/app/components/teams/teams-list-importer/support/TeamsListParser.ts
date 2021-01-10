@@ -3,11 +3,11 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDataImporter';
 import { TeamsListParserParameters } from './TeamsListParserParameters';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { HttpHeaders } from '@angular/common/http';
 import { TeamsListImporterComponent } from '../teams-list-importer.component';
+import { AbstractMultiLineDataImporter } from '../../../../utils/AbstractMultiLineDataImporter';
+import { TeamDataModel } from '../../../../data-model/TeamDataModel';
 
 export class TeamsListParser extends AbstractMultiLineDataImporter {
   private parameters: TeamsListParserParameters;

@@ -1,10 +1,10 @@
+import { TeamDataModel } from '../../../../../data-model/TeamDataModel';
+import { AnswerDataModel } from '../../../../../data-model/AnswerDataModel';
 /*
  * SPDX-License-Identifier: GPL-3.0-only
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 
 export class EmailBodyParsingResult {
   team: TeamDataModel;

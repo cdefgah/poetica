@@ -7,10 +7,10 @@ import {
 } from '@angular/material/dialog';
 
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { QuestionDataModel } from 'src/app/data-model/QuestionDataModel';
 import { QuestionsImporter } from './support/QuestionsImporter';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
+import { QuestionDataModel } from '../../../data-model/QuestionDataModel';
 
 @Component({
   selector: 'app-questions-list-importer',

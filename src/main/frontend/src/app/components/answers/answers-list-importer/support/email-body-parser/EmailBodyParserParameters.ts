@@ -3,9 +3,9 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { EmailValidationService } from 'src/app/components/core/validators/EmailValidationService';
-import { AnswerValidationService } from 'src/app/components/core/validators/AnswerValidationService';
 import { HttpClient } from '@angular/common/http';
+import { EmailValidationService } from '../../../../core/validators/EmailValidationService';
+import { AnswerValidationService } from '../../../../core/validators/AnswerValidationService';
 
 export class EmailBodyParserParameters {
   parentComponentObject: any;

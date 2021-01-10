@@ -12,7 +12,7 @@ import {
 } from '@angular/material/dialog';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
-import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
+import { EmailDataModel } from '../../../data-model/EmailDataModel';
 
 @Component({
   selector: 'app-email-details',
