@@ -3,6 +3,7 @@ import { QuestionDataModel } from '../../../../data-model/QuestionDataModel';
 import { QuestionValidationService } from '../../../core/validators/QuestionValidationService';
 import { AbstractMultiLineDataImporter } from '../../../../utils/AbstractMultiLineDataImporter';
 import { StringBuilder } from '../../../../utils/StringBuilder';
+import { PoeticaLogger } from '../../../../utils/PoeticaLogger';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
@@ -105,6 +106,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
       return false;
     }
 
+    const maxQuestionBodyLength = this.questionModelValidatorService.maxBodyLength;
+    if (question.body.length > maxQuestionBodyLength) {
+      const errorMessage = `В задании с номером ${question.externalNumber}
+       количество символов в теле задания (${question.body.length}) превышает максимально
+        разрешенное количество символов для содержательной части задания (${maxQuestionBodyLength}). ${QuestionsImporter.rtfmMessage}`;
+
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, errorMessage);
+      return false;
+    }
+
     // после сегмента с содержимым вопроса ожидаем сегмент с авторским ответом
     if (!this.validateAuthorsAnswerSegmentPresence(question)) {
       return false;
@@ -113,11 +125,33 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     const authorsAnswerFirstLine: string = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
     question.authorsAnswer = this.loadSegmentText(authorsAnswerFirstLine);
 
+    const maxAuthorsAnswerLength = this.questionModelValidatorService.maxAuthorsAnswerLength;
+    if (question.authorsAnswer.length > maxAuthorsAnswerLength) {
+      const errorMessage = `В задании с номером ${question.externalNumber}
+       количество символов в авторском ответе (${question.authorsAnswer.length}) превышает максимально
+        разрешенное количество символов для авторского ответа (${maxAuthorsAnswerLength}). ${QuestionsImporter.rtfmMessage}`;
+
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, errorMessage);
+      return false;
+    }
+
     // проверяем наличие необязательного сегмента с комментарием
     if (this.validateCommentsSegmentPresence()) {
       // если комментарий есть, загружаем его
       const firstCommentsLine: string = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
       question.comment = this.loadSegmentText(firstCommentsLine);
+
+      const maxCommentLength = this.questionModelValidatorService.maxCommentLength;
+      if (question.comment.length > maxCommentLength) {
+        const errorMessage = `В задании с номером ${question.externalNumber}
+        количество символов в комментарии (${question.comment.length}) превышает максимально
+         разрешенное количество символов для комментария (${maxCommentLength}). ${QuestionsImporter.rtfmMessage}`;
+
+        this.allThingsOk = false;
+        this.onFailure(this.parentComponentObject, errorMessage);
+        return false;
+      }
     }
 
     // тут проверяем наличие сегмента с информацией об источнике
@@ -128,6 +162,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     const questionSource = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
     question.source = this.loadSegmentText(questionSource);
 
+    const maxSourceLength = this.questionModelValidatorService.maxSourceLength;
+    if (question.source.length > maxSourceLength) {
+      const errorMessage = `В задании с номером ${question.externalNumber}
+      количество символов в блоке об источнике информации для задания (${question.source.length}) превышает максимально
+       разрешенное количество символов для описания источника (${maxSourceLength}). ${QuestionsImporter.rtfmMessage}`;
+
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, errorMessage);
+      return false;
+    }
+
     // проверяем наличие информации об авторе бескрылки
     if (!this.validateAuthorInfoSegmentPresence(question)) {
       return false;
@@ -135,6 +180,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
 
     const firstAuthorsInfoLine = this.removeSegmentPrefix(this.sourceTextLinesIterator.nextLine());
     question.authorInfo = this.loadSegmentText(firstAuthorsInfoLine);
+
+    const maxAuthorInfoLength = this.questionModelValidatorService.maxAuthorInfoLength;
+    if (question.authorInfo.length > maxAuthorInfoLength) {
+      const errorMessage = `В задании с номером ${question.externalNumber}
+      количество символов в строке с информацией об авторе задания (${question.authorInfo.length}) превышает максимально
+       разрешенное количество символов для информации об авторе задания (${maxAuthorInfoLength}). ${QuestionsImporter.rtfmMessage}`;
+
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, errorMessage);
+      return false;
+    }
 
     return true;
   }
@@ -275,10 +331,10 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
   }
 
   /**
-   * Извлекает номер задания из строки.
+   * Извлекает номер задания и заголовок задания из строки и пишет в объект вопроса.
    * @param sourceStringLine строка для обработки.
    * @param currentQuestionObject объект класса QuestionDataModel для записи результатов парсинга.
-   * @returns блок данных с информацией о номере, зачётности задания, и заголовок задания.
+   * @returns true, если всё прошло успешно.
    */
   private parseFirstQuestionLine(sourceStringLine: string, currentQuestionObject: QuestionDataModel): boolean {
     if (!QuestionsImporter.hasControlPrefix(sourceStringLine)) {
@@ -322,6 +378,17 @@ export class QuestionsImporter extends AbstractMultiLineDataImporter {
     }
 
     currentQuestionObject.title = sourceStringLine.substring(colonSymbolPosition + 1).trim();
+
+    const maxTitleLength = this.questionModelValidatorService.maxTitleLength;
+    if (currentQuestionObject.title && currentQuestionObject.title.length > maxTitleLength) {
+      const errorMessage = `В задании с номером ${currentQuestionObject.externalNumber}
+       количество символов в заголовке (${currentQuestionObject.title.length}) превышает максимально
+        разрешенное количество символов для заголовка задания (${maxTitleLength}). ${QuestionsImporter.rtfmMessage}`;
+
+      this.allThingsOk = false;
+      this.onFailure(this.parentComponentObject, errorMessage);
+      return false;
+    }
 
     return true;
   }
