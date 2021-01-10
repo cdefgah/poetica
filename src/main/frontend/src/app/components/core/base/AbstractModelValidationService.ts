@@ -8,25 +8,21 @@
  */
 export abstract class AbstractModelValidationService {
   // используется в случае поломок, для хранения описания, что сломалось
-  protected _brokenStateDescription: string = "";
+  public brokenStateDescription = '';
+
+  protected static isNumber(value: string | number): boolean {
+    return value != null && value !== '' && !isNaN(Number(value.toString()));
+  }
 
   constructor() { }
 
   protected setBrokenInternalState(description: string) {
-    this._brokenStateDescription = description;
+    this.brokenStateDescription = description;
   }
 
   public isInternalStateCorrect() {
     return !(
-      this._brokenStateDescription && this._brokenStateDescription.length > 0
+      this.brokenStateDescription && this.brokenStateDescription.length > 0
     );
-  }
-
-  get brokenStateDescription(): string {
-    return this._brokenStateDescription;
-  }
-
-  protected static isNumber(value: string | number): boolean {
-    return value != null && value !== "" && !isNaN(Number(value.toString()));
   }
 }

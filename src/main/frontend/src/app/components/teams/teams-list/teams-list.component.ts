@@ -14,7 +14,6 @@ import { TeamsListImporterComponent } from '../teams-list-importer/teams-list-im
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { DialogResultFlags } from '../../../utils/DialogResultFlags';
 import { TeamViewModel } from '../../../view-model/TeamViewModel';
-import { debugObject } from 'src/app/utils/Config';
 
 @Component({
   selector: 'app-teams-list',

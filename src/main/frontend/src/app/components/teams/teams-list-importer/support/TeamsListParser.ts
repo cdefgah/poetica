@@ -7,7 +7,7 @@ import { AbstractMultiLineDataImporter } from 'src/app/utils/AbstractMultilineDa
 import { TeamsListParserParameters } from './TeamsListParserParameters';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { HttpHeaders } from '@angular/common/http';
-import { debugString, debugObject } from 'src/app/utils/Config';
+import { TeamsListImporterComponent } from '../teams-list-importer.component';
 
 export class TeamsListParser extends AbstractMultiLineDataImporter {
   private parameters: TeamsListParserParameters;
@@ -15,8 +15,8 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
 
   constructor(
     parameters: TeamsListParserParameters,
-    onSuccess: Function,
-    onFailure: Function
+    onSuccess: (importerComponentReference: TeamsListImporterComponent, teams2Import: TeamDataModel[]) => void,
+    onFailure: (importerComponentReference: TeamsListImporterComponent, errorMessage: string) => void
   ) {
     super(parameters.textWithTeamsList, onSuccess, onFailure);
     this.parameters = parameters;
@@ -48,14 +48,8 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       const teamNumberValidationMessage: string = this.parameters.teamValidationService.
         checkTeamNumberAndGetValidationMessage(teamNumberString);
 
-      if (
-        teamNumberValidationMessage &&
-        teamNumberValidationMessage.length > 0
-      ) {
-        this.onFailure(
-          this.parameters.parentComponentObject,
-          `Ошибка в формате строки: '${lineWithTeamNumberAndTitle}'. ${teamNumberValidationMessage}`
-        );
+      if (teamNumberValidationMessage && teamNumberValidationMessage.length > 0) {
+        this.onFailure(this.parameters.parentComponentObject, `Ошибка в формате строки: '${lineWithTeamNumberAndTitle}'. ${teamNumberValidationMessage}`);
         return;
       }
 
@@ -66,18 +60,12 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       );
 
       if (teamTitleValidationMessage && teamTitleValidationMessage.length > 0) {
-        this.onFailure(
-          this.parameters.parentComponentObject,
-          `Ошибка в формате строки: '${lineWithTeamNumberAndTitle}'. ${teamTitleValidationMessage}`
-        );
+        this.onFailure(this.parameters.parentComponentObject, `Ошибка в формате строки: '${lineWithTeamNumberAndTitle}'. ${teamTitleValidationMessage}`);
         return;
       }
 
       if (processedTeamNumbers.has(teamNumber)) {
-        this.onFailure(
-          this.parameters.parentComponentObject,
-          `В строке: '${lineWithTeamNumberAndTitle}' указан повторяющийся номер команды. Он уже есть у другой команды выше в списке.`
-        );
+        this.onFailure(this.parameters.parentComponentObject, `В строке: '${lineWithTeamNumberAndTitle}' указан повторяющийся номер команды. Он уже есть у другой команды выше в списке.`);
         return;
       }
 
@@ -85,10 +73,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
 
       const teamTitleInLowerCase: string = teamTitle.toLowerCase();
       if (processedTeamTitles.has(teamTitleInLowerCase)) {
-        this.onFailure(
-          this.parameters.parentComponentObject,
-          `В строке: '${lineWithTeamNumberAndTitle}' указано повторяющееся название команды. Это название уже есть у другой команды выше в списке.`
-        );
+        this.onFailure(this.parameters.parentComponentObject, `В строке: '${lineWithTeamNumberAndTitle}' указано повторяющееся название команды. Это название уже есть у другой команды выше в списке.`);
         return;
       }
 
@@ -100,10 +85,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
     }
 
     if (this.teams.length === 0) {
-      this.onFailure(
-        this.parameters.parentComponentObject,
-        'Забыли задать текст со списком команд.'
-      );
+      this.onFailure(this.parameters.parentComponentObject, 'Забыли задать текст со списком команд.');
       return;
     }
 
@@ -111,15 +93,7 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
     this.doValidationWithServerData(this, this.teams);
   }
 
-  private doValidationWithServerData(
-    parserObjectReference: TeamsListParser,
-    loadedTeams: TeamDataModel[]
-  ) {
-    debugString(
-      'Validating teams using server-side data. Teams list is below:'
-    );
-    debugObject(loadedTeams);
-
+  private doValidationWithServerData(parserObjectReference: TeamsListParser, loadedTeams: TeamDataModel[]) {
     const headers = new HttpHeaders().set(
       'Content-Type',
       'application/json; charset=utf-8'
@@ -130,38 +104,18 @@ export class TeamsListParser extends AbstractMultiLineDataImporter {
       .post(validationUrl, loadedTeams, { headers })
       .subscribe(
         (validationErrors: string[]) => {
-          debugString('Server reponse received.');
-
           if (validationErrors && validationErrors.length > 0) {
             // что-то с валидацией не то
-            debugString('There are some validation issues listed below');
-            debugObject(validationErrors);
-
-            parserObjectReference.onFailure(
-              parserObjectReference.parameters.parentComponentObject,
-              validationErrors.join('\n')
+            parserObjectReference.onFailure(parserObjectReference.parameters.parentComponentObject, validationErrors.join('\n')
             );
             return;
           } else {
             // валидация прошла успешно
-            debugString('Server-side validation passed ok');
-            parserObjectReference.onSuccess(
-              parserObjectReference.parameters.parentComponentObject,
-              loadedTeams
-            );
+            parserObjectReference.onSuccess(parserObjectReference.parameters.parentComponentObject, loadedTeams);
             return;
           }
         },
         (error) => {
-          debugString('Validation failed. Error object is below');
-          debugObject(error);
-          debugString('parserObjectReference object is below:');
-          debugObject(parserObjectReference);
-          debugString(
-            'parserObjectReference._parentComponentObject object is below:'
-          );
-          debugObject(parserObjectReference.parentComponentObject);
-
           parserObjectReference.onFailure(
             parserObjectReference.parentComponentObject,
             `Не удалось получить информацию из базы данных о приемлемости номера и названия для команды.

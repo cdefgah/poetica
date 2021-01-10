@@ -7,6 +7,7 @@ import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../message-box/message-box.component';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { AbstractBareComponent } from './AbstractBareComponent';
+import { PoeticaLogger } from '../../../utils/PoeticaLogger';
 
 export abstract class AbstractInteractiveComponentModel extends AbstractBareComponent {
   protected abstract getMessageDialogReference(): MatDialog;
@@ -17,11 +18,8 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
       // TODO сделать функцию, которая ищет message в глубину
       // ибо бывают ошибки error.error.error.error.message
       // спросить на SO - как лучше сделать.
-      console.log('===========================================');
-      console.log('========= SERFVER ERROR OBJECT ============');
-      console.log('===========================================');
-      console.dir(errorObject);
-      console.log('===========================================');
+
+      PoeticaLogger.logObjectState(errorObject, 'Server error object');
 
       const rawErrorMessage: string = errorObject.error !== undefined ? String(errorObject.error) : String(errorObject.message);
 
@@ -38,30 +36,19 @@ export abstract class AbstractInteractiveComponentModel extends AbstractBareComp
       }
     }
 
-    const customePrefixMessage =
-      customMessage && customMessage.length > 0 ? customMessage + '. ' : '';
-    const errorMessage = `${customePrefixMessage}${getServerErrorMessage(
-      error
-    )}.`;
+    const customePrefixMessage = customMessage && customMessage.length > 0 ? customMessage + '. ' : '';
+    const errorMessage = `${customePrefixMessage}${getServerErrorMessage(error)}.`;
     this.displayMessage(errorMessage);
   }
 
-  protected displayMessage(
-    messageToDisplay: string,
-    messageBoxTitle: string = 'Внимание'
-  ): void {
-    const msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(
-      messageToDisplay,
-      messageBoxTitle
-    );
+  protected displayMessage(messageToDisplay: string, messageBoxTitle: string = 'Внимание'): void {
 
+    const msgBoxConfig: MatDialogConfig = MessageBoxComponent.getDialogConfigWithData(messageToDisplay, messageBoxTitle);
     this.getMessageDialogReference().open(MessageBoxComponent, msgBoxConfig);
   }
 
-  protected confirmationDialog(
-    confirmationMessage: string,
-    dialogAcceptedAction: Function
-  ): void {
+  protected confirmationDialog(confirmationMessage: string, dialogAcceptedAction: Function): void {
+
     const confirmationDialogConfig: MatDialogConfig = ConfirmationDialogComponent.getDialogConfigWithData(
       confirmationMessage
     );

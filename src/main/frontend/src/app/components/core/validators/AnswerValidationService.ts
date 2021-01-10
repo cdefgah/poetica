@@ -3,8 +3,8 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { AbstractModelValidationService } from "../base/AbstractModelValidationService";
-import { HttpClient } from "@angular/common/http";
+import { AbstractModelValidationService } from '../base/AbstractModelValidationService';
+import { HttpClient } from '@angular/common/http';
 
 export class AnswerValidationService extends AbstractModelValidationService {
   private _maxBodyLength: number;
@@ -13,14 +13,14 @@ export class AnswerValidationService extends AbstractModelValidationService {
   constructor(httpClient: HttpClient) {
     super();
 
-    const url: string = "/answers/model-constraints";
+    const url = '/answers/model-constraints';
     httpClient.get(url).subscribe(
       (data: Map<string, string>) => {
-        this._maxBodyLength = parseInt(data["MAX_BODY_LENGTH"]);
-        this._maxCommentLength = parseInt(data["MAX_COMMENT_LENGTH"]);
+        this._maxBodyLength = parseInt(data['MAX_BODY_LENGTH'], 10);
+        this._maxCommentLength = parseInt(data['MAX_COMMENT_LENGTH'], 10);
       },
       (error) => {
-        var errorMessage: string = `$Ошибка при получении model-constraints для Answer. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
+        const errorMessage = `$Ошибка при получении model-constraints для Answer. ${error.error}. Код статуса: ${error.status}. Сообщение сервера: '${error.message}'`;
         this.setBrokenInternalState(errorMessage);
       }
     );
@@ -37,7 +37,7 @@ export class AnswerValidationService extends AbstractModelValidationService {
     if (answerBody.length > this._maxBodyLength) {
       return `Количество символов в ответе с номером ${questionNumber} равно ${answerBody.length} и превышает максимально допустимое количество символов для обработки: ${this._maxBodyLength}`;
     } else {
-      return "";
+      return '';
     }
   }
 
@@ -48,7 +48,7 @@ export class AnswerValidationService extends AbstractModelValidationService {
     if (answerComment.length > this._maxCommentLength) {
       return `Количество символов в комментарии к ответу c номером ${questionNumber} равно ${answerComment.length} и превышает максимально допустимое количество символов для обработки: ${this._maxCommentLength}`;
     } else {
-      return "";
+      return '';
     }
   }
 }

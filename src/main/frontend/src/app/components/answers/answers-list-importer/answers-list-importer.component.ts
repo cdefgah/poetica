@@ -16,7 +16,6 @@ import { AbstractInteractiveComponentModel } from 'src/app/components/core/base/
 import { EmailValidationService } from '../../core/validators/EmailValidationService';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
 import { AnswerValidationService } from '../../core/validators/AnswerValidationService';
-import { debugString, debugObject } from 'src/app/utils/Config';
 import { EmailBodyParsingResult } from './support/email-body-parser/EmailBodyParsingResult';
 import { EmailBodyParserParameters } from './support/email-body-parser/EmailBodyParserParameters';
 import { EmailBodyParser } from './support/email-body-parser/EmailBodyParser';
@@ -225,18 +224,12 @@ export class AnswersListImporterComponent
   //#endregion
 
   onStepChange(event: any) {
-    debugString(
-      'Importing answers. Event parameter is provided below. onStepChange:: start'
-    );
-    debugObject(event);
-
     // если перешли на нулевой шаг с любого
     if (event.selectedIndex === 0) {
-      // сбрасываем состояние всех контролирующих переменных
-      // и выходим
-      debugString('Switched to the first step. Resetting vars and exiting.');
+      // сбрасываем состояние всех контролирующих переменных и выходим
       this.resetStepperVariables(event);
       return;
+
     } else if (event.selectedIndex === 1) {
       // TODO - костыльный код, стыдно, товарищ, непременно переделай как дойдут руки!
       // если пришли на второй шаг (неважно с какого, например с третьего), скрываем кнопку импорта
@@ -245,18 +238,13 @@ export class AnswersListImporterComponent
 
     if (event.previouslySelectedIndex === 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем содержимое письма
-      debugString(
-        'Moving from the first step. Processing email body.'
-      );
       this.processEmailBody(
         this.onSuccessfullyEmailBodyParse,
         this.onEmailParsingFailure
       );
+
     } else if (event.previouslySelectedIndex === 1) {
       // если ушли со второго шага (индекс == 1), то обрабатываем номер тура и дату/время письма
-      debugString(
-        'Moving from the second step. Processing email date/time and round number'
-      );
       this.processSpecifiedRoundNumberAndEmailDateTime(
         this.emailUniquenessCheckFailed
       );
@@ -268,8 +256,6 @@ export class AnswersListImporterComponent
     onFailure: (parentComponentObject: AnswersListImporterComponent, errorMessage: string) => void): void {
     const parentComponentObject: AnswersListImporterComponent = this;
 
-    debugString('Preparing email body parser for launch...');
-
     const emailBodyParserParameters: EmailBodyParserParameters = new EmailBodyParserParameters();
     emailBodyParserParameters.parentComponentObject = parentComponentObject;
     emailBodyParserParameters.emailBody = parentComponentObject.emailBody;
@@ -279,14 +265,12 @@ export class AnswersListImporterComponent
 
     emailBodyParserParameters.httpClient = parentComponentObject.httpClient;
 
-    debugString('Creating emailBodyParser object');
     const emailBodyParser: EmailBodyParser = new EmailBodyParser(
       emailBodyParserParameters,
       onSuccess,
       onFailure
     );
 
-    debugString('Launching email body parsing ...');
     emailBodyParser.parse();
   }
 
@@ -300,11 +284,6 @@ export class AnswersListImporterComponent
       parsingResult.questionNumbersSequenceString;
 
     parentComponentObject.firstStepErrorMessage = ''; // нет ошибок
-
-    debugString('Email body parsed successfully');
-    debugString(`team: ${parentComponentObject.teamFromEmailBody.toString()}`);
-    debugString('Answers listed below');
-    debugObject(parentComponentObject.answers);
   }
 
   /**
@@ -314,20 +293,8 @@ export class AnswersListImporterComponent
    * @param parentComponentObject ссылка на этот компонент, хранится в парсере и пробрасывается в вызов этого метода.
    * @param errorMessage сообщение об ошибке.
    */
-  private onEmailParsingFailure(
-    parentComponentObject: AnswersListImporterComponent,
-    errorMessage: string
-  ) {
-    debugString(`Email parser failed. Error message: ${errorMessage}`);
-
+  private onEmailParsingFailure(parentComponentObject: AnswersListImporterComponent, errorMessage: string) {
     parentComponentObject.firstStepErrorMessage = errorMessage;
-
-    debugString(
-      `parentComponentObject.firstStepErrorMessage = ${parentComponentObject.firstStepErrorMessage}`
-    );
-    debugString(
-      `parentComponentObject.allThingsAreOk = ${parentComponentObject.allThingsAreOk}`
-    );
   }
 
   /**
@@ -336,22 +303,16 @@ export class AnswersListImporterComponent
    * @param onEmailUniquenessCheckFailure функция, которая будет вызвана в случае ошибки в коде проверки уникальности присланного письма.
    */
   private processSpecifiedRoundNumberAndEmailDateTime(
-    onEmailUniquenessCheckFailure: Function
+                        onEmailUniquenessCheckFailure: (componentReference: AnswersListImporterComponent, errorMessage: string) => void
   ): void {
-    debugString('Processing specified round number and email date/time');
-    if (this.selectedRoundNumber) {
-      debugString(`Round number: ${this.selectedRoundNumber}`);
-    } else {
-      debugString('Round number is not specified');
+
+    if (!this.selectedRoundNumber) {
       this.secondStepErrorMessage =
         'Не указано на какой раунд (тур) прислано письмо. Предварительный или основной.';
       return;
     }
 
-    debugString('Processing email date/time');
     if (this.emailSentOnDate) {
-      debugString(`this.emailSentOnDate = ${this.emailSentOnDate}`);
-
       const day = this.emailSentOnDate.getDate();
       const month = this.emailSentOnDate.getMonth();
       const year = this.emailSentOnDate.getFullYear();
@@ -376,40 +337,27 @@ export class AnswersListImporterComponent
 
       // отправляем compoundDate на сервер и строим там java-Date
       // new Date(compoundDate);
-      debugString(
-        `Compound long-format date: ${this.compoundEmailSentOnDate.getTime()}`
-      );
-
-      debugString('Checking email uniqueness...');
       this.validateEmailUniqueness(onEmailUniquenessCheckFailure);
     } else {
-      debugString('Date when email has been sent is not specified');
       this.secondStepErrorMessage = 'Не указана дата отправки письма';
     }
   }
 
-  private validateEmailUniqueness(onEmailUniquenessCheckFailure: Function) {
+  private validateEmailUniqueness(onEmailUniquenessCheckFailure: 
+        (componentReference: AnswersListImporterComponent, errorMessage: string) => void) {
+
     const thisComponentReference: AnswersListImporterComponent = this;
     const teamId: number = this.teamFromEmailBody.id;
     const roundNumber: string = this.selectedRoundNumber;
     const emailSentOn: number = this.compoundEmailSentOnDate.getTime();
 
-    debugString(' ====================== EMAIL UNIQUENESS CHECKING ============================ ');
-    debugString('teamId: ' + teamId);
-    debugString('roundNUmber: ' + roundNumber);
-    debugString('emailSentOn: ' + emailSentOn);
-
     const emailUniquenessCheckUrl = `/emails/is-unique/${teamId}/${roundNumber}/${emailSentOn}`;
-    debugString('emailUniquenessCheckUrl:' + emailUniquenessCheckUrl);
 
     thisComponentReference.httpClient.get(emailUniquenessCheckUrl).subscribe(
       (resultFlag: string) => {
-        debugString('received resultFlag: ' + resultFlag);
         const resultFlagInNumericForm: number = parseInt(resultFlag, 10);
-        debugString('resultFlagInNumericForm: ' + resultFlagInNumericForm);
 
         if (resultFlagInNumericForm < 0) {
-          debugString('Email is not unique...');
           thisComponentReference.displayImportButton = false;
 
           const errorMessage =
@@ -417,7 +365,6 @@ export class AnswersListImporterComponent
           onEmailUniquenessCheckFailure(thisComponentReference, errorMessage);
         } else {
           // письмо уникальное
-          debugString('Email is unique...');
           thisComponentReference.displayImportButton = true;
           thisComponentReference.secondStepErrorMessage = '';
         }
@@ -429,17 +376,8 @@ export class AnswersListImporterComponent
     );
   }
 
-  private emailUniquenessCheckFailed(
-    thisComponentReference: AnswersListImporterComponent,
-    errorMessage: string
-  ) {
-    debugString(
-      `Email uniqueness check failed. Error message: ${errorMessage}`
-    );
-
-    debugString('allThingsAreOk before assigning error message: ' + thisComponentReference.allThingsAreOk);
+  private emailUniquenessCheckFailed(thisComponentReference: AnswersListImporterComponent, errorMessage: string) {
     thisComponentReference.secondStepErrorMessage = errorMessage;
-    debugString('allThingsAreOk after assigning error message: ' + thisComponentReference.allThingsAreOk);
   }
 
   private resetStepperVariables(stepChangeEvent: any): void {
@@ -480,16 +418,11 @@ export class AnswersListImporterComponent
         oneAnswer.roundNumber = parseInt(this.selectedRoundNumber, 10);
       }
     });
-    debugString('Answers after import preparation (check below):');
-    debugObject(this.answers);
   }
 
   doImportAnswers(): void {
-    debugString('Confirming the answers import action');
     this.confirmationDialog('Импортировать ответы?', () => {
       // если диалог был принят (accepted)
-
-      debugString('Action confirmed. Preparing email to save in database ...');
 
       // сперва отправляем присланный email в базу
       const email2Import = new EmailDataModel();
@@ -501,53 +434,29 @@ export class AnswersListImporterComponent
       email2Import.importedOn = new Date().getTime();
       email2Import.questionNumbersSequence = this.questionNumbersSequence;
 
-      debugString('Prepared email object looks like that (check below)');
-      debugObject(email2Import);
-
       // импортируем email
       const headers = new HttpHeaders().set(
         'Content-Type',
         'application/json; charset=utf-8'
       );
 
-      debugString('Sending request to save email in database ...');
       this.httpClient
         .post('/emails/import', email2Import, { headers })
         .subscribe(
           (receivedEmailId) => {
-            debugString(
-              `Email import request succeed. Now getting the id of saved email. It is: ${receivedEmailId}`
-            );
 
             const emailId: number = parseInt(receivedEmailId.toString(), 10);
             this.prepareAnswersToImport(emailId, email2Import.sentOn);
 
-            debugString(
-              'Answers data prepared. Sending the request to the server...'
-            );
             // импортируем ответы
             this.httpClient
               .post('/answers/import', this.answers, { headers })
               .subscribe(
-                (data) => {
-                  debugString('Request succeed. Closing the import dialog.');
-                  this.dialog.close(new AnswersImporterDialogResult(true, this.teamFromEmailBody.id, this.selectedRoundNumber));
-                },
-                (error) => {
-                  debugString('Request failed. Error is below:');
-                  debugObject(error);
-                  this.reportServerError(error, 'Сбой при импорте ответов.');
-                }
+                () => this.dialog.close(new AnswersImporterDialogResult(true, this.teamFromEmailBody.id, this.selectedRoundNumber)),
+                (error) => this.reportServerError(error, 'Сбой при импорте ответов.')
               );
           },
-          (error) => {
-            debugString('Email import request failed. Error is below:');
-            debugObject(error);
-            this.reportServerError(
-              error,
-              'Сбой при импорте присланного письма.'
-            );
-          }
+          (error) => this.reportServerError(error, 'Сбой при импорте присланного письма.')
         );
     });
   }

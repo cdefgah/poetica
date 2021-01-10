@@ -13,7 +13,6 @@ import {
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
-import { debugString, debugObject } from 'src/app/utils/Config';
 
 @Component({
   selector: 'app-email-details',
@@ -52,12 +51,7 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    debugString('Loading emailId in the dialog ...');
-    let emailId = dialogData[EmailDetailsComponent.KEY_DIALOG_ID];
-
-    debugString(`emailId = ${this.email.id}`);
-    debugString('dialogData is below:');
-    debugObject(dialogData);
+    const emailId = dialogData[EmailDetailsComponent.KEY_DIALOG_ID];
 
     // получаем объект email
     const emailRequestUrl = `/emails/${emailId}`;
@@ -77,14 +71,13 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   deleteEmailWithAllImportedAnswers() {
-    let confirmationMessage = `Удалить это письмо и все импортированные из него ответы ?`;
+    const confirmationMessage = `Удалить это письмо и все импортированные из него ответы ?`;
 
     this.confirmationDialog(confirmationMessage, () => {
       // если диалог был принят (accepted)
-      let requestUrl = `/emails/delete/${this.email.id.toString()}`;
+      const requestUrl = `/emails/delete/${this.email.id.toString()}`;
       this.httpClient.delete(requestUrl).subscribe(
         (data: any) => {
-          debugString('Email has been deleted ... request done successfully');
           this.dialog.close(true); // true означает, что были изменения
         },
         (error) => this.reportServerError(error)
@@ -93,7 +86,6 @@ export class EmailDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   justCloseDialog() {
-    debugString('Just closing dialog without affecting email');
     this.dialog.close(false); // false означает, что изменений не было (письма не удаляли)
   }
 }

@@ -13,7 +13,6 @@ import { StringBuilder } from '../../../../../utils/StringBuilder';
 import { EmailBodyParsingResult } from './EmailBodyParsingResult';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
-import { debugString } from '../../../../../utils/Config';
 import { AnswersListImporterComponent } from '../../answers-list-importer.component';
 
 export class EmailBodyParser extends AbstractMultiLineDataImporter {
@@ -99,13 +98,10 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     parserObjectReference: EmailBodyParser,
     loadedAnswers: AnswerDataModel[]
   ) {
-    debugString('Validating team title...');
     // сперва проверяем корректность названия команды из письма
     const teamNumber: number = parserObjectReference.team.number;
-    debugString(`teamNumber: ${teamNumber}`);
 
     const teamValidationUrl = `/teams/numbers/${teamNumber}`;
-    debugString(`teamValidationUrl: ${teamValidationUrl}`);
 
     const importingTeamTitle = parserObjectReference.team.title;
     parserObjectReference.httpClient.get(teamValidationUrl).subscribe(

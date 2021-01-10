@@ -33,10 +33,7 @@ export class QuestionsListImporterComponent
       return;
     }
 
-    this.questionValidationService =
-      dialogData[
-      QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE
-      ];
+    this.questionValidationService = dialogData[QuestionsListImporterComponent.KEY_DIALOG_QUESTION_VALIDATOR_SERVICE];
   }
 
   private static readonly KEY_DIALOG_QUESTION_VALIDATOR_SERVICE = 'questionModelValidatorService';
@@ -63,9 +60,8 @@ export class QuestionsListImporterComponent
 
   questionValidationService: QuestionValidationService;
 
-  static getDialogConfigWithData(
-    questionValidationService: QuestionValidationService
-  ): MatDialogConfig {
+  static getDialogConfigWithData(questionValidationService: QuestionValidationService): MatDialogConfig {
+
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
@@ -117,31 +113,11 @@ export class QuestionsListImporterComponent
     questionsImporter.doImport();
   }
 
-  private onQuestionsImportSuccess(
-    importerComponent: QuestionsListImporterComponent,
-    questionsList: QuestionDataModel[]
-  ) {
+  private onQuestionsImportSuccess(importerComponent: QuestionsListImporterComponent, questionsList: QuestionDataModel[]) {
     importerComponent.dataSource = questionsList;
-
-    console.log(
-      '=================== QUESTIONS TO IMPORT ======================'
-    );
-
-    questionsList.forEach((oneQuestion) => {
-      console.log('+++++++++++');
-      console.log(oneQuestion);
-      console.log('+++++++++++');
-    });
-
-    console.log(
-      '=============================================================='
-    );
   }
 
-  private onQuestionImportFailure(
-    importerComponent: QuestionsListImporterComponent,
-    errorMessage: string
-  ) {
+  private onQuestionImportFailure(importerComponent: QuestionsListImporterComponent, errorMessage: string) {
     importerComponent.foundError = errorMessage;
   }
 
@@ -159,9 +135,7 @@ export class QuestionsListImporterComponent
       this.http
         .post('/questions/import', this.dataSource, { headers })
         .subscribe(
-          (data) => {
-            this.dialog.close(true);
-          },
+          () => this.dialog.close(true),
           (error) => this.reportServerError(error, 'Сбой при импорте заданий.')
         );
     });

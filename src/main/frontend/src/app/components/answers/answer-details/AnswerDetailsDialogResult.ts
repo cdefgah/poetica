@@ -4,6 +4,8 @@
  */
 
 export class AnswerDetailsDialogResult {
+    public static readonly emptyResult: AnswerDetailsDialogResult = new AnswerDetailsDialogResult('', '');
+
     public readonly gradeOnDialogOpen: string;
     public readonly gradeOnDialogClose: string;
 

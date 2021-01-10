@@ -11,7 +11,6 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef,
 } from '@angular/material';
-import { debugString, debugObject } from 'src/app/utils/Config';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AnswerDataModel } from 'src/app/data-model/AnswerDataModel';
 import { EmailDataModel } from 'src/app/data-model/EmailDataModel';
@@ -44,18 +43,7 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
     dialogConfig.width = '75%';
 
     dialogConfig.data = new Map<string, any>();
-
-    debugString('Checking the row validity');
-    debugString(row);
-    if (row) {
-      debugString('Checking the row validity ... row is defined!');
-
-      // идентификатор ответа (из строки списка ответов)
-      dialogConfig.data[AnswerDetailsComponent.KEY_DIALOG_ID] =
-        row[AnswerDetailsComponent.KEY_DIALOG_ID];
-    } else {
-      debugString('Checking the row validity - ROW IS UNDEFINED!');
-    }
+    dialogConfig.data[AnswerDetailsComponent.KEY_DIALOG_ID] = row[AnswerDetailsComponent.KEY_DIALOG_ID];
 
     return dialogConfig;
   }
@@ -68,12 +56,7 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   ) {
     super();
 
-    debugString('Loading answerId in the dialog ...');
     const answerId = dialogData[AnswerDetailsComponent.KEY_DIALOG_ID];
-
-    debugString(`answerId = ${answerId}`);
-    debugString('dialogData is below:');
-    debugObject(dialogData);
 
     const componentReference = this;
 
@@ -145,14 +128,12 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
 
   acceptAnswer() {
     this.confirmationDialog('Принять ответ?', () => {
-      debugString('Answer has accepted');
       const requestUrl = '/answers/accept';
       const payload = new HttpParams().set('answerId', this.answer.id.toString()
       );
 
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
-          debugString('Answer has accepted ... request done successfully');
           const acceptedAnswerGrade = 'Accepted';
           const dialogResult: AnswerDetailsDialogResult = new AnswerDetailsDialogResult(this.answer.grade, acceptedAnswerGrade);
           this.dialog.close(dialogResult);
@@ -164,13 +145,11 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
 
   declineAnswer() {
     this.confirmationDialog('Отклонить ответ?', () => {
-      debugString('Answer has declined');
       const requestUrl = '/answers/decline';
       const payload = new HttpParams().set('answerId', this.answer.id.toString());
 
       this.httpClient.put(requestUrl, payload).subscribe(
         () => {
-          debugString('Answer has declined ... request done successfully');
           const NotAcceptedAnswerGrade = 'NotAccepted';
           const dialogResult: AnswerDetailsDialogResult = new AnswerDetailsDialogResult(this.answer.grade, NotAcceptedAnswerGrade);
           this.dialog.close(dialogResult);
@@ -181,7 +160,6 @@ export class AnswerDetailsComponent extends AbstractInteractiveComponentModel
   }
 
   justCloseDialog() {
-    debugString('Just closing dialog without affecting answer');
-    this.dialog.close(new AnswerDetailsDialogResult('', ''));
+    this.dialog.close(AnswerDetailsDialogResult.emptyResult);
   }
 }

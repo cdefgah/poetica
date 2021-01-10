@@ -14,7 +14,6 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ConfirmationDialogComponent } from '../../core/confirmation-dialog/confirmation-dialog.component';
 import { TeamDataModel } from 'src/app/data-model/TeamDataModel';
-import { debugString, debugObject } from 'src/app/utils/Config';
 import { TeamValidationService } from '../../core/validators/TeamValidationService';
 import { TeamsListParserParameters } from './support/TeamsListParserParameters';
 import { TeamsListParser } from './support/TeamsListParser';
@@ -137,14 +136,7 @@ export class TeamsListImporterComponent
     parser.processText();
   }
 
-  textWithTeamsListProcessedOk(
-    currentComponentReference: TeamsListImporterComponent,
-    teams2Import: TeamDataModel[]
-  ) {
-    debugString(
-      'Teams are processed successfully. Object is displayed below...'
-    );
-    debugObject(teams2Import);
+  textWithTeamsListProcessedOk(currentComponentReference: TeamsListImporterComponent, teams2Import: TeamDataModel[]) {
     currentComponentReference.firstStepErrorMessage = ''; // нет ошибок
     currentComponentReference.teams = teams2Import;
 
@@ -152,11 +144,7 @@ export class TeamsListImporterComponent
     currentComponentReference.updateDisplayImportButton(1);
   }
 
-  processingTextWithTeamsListFailed(
-    currentComponentReference: TeamsListImporterComponent,
-    errorMessage: string
-  ) {
-    debugString(`Teams processing failed. Error message: ${errorMessage}`);
+  processingTextWithTeamsListFailed(currentComponentReference: TeamsListImporterComponent, errorMessage: string) {
     currentComponentReference.firstStepErrorMessage = errorMessage;
 
     // второй шаг имеет индекс == 1
@@ -166,22 +154,15 @@ export class TeamsListImporterComponent
   onStepChange(event: any) {
     // если перешли на нулевой шаг с любого
     if (event.selectedIndex === 0) {
-      // сбрасываем состояние всех контролирующих переменных
-      // и выходим
-      debugString('Switched to the first step. Resetting vars and exiting.');
+      // сбрасываем состояние всех контролирующих переменных и выходим
       this.resetStepperVariables(event);
       return;
     }
 
     if (event.previouslySelectedIndex === 0) {
       // если ушли с первого шага (нулевой индекс), то обрабатываем список команд
-      debugString('Moving from the first step. Processing teams list.');
-
       // обрабатываем список команд
-      this.processTextWithTeamsList(
-        this.textWithTeamsListProcessedOk,
-        this.processingTextWithTeamsListFailed
-      );
+      this.processTextWithTeamsList(this.textWithTeamsListProcessedOk, this.processingTextWithTeamsListFailed);
     }
 
     // пересчитываем признак, по которому мы определяем
@@ -202,15 +183,8 @@ export class TeamsListImporterComponent
       this.httpClient
         .post('/teams/import', this.teams, { headers })
         .subscribe(
-          (data) => {
-            debugString('Request succeed. Closing the import dialog.');
-            this.dialog.close(true);
-          },
-          (error) => {
-            debugString('Request failed. Error is below:');
-            debugObject(error);
-            this.reportServerError(error, 'Сбой при импорте команд.');
-          }
+          () => this.dialog.close(true),
+          (error) => this.reportServerError(error, 'Сбой при импорте команд.')
         );
     });
   }
