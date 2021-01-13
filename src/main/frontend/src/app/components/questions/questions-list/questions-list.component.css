@@ -15,14 +15,3 @@ button {
 .highlight-not-graded {
   background: #e1e8b5;
 }
-
-th.mat-header-cell {
-  font-family: sans-serif;
-  text-align: center;  
-}
-
-td.mat-cell {
-  padding: 1em;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-}

@@ -21,35 +21,37 @@ Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com> -->
   </mat-radio-button>
 </mat-radio-group>
 <hr />
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<table mat-table #questionsTable #questionsTableSort="matSort" [dataSource]="questionsDataSource" matSort
+  class="mat-elevation-z8">
+
   <ng-container matColumnDef="externalNumber">
-    <th mat-header-cell *matHeaderCellDef>Номер</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Номер</th>
     <td mat-cell *matCellDef="let oneQuestion">
       {{ oneQuestion.externalNumber }}
     </td>
   </ng-container>
 
   <ng-container matColumnDef="mainContent">
-    <th mat-header-cell *matHeaderCellDef>Содержание</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Содержание</th>
     <td mat-cell *matCellDef="let oneQuestion">
       {{ oneQuestion.mainContent }}
     </td>
   </ng-container>
 
   <ng-container matColumnDef="authorsAnswer">
-    <th mat-header-cell *matHeaderCellDef>Авторский ответ</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Авторский ответ</th>
     <td mat-cell *matCellDef="let oneQuestion">
       {{ oneQuestion.authorsAnswer }}
     </td>
   </ng-container>
 
   <ng-container matColumnDef="source">
-    <th mat-header-cell *matHeaderCellDef>Источник</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Источник</th>
     <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.source }}</td>
   </ng-container>
 
   <ng-container matColumnDef="comment">
-    <th mat-header-cell *matHeaderCellDef>Комментарий</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Комментарий</th>
     <td mat-cell *matCellDef="let oneQuestion">{{ oneQuestion.comment }}</td>
   </ng-container>
 

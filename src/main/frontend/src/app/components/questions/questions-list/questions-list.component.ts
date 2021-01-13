@@ -3,22 +3,23 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog, MatRadioChange } from '@angular/material';
+import { MatDialog, MatRadioChange, MatSort, MatTableDataSource } from '@angular/material';
 import { QuestionsListImporterComponent } from '../questions-list-importer/questions-list-importer.component';
 import { QuestionDetailsComponent } from '../question-details/question-details.component';
 import { QuestionValidationService } from '../../core/validators/QuestionValidationService';
 import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInteractiveComponentModel';
 import { QuestionDataModel } from '../../../data-model/QuestionDataModel';
 import { QuestionViewModel } from '../../../view-model/QuestionViewModel';
+import { ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-questions-list',
   templateUrl: './questions-list.component.html',
   styleUrls: ['./questions-list.component.css'],
 })
-export class QuestionsListComponent extends AbstractInteractiveComponentModel implements OnInit {
+export class QuestionsListComponent extends AbstractInteractiveComponentModel implements OnInit, AfterViewInit {
   // эти псевдонимы также используются для формирования строки http-запроса, не меняйте их.
   private static readonly DISPLAY_MODE_ALIAS_ALL_QUESTIONS = 'all';
   private static readonly DISPLAY_MODE_ALIAS_CREDITED_QUESTIONS = 'credited';
@@ -42,7 +43,9 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     'comment',
   ];
 
-  dataSource: QuestionViewModel[];
+  @ViewChild('questionsTableSort') public questionsTableSort: MatSort;
+
+  questionsDataSource: MatTableDataSource<QuestionViewModel> = new MatTableDataSource([]);
 
   totalQuestionsAmount: number;
 
@@ -51,6 +54,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   private questionValidationService: QuestionValidationService;
 
   constructor(
+    private cdRef: ChangeDetectorRef,
     private http: HttpClient,
     public dialog: MatDialog,
     public otherDialog: MatDialog
@@ -73,17 +77,31 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
 
   ngOnInit() { }
 
+  ngAfterViewInit() {
+    this.questionsDataSource.sort = this.questionsTableSort;
+    this.cdRef.detectChanges();
+  }
+
   loadQuestionsList() {
+    // загружаем вопросы (все, внезачётные итп)
     const url = `/questions/${this.selectedDisplayModeAlias}`;
     this.http.get(url).subscribe(
       (receivedDataStructures: QuestionDataModel[]) => {
-        this.dataSource = [];
+        this.questionsDataSource.data.length = 0;
+
         receivedDataStructures.forEach((oneDataStructure) => {
-          this.dataSource.push(
+          this.questionsDataSource.data.push(
             new QuestionViewModel(oneDataStructure)
           );
         });
 
+        // оповещаем, что источник данных изменился
+        this.questionsDataSource._updateChangeSubscription();
+
+        // тут загружаем общее кол-во вопросов
+        // нельзя обойтись счётчиком в вышеприведенном цикле
+        // ибо там вопросы могут быть только определенного типа
+        // а нам нужно общее количество
         this.loadTotalQuestionsAmount();
       },
       (error) => this.reportServerError(error)
@@ -130,7 +148,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   }
 
   public get questionsArePresent(): boolean {
-    return this.dataSource && this.dataSource.length > 0;
+    return this.questionsDataSource.data && this.questionsDataSource.data.length > 0;
   }
 
   ImportQuestions() {
@@ -139,7 +157,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
         if (answersArePresentFlag) {
           this.displayMessage('Чтобы импортировать задания, надо предварительно удалить уже существующие. Но этого сделать нельзя, пока в системе есть ответы на них. Удалите их, прежде чем импортировать вопросы заново.');
         } else {
-          if (this.dataSource.length > 0) {
+          if (this.questionsDataSource.data.length > 0) {
             const confirmationMessage =
               'В базе данных уже представлены загруженнные задания. Их необходимо удалить, прежде чем импортировать новые. Удалить все загруженные задания?';
 
@@ -170,13 +188,16 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   }
 
   private startImportingQuestions() {
+
     const importDialogConfig = QuestionsListImporterComponent.getDialogConfigWithData(
       this.questionValidationService
     );
+
     const dialogRef = this.dialog.open(
       QuestionsListImporterComponent,
       importDialogConfig
     );
+
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // если диалог был принят (accepted)

@@ -38,9 +38,6 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     'Окончательный тур',
   ];
 
-  // если у нас много таблиц с сортируемыми колонками, то надо хитрО извернуться
-  // https://stackoverflow.com/questions/48001006/angular-material-distinct-mat-sort-on-multiple-tables/49056060
-
   @ViewChild('allAnswersTableSort') public allAnswersTableSort: MatSort;
   @ViewChild('answersWithoutGradesSort') public answersWithoutGradesSort: MatSort;
   @ViewChild('loadedEmailsTableSort') public loadedEmailsTableSort: MatSort;
