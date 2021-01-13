@@ -3,7 +3,6 @@ import { QuestionDataModel } from '../../../../data-model/QuestionDataModel';
 import { QuestionValidationService } from '../../../core/validators/QuestionValidationService';
 import { AbstractMultiLineDataImporter } from '../../../../utils/AbstractMultiLineDataImporter';
 import { StringBuilder } from '../../../../utils/StringBuilder';
-import { PoeticaLogger } from '../../../../utils/PoeticaLogger';
 
 export class QuestionsImporter extends AbstractMultiLineDataImporter {
 

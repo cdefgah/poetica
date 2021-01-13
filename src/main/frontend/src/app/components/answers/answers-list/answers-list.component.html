@@ -55,32 +55,33 @@ Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com> -->
 <div>
   <mat-tab-group>
     <mat-tab label="Все ответы">
-      <table mat-table #allAnswersTable #allAnswersSort="matSort" [dataSource]="answersDataSource" matSort
+      <table mat-table #allAnswersTable #allAnswersTableSort="matSort" [dataSource]="answersDataSource" matSort
         class="mat-elevation-z8">
-        <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
+
+        <ng-container matColumnDef="questionNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Номер</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
         </ng-container>
 
         <ng-container matColumnDef="emailSentOn">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Время ответа&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Время ответа</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="body">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Содержание&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Содержание</th>
           <td mat-cell *matCellDef="let answer">{{ answer.body }}</td>
         </ng-container>
 
         <ng-container matColumnDef="comment">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Комментарий&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Комментарий</th>
           <td mat-cell *matCellDef="let answer">{{ answer.comment }}</td>
         </ng-container>
 
         <ng-container matColumnDef="roundNumber">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Тур&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Тур</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.roundNumber | displayRound }}
           </td>
@@ -96,30 +97,30 @@ Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com> -->
     <mat-tab label="Ответы без оценок">
       <table mat-table #answersWithoutGradesTable #answersWithoutGradesSort="matSort"
         [dataSource]="answersWithoutGradesDataSource" matSort class="mat-elevation-z8">
-        <ng-container matColumnDef="number">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Номер&nbsp;</th>
+        <ng-container matColumnDef="questionNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Номер</th>
           <td mat-cell *matCellDef="let answer">{{ answer.questionNumber }}</td>
         </ng-container>
 
         <ng-container matColumnDef="emailSentOn">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Время ответа&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Время ответа</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.emailSentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="body">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Содержание&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Содержание</th>
           <td mat-cell *matCellDef="let answer">{{ answer.body }}</td>
         </ng-container>
 
         <ng-container matColumnDef="comment">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Комментарий&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Комментарий</th>
           <td mat-cell *matCellDef="let answer">{{ answer.comment }}</td>
         </ng-container>
 
         <ng-container matColumnDef="roundNumber">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Тур&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Тур</th>
           <td mat-cell *matCellDef="let answer">
             {{ answer.roundNumber | displayRound }}
           </td>
@@ -155,24 +156,24 @@ Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com> -->
         </tr>
       </table>
       &nbsp;
-      <table mat-table #loadedEmailsTable #loadedEmailsSort="matSort" [dataSource]="emailsDataSource" matSort
+      <table mat-table #loadedEmailsTable #loadedEmailsTableSort="matSort" [dataSource]="emailsDataSource" matSort
         class="mat-elevation-z8">
         <ng-container matColumnDef="sentOn">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Отправлено&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Отправлено</th>
           <td mat-cell *matCellDef="let email">
             {{ email.sentOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
         <ng-container matColumnDef="importedOn">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            &nbsp;Загружено в систему&nbsp;
+          <th mat-header-cell *matHeaderCellDef>
+            Загружено в систему
           </th>
           <td mat-cell *matCellDef="let email">
             {{ email.importedOn | date: "dd-MM-yyyy HH:mm" }}
           </td>
         </ng-container>
         <ng-container matColumnDef="questionNumbersSequence">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;Номера заданий&nbsp;</th>
+          <th mat-header-cell *matHeaderCellDef>Номера заданий</th>
           <td mat-cell *matCellDef="let email">
             {{ email.questionNumbersSequence }}
           </td>

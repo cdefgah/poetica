@@ -3,7 +3,7 @@
  * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { MatRadioChange, MatDialog, MatSelectChange, MatSort, MatTableDataSource } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { AnswersListImporterComponent } from '../answers-list-importer/answers-list-importer.component';
@@ -16,6 +16,7 @@ import { AbstractInteractiveComponentModel } from '../../core/base/AbstractInter
 import { AnswerDataModel } from '../../../data-model/AnswerDataModel';
 import { EmailDataModel } from '../../../data-model/EmailDataModel';
 import { TeamDataModel } from '../../../data-model/TeamDataModel';
+import { PoeticaLogger } from '../../../utils/PoeticaLogger';
 
 @Component({
   selector: 'app-answers-list',
@@ -40,9 +41,9 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   // если у нас много таблиц с сортируемыми колонками, то надо хитрО извернуться
   // https://stackoverflow.com/questions/48001006/angular-material-distinct-mat-sort-on-multiple-tables/49056060
 
-  @ViewChild('allAnswersSort') public allAnswersSortHandler: MatSort;
-  @ViewChild('answersWithoutGradesSort') public answersWithoutGradesSortHandler: MatSort;
-  @ViewChild('loadedEmailsSort') public loadedEmailsSortHandler: MatSort;
+  @ViewChild('allAnswersTableSort') public allAnswersTableSort: MatSort;
+  @ViewChild('answersWithoutGradesSort') public answersWithoutGradesSort: MatSort;
+  @ViewChild('loadedEmailsTableSort') public loadedEmailsTableSort: MatSort;
 
   selectedRoundAlias: string = this.allRoundAliases[0];
 
@@ -57,7 +58,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   emailsCountDigest: EmailsCountDigest = EmailsCountDigest.emptyDigest;
 
   displayedAnswerColumns: string[] = [
-    'number',
+    'questionNumber',
     'emailSentOn',
     'body',
     'roundNumber',
@@ -75,7 +76,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   notGradedAnswersArePresent = false;
 
   //#region ConstructorsAndInits
-  constructor(private http: HttpClient, private dialog: MatDialog) {
+  constructor(private cdRef: ChangeDetectorRef, private http: HttpClient, private dialog: MatDialog) {
     super();
   }
 
@@ -84,13 +85,17 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   ngAfterViewInit() {
-    this.answersDataSource.sort = this.allAnswersSortHandler;
-    this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSortHandler;
-    this.emailsDataSource.sort = this.loadedEmailsSortHandler;
+    this.answersDataSource.sort = this.allAnswersTableSort;
+    this.answersWithoutGradesDataSource.sort = this.answersWithoutGradesSort;
+    this.emailsDataSource.sort = this.loadedEmailsTableSort;
+
+    this.cdRef.detectChanges();
+    PoeticaLogger.logObjectState(this.answersDataSource.sort, 'this.answersDataSource.sort');
 
     this.checkNotGradedAnswersPresence();
 
     this.loadTeamsList(this, -1, false, this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
+
   }
   //#endregion
 
@@ -388,23 +393,20 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   private separateAndSortLoadedAnswers(loadedAnswers: AnswerDataModel[], componentReference: AnswersListComponent) {
-    const answersWithoutGradesList: AnswerDataModel[] = [];
+    componentReference.answersDataSource.data.length = 0;
+    componentReference.answersWithoutGradesDataSource.data.length = 0;
+
+    loadedAnswers.sort(compareAnswers);
 
     loadedAnswers.forEach((oneLoadedAnswer) => {
       componentReference.answersDataSource.data.push(oneLoadedAnswer);
       if (oneLoadedAnswer.grade === AnswerDataModel.GradeNone) {
-        answersWithoutGradesList.push(oneLoadedAnswer);
+        componentReference.answersWithoutGradesDataSource.data.push(oneLoadedAnswer);
       }
     });
 
-    loadedAnswers.sort(compareAnswers);
-    answersWithoutGradesList.sort(compareAnswers);
-
-    componentReference.answersDataSource = new MatTableDataSource(loadedAnswers);
-    componentReference.answersDataSource.sort = componentReference.allAnswersSortHandler;
-
-    componentReference.answersWithoutGradesDataSource = new MatTableDataSource(answersWithoutGradesList);
-    componentReference.answersWithoutGradesDataSource.sort = componentReference.answersWithoutGradesSortHandler;
+    componentReference.answersDataSource._updateChangeSubscription();
+    componentReference.answersWithoutGradesDataSource._updateChangeSubscription();
 
     // --- локальные функции ---
     function compareAnswers(oneAnswer: AnswerDataModel, anotherAnswer: AnswerDataModel) {
@@ -441,8 +443,7 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
 
     componentReference.http.get(emailsUrl).subscribe(
       (loadedEmailsList: EmailDataModel[]) => {
-        componentReference.emailsDataSource = new MatTableDataSource(loadedEmailsList);
-        componentReference.emailsDataSource.sort = componentReference.loadedEmailsSortHandler;
+        componentReference.emailsDataSource.data = loadedEmailsList;
 
         const digestUrl = `/emails/digest/${teamId}`;
         componentReference.http.get(digestUrl).subscribe(

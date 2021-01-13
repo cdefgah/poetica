@@ -21,8 +21,6 @@ export class PoeticaLogger {
             console.log('...........................................');
             console.dir(obj);
             console.log('...........................................');
-            console.table(obj);
-            console.log('...........................................');
         }
     }
 }
