@@ -67,7 +67,7 @@ public final class Team {
 
     /**
      * Название команды в нижнем регистре, для поиска.
-     * Это поле нужно, так как SQLite не поддерживает LOWER для unicode-строк, а только для латинницы.
+     * Это поле нужно, так как SQLite не поддерживает sql-функцию LOWER для unicode-строк, а только для латинницы.
      */
     @JsonIgnore
     @Column(length = 64, nullable = false, unique=true)
