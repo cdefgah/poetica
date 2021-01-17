@@ -1,38 +1,37 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Сообщение об ошибке
+about: Сообщите, если что-то поломалось
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Опишите некорректное поведение программы**
+Чёткое и понятное описание проблемного поведения программы.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Как воспроизвести ошибку**
+Шаги, которые надо предпринять, чтобы воспроизвести проблемное поведение программы:
+1. Перейти туда-то '...'
+2. Нажать туда-то '....'
+3. Прокрутить страницу туда-то '....'
+4. Наблюдать проблемное поведение там-то
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Ожидаемое поведение программы**
+Чёткое и понятное описание ожидаемого поведения программы.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Скриншоты**
+Если возможно, приложите скриншоты (снимки экрана), демонстрирующие проблемное поведение программы.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Если программа запускалась на персональном компьютере (пожалуйста, укажите нужные данные):**
+ - Операционная система (полное название и версия): [например: Windows 10 (версия 10.0.19042.746), MacOS Catalina 10.15.7, Ubuntu Linux 20.04 LTS]
+ - Браузер и его версия [например: Google Chrome 87.0.4280.141 (Official Build) (64-bit)]
+ - Версия виртуальной машины Java (например: Java(TM) SE Runtime Environment (build 13+33))
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Мобильное устройство (пожалуйста, укажите нужные данные):**
+ - Устройство: [например iPhone6]
+ - Операционная система: [например iOS8.1, Android 10]
+ - Браузер [например Встроенный браузер, Google Chrome версии 1.2.3.4]
 
-**Additional context**
-Add any other context about the problem here.
+**Дополнительная информация**
+В этом разделе вы можете дать любую дополнительную информацию, которая, на ваш взгляд, может помочь в выявлении причин и решении проблемы.
