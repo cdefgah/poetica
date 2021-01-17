@@ -11,7 +11,7 @@ import com.github.cdefgah.poetica.reports.summary.model.SummaryReportModel;
 /**
  * Представление отчёта "Сводка".
  */
-public class SummaryReportView extends AbstractReportView {
+public final class SummaryReportView extends AbstractReportView {
 
     /**
      * Конструктор класса.

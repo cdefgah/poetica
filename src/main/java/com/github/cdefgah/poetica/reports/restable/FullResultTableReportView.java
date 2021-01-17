@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Представление для полного формата отчёта "Таблица результатов."
  */
-public class FullResultTableReportView extends AbstractResultTableReportView {
+public final class FullResultTableReportView extends AbstractResultTableReportView {
 
     /**
      * Конструктор класса.
@@ -67,10 +67,10 @@ public class FullResultTableReportView extends AbstractResultTableReportView {
             }
 
             // выводим информацию о количестве взятых в предыдущем и текущем турах вопросах
-            sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfTakenAnswersInThisRound()));
+            sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfCorrectAnswersInThisRound()));
             sb.append(".");
             sb.append(getRightAlignedNumber(maxQuestionNumberLength,
-                                                                 oneModelRow.getAmountOfTakenAnswersInPreviousRound()));
+                                                                 oneModelRow.getAmountOfCorrectAnswersInPreviousRound()));
             sb.append(oneSpace);
             sb.append(getRightAlignedText(getMaxTeamRatingLength(isMainRound),
                                                                           String.valueOf(oneModelRow.getTeamRating())));

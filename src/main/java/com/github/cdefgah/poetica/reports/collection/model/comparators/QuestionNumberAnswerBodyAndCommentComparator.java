@@ -12,7 +12,7 @@ import java.util.Comparator;
 /**
  * Компаратор для сортировки по номеру вопроса, и по его содержимому, с комментарием.
  */
-public class QuestionNumberAnswerBodyAndCommentComparator implements Comparator<Answer> {
+public final class QuestionNumberAnswerBodyAndCommentComparator implements Comparator<Answer> {
 
     /**
      * Если параметры равны, вовзаращает 0. Если первый больше второго, возвращает 1, иначе возвращает -1.

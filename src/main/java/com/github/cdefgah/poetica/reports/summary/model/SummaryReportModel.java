@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Модель данных для отчёта "Сводка".
  */
-public class SummaryReportModel extends AbstractReportModel {
+public final class SummaryReportModel extends AbstractReportModel {
 
     /**
      * Таблица для быстрого доступа к команде по её номеру.

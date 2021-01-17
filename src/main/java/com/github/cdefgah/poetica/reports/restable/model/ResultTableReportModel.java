@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Модель класса отчёта "Таблица результатов".
  */
-public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
+public final class ResultTableReportModel extends ReportWithConsistencyCheckModel {
 
     /**
      * Строки для блока отчёта за предварительный тур.
@@ -165,7 +165,7 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
     /**
      * Представляет собой модель данных для строки отчёта.
      */
-    public class ReportRowModel implements Comparable<ReportRowModel> {
+    public final class ReportRowModel implements Comparable<ReportRowModel> {
 
         /**
          * Номер команды.
@@ -274,7 +274,7 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
             amountOfTakenAnswersInThisRound = takenAnswersAmount;
             if (previousRoundRowModel != null) {
                 // если строка отчёта за предыдущий раунд представлена
-                amountOfTakenAnswersInPreviousRound = previousRoundRowModel.getAmountOfTakenAnswersInThisRound();
+                amountOfTakenAnswersInPreviousRound = previousRoundRowModel.getAmountOfCorrectAnswersInThisRound();
             }
         }
 
@@ -338,7 +338,7 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
          * Возвращает количество зачтённых ответов в текущем раунде (туре).
          * @return количество зачтённых ответов в текущем раунде (туре).
          */
-        public int getAmountOfTakenAnswersInThisRound() {
+        public int getAmountOfCorrectAnswersInThisRound() {
             return amountOfTakenAnswersInThisRound;
         }
 
@@ -346,7 +346,7 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
          * Отдаёт количество зачтённых ответов в предыдущем раунде (туре).
          * @return количество зачтённых ответов в предыдущем раунде (туре).
          */
-        public int getAmountOfTakenAnswersInPreviousRound() {
+        public int getAmountOfCorrectAnswersInPreviousRound() {
             return amountOfTakenAnswersInPreviousRound;
         }
 
@@ -417,6 +417,3 @@ public class ResultTableReportModel extends ReportWithConsistencyCheckModel {
         }
     }
 }
-
-
-

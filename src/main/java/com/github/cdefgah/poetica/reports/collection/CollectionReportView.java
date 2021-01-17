@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Представление отчёта "Собрание сочинений".
  */
-public class CollectionReportView extends ReportWithConsistencyCheckView {
+public final class CollectionReportView extends ReportWithConsistencyCheckView {
 
     /**
      * Конструктор класса.

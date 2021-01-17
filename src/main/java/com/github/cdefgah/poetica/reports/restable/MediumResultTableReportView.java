@@ -10,7 +10,7 @@ import com.github.cdefgah.poetica.reports.restable.model.ResultTableReportModel;
 import java.util.Collection;
 import java.util.Map;
 
-public class MediumResultTableReportView extends AbstractResultTableReportView {
+public final class MediumResultTableReportView extends AbstractResultTableReportView {
 
     /**
      * Конструктор класса.
@@ -79,10 +79,10 @@ public class MediumResultTableReportView extends AbstractResultTableReportView {
             }
 
             // выводим информацию о количестве взятых в предыдущем и текущем турах вопросах
-            sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfTakenAnswersInThisRound()));
+            sb.append(getRightAlignedNumber(maxQuestionNumberLength, oneModelRow.getAmountOfCorrectAnswersInThisRound()));
             sb.append(".");
             sb.append(getRightAlignedNumber(maxQuestionNumberLength,
-                    oneModelRow.getAmountOfTakenAnswersInPreviousRound()));
+                    oneModelRow.getAmountOfCorrectAnswersInPreviousRound()));
             sb.append(oneSpace);
             sb.append(getRightAlignedText(getMaxTeamRatingLength(isMainRound),
                     String.valueOf(oneModelRow.getTeamRating())));
