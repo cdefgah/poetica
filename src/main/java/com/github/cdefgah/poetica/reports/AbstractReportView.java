@@ -22,7 +22,7 @@ public class AbstractReportView {
     /**
      * Модель данных отчёта.
      */
-    protected AbstractReportModel reportModel;
+    protected final AbstractReportModel reportModel;
 
     /**
      * Конструктор класса.

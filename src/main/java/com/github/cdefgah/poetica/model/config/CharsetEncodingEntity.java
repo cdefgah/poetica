@@ -9,8 +9,8 @@ package com.github.cdefgah.poetica.model.config;
  * Представляет собой сущность с информацией о кодировке.
  */
 public final class CharsetEncodingEntity {
-    private String humanReadableTitle;
-    private String systemName;
+    private final String humanReadableTitle;
+    private final String systemName;
 
     /**
      * Конструктор класса.

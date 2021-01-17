@@ -20,7 +20,8 @@ abstract class AbstractController {
     /**
      * Для формирования строки с датой и временем в именах сгенерированных файлов.
      */
-    private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHMMss");
+    @SuppressWarnings("SpellCheckingInspection")
+    private static final SimpleDateFormat fileNameTimeStampDateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
     /**
      * Менеджер сущностей для взаимодействия с базой данных.

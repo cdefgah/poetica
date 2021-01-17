@@ -30,6 +30,7 @@ public class PoeticaApplication {
 	 * Отдаёт информацию о конфигурации приложения.
 	 * @return информация о конфигурации приложения.
 	 */
+	@SuppressWarnings("InstantiationOfUtilityClass")
 	@Bean
 	public Configuration configuration() {
 		return new Configuration();

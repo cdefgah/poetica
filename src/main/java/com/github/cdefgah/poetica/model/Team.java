@@ -186,6 +186,7 @@ public final class Team {
      * Отдаёт текстовое представление экземпляра класса согласно требованиям импортёра команд.
      * @return текстовое представление экземпляра класса согласно требованиям импортёра команд.
      */
+    @SuppressWarnings("StringBufferReplaceableByString")
     @JsonIgnore
     public String getTextRepresentationForImporter() {
         StringBuilder sb = new StringBuilder();
