@@ -1,20 +1,20 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Запрос новой функциональности
+about: Предложите реализовать ту или иную функциональность в программе
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Если ваш запрос как-то связан с проблемным поведением программы, пожалуйста опишите.**
+Чёткое и понятное описание проблемы. Например, мне трудно каждый раз делать [...]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Опишите желаемое поведение программы**
+Чёткое и понятное описание ожидаемого поведения программы, которое будет после реализации запрошенной функциональности.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Опишите альтернативные варианты, если вы их рассматривали**
+Чёткое и понятное описание альтернативных решений, которые вы предлагаете.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Дополнительная информация**
+Любая дополнительная информация, которая может быть полезной.
