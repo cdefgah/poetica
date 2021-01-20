@@ -8,5 +8,7 @@ package com.github.cdefgah.poetica.reports;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReportWithConsistencyCheckModelTest {
+    
+
 
 }
