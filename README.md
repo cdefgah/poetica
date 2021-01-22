@@ -1,6 +1,6 @@
 # Poetica Project
 
-[![Build Status](https://travis-ci.org/cdefgah/poetica.svg?branch=master)](https://travis-ci.org/cdefgah/poetica)
+[![Build Status](https://cloud.drone.io/api/badges/cdefgah/poetica/status.svg)](https://cloud.drone.io/cdefgah/poetica)
 
 Проект Poetica призван помочь оператору дежурной команды провести тур чемпионата по [бескрылкам](https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D1%81%D0%BA%D1%80%D1%8B%D0%BB%D0%BA%D0%B0).
 
