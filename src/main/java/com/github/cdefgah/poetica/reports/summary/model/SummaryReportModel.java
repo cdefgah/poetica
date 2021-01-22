@@ -11,11 +11,7 @@ import com.github.cdefgah.poetica.reports.AbstractReportModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Модель данных для отчёта "Сводка".
@@ -182,6 +178,28 @@ public final class SummaryReportModel extends AbstractReportModel {
          */
         public int getEmailsCount() {
             return emailsCount;
+        }
+
+        /**
+         * Сравнивает текущий экземпляр класса с переданным в параметре.
+         * @param o экземпляр класса для сравнения.
+         * @return true, если текущий класс и переданный в параметре эквивалентны.
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SummaryReportRow that = (SummaryReportRow) o;
+            return teamTitle.equals(that.teamTitle);
+        }
+
+        /**
+         * Вычисляет и возвращает хэш-код экземпляра класса.
+         * @return хэш-код экземпляра класса.
+         */
+        @Override
+        public int hashCode() {
+            return Objects.hash(teamTitle);
         }
 
         /**
