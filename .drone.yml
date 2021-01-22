@@ -2,6 +2,14 @@ kind: pipeline
 name: default
 
 steps:
+- name: Install Angular
+  image: node
+  commands:
+  - npm install -g @angular/cli
+  - ls
+  - cd src/main/frontend
+  - npm install
+
 - name: test
   image: maven:3-jdk-8
   commands:
