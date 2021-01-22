@@ -1,21 +1,12 @@
 kind: pipeline
+type: exec
 name: default
 
-steps:
-- name: Install Angular
-  image: node
-  commands:
-  - npm install -g @angular/cli
-  - ls
-  - pwd
-  - cd src/main/frontend
-  - npm install
-  - cd /drone/src/src/main/frontend
-  - ng --version
+platform:
+  os: linux
+  arch: amd64
 
-- name: test
-  image: maven:3-jdk-8
+steps:
+- name: greeting
   commands:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-  - mvn test -B
-  
+  - uname -r
