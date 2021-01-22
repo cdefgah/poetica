@@ -11,6 +11,13 @@ steps:
   - cd src/main/frontend
   - npm install
   - cd /drone/src
+  - ls
+  - cd /drone/src/src
+  - ls
+  - cd main
+  - ls
+  - cd frontend
+  - ls
 
 - name: test
   image: maven:3-jdk-8
