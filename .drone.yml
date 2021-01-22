@@ -7,8 +7,10 @@ steps:
   commands:
   - npm install -g @angular/cli
   - ls
+  - pwd
   - cd src/main/frontend
   - npm install
+  - cd $HOME
 
 - name: test
   image: maven:3-jdk-8
