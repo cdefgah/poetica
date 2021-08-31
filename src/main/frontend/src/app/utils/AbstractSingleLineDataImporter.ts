@@ -50,11 +50,7 @@ export abstract class AbstractSingleLineDataImporter {
   protected static isZeroOrPositiveInteger(sourceString: string): boolean {
     // нормализация нужна, чтобы исключить случаи, когда перед нулём дали символ минуса или плюса
     // или дали два или более нулей в качестве исходной строки.
-    var normalizedString: string = AbstractSingleLineDataImporter.isNumber(
-      sourceString
-    )
-      ? parseInt(sourceString, 10).toString()
-      : "";
+    var normalizedString: string = AbstractSingleLineDataImporter.isNumber(sourceString) ? parseInt(sourceString, 10).toString() : "";
 
     if (normalizedString.length > 0 && normalizedString === sourceString) {
       return parseInt(sourceString, 10) >= 0;

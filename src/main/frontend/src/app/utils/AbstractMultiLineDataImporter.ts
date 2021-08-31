@@ -4,7 +4,8 @@
  */
 
 import { StringLinesIterator } from './StringLinesIterator';
-import { AbstractSingleLineDataImporter } from './AbstractSinglelineDataImporter';
+import { AbstractSingleLineDataImporter } from './AbstractSingleLineDataImporter';
+
 
 export abstract class AbstractMultiLineDataImporter extends AbstractSingleLineDataImporter {
   protected static readonly newline = '\n';

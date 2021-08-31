@@ -6,7 +6,7 @@
 import { PoeticaLogLevel } from './PoeticaLogLevel';
 
 export class PoeticaLogger {
-    public static LogLevel: PoeticaLogLevel;
+    public static LogLevel: PoeticaLogLevel = PoeticaLogLevel.DEBUG;
 
     public static logMessage(message: string) {
         if (PoeticaLogger.LogLevel >= PoeticaLogLevel.DEBUG) {
@@ -16,13 +16,12 @@ export class PoeticaLogger {
 
     public static logObjectState(obj: any, description: string) {
         if (PoeticaLogger.LogLevel >= PoeticaLogLevel.DEBUG) {
-            console.log('...........................................');
+            const delimiter = '...........................................';
+            console.log(delimiter);
             console.log(description);
-            console.log('...........................................');
+            console.log(delimiter);
             console.dir(obj);
-            console.log('...........................................');
+            console.log(delimiter);
         }
     }
 }
-
-PoeticaLogger.LogLevel = PoeticaLogLevel.DEBUG;
