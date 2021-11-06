@@ -58,7 +58,7 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode package
         
-      - name: 'Upload Artifact for MacOS Intel x64'
+      - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: poetica-${{env.app_version_number}}-distrib.zip
