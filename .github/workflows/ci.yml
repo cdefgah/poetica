@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  app_version_number: '0.94.4'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [12.x]    
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+        
+      - name: Installing npm packages
+        run: npm install --prefix ./src/main/frontend
+        
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'        
+        
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.2
+        with:
+          maven-version: 3.8.2
+          
+      - name: Listing current folder
+        run: ls -a
+
+      - run: npm install -g @angular/cli
+        
+      - name: View angular version
+        run: ng --version
+
+      - name: Build with Maven
+        run: mvn --batch-mode package
+        
+      - name: 'Upload Artifact for MacOS Intel x64'
+        uses: actions/upload-artifact@v2
+        with:
+          name: poetica-${{env.app_version_number}}-distrib.zip
+          path: target/poetica-v${{env.app_version_number}}-distrib.zip
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+         body: "Приложение для упрощения работы дежурной команды во время проведения тура по бескрылкам.
+
+Информация о том, как пользоваться программой находится в файле readme.txt в zip-архиве дистирбутива приложения. Информация об изменениях в текущей версии находится в файле whatsnew.txt в zip-архиве дистирбутива приложения. Чтобы скачать архив дистрибутива приложения, раскройте секцию Assets ниже и скачайте файл poetica-${{env.app_version_number}}-distrib.zip. После скачивания архива распакуйте его в любую удобную для вас папку.
+
+Пользовательская документация и информация о том, как скачать и запустить программу, находится по адресу: https://github.com/cdefgah/poetica/wiki"
+
+         tag_name: v${{env.app_version_number}}
+         release_name: 'Poetica ${{env.app_version_number}}'
+         draft: false
+         prerelease: true
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: target/poetica-${{env.app_version_number}}-distrib.zip
+            asset_name: poetica-${{env.app_version_number}}-distrib.zip
+            asset_content_type: application/zip
+            
+      - uses: eregon/publish-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            release_id: ${{ steps.create_release.outputs.id }}
+ 
