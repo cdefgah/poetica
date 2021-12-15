@@ -53,6 +53,7 @@ public class AnswersController extends AbstractController {
             produces = "application/json")
     public ResponseEntity<String> importAnswers(@RequestBody Answer[] answersToImport) {
 
+        //TODO тут сделать проверку наличия ответа с оценкой и в случае совпадения ставить ту-же оценку
         for(Answer oneAnswer: answersToImport) {
             Optional<Long> questionIdInfo = getQuestionIdByQuestionNumber(oneAnswer.getQuestionNumber());
             if (questionIdInfo.isPresent()) {
@@ -76,7 +77,6 @@ public class AnswersController extends AbstractController {
     @RequestMapping(path = "/answers/{teamId}/{roundOption}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<Answer>> getAnswers(@PathVariable long teamId, @PathVariable int roundOption) {
         TypedQuery<Answer> query;
-
 
         if (roundOption == 0) {
             // нужны все ответы

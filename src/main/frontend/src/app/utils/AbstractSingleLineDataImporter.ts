@@ -27,36 +27,34 @@ export abstract class AbstractSingleLineDataImporter {
    * @returns нормализованная строка.
    */
   protected static normalizeString(sourceString: string): string {
-    if (!sourceString || sourceString.length == 0) {
-      return "";
+    if (!sourceString || sourceString.length === 0) {
+      return '';
     }
 
     // убираем ненужные символы
-    var processedString: string = sourceString.replace(/[¶]/g, "");
+    let processedString: string = sourceString.replace(/[¶]/g, '');
 
     // нормализуем кавычки
     processedString = processedString.replace(/[‘’“”„‹›'»«]/g, '"');
 
     // нормализуем тире и дефисы
-    processedString = processedString.replace(/[-֊־᠆‐‒–—―⸺⸻〰﹘﹣－]/g, "-");
+    processedString = processedString.replace(/[-֊־᠆‐‒–—―⸺⸻〰﹘﹣－]/g, '-');
 
     return processedString;
   }
 
   private static isNumber(value: string | number): boolean {
-    return value != null && value !== "" && !isNaN(Number(value.toString()));
+    return value != null && value !== '' && !isNaN(Number(value.toString()));
   }
 
   protected static isZeroOrPositiveInteger(sourceString: string): boolean {
     // нормализация нужна, чтобы исключить случаи, когда перед нулём дали символ минуса или плюса
     // или дали два или более нулей в качестве исходной строки.
-    var normalizedString: string = AbstractSingleLineDataImporter.isNumber(sourceString) ? parseInt(sourceString, 10).toString() : "";
+    const normalizedString: string = AbstractSingleLineDataImporter.isNumber(sourceString) ?
+                                        AbstractSingleLineDataImporter.parseInt(sourceString).toString() : '';
 
-    if (normalizedString.length > 0 && normalizedString === sourceString) {
-      return parseInt(sourceString, 10) >= 0;
-    } else {
-      return false;
-    }
+    return (normalizedString.length > 0) && (normalizedString === sourceString)
+                                              && (AbstractSingleLineDataImporter.parseInt(sourceString) >= 0);
   }
 
   /**
@@ -65,14 +63,14 @@ export abstract class AbstractSingleLineDataImporter {
    * @returns исходная строка без двойных кавычек.
    */
   protected static removeDoubleQuotations(rawString: string) {
-    var processedString: string = "";
-    var doubleQuotationMarksArePresent = rawString.indexOf('"');
+    let processedString = '';
+    const doubleQuotationMarksArePresent = rawString.indexOf('"');
     if (doubleQuotationMarksArePresent === -1) {
       // нет двойных кавычек
       processedString = rawString;
     } else {
       // есть двойные кавычки, убираем их
-      processedString = rawString.replace(/"/g, "");
+      processedString = rawString.replace(/"/g, '');
     }
 
     return processedString;
