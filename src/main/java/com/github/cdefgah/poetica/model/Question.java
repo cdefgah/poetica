@@ -23,7 +23,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "Questions")
-public final class Question {
+public final class Question extends QuestionAnswerPrototype {
 
     /**
      * Информация об ограничениях на длину полей.
@@ -122,17 +122,17 @@ public final class Question {
     private boolean graded;
 
     /**
+     * Хэш для авторского ответа, используется для сверки с импортируемыми ответами.
+     */
+    @Column()
+    private String authorsAnswerHash;
+
+    /**
      * Информация об авторе бескрылки.
      */
     @Column(length = ModelConstraints.MAX_AUTHOR_INFO_LENGTH, nullable = false)
     @Size(max = ModelConstraints.MAX_AUTHOR_INFO_LENGTH)
     private String authorInfo;
-
-    /**
-     * Конструктор класса.
-     */
-    public Question() {
-    }
 
     /**
      * Возвращает true, если у задания только один номер, оно не состоит из нескольких крыльев.
@@ -300,6 +300,7 @@ public final class Question {
      */
     public void setAuthorsAnswer(String authorsAnswer) {
         this.authorsAnswer = authorsAnswer;
+        this.authorsAnswerHash = getHashForRawText(this.authorsAnswer);
     }
 
     /**

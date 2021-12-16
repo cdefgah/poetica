@@ -5,14 +5,7 @@
 
 package com.github.cdefgah.poetica.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +16,7 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "Answers")
-public final class Answer {
+public final class Answer extends QuestionAnswerPrototype {
 
     /**
      * Ограничения на размер полей.
@@ -38,8 +31,7 @@ public final class Answer {
      */
     private static final Map<String, String> modelConstraintsMap;
 
-    static
-    {
+    static {
         final Map<String, String> localConstraintsMap = new HashMap<>();
         localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
         localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
@@ -48,6 +40,7 @@ public final class Answer {
 
     /**
      * Отдаёт информацию об ограничениях на размер полей.
+     *
      * @return информация об ограничениях на размер полей.
      */
     public static Map<String, String> getModelConstraintsMap() {
@@ -113,12 +106,19 @@ public final class Answer {
     private Grade grade = Grade.None;
 
     /**
+     * SHA-512 хэш для ответа, для вычисления совпадающих ответов.
+     */
+    @Column()
+    private String answerBodyHash;
+
+    /**
      * Время отправки письма с этим ответом.
      */
     private long emailSentOn;
 
     /**
      * Отдаёт уникальный идентификатор ответа.
+     *
      * @return уникальный идентификатор ответа.
      */
     public Long getId() {
@@ -127,6 +127,7 @@ public final class Answer {
 
     /**
      * Отдаёт уникальный идентификатор команды, приславшей ответ.
+     *
      * @return уникальный идентификатор команды, приславшей ответ.
      */
     public Long getTeamId() {
@@ -135,6 +136,7 @@ public final class Answer {
 
     /**
      * Устанавливает уникальный идентификатор команды, приславшей ответ.
+     *
      * @param teamId уникальный идентификатор команды, приславшей ответ.
      */
     public void setTeamId(Long teamId) {
@@ -143,6 +145,7 @@ public final class Answer {
 
     /**
      * Отдаёт уникальный идентификатор вопроса (задания), на который дан ответ.
+     *
      * @return уникальный идентификатор вопроса (задания), на который дан ответ.
      */
     public Long getQuestionId() {
@@ -151,6 +154,7 @@ public final class Answer {
 
     /**
      * Устанавливает уникальный идентификатор вопроса (задания), на который дан ответ.
+     *
      * @param questionId уникальный идентификатор вопроса (задания), на который дан ответ.
      */
     public void setQuestionId(Long questionId) {
@@ -159,6 +163,7 @@ public final class Answer {
 
     /**
      * Отдаёт уникальный идентификатор письма, в котором пришёл этот ответ.
+     *
      * @return уникальный идентификатор письма, в котором пришёл этот ответ.
      */
     public Long getEmailId() {
@@ -167,6 +172,7 @@ public final class Answer {
 
     /**
      * Устанавливает уникальный идентификатор письма, в котором пришёл этот ответ.
+     *
      * @param emailId уникальный идентификатор письма, в котором пришёл этот ответ.
      */
     public void setEmailId(Long emailId) {
@@ -175,6 +181,7 @@ public final class Answer {
 
     /**
      * Возвращает номер раунда (тура), на который было прислано письмо с этим ответом.
+     *
      * @return номер раунда (тура), на который было прислано письмо с этим ответом.
      */
     public int getRoundNumber() {
@@ -183,6 +190,7 @@ public final class Answer {
 
     /**
      * Устанавливает номер раунда (тура), на который было прислано письмо с этим ответом.
+     *
      * @param roundNumber номер раунда (тура), на который было прислано письмо с этим ответом.
      */
     public void setRoundNumber(int roundNumber) {
@@ -191,6 +199,7 @@ public final class Answer {
 
     /**
      * Отдаёт содержимое тела ответа.
+     *
      * @return содержимое тела ответа.
      */
     public String getBody() {
@@ -199,14 +208,17 @@ public final class Answer {
 
     /**
      * Устанавливает содержимое тела ответа.
+     *
      * @param body содержимое тела ответа.
      */
     public void setBody(String body) {
         this.body = body;
+        this.answerBodyHash = this.getHashForRawText(this.body);
     }
 
     /**
      * Отдаёт комментарий к ответу.
+     *
      * @return комментарий к ответу.
      */
     public String getComment() {
@@ -215,6 +227,7 @@ public final class Answer {
 
     /**
      * Устанавливает комментарий к ответу.
+     *
      * @param comment комментарий к ответу.
      */
     public void setComment(String comment) {
@@ -223,6 +236,7 @@ public final class Answer {
 
     /**
      * Отдаёт оценку ответа.
+     *
      * @return оценка ответа.
      */
     public Grade getGrade() {
@@ -231,6 +245,7 @@ public final class Answer {
 
     /**
      * Устанавливает оценку для ответа.
+     *
      * @param grade оценка для ответа.
      */
     public void setGrade(Grade grade) {
@@ -239,6 +254,7 @@ public final class Answer {
 
     /**
      * Отдаёт номер вопроса (задания), на который дан ответ.
+     *
      * @return номер вопроса (задания), на который дан ответ.
      */
     public int getQuestionNumber() {
@@ -247,6 +263,7 @@ public final class Answer {
 
     /**
      * Устанавливает номер вопроса (задания), на который дан ответ.
+     *
      * @param questionNumber номер вопроса (задания), на который дан ответ.
      */
     public void setQuestionNumber(int questionNumber) {
@@ -255,6 +272,7 @@ public final class Answer {
 
     /**
      * Отдаёт время отправки письма в миллисекундах.
+     *
      * @return время отправки письма в миллисекундах.
      */
     public long getEmailSentOn() {
@@ -263,6 +281,7 @@ public final class Answer {
 
     /**
      * Устанавливает время отправки письма в миллисекундах.
+     *
      * @param emailSentOn время отправки письма в миллисекундах.
      */
     public void setEmailSentOn(long emailSentOn) {
@@ -271,6 +290,7 @@ public final class Answer {
 
     /**
      * Отдаёт содержимое тела ответа вместе с комментарием.
+     *
      * @return содержимое тела ответа вместе с комментарием.
      */
     public String getBodyWithComment() {
@@ -284,9 +304,18 @@ public final class Answer {
 
     /**
      * Возвращает true, если ответ зачтён.
+     *
      * @return true, если ответ зачтён.
      */
     public boolean isAccepted() {
         return this.grade == Grade.Accepted;
+    }
+
+    /**
+     * Отдаёт SHA-512 хэш код тела ответа.
+     * @return SHA-512 хэш код тела ответа.
+     */
+    public String getAnswerBodyHash() {
+        return answerBodyHash;
     }
 }
