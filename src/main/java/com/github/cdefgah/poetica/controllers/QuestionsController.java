@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.nio.charset.StandardCharsets;
@@ -293,38 +292,5 @@ public class QuestionsController extends AbstractController {
                         "question where question.graded=:graded", Question.class);
         query.setParameter("graded", onlyGradedQuestions);
         return query.getResultList();
-    }
-
-    /**
-     * Обновляет вопросы без хэша для авторского ответа.
-     */
-    @PostConstruct
-    private void updateAuthorsAnswerHashForQuestions() {
-        System.out.println("Updating questions without author's answer hash...");
-        TypedQuery<Long> questionsQuery = entityManager.createQuery("select question.id from " +
-                "Question question where question.authorsAnswerHash is NULL", Long.class);
-
-        List<Long> foundQuestionIds = questionsQuery.getResultList();
-        if (foundQuestionIds.size() > 0) {
-            updateAuthorsAnswerHashForQuestions(foundQuestionIds);
-        }
-    }
-
-    /**
-     * Обновляет хэш для авторского ответа в заданиях.
-     * @param questionIdsList список уникальных идентификаторов заданий (вопросов),
-     *                        в которых не задан хэш-код для авторского ответа.
-     */
-    private void updateAuthorsAnswerHashForQuestions(List<Long> questionIdsList) {
-        for(long questionId : questionIdsList) {
-            Question oneProcessingQuestion = entityManager.find(Question.class, questionId);
-            if (oneProcessingQuestion != null) {
-                oneProcessingQuestion.buildAndSetAuthorsAnswerHash();
-                entityManager.persist(oneProcessingQuestion);
-            } else {
-                // управление не должно сюда сваливаться, но если вдруг такое произойдет, значит база сломалась
-                throw new RuntimeException("Unable to find question by id: " + questionId);
-            }
-        }
     }
 }
