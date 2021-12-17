@@ -114,7 +114,7 @@ public class AnswersController extends AbstractController {
      */
     private void rebuildAnswerHashWhenNecessary(Question question, Answer answer) {
         if (!answer.IsAnswerBodyHashPresent()) {
-            answer.buildAndSetAuthorsAnswerHash();
+            answer.buildAndSetAnswerBodyHash();
         }
 
         if (!question.IsAuthorsAnswerHashPresent()) {
