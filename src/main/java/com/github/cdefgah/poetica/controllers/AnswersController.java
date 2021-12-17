@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -304,6 +305,40 @@ public class AnswersController extends AbstractController {
         } catch(NoResultException noResultException) {
             // сюда управление в принципе не может быть передано, но мы обрабатываем всё равно
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Этот метод автоматически вызывается при запуске приложения, обрабатывает ситуации,
+     * когда приложение запущено с базой, созданной в предыдущей версии Poetica.
+     */
+    @PostConstruct
+    private void updateAnswerBodyHashForAnswers() {
+        System.out.println("Updating answers without answer body hash...");
+        TypedQuery<Long> answersQuery = entityManager.createQuery("select answer.id from " +
+                "Answer answer where answer.answerBodyHash is NULL", Long.class);
+
+        List<Long> foundAnswerIds = answersQuery.getResultList();
+        if (foundAnswerIds.size() > 0) {
+            updateAnswerBodyHashForAnswers(foundAnswerIds);
+        }
+    }
+
+    /**
+     * Обновляет хэш для тела ответа в объектах Ответ.
+     * @param answerIdsList список уникальных идентификаторов ответов, в которых не задан хэш-код для тела ответа.
+     */
+    private void updateAnswerBodyHashForAnswers(List<Long> answerIdsList) {
+        for(long answerId : answerIdsList) {
+            Answer oneProcessingAnswer = entityManager.find(Answer.class, answerId);
+            if (oneProcessingAnswer != null) {
+                oneProcessingAnswer.buildAndSetAnswerBodyHash();
+                entityManager.persist(oneProcessingAnswer);
+            } else {
+                // выполнение сюда не должно свалиться, но если вдруг,
+                // мы не дадим этому знаменательному событию пройти втихую
+                throw new RuntimeException("Unable to find answer by id: " + answerId);
+            }
         }
     }
 }
