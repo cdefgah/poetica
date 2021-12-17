@@ -26,7 +26,7 @@ public abstract class QuestionAnswerPrototype {
      * @return нормализованный текст.
      */
     private static String normalizeText(String textToNormalize) {
-        return textToNormalize.replaceAll("[\\t\\n\\r]+", " ").replaceAll(" +", " ");
+        return textToNormalize.replaceAll("[\\t\\n\\r]+", " ").replaceAll(" +", " ").trim();
     }
 
     /**

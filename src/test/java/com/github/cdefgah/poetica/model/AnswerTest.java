@@ -56,13 +56,13 @@ public class AnswerTest {
         answer1.setBody(BODY_FOR_ANSWER1);
 
         Answer answer2 = new Answer();
-        answer1.setBody(BODY_FOR_ANSWER2);
+        answer2.setBody(BODY_FOR_ANSWER2);
 
         Answer answer3 = new Answer();
-        answer1.setBody(BODY_FOR_ANSWER3);
+        answer3.setBody(BODY_FOR_ANSWER3);
 
         Answer answer4 = new Answer();
-        answer1.setBody(BODY_FOR_ANSWER4);
+        answer4.setBody(BODY_FOR_ANSWER4);
 
         final String expectedHashCode = "55e75e5d01edc3f3c62fa038857dc716a6acb236842b3fae5456dbfb5c756bc2a8610bb654551ce29b2ffb48e8dcf90f6983c541a015b3595fda01359ff92a0c";
 
