@@ -8,6 +8,7 @@ package com.github.cdefgah.poetica.controllers;
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Grade;
 
+import com.github.cdefgah.poetica.model.Question;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,11 +54,12 @@ public class AnswersController extends AbstractController {
             produces = "application/json")
     public ResponseEntity<String> importAnswers(@RequestBody Answer[] answersToImport) {
 
-        //TODO тут сделать проверку наличия ответа с оценкой и в случае совпадения ставить ту-же оценку
         for(Answer oneAnswer: answersToImport) {
             Optional<Long> questionIdInfo = getQuestionIdByQuestionNumber(oneAnswer.getQuestionNumber());
             if (questionIdInfo.isPresent()) {
                 oneAnswer.setQuestionId(questionIdInfo.get());
+                assignGradeAutomaticallyIfPossible(oneAnswer);
+
                 entityManager.persist(oneAnswer);
             } else {
                 return new ResponseEntity<>(composeErrorMessage("В базе данных не удалось найти вопрос с номером: " +
@@ -66,6 +68,93 @@ public class AnswersController extends AbstractController {
         }
 
         return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    /**
+     * Пытается проставить оценку импортируемому ответу автоматически.
+     * Сперва проверяем на совпадение с авторским ответом в соответствующем ответу задании.
+     * Если совпадение есть, то ответу засчитывается зачёт (+), если нет, идёт поиск среди ответов,
+     * уже получивших оценку. Если найден ответ с оценкой, то обрабатываемому ответу даём ту-же оценку,
+     * что и в найденном ответе.
+     * @param answer Объект ответа, для которого надо попробовать дать автоматическую оценку.
+     */
+    private void assignGradeAutomaticallyIfPossible(Answer answer) {
+        long questionId = answer.getQuestionId();
+        Question question = getQuestionById(questionId);
+        rebuildAnswerHashWhenNecessary(question, answer);
+
+        if (answer.getAnswerBodyHash().equals(question.getAuthorsAnswerHash())) {
+            // если ответ совпадает с авторским ответом, засчитываем ответ и выходим
+            answer.setGrade(Grade.Accepted);
+            return;
+        }
+
+        attemptToGradeViaCheckingOtherGradedAnswers(answer);
+    }
+
+    /**
+     * Отдаёт объект вопроса по id.
+     * @param questionId id вопроса.
+     * @return объект вопроса.
+     */
+    private Question getQuestionById(long questionId) {
+        Question question = entityManager.find(Question.class, questionId);
+        if (question == null) {
+            // этого не может произойти, но если вдруг, мы бросаем RuntimeException().
+            throw new RuntimeException("Unable to find question by id: " + questionId);
+        }
+
+        return question;
+    }
+
+    /**
+     * Перестраивает hash-коды вопроса и ответа, если есть необходимость.
+     * @param question объект вопроса.
+     * @param answer объект ответа.
+     */
+    private void rebuildAnswerHashWhenNecessary(Question question, Answer answer) {
+        if (!answer.IsAnswerBodyHashPresent()) {
+            answer.buildAndSetAuthorsAnswerHash();
+        }
+
+        if (!question.IsAuthorsAnswerHashPresent()) {
+            question.buildAndSetAuthorsAnswerHash();
+        }
+    }
+
+    /**
+     * Проверяет все оцененные ответы на тот-же вопрос, на который дан ответ в объекте, переданном в параметре.
+     * Если найдётся совпадение, то переданный в параметре ответ получает ту-же оценку, что и в найденном ответе.
+     * @param answer объект ответа.
+     */
+    private void attemptToGradeViaCheckingOtherGradedAnswers(Answer answer) {
+
+        // ищем id оцененных ответов на этот-же вопрос, у которых совпадает hash-код ответа
+        TypedQuery<Long> query = entityManager.createQuery("select answer.id from " +
+                                                            "Answer answer where answer.grade<>:grade " +
+                                                            "and answer.questionId=:questionId " +
+                                                            "and answer.answerBodyHash=:answerBodyHash", Long.class);
+
+        query.setParameter("grade", Grade.None);
+        query.setParameter("questionId", answer.getQuestionId());
+        query.setParameter("answerBodyHash", answer.getAnswerBodyHash());
+
+        List<Long> resultList = query.getResultList();
+        if (resultList.size() == 0) {
+            // если ничего не нашли, просто выходим
+            return;
+        }
+
+        // если наши, то берем первый id ответа
+        long foundGradedAnswerId = resultList.get(0);
+        Answer foundGradedAnswer = entityManager.find(Answer.class, foundGradedAnswerId);
+        if (foundGradedAnswer == null) {
+            // этого не может произойти, но если вдруг, мы бросаем RuntimeException().
+            throw new RuntimeException("Unable to find answer by id: " + foundGradedAnswerId);
+        }
+
+        // выставляем ту-же оценку, что и у найденного ответа
+        answer.setGrade(foundGradedAnswer.getGrade());
     }
 
     /**

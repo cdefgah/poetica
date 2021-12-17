@@ -213,7 +213,23 @@ public final class Answer extends QuestionAnswerPrototype {
      */
     public void setBody(String body) {
         this.body = body;
+        buildAndSetAuthorsAnswerHash();
+    }
+
+    /**
+     * Формирует hash-код для тела ответа.
+     * Публичный метод нужен для ситуаций, когда идёт работа с базой, созданной в предыдущей версии Poetica.
+     */
+    public void buildAndSetAuthorsAnswerHash() {
         this.answerBodyHash = this.getHashForRawText(this.body);
+    }
+
+    /**
+     * Возвращает true, если для тела ответа рассчитан hash-код.
+     * @return true, если для тела ответа рассчитан hash-код.
+     */
+    public boolean IsAnswerBodyHashPresent() {
+        return (answerBodyHash != null && !answerBodyHash.isEmpty());
     }
 
     /**

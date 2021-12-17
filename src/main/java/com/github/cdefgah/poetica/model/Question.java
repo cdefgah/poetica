@@ -47,7 +47,8 @@ public final class Question extends QuestionAnswerPrototype {
         final Map<String, String> localConstraintsMap = new HashMap<>();
         localConstraintsMap.put("MAX_TITLE_LENGTH", String.valueOf(ModelConstraints.MAX_TITLE_LENGTH));
         localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
-        localConstraintsMap.put("MAX_AUTHORS_ANSWER_LENGTH", String.valueOf(ModelConstraints.MAX_AUTHORS_ANSWER_LENGTH));
+        localConstraintsMap.put("MAX_AUTHORS_ANSWER_LENGTH",
+                                                        String.valueOf(ModelConstraints.MAX_AUTHORS_ANSWER_LENGTH));
         localConstraintsMap.put("MAX_COMMENT_LENGTH", String.valueOf(ModelConstraints.MAX_COMMENT_LENGTH));
         localConstraintsMap.put("MAX_SOURCE_LENGTH", String.valueOf(ModelConstraints.MAX_SOURCE_LENGTH));
         localConstraintsMap.put("MAX_AUTHOR_INFO_LENGTH", String.valueOf(ModelConstraints.MAX_AUTHOR_INFO_LENGTH));
@@ -300,6 +301,14 @@ public final class Question extends QuestionAnswerPrototype {
      */
     public void setAuthorsAnswer(String authorsAnswer) {
         this.authorsAnswer = authorsAnswer;
+        buildAndSetAuthorsAnswerHash();
+    }
+
+    /**
+     * Формирует hash-код для авторского ответа.
+     * Публичный метод нужен для ситуаций, когда идёт работа с базой, созданной в предыдущей версии Poetica.
+     */
+    public void buildAndSetAuthorsAnswerHash() {
         this.authorsAnswerHash = getHashForRawText(this.authorsAnswer);
     }
 
@@ -317,6 +326,22 @@ public final class Question extends QuestionAnswerPrototype {
      */
     public void setAuthorInfo(String authorInfo) {
         this.authorInfo = authorInfo;
+    }
+
+    /**
+     * Отдаёт hash-код для авторского ответа.
+     * @return hash-код для авторского ответа.
+     */
+    public String getAuthorsAnswerHash() {
+        return authorsAnswerHash;
+    }
+
+    /**
+     * Возвращает true, если для авторского ответа рассчитан hash-код.
+     * @return true, если для авторского ответа рассчитан hash-код.
+     */
+    public boolean IsAuthorsAnswerHashPresent() {
+        return (authorsAnswerHash != null && !authorsAnswerHash.isEmpty());
     }
 
     /**
