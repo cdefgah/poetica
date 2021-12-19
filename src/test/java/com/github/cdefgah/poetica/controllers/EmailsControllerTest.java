@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-only
- * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
+ * Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
 package com.github.cdefgah.poetica.controllers;
@@ -15,7 +15,7 @@ public class EmailsControllerTest extends AbstractRestControllerTest {
     public void testModelConstraintsRequest() throws Exception {
         final String endpointAddress = "/emails/model-constraints";
         final String url = localAddressPrefix + port + endpointAddress;
-        final String expectedString = "{\"MAX_BODY_LENGTH\":\"32768\",\"MAX_SUBJECT_LENGTH\":\"256\"}";
+        final String expectedString = "{\"MAX_BODY_LENGTH\":\"32768\"}";
 
         assertThat(this.restTemplate.getForObject(url, String.class)).isEqualTo(expectedString);
     }

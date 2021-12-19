@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-only
- * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
+ * Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
 import { EmailBodyParserParameters } from './EmailBodyParserParameters';
@@ -23,7 +23,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
   private emailValidationService: EmailValidationService;
   private answerValidationService: AnswerValidationService;
 
-  private teamFromEmailSubject: TeamDataModel;
   private roundNumber: string;
 
   private httpClient: HttpClient;
@@ -66,16 +65,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       return;
     } else {
       this.team = teamInfoCalculationResult.resultObject;
-
-      if (this.teamFromEmailSubject) {
-        if (this.teamFromEmailSubject.number !== this.team.number) {
-          this.onFailure(
-            this.parentComponentObject,
-            `Номер команды в содержимом письма ${this.team.number} отличается от номера команды в теме письма: ${this.teamFromEmailSubject.number}`
-          );
-          return;
-        }
-      }
     }
 
     // тут пропускаем строки до начала блока ответов, а то иногда в письмах бывает, в нарушение регламента
@@ -244,16 +233,6 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
     if (foundTeamTitle.length === 0) {
       errorMessage = 'В содержании письма не указано название команды';
       return new CalculationResult(null, errorMessage);
-    }
-
-    if (this.teamFromEmailSubject) {
-      // совпадение названия команды из темы письма с названием в содержании - не проверяем.
-      // так как в теме письма может быть транслит, а в содержании - кириллица.
-      // проверяем только номер.
-      if (foundTeamNumber !== this.teamFromEmailSubject.number) {
-        errorMessage = `Номер команды в теме письма: ${this.teamFromEmailSubject.number} не совпадает с номером команды в содержании письма: ${foundTeamNumber}`;
-        return new CalculationResult(null, errorMessage);
-      }
     }
 
     const team: TeamDataModel = TeamDataModel.createTeamByNumberAndTitle(foundTeamNumber, foundTeamTitle);

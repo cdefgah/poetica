@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-only
- * Copyright (c) 2020 - 2021 by Rafael Osipov <rafael.osipov@outlook.com>
+ * Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com>
  */
 
 import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
