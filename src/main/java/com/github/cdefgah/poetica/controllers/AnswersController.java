@@ -226,6 +226,8 @@ public class AnswersController extends AbstractController {
 
         answer.setGrade(Grade.Accepted);
         entityManager.persist(answer);
+
+        setTheSameGradeToAnswers(answer);
         return ResponseEntity.ok().build();
     }
 
@@ -246,6 +248,8 @@ public class AnswersController extends AbstractController {
 
         answer.setGrade(Grade.NotAccepted);
         entityManager.persist(answer);
+
+        setTheSameGradeToAnswers(answer);
         return ResponseEntity.ok().build();
     }
 
@@ -304,6 +308,37 @@ public class AnswersController extends AbstractController {
         } catch(NoResultException noResultException) {
             // сюда управление в принципе не может быть передано, но мы обрабатываем всё равно
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Выставляет ту-же оценку что и в ответе всем другим ответам на то-же задание.
+     * @param answer объект ответа.
+     */
+    // TODO переделать на Spring.Batch и делать всё одним запросом.
+    private void setTheSameGradeToAnswers(Answer answer) {
+        // ищем id ответов на этот-же вопрос, у которых совпадает hash-код ответа
+        TypedQuery<Long> query = entityManager.createQuery("select answer.id from " +
+                "Answer answer where " +
+                "answer.questionId=:questionId " +
+                "and answer.answerBodyHash=:answerBodyHash", Long.class);
+
+        query.setParameter("questionId", answer.getQuestionId());
+        query.setParameter("answerBodyHash", answer.getAnswerBodyHash());
+
+        List<Long> foundAnswerIdsList = query.getResultList();
+        Grade gradeToSet = answer.getGrade();
+
+        for(long oneProcessingAnswerId : foundAnswerIdsList) {
+            Answer foundAnswer = entityManager.find(Answer.class, oneProcessingAnswerId);
+            if (foundAnswer == null) {
+                // Сюда управление не должно передаваться
+                // Если это произойдет, значит база сломана
+                throw new RuntimeException("Unable to find answer by id: " + oneProcessingAnswerId);
+            }
+
+            foundAnswer.setGrade(gradeToSet);
+            entityManager.persist(foundAnswer);
         }
     }
 }
