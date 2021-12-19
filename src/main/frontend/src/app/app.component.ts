@@ -10,6 +10,7 @@ enum AppWindowState {
   Teams,
   Answers,
   Reports,
+  Tools,
   About,
 }
 
@@ -29,31 +30,37 @@ export class AppComponent {
   public windowState: AppWindowState = AppWindowState.Questions;
 
   toggleQuestionsScreen() {
-    if (this.windowState != AppWindowState.Questions) {
+    if (this.windowState !== AppWindowState.Questions) {
       this.windowState = AppWindowState.Questions;
     }
   }
 
   toggleTeamsScreen() {
-    if (this.windowState != AppWindowState.Teams) {
+    if (this.windowState !== AppWindowState.Teams) {
       this.windowState = AppWindowState.Teams;
     }
   }
 
   toggleAnswersScreen() {
-    if (this.windowState != AppWindowState.Answers) {
+    if (this.windowState !== AppWindowState.Answers) {
       this.windowState = AppWindowState.Answers;
     }
   }
 
   toggleReportsScreen() {
-    if (this.windowState != AppWindowState.Reports) {
+    if (this.windowState !== AppWindowState.Reports) {
       this.windowState = AppWindowState.Reports;
     }
   }
 
+  toggleToolsScreen() {
+    if (this.windowState !== AppWindowState.Tools) {
+      this.windowState = AppWindowState.Tools;
+    }
+  }
+
   toggleAboutScreen() {
-    if (this.windowState != AppWindowState.About) {
+    if (this.windowState !== AppWindowState.About) {
       this.windowState = AppWindowState.About;
     }
   }

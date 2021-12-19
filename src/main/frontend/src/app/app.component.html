@@ -19,17 +19,20 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
       Отчёты
     </button>
     <mat-divider></mat-divider>
+    <button mat-menu-item (click)="toggleToolsScreen()">
+      Управление/Настройки
+    </button>
+    <mat-divider></mat-divider>
     <button mat-menu-item (click)="toggleAboutScreen()">
       О программе
     </button>
   </mat-menu>
   <span class="fill-remaining-space"></span>
-  <span>Poetica</span>
+  <span><a class="app-title" href="https://github.com/cdefgah/poetica/wiki" target="_">Poetica</a></span>
 </mat-toolbar>
 
 <div [ngSwitch]="windowState">
   <app-questions-list *ngSwitchCase="appWindowState.Questions"></app-questions-list>
-
   <app-teams-list *ngSwitchCase="appWindowState.Teams"> </app-teams-list>
   <app-answers-list *ngSwitchCase="appWindowState.Answers"></app-answers-list>
   <app-reports *ngSwitchCase="appWindowState.Reports"></app-reports>
