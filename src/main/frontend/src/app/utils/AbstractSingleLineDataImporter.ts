@@ -43,18 +43,17 @@ export abstract class AbstractSingleLineDataImporter {
     return processedString;
   }
 
-  private static isNumber(value: string | number): boolean {
-    return value != null && value !== '' && !isNaN(Number(value.toString()));
-  }
+  protected static isZeroOrPositiveInteger(sourceString: string, allowLeadingZeroes: boolean = false): boolean {
+    if (allowLeadingZeroes) {
+      sourceString = sourceString.trim();
+      if (!sourceString) {
+          return false;
+      }
+      sourceString = sourceString.replace(/^0+/, '') || '0';
+    }
 
-  protected static isZeroOrPositiveInteger(sourceString: string): boolean {
-    // нормализация нужна, чтобы исключить случаи, когда перед нулём дали символ минуса или плюса
-    // или дали два или более нулей в качестве исходной строки.
-    const normalizedString: string = AbstractSingleLineDataImporter.isNumber(sourceString) ?
-                                        AbstractSingleLineDataImporter.parseInt(sourceString).toString() : '';
-
-    return (normalizedString.length > 0) && (normalizedString === sourceString)
-                                              && (AbstractSingleLineDataImporter.parseInt(sourceString) >= 0);
+    const n = Math.floor(Number(sourceString));
+    return n !== Infinity && String(n) === sourceString && n >= 0;
   }
 
   /**

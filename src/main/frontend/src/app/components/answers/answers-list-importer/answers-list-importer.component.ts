@@ -44,27 +44,27 @@ export class AnswersListImporterComponent
   }
 
   get firstStepErrorMessage(): string {
-    if (this._firstStepErrorMessage) {
-      return this._firstStepErrorMessage;
+    if (this.firstStepErrorMessageString) {
+      return this.firstStepErrorMessageString;
     } else {
       return '';
     }
   }
 
   set firstStepErrorMessage(value: string) {
-    this._firstStepErrorMessage = value ? value : '';
+    this.firstStepErrorMessageString = value ? value : '';
   }
 
   get secondStepErrorMessage(): string {
-    if (this._secondStepErrorMessage) {
-      return this._secondStepErrorMessage;
+    if (this.secondStepErrorMessageString) {
+      return this.secondStepErrorMessageString;
     } else {
       return '';
     }
   }
 
   set secondStepErrorMessage(value: string) {
-    this._secondStepErrorMessage = value ? value : '';
+    this.secondStepErrorMessageString = value ? value : '';
   }
 
   get IsFirstStepOk(): boolean {
@@ -177,8 +177,8 @@ export class AnswersListImporterComponent
   //#endregion
 
   //#region Errors handling
-  _firstStepErrorMessage: string;
-  _secondStepErrorMessage: string;
+  firstStepErrorMessageString: string;
+  secondStepErrorMessageString: string;
   //#endregion
 
   //#region StaticMethodForDialogs

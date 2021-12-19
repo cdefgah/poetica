@@ -218,7 +218,7 @@ export class EmailBodyParser extends AbstractMultiLineDataImporter {
       foundTeamTitle = firstLineParts[0].trim();
       foundTeamNumberString = firstLineParts[1].trim();
 
-      if (!EmailBodyParser.isZeroOrPositiveInteger(foundTeamNumberString)) {
+      if (!EmailBodyParser.isZeroOrPositiveInteger(foundTeamNumberString, true)) {
         errorMessage = `Номер команды может быть либо нулём, либо положительным целым значением. Но в письме передан номер: ${foundTeamNumberString}`;
         return new CalculationResult(null, errorMessage);
       } else {
