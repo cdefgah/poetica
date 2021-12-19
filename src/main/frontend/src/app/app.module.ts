@@ -49,6 +49,7 @@ import { EmailDetailsComponent } from './components/answers/email-details/email-
 import { DatePipe } from '@angular/common';
 import { DisplayRoundPipe } from './components/answers/support/display-round-pipe/display-round.pipe';
 import { TeamsListImporterComponent } from './components/teams/teams-list-importer/teams-list-importer.component';
+import { ToolsComponent } from './components/tools/tools.component';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { TeamsListImporterComponent } from './components/teams/teams-list-import
     AboutComponent,
     DisplayRoundPipe,
     TeamsListImporterComponent,
+	ToolsComponent,
   ],
   imports: [
     FormsModule,
