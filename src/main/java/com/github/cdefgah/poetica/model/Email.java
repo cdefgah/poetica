@@ -27,7 +27,6 @@ public final class Email {
      * Информация об ограничениях на длину полей.
      */
     private static class ModelConstraints {
-        static final int MAX_SUBJECT_LENGTH = 256;
         static final int MAX_BODY_LENGTH = 32768;
     }
 
@@ -39,7 +38,6 @@ public final class Email {
     static
     {
         final Map<String, String> localConstraintsMap = new HashMap<>();
-        localConstraintsMap.put("MAX_SUBJECT_LENGTH", String.valueOf(ModelConstraints.MAX_SUBJECT_LENGTH));
         localConstraintsMap.put("MAX_BODY_LENGTH", String.valueOf(ModelConstraints.MAX_BODY_LENGTH));
         modelConstraintsMap = Collections.unmodifiableMap(localConstraintsMap);
     }
@@ -70,13 +68,6 @@ public final class Email {
      */
     @Column(nullable = false)
     private int roundNumber;
-
-    /**
-     * Тема письма.
-     */
-    @Column(length = ModelConstraints.MAX_SUBJECT_LENGTH)
-    @Size(max = ModelConstraints.MAX_SUBJECT_LENGTH)
-    private String subject;
 
     /**
      * Содержимое письма.
@@ -117,22 +108,6 @@ public final class Email {
      */
     public void setSentOn(long sentOn) {
         this.sentOn = sentOn;
-    }
-
-    /**
-     * Отдаёт тему письма.
-     * @return тема письма.
-     */
-    public String getSubject() {
-        return subject;
-    }
-
-    /**
-     * Устанавливает тему письма.
-     * @param subject тема письма.
-     */
-    public void setSubject(String subject) {
-        this.subject = subject;
     }
 
     /**
@@ -233,7 +208,6 @@ public final class Email {
                 "id=" + id +
                 ", teamId=" + teamId +
                 ", roundNumber=" + roundNumber +
-                ", subject='" + subject + '\'' +
                 ", body='" + body + '\'' +
                 ", questionNumbersSequence='" + questionNumbersSequence + '\'' +
                 ", sentOn=" + sentOn +

@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  app_version_number: '0.94.5'
+  app_version_number: '0.94.6'
 
   workflow_dispatch:
 
