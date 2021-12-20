@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/cdefgah/poetica/workflows/build/badge.svg)](https://github.com/cdefgah/poetica/actions)
 
-#### Актуальная версия 0.94.6 (Выпущена: 19 декабря 2021 года)
+#### Актуальная версия [0.94.6 от 19 декабря 2021 года](https://github.com/cdefgah/poetica/releases/tag/v0.94.6).
 <hr/>
 
 Проект Poetica призван помочь оператору дежурной команды провести тур чемпионата по [бескрылкам](https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D1%81%D0%BA%D1%80%D1%8B%D0%BB%D0%BA%D0%B0).
