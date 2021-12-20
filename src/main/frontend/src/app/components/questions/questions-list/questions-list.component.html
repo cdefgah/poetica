@@ -57,5 +57,5 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns; let question" (click)="onRowClicked(row)"
-    [ngClass]="{ 'highlight-not-graded': !question.graded }"></tr>
+    [style.background-color]="question.graded?'red':'blue'"></tr>
 </table>
