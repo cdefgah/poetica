@@ -31,13 +31,6 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS,
   ];
 
-  getRowColor(question): string {
-    const gradedRowColor = 'pink';
-    const nonGradedRowColor = 'lightgreen';
-
-    return question.graded ? gradedRowColor : nonGradedRowColor;
-  }
-
   displayModeTitles: string[] = ['Все', 'Зачётные', 'Внезачётные'];
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
@@ -57,6 +50,10 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
   totalQuestionsAmount: number;
 
   selectedRowIndex: number;
+
+  gradedRowColor: string;
+
+  nonGradedRowColor: string;
 
   private questionValidationService: QuestionValidationService;
 
@@ -113,6 +110,13 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
       },
       (error) => this.reportServerError(error)
     );
+
+    this.gradedRowColor = 'orange';
+    this.nonGradedRowColor = 'blue';
+  }
+
+  getRowColor(question): string {
+    return question.graded ? this.gradedRowColor : this.nonGradedRowColor;
   }
 
   loadTotalQuestionsAmount() {
