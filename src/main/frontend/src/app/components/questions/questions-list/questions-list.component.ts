@@ -31,6 +31,13 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     QuestionsListComponent.DISPLAY_MODE_ALIAS_NOT_CREDITED_QUESTIONS,
   ];
 
+  gradedRowColor: 'orange';
+  nonGradedRowColor: 'green';
+
+  getRowColor(question): string {
+    return question.graded ? 'red' : 'blue';
+  }
+
   displayModeTitles: string[] = ['Все', 'Зачётные', 'Внезачётные'];
 
   selectedDisplayModeAlias: string = this.displayModeAliases[0];
