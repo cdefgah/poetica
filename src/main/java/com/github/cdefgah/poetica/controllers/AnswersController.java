@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
@@ -312,33 +313,20 @@ public class AnswersController extends AbstractController {
     }
 
     /**
-     * Выставляет ту-же оценку что и в ответе всем другим ответам на то-же задание.
+     * Выставляет ту-же оценку, что и в ответе всем другим ответам на то-же задание.
      * @param answer объект ответа.
      */
-    // TODO переделать на Spring.Batch и делать всё одним запросом.
     private void setTheSameGradeToAnswers(Answer answer) {
-        // ищем id ответов на этот-же вопрос, у которых совпадает hash-код ответа
-        TypedQuery<Long> query = entityManager.createQuery("select answer.id from " +
-                "Answer answer where " +
-                "answer.questionId=:questionId " +
-                "and answer.answerBodyHash=:answerBodyHash", Long.class);
+        Query updateAnswersQuery = entityManager.
+                                        createQuery("update Answer answer " +
+                                                            "set answer.grade=:gradeToSet where " +
+                                                            "answer.questionId=:questionId and " +
+                                                            "answer.answerBodyHash=:answerBodyHash");
 
-        query.setParameter("questionId", answer.getQuestionId());
-        query.setParameter("answerBodyHash", answer.getAnswerBodyHash());
+        updateAnswersQuery.setParameter("gradeToSet", answer.getGrade());
+        updateAnswersQuery.setParameter("questionId", answer.getQuestionId());
+        updateAnswersQuery.setParameter("answerBodyHash", answer.getAnswerBodyHash());
 
-        List<Long> foundAnswerIdsList = query.getResultList();
-        Grade gradeToSet = answer.getGrade();
-
-        for(long oneProcessingAnswerId : foundAnswerIdsList) {
-            Answer foundAnswer = entityManager.find(Answer.class, oneProcessingAnswerId);
-            if (foundAnswer == null) {
-                // Сюда управление не должно передаваться
-                // Если это произойдет, значит база сломана
-                throw new RuntimeException("Unable to find answer by id: " + oneProcessingAnswerId);
-            }
-
-            foundAnswer.setGrade(gradeToSet);
-            entityManager.persist(foundAnswer);
-        }
+        updateAnswersQuery.executeUpdate();
     }
 }
