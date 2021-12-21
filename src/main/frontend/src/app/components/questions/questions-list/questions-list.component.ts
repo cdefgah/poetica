@@ -51,9 +51,13 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
 
   selectedRowIndex: number;
 
-  gradedRowColor: string;
+  gradedRowBackgroundColor: string;
 
-  nonGradedRowColor: string;
+  nonGradedRowBackgroundColor: string;
+
+  gradedRowTextColor: string;
+
+  nonGradedRowTextColor: string;
 
   private questionValidationService: QuestionValidationService;
 
@@ -111,12 +115,25 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
       (error) => this.reportServerError(error)
     );
 
-    this.gradedRowColor = 'orange';
-    this.nonGradedRowColor = 'blue';
+    this.gradedRowTextColor = '#0339fc';
+    this.gradedRowBackgroundColor = '#fcba03';
+
+    this.nonGradedRowTextColor = '#d407eb';
+    this.nonGradedRowBackgroundColor = '#bbede5';
   }
 
-  getRowColor(question): string {
-    return question.graded ? this.gradedRowColor : this.nonGradedRowColor;
+  getRowBackgroundColor(row): string {
+    console.log('======');
+    console.log(typeof(row));
+    console.log('======');
+    return row.graded ? this.gradedRowBackgroundColor : this.nonGradedRowBackgroundColor;
+  }
+
+  getRowTextColor(row): string {
+    console.log('======');
+    console.log(typeof(row));
+    console.log('======');
+    return row.graded ? this.gradedRowTextColor : this.nonGradedRowTextColor;
   }
 
   loadTotalQuestionsAmount() {

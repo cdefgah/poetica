@@ -37,4 +37,7 @@ public class ConfigurationController extends AbstractController {
     public ResponseEntity<CharsetEncodingEntity[]> getSupportedReportEncodings() {
         return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
     }
+
+
+
 }

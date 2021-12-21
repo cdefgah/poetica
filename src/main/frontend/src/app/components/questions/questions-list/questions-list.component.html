@@ -57,6 +57,6 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns; let question" (click)="onRowClicked(row)"
-    [style.background-color]="getRowColor(question)"></tr>
+    [style.background-color]="getRowBackgroundColor(question)" [style.color]="getRowTextColor(question)"></tr>
 
 </table>
