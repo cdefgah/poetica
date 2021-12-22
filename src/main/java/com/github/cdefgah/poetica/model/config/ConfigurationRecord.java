@@ -11,41 +11,27 @@ import javax.persistence.*;
  * Строка в таблице конфигурации.
  */
 @Entity
-@Table(name = "CONFIGURATION")
+@Table(name = "CONFIG")
 public class ConfigurationRecord {
 
     /**
-     * Уникальный идентификатор записи в настройках.
+     * Уникальный ключ для той или иной настройки.
      */
     @Id
-    @GeneratedValue
-    private Long id;
-
-    /**
-     * Ключ для той или иной настройки.
-     */
-    @Column(nullable = false)
+    @Column(name = "CONFIG_KEY", nullable = false)
     private String key;
 
     /**
      * Значение для той или иной настройки.
      * Для сложных значений применяем JSON.
      */
-    @Column(nullable = false)
+    @Column(name = "CONFIG_VALUE", nullable = false)
     private String value;
 
     /**
      * Конструктор класса.
      */
     public ConfigurationRecord() {
-    }
-
-    /**
-     * Отдаёт уникальный идентификатор строки в таблице настроек.
-     * @return уникальный идентификатор строки в таблице настроек.
-     */
-    public Long getId() {
-        return id;
     }
 
     /**

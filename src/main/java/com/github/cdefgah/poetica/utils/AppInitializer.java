@@ -2,6 +2,8 @@ package com.github.cdefgah.poetica.utils;
 
 import com.github.cdefgah.poetica.model.Answer;
 import com.github.cdefgah.poetica.model.Question;
+import com.github.cdefgah.poetica.model.config.Configuration;
+import com.github.cdefgah.poetica.model.config.ConfigurationRecord;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -25,13 +27,44 @@ public class AppInitializer {
     EntityManager entityManager;
 
     /**
-     * Обновляет пустые поля в таблицах на тот случай, если база была создана в предыдущей версии приложения.
+     * Инициализация базы данных.
      */
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void updateDatabase() {
+    public void initializeDatabase() {
+        // Выставляем значения по-умолчанию в конфигурации, если нужно.
+        setupConfigurationDefaults();
+
+        // Обновляем пустые поля в таблицах на тот случай, если база была создана в предыдущей версии приложения.
         updateAuthorsAnswerHashForQuestions();
         updateAnswerBodyHashForAnswers();
+    }
+
+    private void setupConfigurationDefaults() {
+        final String DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR = "#FFFFFF";
+        final String DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR = "#C0E6E9";
+
+        System.out.println("Setup configuration defaults...");
+        ConfigurationRecord gradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                                                            Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
+
+        if (gradedQuestionBackgroundColor == null) {
+            gradedQuestionBackgroundColor = new ConfigurationRecord();
+            gradedQuestionBackgroundColor.setKey(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
+            gradedQuestionBackgroundColor.setValue(DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
+            entityManager.persist(gradedQuestionBackgroundColor);
+        }
+
+        ConfigurationRecord nonGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                            Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+        if (nonGradedQuestionBackgroundColor == null) {
+            nonGradedQuestionBackgroundColor = new ConfigurationRecord();
+            nonGradedQuestionBackgroundColor.setKey(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+            nonGradedQuestionBackgroundColor.setValue(DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+            entityManager.persist(nonGradedQuestionBackgroundColor);
+        }
+
+        System.out.println("Setup configuration defaults... done");
     }
 
     /**
@@ -46,6 +79,7 @@ public class AppInitializer {
         if (foundQuestionIds.size() > 0) {
             updateAuthorsAnswerHashForQuestions(foundQuestionIds);
         }
+        System.out.println("Updating questions without author's answer hash... done");
     }
 
     /**

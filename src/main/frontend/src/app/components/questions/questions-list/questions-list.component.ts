@@ -55,10 +55,6 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
 
   nonGradedRowBackgroundColor: string;
 
-  gradedRowTextColor: string;
-
-  nonGradedRowTextColor: string;
-
   private questionValidationService: QuestionValidationService;
 
   constructor(
@@ -77,6 +73,7 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     }
 
     this.loadQuestionsList();
+    this.loadTableColors();
   }
 
   protected getMessageDialogReference(): MatDialog {
@@ -114,26 +111,21 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
       },
       (error) => this.reportServerError(error)
     );
+  }
 
-    this.gradedRowTextColor = '#0339fc';
-    this.gradedRowBackgroundColor = '#fcba03';
+  loadTableColors() {
+    // загружаем цвета фона для строк таблицы
+    // цвета базируются на основе признака "зачётный"/"внезачётный" вопроса
 
-    this.nonGradedRowTextColor = '#d407eb';
-    this.nonGradedRowBackgroundColor = '#bbede5';
+    const defaultBackgroundColorForGradedRows = '';
+    const defaultBackgroundColorForNonGradedRows = '';
+
+    this.gradedRowBackgroundColor = 'black';
+    this.nonGradedRowBackgroundColor = 'green';
   }
 
   getRowBackgroundColor(row): string {
-    console.log('======');
-    console.log(typeof(row));
-    console.log('======');
     return row.graded ? this.gradedRowBackgroundColor : this.nonGradedRowBackgroundColor;
-  }
-
-  getRowTextColor(row): string {
-    console.log('======');
-    console.log(typeof(row));
-    console.log('======');
-    return row.graded ? this.gradedRowTextColor : this.nonGradedRowTextColor;
   }
 
   loadTotalQuestionsAmount() {

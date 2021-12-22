@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 /**
  * Отвечает за управление настройками программы.
@@ -38,6 +40,22 @@ public class ConfigurationController extends AbstractController {
         return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/configuration/colors-for-questions",
+            method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Map<String,ConfigurationRecord >> getColorsForQuestionsPage() {
 
+        // return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
+        return null;
+    }
 
+    /**
+     * Сбрасывает настройки цвета в цвета по-умолчанию для таблицы с вопросами.
+     */
+    @RequestMapping(path = "/configuration/reset-colors-for-questions",
+            method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<String> resetQuestionPageColors() {
+
+        // return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
 }

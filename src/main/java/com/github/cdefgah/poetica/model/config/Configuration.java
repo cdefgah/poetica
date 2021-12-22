@@ -14,6 +14,11 @@ import java.util.Map;
  */
 public class Configuration {
 
+    public static final String CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR = "configKeyGradedQuestionBackgroundColor";
+    public static final String CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR =
+                                                                           "configKeyNonGradedQuestionBackgroundColor";
+
+
     /**
      * Список поддерживаемых приложением кодировок для формирования отчётов.
      */

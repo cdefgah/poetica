@@ -22,7 +22,7 @@ public final class CharsetEncodingEntity {
 
     /**
      * Конструктор класса.
-     * @param humanReadableTitle название кодировки для отображения в пользовтельском интерфейсе.
+     * @param humanReadableTitle название кодировки для отображения в пользовательском интерфейсе.
      * @param systemName системное название кодировки.
      */
     public CharsetEncodingEntity(String humanReadableTitle, String systemName) {
