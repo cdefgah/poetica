@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,10 +44,16 @@ public class ConfigurationController extends AbstractController {
 
     @RequestMapping(path = "/configuration/colors-for-questions",
             method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Map<String,ConfigurationRecord >> getColorsForQuestionsPage() {
+    public ResponseEntity<Map<String,String >> getColorsForQuestionsPage() {
+        ConfigurationRecord gradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                                                            Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
+        ConfigurationRecord nonGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+        Map<String,String> resultMap = new HashMap<>();
+        resultMap.put(gradedQuestionBackgroundColor.getKey(), gradedQuestionBackgroundColor.getValue());
+        resultMap.put(nonGradedQuestionBackgroundColor.getKey(), nonGradedQuestionBackgroundColor.getValue());
 
-        // return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
-        return null;
+        return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
 
     /**

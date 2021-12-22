@@ -113,6 +113,7 @@ public class AppInitializer {
         if (foundAnswerIds.size() > 0) {
             updateAnswerBodyHashForAnswers(foundAnswerIds);
         }
+        System.out.println("Updating answers without answer body hash... done");
     }
 
     /**

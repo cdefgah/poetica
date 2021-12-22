@@ -117,11 +117,18 @@ export class QuestionsListComponent extends AbstractInteractiveComponentModel im
     // загружаем цвета фона для строк таблицы
     // цвета базируются на основе признака "зачётный"/"внезачётный" вопроса
 
-    const defaultBackgroundColorForGradedRows = '';
-    const defaultBackgroundColorForNonGradedRows = '';
+    const url = '/configuration/colors-for-questions';
 
-    this.gradedRowBackgroundColor = 'black';
-    this.nonGradedRowBackgroundColor = 'green';
+    this.http.get(url).subscribe(
+      (colorMap) => {
+        const keyBackgroundColorForGradedRow = 'configKeyGradedQuestionBackgroundColor';
+        const keyBackgroundColorForNonGradedRow = 'configKeyNonGradedQuestionBackgroundColor';
+
+        this.gradedRowBackgroundColor = colorMap[keyBackgroundColorForGradedRow];
+        this.nonGradedRowBackgroundColor = colorMap[keyBackgroundColorForNonGradedRow];
+      },
+      (error) => this.reportServerError(error)
+    );
   }
 
   getRowBackgroundColor(row): string {
