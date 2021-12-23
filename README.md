@@ -2,6 +2,9 @@
 
 [![Build Status](https://github.com/cdefgah/poetica/workflows/build/badge.svg)](https://github.com/cdefgah/poetica/actions)
 
+#### Актуальная версия [0.94.6 от 19 декабря 2021 года](https://github.com/cdefgah/poetica/releases/tag/v0.94.6).&nbsp;&nbsp;&nbsp;([Что нового в текущей версии](https://github.com/cdefgah/poetica/blob/master/src/main/resources/other/whatsnew.txt))
+<hr/>
+
 Проект Poetica призван помочь оператору дежурной команды провести тур чемпионата по [бескрылкам](https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D1%81%D0%BA%D1%80%D1%8B%D0%BB%D0%BA%D0%B0).
 
 Информация о том, как скачать и запустить готовую программу, а также остальная пользовательская документация по проекту находятся по ссылке:  [https://github.com/cdefgah/poetica/wiki](https://github.com/cdefgah/poetica/wiki)
@@ -44,7 +47,7 @@
 
 `mvn clean package`
 
-После выполнения сборки, из папки `target` забирайте файл `poetica-x.xx-distrib.zip`, где `x.xx` - номер версии, например: `poetica-0.92-distrib.zip`.
+После выполнения сборки, из папки `target` забирайте файл `poetica-x.xx.x-distrib.zip`, где `x.xx.x` - номер версии, например: `poetica-0.94.6-distrib.zip`.
 
 Внутри этого zip-архива находится папка со всеми файлами приложения. Просто распакуйте этот архив и следуйте [инструкциям пользовательской документации по запуску приложения](https://github.com/cdefgah/poetica/wiki/%D0%9E-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B5).
 
