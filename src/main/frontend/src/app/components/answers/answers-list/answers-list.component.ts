@@ -535,17 +535,12 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   //#endregion
 
   getRowBackgroundColor(row): string {
-    console.log('============ getRowBackgroundColor::START =================');
-    switch(row.Grade) {
+    switch(row.grade) {
       case 'Accepted':
-        console.log('ACCEPTED COLOR');
         return this.acceptedAnswerBackgroundColor;
-         
       case 'NotAccepted':
-        console.log('NOT-ACCEPTED COLOR');
         return this.notAcceptedAnswerBackgroundColor;
       default:
-        console.log('NOT GRADED COLOR');
         return this.notGradedAnswerBackgroundColor;
     }
   }
