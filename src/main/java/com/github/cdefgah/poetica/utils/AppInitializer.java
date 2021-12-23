@@ -41,30 +41,54 @@ public class AppInitializer {
     }
 
     private void setupConfigurationDefaults() {
+        System.out.println("Setup configuration defaults...");
+        setupDefaultQuestionRowBackgroundColors();
+        setupDefaultAnswerRowBackgroundColors();
+        System.out.println("Setup configuration defaults... done");
+    }
+
+    /**
+     * Формирует цвета по умолчанию с цветами фона для строк в таблице вопросов.
+     */
+    private void setupDefaultQuestionRowBackgroundColors() {
         final String DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR = "#FFFFFF";
         final String DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR = "#C0E6E9";
 
-        System.out.println("Setup configuration defaults...");
-        ConfigurationRecord gradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
-                                                            Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
+        setupSingleDefaultColor(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR,
+                                                                        DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
+        setupSingleDefaultColor(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR,
+                                                                    DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+    }
 
-        if (gradedQuestionBackgroundColor == null) {
-            gradedQuestionBackgroundColor = new ConfigurationRecord();
-            gradedQuestionBackgroundColor.setKey(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
-            gradedQuestionBackgroundColor.setValue(DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
-            entityManager.persist(gradedQuestionBackgroundColor);
+    /**
+     * Формирует цвета по умолчанию с цветами фона для строк в таблице ответов.
+     */
+    private void setupDefaultAnswerRowBackgroundColors() {
+        final String DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#D4E9C5";
+        final String DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#F8CBCF";
+        final String DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR = "#EDECEC";
+
+        setupSingleDefaultColor(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER,
+                                                                              DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR);
+        setupSingleDefaultColor(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_ACCEPTED_ANSWER,
+                                                                          DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR);
+        setupSingleDefaultColor(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER,
+                                                                            DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR);
+    }
+
+    /**
+     * Прописывает цвет по умолчанию в таблицу конфигурации.
+     * @param colorKey ключ для цвета.
+     * @param colorValue значение для цвета.
+     */
+    private void setupSingleDefaultColor(String colorKey, String colorValue) {
+        ConfigurationRecord defaultColor = entityManager.find(ConfigurationRecord.class, colorKey);
+        if (defaultColor == null) {
+            defaultColor = new ConfigurationRecord();
+            defaultColor.setKey(colorKey);
+            defaultColor.setValue(colorValue);
+            entityManager.persist(defaultColor);
         }
-
-        ConfigurationRecord nonGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
-                            Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR);
-        if (nonGradedQuestionBackgroundColor == null) {
-            nonGradedQuestionBackgroundColor = new ConfigurationRecord();
-            nonGradedQuestionBackgroundColor.setKey(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR);
-            nonGradedQuestionBackgroundColor.setValue(DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR);
-            entityManager.persist(nonGradedQuestionBackgroundColor);
-        }
-
-        System.out.println("Setup configuration defaults... done");
     }
 
     /**

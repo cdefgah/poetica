@@ -48,6 +48,10 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   answersWithoutGradesDataSource: MatTableDataSource<AnswerDataModel> = new MatTableDataSource([]);
   emailsDataSource: MatTableDataSource<EmailDataModel> = new MatTableDataSource([]);
 
+  private acceptedAnswerBackgroundColor: string;
+  private notAcceptedAnswerBackgroundColor: string;
+  private notGradedAnswerBackgroundColor: string;
+
   /**
    * Инициализируем пустым дайджестом, чтобы не сломались компоненты, привязанные к этому свойству.
    * TODO - перенести потом инициализацию в ngOnInit() метод, чтоб не было нужды в инициализации пустыми значениями.
@@ -92,9 +96,28 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
     this.checkNotGradedAnswersPresence();
 
     this.loadTeamsList(this, -1, false, this.populateTeamSelectionFieldAndLoadAnswersWithEmails);
-
+    this.loadTableColors();
   }
   //#endregion
+
+  loadTableColors() {
+    // загружаем цвета фона для строк таблицы ответов
+    // цвета фона различаются для зачтённых, незачтённых ответов и для ответов без оценки.
+
+    const url = '/configuration/colors-for-answers';
+    this.http.get(url).subscribe(
+      (colorMap) => {
+        const keyBackgroundColorForAcceptedAnswer = 'configKeyBackgroundColorForAcceptedAnswer';
+        const keyBackgroundColorForNotAcceptedAnswer = 'configKeyBackgroundColorForNotAcceptedAnswer';
+        const keyBackgroundColorForNotGradedAnswer = 'configKeyBackgroundColorForNotGradedAnswer';
+
+        this.acceptedAnswerBackgroundColor = colorMap[keyBackgroundColorForAcceptedAnswer];
+        this.notAcceptedAnswerBackgroundColor = colorMap[keyBackgroundColorForNotAcceptedAnswer];
+        this.notGradedAnswerBackgroundColor = colorMap[keyBackgroundColorForNotGradedAnswer];
+      },
+      (error) => this.reportServerError(error)
+    );
+  }
 
   //#region EventHandlers
   actualRoundChanged(event: MatRadioChange) {
@@ -512,8 +535,18 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   //#endregion
 
   getRowBackgroundColor(row): string {
-
-    
-    return row.graded ? this.acceptedAnswerBackgroundColor : this.nonGradedRowBackgroundColor;
+    console.log('============ getRowBackgroundColor::START =================');
+    switch(row.Grade) {
+      case 'Accepted':
+        console.log('ACCEPTED COLOR');
+        return this.acceptedAnswerBackgroundColor;
+         
+      case 'NotAccepted':
+        console.log('NOT-ACCEPTED COLOR');
+        return this.notAcceptedAnswerBackgroundColor;
+      default:
+        console.log('NOT GRADED COLOR');
+        return this.notGradedAnswerBackgroundColor;
+    }
   }
 }

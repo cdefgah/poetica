@@ -89,7 +89,7 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedAnswerColumns; let answer" (click)="onAnswerRowClicked(row)"
-          [style.background-color]="getRowBackgroundColor(question)"></tr>
+          [style.background-color]="getRowBackgroundColor(row)"></tr>
       </table>
     </mat-tab>
     <mat-tab label="Ответы без оценок">
@@ -126,7 +126,7 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
         <tr mat-header-row *matHeaderRowDef="displayedAnswerColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedAnswerColumns; let answer" (click)="onAnswerRowClicked(row)"
-          [style.background-color]="getRowBackgroundColor(question)"></tr>
+          [style.background-color]="getRowBackgroundColor(row)"></tr>
       </table>
     </mat-tab>
     <mat-tab label="Загруженные письма">

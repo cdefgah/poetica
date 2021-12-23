@@ -42,9 +42,13 @@ public class ConfigurationController extends AbstractController {
         return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
     }
 
+    /**
+     * Отдаёт по запросу цвета фона для строк таблицы вопросов.
+     * @return словарь (map) с цветами фона для строк таблицы вопросов.
+     */
     @RequestMapping(path = "/configuration/colors-for-questions",
             method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Map<String,String >> getColorsForQuestionsPage() {
+    public ResponseEntity<Map<String,String >> getColorsForQuestionsTable() {
         ConfigurationRecord gradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
                                                             Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR);
         ConfigurationRecord nonGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
@@ -52,6 +56,32 @@ public class ConfigurationController extends AbstractController {
         Map<String,String> resultMap = new HashMap<>();
         resultMap.put(gradedQuestionBackgroundColor.getKey(), gradedQuestionBackgroundColor.getValue());
         resultMap.put(nonGradedQuestionBackgroundColor.getKey(), nonGradedQuestionBackgroundColor.getValue());
+
+        return new ResponseEntity<>(resultMap, HttpStatus.OK);
+    }
+
+    /**
+     * Отдаёт по запросу цвета фона для строк таблицы ответов.
+     * @return словарь (map) с цветами фона для строк таблицы ответов.
+     */
+    @RequestMapping(path = "/configuration/colors-for-answers",
+            method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Map<String,String >> getColorsForAnswersTable() {
+
+        ConfigurationRecord acceptedAnswerBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                                                    Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER);
+
+        ConfigurationRecord notAcceptedAnswerBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                                                   Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_ACCEPTED_ANSWER);
+
+        ConfigurationRecord notGradedAnswerBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                                                     Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER);
+
+
+        Map<String,String> resultMap = new HashMap<>();
+        resultMap.put(acceptedAnswerBackgroundColor.getKey(), acceptedAnswerBackgroundColor.getValue());
+        resultMap.put(notAcceptedAnswerBackgroundColor.getKey(), notAcceptedAnswerBackgroundColor.getValue());
+        resultMap.put(notGradedAnswerBackgroundColor.getKey(), notGradedAnswerBackgroundColor.getValue());
 
         return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
