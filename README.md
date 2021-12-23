@@ -2,7 +2,9 @@
 
 [![Build Status](https://github.com/cdefgah/poetica/workflows/build/badge.svg)](https://github.com/cdefgah/poetica/actions)
 
-#### Актуальная версия [0.94.6 от 19 декабря 2021 года](https://github.com/cdefgah/poetica/releases/tag/v0.94.6).&nbsp;&nbsp;&nbsp;([Что нового в текущей версии](https://github.com/cdefgah/poetica/blob/master/src/main/resources/other/whatsnew.txt))
+#### Актуальная версия [0.94.7 от 25 декабря 2021 года](https://github.com/cdefgah/poetica/releases/tag/v0.94.7).
+
+[Информация о сборке](https://github.com/cdefgah/poetica/blob/master/src/main/resources/other/whatsnew.txt)
 <hr/>
 
 Проект Poetica призван помочь оператору дежурной команды провести тур чемпионата по [бескрылкам](https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D1%81%D0%BA%D1%80%D1%8B%D0%BB%D0%BA%D0%B0).
@@ -21,13 +23,13 @@
 Установка Node.JS и Angular делается следующим образом:
 
 1. Скачиваете и устанавливаете Node.JS
-2. Открываете cmd-терминал Windows и даёте команду:
+2. Открываете терминал и даёте команду (Linux-пользователям надо добавить перед командой `sudo `):
 
 `npm install -g typescript`
 
 Эта команда установит поддержку typescript.
 
-3. Затем в этом-же терминале даёте команду:
+3. Затем в этом-же терминале даёте команду (Linux-пользователям надо добавить перед командой `sudo `):
 
 `npm install -g @angular/cli@11.0.5`
 
@@ -35,7 +37,7 @@
 
 `ng --version`
 
-Должна отобразиться информация об установленном Angular и его компонентах.
+Должна отобразиться информация об установленном Angular и его компонентах. В информации о компонентах не должно быть никаких сообщений об ошибках. Если они есть, переустановите эти компоненты отдельно.
 
 Если это первая сборка проекта, то перейдите в папку `src/main/frontend`, откройте терминал в этой папке и дайте команду:
 

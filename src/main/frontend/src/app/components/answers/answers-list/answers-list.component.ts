@@ -510,4 +510,10 @@ export class AnswersListComponent extends AbstractInteractiveComponentModel
   }
 
   //#endregion
+
+  getRowBackgroundColor(row): string {
+
+    
+    return row.graded ? this.acceptedAnswerBackgroundColor : this.nonGradedRowBackgroundColor;
+  }
 }

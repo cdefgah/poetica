@@ -47,10 +47,6 @@
   text-align: right;
 }
 
-.highlight-answer-without-grade {
-  background: bisque;
-}
-
 .not-graded-answers-warning {
   background-color: bisque;
   padding: 0.5em;
