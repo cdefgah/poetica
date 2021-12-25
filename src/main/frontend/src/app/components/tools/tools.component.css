@@ -16,18 +16,28 @@ table {
   border-width: 1px;
 }
 
-.participant-name {
-  width: 25%;
+.color-table-header-cell {
+  background-color: darkblue;
+  color: white;
   font-family: sans-serif;
-  color: darkblue;
-  font-size: 1em;
-  padding: 1em;
+  font-size: 1.5em;
+  vertical-align: center;
+  text-align: center;
 }
 
-.participant-description {
-  width: auto;
+.color-description-cell {
+  border: 1px;
+  border-color: red;
+  width: 40%;
+  vertical-align: center;
+  text-align: left;
   font-family: sans-serif;
-  color: darkblue;
-  font-size: 1em;
-  padding: 1em;
+  font-size: 1.25em;
+}
+
+.color-picker-cell {
+  border: 1px;
+  border-color: orange;  
+  width: 60%;
+  vertical-align: center;
 }

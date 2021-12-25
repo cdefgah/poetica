@@ -21,9 +21,14 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
 
   public appVersion: string;
 
-  public isColorPickerCollapsedInitially = false;
+  // наименование этого свойства может вводить в заблуждение
+  // так как оно привязано к collapsed и при false
+  // элемент будет именно collpased.
+  // но это глюк в самом компоненте color-picker-а.
+  public isColorPickerOpenedInitially = false;
 
-  selectedColor = '#0000ff';
+  backgroundColorForRowWithGradedQuestion: string;
+  backgroundColorForRowWithNotGradedQuestion: string;
 
   ngOnInit() {
     this.httpClient.get('reports/app-version', { responseType: 'text' }).subscribe(

@@ -2,10 +2,34 @@
 Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
 <div class="container">
-  <h3>Tools</h3>
+  <h3>Настройки и управление</h3>
 
-  <rcp-radial-color-picker [size]="150" [collapsed]="isColorPickerCollapsedInitially" [color]="selectedColor"
-    (selected)="onColorSelected($event)">
-  </rcp-radial-color-picker>
+  <table>
+    <thead>
+      <tr>
+        <td class="color-table-header-cell">Настройка цветов фона для таблицы с заданиями</td>
+      </tr>
+    </thead>
+    <tr>
+      <td class="color-description-cell" colspan="2">
+        Цвет фона для строк с зачётными заданиями:
+      </td>
+      <td class="color-picker-cell">
+        <rcp-radial-color-picker [size]="96" [collapsed]="isColorPickerOpenedInitially"
+          [color]="backgroundColorForRowWithGradedQuestion" (selected)="onColorSelected($event)">
+        </rcp-radial-color-picker>
+      </td>
+    </tr>
+    <tr>
+      <td class="color-description-cell">
+        Цвет фона для строк с внезачётными заданиями:
+      </td>
+      <td class="color-picker-cell">
+        <rcp-radial-color-picker [size]="96" [collapsed]="isColorPickerOpenedInitially"
+          [color]="backgroundColorForRowWithNotGradedQuestion" (selected)="onColorSelected($event)">
+        </rcp-radial-color-picker>
+      </td>
+    </tr>
+  </table>
 
 </div>
