@@ -21,6 +21,10 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
 
   public appVersion: string;
 
+  public isColorPickerCollapsedInitially = false;
+
+  selectedColor = '#0000ff';
+
   ngOnInit() {
     this.httpClient.get('reports/app-version', { responseType: 'text' }).subscribe(
       (versionInfoString: string) => {
@@ -32,5 +36,11 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
 
   protected getMessageDialogReference(): MatDialog {
     return this.dialog;
+  }
+
+  onColorSelected($colorSelectedEvent) {
+    console.log('======== ON COLOR CHANGE ==== START');
+    console.dir($colorSelectedEvent);
+    console.log('======== ON COLOR CHANGE ==== END');
   }
 }

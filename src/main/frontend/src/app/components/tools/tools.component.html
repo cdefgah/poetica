@@ -3,37 +3,9 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
 <div class="container">
   <h3>Tools</h3>
-  <p>Версия программы: {{ appVersion }}</p>
-  <p>
-    Страница проекта:
-    <a href="https://www.github.com/cdefgah/poetica" target="_blank">https://www.github.com/cdefgah/poetica</a>
-  </p>
 
-  <p>Участники проекта: </p>
-  <table>
-    <tr>
-      <td class="participant-name">
-        <a href="https://www.facebook.com/anna.poletaeva.193/" target="_blank">Анна Полетаева</a>
-      </td>
-      <td class="participant-description">
-        Консультации, тестирование.
-      </td>
-    </tr>
-    <tr>
-      <td class="participant-name">
-        <a href="https://www.facebook.com/vi.ru.338/" target="_blank">Виталий Рудник</a>
-      </td>
-      <td class="participant-description">
-        Консультации, тестирование.
-      </td>
-    </tr>
-    <tr>
-      <td class="participant-name">
-        <a href="https://github.com/cdefgah/" target="_blank">Рафаэль Осипов</a>
-      </td>
-      <td class="participant-description">
-        Разработка, тестирование, документация и всё остальное.
-      </td>
-    </tr>
-  </table>
+  <rcp-radial-color-picker [size]="150" [collapsed]="isColorPickerCollapsedInitially" [color]="selectedColor"
+    (selected)="onColorSelected($event)">
+  </rcp-radial-color-picker>
+
 </div>
