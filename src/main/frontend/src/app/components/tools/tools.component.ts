@@ -79,5 +79,47 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
 
   onBackgroundColorForGradedQuestionSelected(selectedColor) {
     this.backgroundColorForRowWithGradedQuestion = selectedColor;
-  }  
+  }
+
+  onBackgroundColorForAcceptedAnswerSelected(selectedColor) {
+    this.acceptedAnswerBackgroundColor = selectedColor;
+  }
+
+  onBackgroundColorForNotAcceptedAnswerSelected(selectedColor) {
+    this.notAcceptedAnswerBackgroundColor = selectedColor;
+  }
+
+  onBackgroundColorForNotGradedAnswerSelected(selectedColor) {
+    this.notGradedAnswerBackgroundColor = selectedColor;
+  }
+
+  resetQuestionColorsToDefaults() {
+    const confirmationMessage = `Сбросить настройки цвета для списка заданий в значения по-умолчанию?`;
+
+    const dialogAcceptedAction = () => {
+     // если диалог был принят (accepted), сбрасываем в значения по-умолчанию.
+     const url = '/configuration/reset-colors-for-questions';
+     this.httpClient.post(url, null).subscribe(() => {
+       // заново загружаем значения цветов для заданий, после сброса
+       this.loadBackgroundColorsForQuestionsTable();
+     });
+   };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
+  }
+
+  resetAnswerColorsToDefaults() {
+    const confirmationMessage = `Сбросить настройки цвета для списков ответов в значения по-умолчанию?`;
+
+    const dialogAcceptedAction = () => {
+     // если диалог был принят (accepted), сбрасываем в значения по-умолчанию.
+     const url = '/configuration/reset-colors-for-answers';
+     this.httpClient.post(url, null).subscribe(() => {
+       // заново загружаем значения цветов для списков ответов, после сброса
+       this.loadBackgroundColorsForAnswersTable();
+     });
+   };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);    
+  }
 }

@@ -52,7 +52,7 @@ public class AppInitializer {
      */
     private void setupDefaultQuestionRowBackgroundColors() {
         final String DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR = "#FFFFFF";
-        final String DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR = "#C0E6E9";
+        final String DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR = "#C1F8F2";
 
         setupSingleDefaultColor(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR,
                                                                         DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
@@ -71,9 +71,9 @@ public class AppInitializer {
      * Формирует цвета по умолчанию с цветами фона для строк в таблице ответов.
      */
     private void setupDefaultAnswerRowBackgroundColors() {
-        final String DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#42F50C";
-        final String DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#F50C22";
-        final String DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR = "#929CF7";
+        final String DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#CBE2A5";
+        final String DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR = "#F8CEE7";
+        final String DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR = "#DBDFE9";
 
         setupSingleDefaultColor(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER,
                                                                               DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR);

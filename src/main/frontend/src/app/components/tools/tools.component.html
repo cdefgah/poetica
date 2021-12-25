@@ -22,7 +22,7 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                 <td class="color-picker-cell">
                   <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
                     [color]="backgroundColorForRowWithGradedQuestion"
-                    (selected)="onBackgroundColorForGradedQuestionSelected($event)">
+                    (selected)="onBackgroundColorForGradedQuestionSelected($event)" class="color-picker-control">
                   </rcp-radial-color-picker>
                 </td>
               </tr>
@@ -33,14 +33,14 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                 <td class="color-picker-cell">
                   <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
                     [color]="backgroundColorForRowWithNotGradedQuestion"
-                    (selected)="onBackgroundColorForNotGradedQuestionSelected($event)">
+                    (selected)="onBackgroundColorForNotGradedQuestionSelected($event)" class="color-picker-control">
                   </rcp-radial-color-picker>
                 </td>
               </tr>
             </tbody>
             <tfoot>
-              <tr class="empty-table-row">
-                <td colspan="2"></td>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
               </tr>
               <tr>
                 <td colspan="2">
@@ -56,10 +56,114 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                   </table>
                 </td>
               </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">Чтобы выбрать цвет, нажмите на кружок в соответствующей ячейке справа вверху, выберите
+                  цвет, и нажмите на этот-же кружок ещё раз. Выбранный будет сохранён в настройках автоматически. Чтобы
+                  сбросить настройки цвета в значения по-умолчанию, нажмите на соответствующую кнопку, расположенную
+                  ниже.</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">
+                  <button mat-raised-button color="primary" (click)="resetQuestionColorsToDefaults()"
+                    class="reset-button-style">
+                    Сбросить настройки цвета в значения по-умолчанию
+                  </button>
+                </td>
+              </tr>
             </tfoot>
           </table>
         </mat-tab>
         <mat-tab label="Список ответов">
+          <table>
+            <thead>
+              <tr>
+                <td colspan="2" class="color-table-header-cell">Настройка цветов фона строк для списков ответов</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="color-description-cell">
+                  Цвет фона для строк для ответов без оценки:
+                </td>
+                <td class="color-picker-cell">
+                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                    [color]="notGradedAnswerBackgroundColor"
+                    (selected)="onBackgroundColorForNotGradedAnswerSelected($event)" class="color-picker-control">
+                  </rcp-radial-color-picker>
+                </td>
+              </tr>
+              <tr>
+                <td class="color-description-cell">
+                  Цвет фона для строк для зачтённых (принятых) ответов:
+                </td>
+                <td class="color-picker-cell">
+                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                    [color]="acceptedAnswerBackgroundColor"
+                    (selected)="onBackgroundColorForAcceptedAnswerSelected($event)" class="color-picker-control">
+                  </rcp-radial-color-picker>
+                </td>
+              </tr>
+              <tr>
+                <td class="color-description-cell">
+                  Цвет фона для строк для не зачтённых (не принятых) ответов:
+                </td>
+                <td class="color-picker-cell">
+                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                    [color]="notAcceptedAnswerBackgroundColor"
+                    (selected)="onBackgroundColorForNotAcceptedAnswerSelected($event)" class="color-picker-control">
+                  </rcp-radial-color-picker>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <table class="table-with-examples">
+                    <tbody>
+                      <tr [style.background-color]="notGradedAnswerBackgroundColor">
+                        <td>Строка с ответом без оценки</td>
+                      </tr>
+                      <tr [style.background-color]="acceptedAnswerBackgroundColor">
+                        <td>Строка с принятым ответом</td>
+                      </tr>
+                      <tr [style.background-color]="notAcceptedAnswerBackgroundColor">
+                        <td>Строка с не принятым ответом</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">Чтобы выбрать цвет, нажмите на кружок в соответствующей ячейке справа вверху, выберите
+                  цвет, и нажмите на этот-же кружок ещё раз. Выбранный будет сохранён в настройках автоматически. Чтобы
+                  сбросить настройки цвета в значения по-умолчанию, нажмите на соответствующую кнопку, расположенную
+                  ниже.</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">
+                  <button mat-raised-button color="primary" (click)="resetAnswerColorsToDefaults()"
+                    class="reset-button-style">
+                    Сбросить настройки цвета в значения по-умолчанию
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </mat-tab>
       </mat-tab-group>
     </mat-tab>
