@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Query;
 import java.util.HashMap;
@@ -47,6 +45,20 @@ public class ConfigurationController extends AbstractController {
             method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<CharsetEncodingEntity[]> getSupportedReportEncodings() {
         return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
+    }
+
+    /**
+     * Обновляет значение в конфигурации.
+     * @param configKey ключ для обновления.
+     * @param configValue новое значение.
+     * @return Если всё в порядке, ничего не возвращает кроме HTTP.OK.
+     */
+    @RequestMapping(path = "/configuration/updateConfig/{configKey}",
+                                                            method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<String> updateConfiguration(@PathVariable String configKey,
+                                                                    @RequestParam("configValue") String configValue) {
+        updateConfigRecord(configKey, configValue);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -152,7 +164,7 @@ public class ConfigurationController extends AbstractController {
      * Сбрасывает настройки цвета в цвета по-умолчанию для таблицы с вопросами.
      */
     @RequestMapping(path = "/configuration/reset-database-state",
-            method = RequestMethod.GET, produces = "text/plain")
+            method = RequestMethod.POST, produces = "text/plain")
     public ResponseEntity<String> resetDatabaseStateForTheNextRound() {
         Query answersDeletionQuery = entityManager.createQuery("delete from Answer answer");
         Query emailsDeletionQuery = entityManager.createQuery("delete from Email email");
