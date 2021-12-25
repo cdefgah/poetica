@@ -30,10 +30,40 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
   backgroundColorForRowWithGradedQuestion: string;
   backgroundColorForRowWithNotGradedQuestion: string;
 
+  acceptedAnswerBackgroundColor: string;
+  notAcceptedAnswerBackgroundColor: string;
+  notGradedAnswerBackgroundColor: string;
+
   ngOnInit() {
-    this.httpClient.get('reports/app-version', { responseType: 'text' }).subscribe(
-      (versionInfoString: string) => {
-        this.appVersion = versionInfoString;
+    this.loadBackgroundColorsForQuestionsTable();
+    this.loadBackgroundColorsForAnswersTable();
+  }
+
+  private loadBackgroundColorsForQuestionsTable() {
+    const questionСolorsUrl = '/configuration/colors-for-questions';
+    this.httpClient.get(questionСolorsUrl).subscribe(
+      (colorMap) => {
+        const keyBackgroundColorForGradedRow = 'configKeyGradedQuestionBackgroundColor';
+        const keyBackgroundColorForNonGradedRow = 'configKeyNonGradedQuestionBackgroundColor';
+
+        this.backgroundColorForRowWithGradedQuestion = colorMap[keyBackgroundColorForGradedRow];
+        this.backgroundColorForRowWithNotGradedQuestion = colorMap[keyBackgroundColorForNonGradedRow];
+      },
+      (error) => this.reportServerError(error)
+    );
+  }
+
+  private loadBackgroundColorsForAnswersTable() {
+    const answerColorsUrl = '/configuration/colors-for-answers';
+    this.httpClient.get(answerColorsUrl).subscribe(
+      (colorMap) => {
+        const keyBackgroundColorForAcceptedAnswer = 'configKeyBackgroundColorForAcceptedAnswer';
+        const keyBackgroundColorForNotAcceptedAnswer = 'configKeyBackgroundColorForNotAcceptedAnswer';
+        const keyBackgroundColorForNotGradedAnswer = 'configKeyBackgroundColorForNotGradedAnswer';
+
+        this.acceptedAnswerBackgroundColor = colorMap[keyBackgroundColorForAcceptedAnswer];
+        this.notAcceptedAnswerBackgroundColor = colorMap[keyBackgroundColorForNotAcceptedAnswer];
+        this.notGradedAnswerBackgroundColor = colorMap[keyBackgroundColorForNotGradedAnswer];
       },
       (error) => this.reportServerError(error)
     );
@@ -43,9 +73,11 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
     return this.dialog;
   }
 
-  onColorSelected($colorSelectedEvent) {
-    console.log('======== ON COLOR CHANGE ==== START');
-    console.dir($colorSelectedEvent);
-    console.log('======== ON COLOR CHANGE ==== END');
+  onBackgroundColorForNotGradedQuestionSelected(selectedColor) {
+    this.backgroundColorForRowWithNotGradedQuestion = selectedColor;
   }
+
+  onBackgroundColorForGradedQuestionSelected(selectedColor) {
+    this.backgroundColorForRowWithGradedQuestion = selectedColor;
+  }  
 }

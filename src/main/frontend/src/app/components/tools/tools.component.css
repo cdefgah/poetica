@@ -12,23 +12,33 @@
 
 table {
   border-style: solid;
-  border-color: darkblue;
+  border-color: #3F51B5;
   border-width: 1px;
+  align-self: center;
+}
+
+table tr {
+  border: 1px;
+  border-color: #3F51B5;
+  border-style: solid;
+  margin: 0 auto;
+  margin-top: 1em;
 }
 
 .color-table-header-cell {
-  background-color: darkblue;
+  background-color: #3F51B5;
   color: white;
   font-family: sans-serif;
-  font-size: 1.5em;
+  font-size: 1.25em;
   vertical-align: center;
   text-align: center;
 }
 
 .color-description-cell {
   border: 1px;
-  border-color: red;
-  width: 40%;
+  border-color: #3F51B5;
+  border-style: solid;
+  width: 80%;
   vertical-align: center;
   text-align: left;
   font-family: sans-serif;
@@ -37,7 +47,37 @@ table {
 
 .color-picker-cell {
   border: 1px;
-  border-color: orange;  
-  width: 60%;
+  border-color: #3F51B5;
+  border-style: solid;
+  width: 20%;
   vertical-align: center;
+  align-self: center;
+  text-align: center;
+}
+
+.table-with-examples {
+  background-color: orange;
+  margin: 0 auto;
+  width: 100%;
+  align-self: center;
+  border-style: solid;
+  border-color: darkblue;
+  border: 1px;
+}
+
+.example-table-header-cell {
+  border-color: #3F51B5;
+  border-style: solid;
+  border: 2px;
+  background-color: white;
+  color: black;
+  font-family: sans-serif;
+  font-size: 1em;
+  vertical-align: center;
+  text-align: center;
+}
+
+.empty-table-row {
+  font-size: 1.5em;
+  background-color: white;
 }

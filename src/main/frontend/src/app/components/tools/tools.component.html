@@ -4,32 +4,66 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 <div class="container">
   <h3>Настройки и управление</h3>
 
-  <table>
-    <thead>
-      <tr>
-        <td class="color-table-header-cell">Настройка цветов фона для таблицы с заданиями</td>
-      </tr>
-    </thead>
-    <tr>
-      <td class="color-description-cell" colspan="2">
-        Цвет фона для строк с зачётными заданиями:
-      </td>
-      <td class="color-picker-cell">
-        <rcp-radial-color-picker [size]="96" [collapsed]="isColorPickerOpenedInitially"
-          [color]="backgroundColorForRowWithGradedQuestion" (selected)="onColorSelected($event)">
-        </rcp-radial-color-picker>
-      </td>
-    </tr>
-    <tr>
-      <td class="color-description-cell">
-        Цвет фона для строк с внезачётными заданиями:
-      </td>
-      <td class="color-picker-cell">
-        <rcp-radial-color-picker [size]="96" [collapsed]="isColorPickerOpenedInitially"
-          [color]="backgroundColorForRowWithNotGradedQuestion" (selected)="onColorSelected($event)">
-        </rcp-radial-color-picker>
-      </td>
-    </tr>
-  </table>
-
+  <mat-tab-group>
+    <mat-tab label="Настройки">
+      <mat-tab-group>
+        <mat-tab label="Список заданий">
+          <table>
+            <thead>
+              <tr>
+                <td colspan="2" class="color-table-header-cell">Настройка цветов фона строк для списка заданий</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="color-description-cell">
+                  Цвет фона для строк с зачётными заданиями:
+                </td>
+                <td class="color-picker-cell">
+                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                    [color]="backgroundColorForRowWithGradedQuestion"
+                    (selected)="onBackgroundColorForGradedQuestionSelected($event)">
+                  </rcp-radial-color-picker>
+                </td>
+              </tr>
+              <tr>
+                <td class="color-description-cell">
+                  Цвет фона для строк с внезачётными заданиями:
+                </td>
+                <td class="color-picker-cell">
+                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                    [color]="backgroundColorForRowWithNotGradedQuestion"
+                    (selected)="onBackgroundColorForNotGradedQuestionSelected($event)">
+                  </rcp-radial-color-picker>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="empty-table-row">
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <table class="table-with-examples">
+                    <tbody>
+                      <tr [style.background-color]="backgroundColorForRowWithGradedQuestion">
+                        <td>Строка с зачётным заданием</td>
+                      </tr>
+                      <tr [style.background-color]="backgroundColorForRowWithNotGradedQuestion">
+                        <td>Строка с внезачётным заданием</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </mat-tab>
+        <mat-tab label="Список ответов">
+        </mat-tab>
+      </mat-tab-group>
+    </mat-tab>
+    <mat-tab label="Управление">
+    </mat-tab>
+  </mat-tab-group>
 </div>
