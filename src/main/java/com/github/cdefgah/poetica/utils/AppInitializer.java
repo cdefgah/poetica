@@ -58,6 +58,13 @@ public class AppInitializer {
                                                                         DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
         setupSingleDefaultColor(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR,
                                                                     DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR);
+
+        setupSingleDefaultColor(
+                Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR),
+                DEFAULT_GRADED_QUESTION_BACKGROUND_COLOR);
+        setupSingleDefaultColor(
+                Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR),
+                DEFAULT_NON_GRADED_QUESTION_BACKGROUND_COLOR);
     }
 
     /**
@@ -74,6 +81,16 @@ public class AppInitializer {
                                                                           DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR);
         setupSingleDefaultColor(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER,
                                                                             DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR);
+
+        setupSingleDefaultColor(
+                Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER),
+                DEFAULT_ACCEPTED_ANSWER_BACKGROUND_COLOR);
+        setupSingleDefaultColor(
+                Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_ACCEPTED_ANSWER),
+                DEFAULT_NOT_ACCEPTED_ANSWER_BACKGROUND_COLOR);
+        setupSingleDefaultColor(
+                Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER),
+                DEFAULT_NOT_GRADED_ANSWER_BACKGROUND_COLOR);
     }
 
     /**

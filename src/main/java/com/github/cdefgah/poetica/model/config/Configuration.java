@@ -32,6 +32,15 @@ public class Configuration {
     };
 
     /**
+     * Отдаёт название ключа для дефолтного значения настроек.
+     * @param configKeyName ключ значения, для которого нам нужно имя дефолтного ключа.
+     * @return название ключа для дефолтного значения настроек.
+     */
+    public static String getDefaultKeyName(String configKeyName) {
+        return "default_" + configKeyName;
+    }
+
+    /**
      * Конструктор класса.
      */
     public Configuration() {

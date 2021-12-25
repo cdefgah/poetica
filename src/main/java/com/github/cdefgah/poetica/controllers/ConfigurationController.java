@@ -6,6 +6,7 @@
 package com.github.cdefgah.poetica.controllers;
 
 import com.github.cdefgah.poetica.model.config.*;
+import com.github.cdefgah.poetica.model.repositories.ConfigurationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.Query;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -31,6 +32,12 @@ public class ConfigurationController extends AbstractController {
      */
     @Autowired
     private Configuration configuration;
+
+    /**
+     * Репозиторий конфигурационных записей.
+     */
+    @Autowired
+    private ConfigurationRepository repository;
 
     /**
      * Отдаёт по запросу перечень поддерживаемых кодировок символов.
@@ -90,10 +97,71 @@ public class ConfigurationController extends AbstractController {
      * Сбрасывает настройки цвета в цвета по-умолчанию для таблицы с вопросами.
      */
     @RequestMapping(path = "/configuration/reset-colors-for-questions",
-            method = RequestMethod.POST, produces = "application/json")
+            method = RequestMethod.POST, produces = "text/plain")
     public ResponseEntity<String> resetQuestionPageColors() {
+        // получаем значения по-умолчанию для цветов
+        ConfigurationRecord defaultGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                            Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR));
 
-        // return new ResponseEntity<>(Configuration.SUPPORTED_ENCODINGS, HttpStatus.OK);
+        ConfigurationRecord defaultNonGradedQuestionBackgroundColor = entityManager.find(ConfigurationRecord.class,
+                        Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR));
+
+        // полученные значения гарантированно не равны null, поэтому проверку тут не делаем
+        updateConfigRecord(Configuration.CONFIG_KEY_GRADED_QUESTION_BACKGROUND_COLOR,
+                                                                       defaultGradedQuestionBackgroundColor.getValue());
+
+        updateConfigRecord(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR,
+                                                                    defaultNonGradedQuestionBackgroundColor.getValue());
+
         return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    /**
+     * Сбрасывает настройки цвета в цвета по-умолчанию для таблицы с ответами.
+     */
+    @RequestMapping(path = "/configuration/reset-colors-for-answers",
+            method = RequestMethod.POST, produces = "text/plain")
+    public ResponseEntity<String> resetAnswersPageColors() {
+        // получаем значения по-умолчанию для цветов
+
+        ConfigurationRecord defaultBackgroundColorForAcceptedAnswer =
+                entityManager.find(ConfigurationRecord.class,
+                        Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER));
+
+        ConfigurationRecord defaultBackgroundColorForNotAcceptedAnswer =
+                entityManager.find(ConfigurationRecord.class,
+                    Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_ACCEPTED_ANSWER));
+
+        ConfigurationRecord defaultBackgroundColorForNotGradedAnswer =
+                entityManager.find(ConfigurationRecord.class,
+                      Configuration.getDefaultKeyName(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER));
+
+
+        updateConfigRecord(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_ACCEPTED_ANSWER,
+                                                                    defaultBackgroundColorForAcceptedAnswer.getValue());
+
+        updateConfigRecord(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_ACCEPTED_ANSWER,
+                                                                 defaultBackgroundColorForNotAcceptedAnswer.getValue());
+
+        updateConfigRecord(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER,
+                                                                   defaultBackgroundColorForNotGradedAnswer.getValue());
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    /**
+     * Обновляет значение настроек.
+     * @param key ключ для значения.
+     * @param value новое значение.
+     */
+    private void updateConfigRecord(String key, String value) {
+        Query updateQuery = entityManager.
+                createQuery("update ConfigurationRecord configurationRecord " +
+                        "set configurationRecord.value=:newValue where " +
+                        "configurationRecord.key=:keyName");
+
+        updateQuery.setParameter("keyName", key);
+        updateQuery.setParameter("newValue", value);
+
+        updateQuery.executeUpdate();
     }
 }
