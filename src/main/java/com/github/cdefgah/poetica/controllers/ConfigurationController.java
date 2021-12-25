@@ -149,6 +149,21 @@ public class ConfigurationController extends AbstractController {
     }
 
     /**
+     * Сбрасывает настройки цвета в цвета по-умолчанию для таблицы с вопросами.
+     */
+    @RequestMapping(path = "/configuration/reset-database-state",
+            method = RequestMethod.GET, produces = "text/plain")
+    public ResponseEntity<String> resetDatabaseStateForTheNextRound() {
+        Query answersDeletionQuery = entityManager.createQuery("delete from Answer answer");
+        Query emailsDeletionQuery = entityManager.createQuery("delete from Email email");
+
+        answersDeletionQuery.executeUpdate();
+        emailsDeletionQuery.executeUpdate();
+
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    /**
      * Обновляет значение настроек.
      * @param key ключ для значения.
      * @param value новое значение.
