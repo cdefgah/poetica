@@ -19,14 +19,6 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
     super();
   }
 
-  public appVersion: string;
-
-  // наименование этого свойства может вводить в заблуждение
-  // так как оно привязано к collapsed и при false
-  // элемент будет именно collpased.
-  // но это глюк в самом компоненте color-picker-а.
-  public isColorPickerOpenedInitially = false;
-
   backgroundColorForRowWithGradedQuestion: string;
   backgroundColorForRowWithNonGradedQuestion: string;
 
@@ -37,7 +29,7 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
   cpDisplayMode = 'popup';
   cpPositionMode = 'left';
   cpAlphaChannelMode = 'disabled';
-  
+
   ngOnInit() {
     this.loadBackgroundColorsForQuestionsTable();
     this.loadBackgroundColorsForAnswersTable();

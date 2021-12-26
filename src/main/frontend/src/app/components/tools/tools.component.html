@@ -72,44 +72,44 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
           </table>
         </mat-tab>
         <mat-tab label="Список ответов">
-          <table>
+          <table class="color-table">
             <thead>
               <tr>
                 <td colspan="2" class="color-table-header-cell">Настройка цветов фона строк для списков ответов</td>
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr class="color-table-row">
                 <td class="color-description-cell" [style.background-color]="notGradedAnswerBackgroundColor">
                   Цвет фона строк для ответов без оценки:
                 </td>
                 <td class="color-picker-cell">
-                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
-                    [color]="notGradedAnswerBackgroundColor"
-                    (selected)="onBackgroundColorForNotGradedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker> -->
+                  <input [(colorPicker)]="notGradedAnswerBackgroundColor"
+                    [style.background]="notGradedAnswerBackgroundColor" [cpPosition]="cpPositionMode"
+                    (colorPickerSelect)="onBackgroundColorForNotGradedAnswerSelected($event)" width="100%"
+                    [cpAlphaChannel]="cpAlphaChannelMode" />
                 </td>
               </tr>
-              <tr>
+              <tr class="color-table-row">
                 <td class="color-description-cell" [style.background-color]="acceptedAnswerBackgroundColor">
                   Цвет фона строк для зачтённых (принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
-                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
-                    [color]="acceptedAnswerBackgroundColor"
-                    (selected)="onBackgroundColorForAcceptedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker> -->
+                  <input [(colorPicker)]="acceptedAnswerBackgroundColor"
+                    [style.background]="acceptedAnswerBackgroundColor" [cpPosition]="cpPositionMode"
+                    (colorPickerSelect)="onBackgroundColorForAcceptedAnswerSelected($event)" width="100%"
+                    [cpAlphaChannel]="cpAlphaChannelMode" />
                 </td>
               </tr>
-              <tr>
+              <tr class="color-table-row">
                 <td class="color-description-cell" [style.background-color]="notAcceptedAnswerBackgroundColor">
                   Цвет фона строк для не зачтённых (не принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
-                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
-                    [color]="notAcceptedAnswerBackgroundColor"
-                    (selected)="onBackgroundColorForNotAcceptedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker> -->
+                  <input [(colorPicker)]="notAcceptedAnswerBackgroundColor"
+                    [style.background]="notAcceptedAnswerBackgroundColor" [cpPosition]="cpPositionMode"
+                    (colorPickerSelect)="onBackgroundColorForNotAcceptedAnswerSelected($event)" width="100%"
+                    [cpAlphaChannel]="cpAlphaChannelMode" />
                 </td>
               </tr>
             </tbody>
