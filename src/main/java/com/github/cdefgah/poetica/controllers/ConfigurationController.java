@@ -166,11 +166,14 @@ public class ConfigurationController extends AbstractController {
     @RequestMapping(path = "/configuration/reset-database-state",
             method = RequestMethod.POST, produces = "text/plain")
     public ResponseEntity<String> resetDatabaseStateForTheNextRound() {
+        System.out.println("Resetting database state ...");
         Query answersDeletionQuery = entityManager.createQuery("delete from Answer answer");
         Query emailsDeletionQuery = entityManager.createQuery("delete from Email email");
 
         answersDeletionQuery.executeUpdate();
         emailsDeletionQuery.executeUpdate();
+
+        System.out.println("Resetting database state ... done");
 
         return ResponseEntity.ok().build();
     }

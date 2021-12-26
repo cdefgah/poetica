@@ -150,6 +150,7 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
      // если диалог был принят (accepted)
      const url = '/configuration/reset-database-state';
      this.httpClient.post(url, null).subscribe(() => {
+      this.dbResetSpellWord = '';
       this.displayMessage('Операция выполнена успешно', 'Сброс состояния базы');
      },
      (error) => this.reportServerError(error));

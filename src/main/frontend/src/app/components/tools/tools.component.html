@@ -163,8 +163,10 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
         </tr>
         <tr>
           <td>
-            <input matInput required ngClass="spell-word-field" placeholder="Текст писать сюда..."
-              [(ngModel)]="dbResetSpellWord" appBlockCopyPaste />
+            <mat-form-field>
+              <input matInput required ngClass="spell-word-field" placeholder="Текст писать сюда..."
+                [(ngModel)]="dbResetSpellWord" appBl ockCopyPaste />
+            </mat-form-field>
           </td>
         </tr>
         <tr>
