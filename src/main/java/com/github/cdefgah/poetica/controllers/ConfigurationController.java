@@ -5,8 +5,6 @@
 
 package com.github.cdefgah.poetica.controllers;
 
-import com.github.cdefgah.poetica.model.config.*;
-import com.github.cdefgah.poetica.model.repositories.ConfigurationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +15,8 @@ import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.cdefgah.poetica.model.config.*;
+import com.github.cdefgah.poetica.model.repositories.ConfigurationRepository;
 
 /**
  * Отвечает за управление настройками программы.
@@ -181,14 +181,8 @@ public class ConfigurationController extends AbstractController {
      * @param value новое значение.
      */
     private void updateConfigRecord(String key, String value) {
-        Query updateQuery = entityManager.
-                createQuery("update ConfigurationRecord configurationRecord " +
-                        "set configurationRecord.value=:newValue where " +
-                        "configurationRecord.key=:keyName");
-
-        updateQuery.setParameter("keyName", key);
-        updateQuery.setParameter("newValue", value);
-
-        updateQuery.executeUpdate();
+        ConfigurationRecord configurationRecord = repository.getOne(key);
+        configurationRecord.setValue(value);
+        repository.save(configurationRecord);
     }
 }

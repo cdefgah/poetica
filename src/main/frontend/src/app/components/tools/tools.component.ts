@@ -6,7 +6,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractInteractiveComponentModel } from '../core/base/AbstractInteractiveComponentModel';
 import { MatDialog } from '@angular/material';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-tools',
@@ -28,7 +28,7 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
   public isColorPickerOpenedInitially = false;
 
   backgroundColorForRowWithGradedQuestion: string;
-  backgroundColorForRowWithNotGradedQuestion: string;
+  backgroundColorForRowWithNonGradedQuestion: string;
 
   acceptedAnswerBackgroundColor: string;
   notAcceptedAnswerBackgroundColor: string;
@@ -47,7 +47,7 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
         const keyBackgroundColorForNonGradedRow = 'configKeyNonGradedQuestionBackgroundColor';
 
         this.backgroundColorForRowWithGradedQuestion = colorMap[keyBackgroundColorForGradedRow];
-        this.backgroundColorForRowWithNotGradedQuestion = colorMap[keyBackgroundColorForNonGradedRow];
+        this.backgroundColorForRowWithNonGradedQuestion = colorMap[keyBackgroundColorForNonGradedRow];
       },
       (error) => this.reportServerError(error)
     );
@@ -73,24 +73,39 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
     return this.dialog;
   }
 
-  onBackgroundColorForNotGradedQuestionSelected(selectedColor) {
-    this.backgroundColorForRowWithNotGradedQuestion = selectedColor;
+  onBackgroundColorForNonGradedQuestionSelected(selectedColor: string) {
+    this.backgroundColorForRowWithNonGradedQuestion = selectedColor;
+    this.updateConfiguration('configKeyNonGradedQuestionBackgroundColor', selectedColor);
   }
 
-  onBackgroundColorForGradedQuestionSelected(selectedColor) {
+  onBackgroundColorForGradedQuestionSelected(selectedColor: string) {
     this.backgroundColorForRowWithGradedQuestion = selectedColor;
+    this.updateConfiguration('configKeyGradedQuestionBackgroundColor', selectedColor);
   }
 
-  onBackgroundColorForAcceptedAnswerSelected(selectedColor) {
+  onBackgroundColorForAcceptedAnswerSelected(selectedColor: string) {
     this.acceptedAnswerBackgroundColor = selectedColor;
+    this.updateConfiguration('configKeyBackgroundColorForAcceptedAnswer', selectedColor);
   }
 
-  onBackgroundColorForNotAcceptedAnswerSelected(selectedColor) {
+  onBackgroundColorForNotAcceptedAnswerSelected(selectedColor: string) {
     this.notAcceptedAnswerBackgroundColor = selectedColor;
+    this.updateConfiguration('configKeyBackgroundColorForNotAcceptedAnswer', selectedColor);
   }
 
-  onBackgroundColorForNotGradedAnswerSelected(selectedColor) {
+  onBackgroundColorForNotGradedAnswerSelected(selectedColor: string) {
     this.notGradedAnswerBackgroundColor = selectedColor;
+    this.updateConfiguration('configKeyBackgroundColorForNotGradedAnswer', selectedColor);
+  }
+
+  private updateConfiguration(key: string, value: string) {
+    const requestUrl = `/configuration/updateConfig/${key}`;
+    const payload = new HttpParams()
+          .set('configValue', value);
+
+    this.httpClient.put(requestUrl, payload).subscribe(
+      (error) => this.reportServerError(error)
+    );
   }
 
   resetQuestionColorsToDefaults() {

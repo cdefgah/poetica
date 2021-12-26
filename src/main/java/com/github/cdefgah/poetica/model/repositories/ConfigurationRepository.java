@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
  * Репозиторий для работы с таблицей настроек.
  */
 @Repository
-public interface ConfigurationRepository extends JpaRepository<ConfigurationRecord, Long> {
+public interface ConfigurationRepository extends JpaRepository<ConfigurationRecord, String> {
 
 }
