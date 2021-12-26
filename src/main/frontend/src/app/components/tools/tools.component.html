@@ -16,7 +16,7 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
             </thead>
             <tbody>
               <tr>
-                <td class="color-description-cell">
+                <td class="color-description-cell" [style.background-color]="backgroundColorForRowWithGradedQuestion">
                   Цвет фона для строк с зачётными заданиями:
                 </td>
                 <td class="color-picker-cell">
@@ -27,7 +27,8 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                 </td>
               </tr>
               <tr>
-                <td class="color-description-cell">
+                <td class="color-description-cell"
+                  [style.background-color]="backgroundColorForRowWithNonGradedQuestion">
                   Цвет фона для строк с внезачётными заданиями:
                 </td>
                 <td class="color-picker-cell">
@@ -39,23 +40,6 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
               </tr>
             </tbody>
             <tfoot>
-              <tr class="spacer-table-row">
-                <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <table class="table-with-examples">
-                    <tbody>
-                      <tr [style.background-color]="backgroundColorForRowWithGradedQuestion">
-                        <td>Строка с зачётным заданием</td>
-                      </tr>
-                      <tr [style.background-color]="backgroundColorForRowWithNonGradedQuestion">
-                        <td>Строка с внезачётным заданием</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
               <tr class="spacer-table-row">
                 <td colspan="2">&nbsp;</td>
               </tr>
@@ -88,8 +72,8 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
             </thead>
             <tbody>
               <tr>
-                <td class="color-description-cell">
-                  Цвет фона для строк для ответов без оценки:
+                <td class="color-description-cell" [style.background-color]="notGradedAnswerBackgroundColor">
+                  Цвет фона строк для ответов без оценки:
                 </td>
                 <td class="color-picker-cell">
                   <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
@@ -99,8 +83,8 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                 </td>
               </tr>
               <tr>
-                <td class="color-description-cell">
-                  Цвет фона для строк для зачтённых (принятых) ответов:
+                <td class="color-description-cell" [style.background-color]="acceptedAnswerBackgroundColor">
+                  Цвет фона строк для зачтённых (принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
                   <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
@@ -110,8 +94,8 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                 </td>
               </tr>
               <tr>
-                <td class="color-description-cell">
-                  Цвет фона для строк для не зачтённых (не принятых) ответов:
+                <td class="color-description-cell" [style.background-color]="notAcceptedAnswerBackgroundColor">
+                  Цвет фона строк для не зачтённых (не принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
                   <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
@@ -122,26 +106,6 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
               </tr>
             </tbody>
             <tfoot>
-              <tr class="spacer-table-row">
-                <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <table class="table-with-examples">
-                    <tbody>
-                      <tr [style.background-color]="notGradedAnswerBackgroundColor">
-                        <td>Строка с ответом без оценки</td>
-                      </tr>
-                      <tr [style.background-color]="acceptedAnswerBackgroundColor">
-                        <td>Строка с принятым ответом</td>
-                      </tr>
-                      <tr [style.background-color]="notAcceptedAnswerBackgroundColor">
-                        <td>Строка с не принятым ответом</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
               <tr class="spacer-table-row">
                 <td colspan="2">&nbsp;</td>
               </tr>

@@ -55,16 +55,6 @@ table tr {
   text-align: center;
 }
 
-.table-with-examples {
-  background-color: #3F51B5;
-  margin: 0 auto;
-  width: 100%;
-  align-self: center;
-  border-style: solid;
-  border-color: #3F51B5;
-  border: 1px;
-}
-
 .example-table-header-cell {
   border-color: #3F51B5;
   border-style: solid;
@@ -91,5 +81,5 @@ table tr {
 }
 
 .reset-button-style {
-  margin: 2em;
+  margin: 1em;
 }
