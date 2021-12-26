@@ -34,6 +34,10 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
   notAcceptedAnswerBackgroundColor: string;
   notGradedAnswerBackgroundColor: string;
 
+  cpDisplayMode = 'popup';
+  cpPositionMode = 'left';
+  cpAlphaChannelMode = 'disabled';
+  
   ngOnInit() {
     this.loadBackgroundColorsForQuestionsTable();
     this.loadBackgroundColorsForAnswersTable();

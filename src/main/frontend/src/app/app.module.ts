@@ -32,6 +32,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material';
 import { MatInputModule } from '@angular/material';
 import { MatStepperModule } from '@angular/material/stepper';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { ReportsComponent } from './components/reports/reports.component';
 import { AboutComponent } from './components/about/about.component';
@@ -93,6 +94,7 @@ import { ToolsComponent } from './components/tools/tools.component';
     MatDatepickerModule,
     MatNativeDateModule,
     MatSortModule,
+    ColorPickerModule
   ],
 
   entryComponents: [

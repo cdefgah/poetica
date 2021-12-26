@@ -6,51 +6,44 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
 
   <mat-tab-group>
     <mat-tab label="Настройки">
-      <mat-tab-group>
+      <mat-tab-group dynamicHeight>
         <mat-tab label="Список заданий">
-          <table>
+          <table class="color-table">
             <thead>
               <tr>
                 <td colspan="2" class="color-table-header-cell">Настройка цветов фона строк для списка заданий</td>
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr class="color-table-row">
                 <td class="color-description-cell" [style.background-color]="backgroundColorForRowWithGradedQuestion">
                   Цвет фона для строк с зачётными заданиями:
                 </td>
                 <td class="color-picker-cell">
-                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
-                    [color]="backgroundColorForRowWithGradedQuestion"
-                    (selected)="onBackgroundColorForGradedQuestionSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker>
+                  <input [(colorPicker)]="backgroundColorForRowWithGradedQuestion"
+                    [style.background]="backgroundColorForRowWithGradedQuestion" [cpPosition]="cpPositionMode"
+                    (colorPickerSelect)="onBackgroundColorForGradedQuestionSelected($event)" width="100%"
+                    [cpAlphaChannel]="cpAlphaChannelMode" />
                 </td>
               </tr>
-              <tr>
+              <tr class="color-table-row">
                 <td class="color-description-cell"
                   [style.background-color]="backgroundColorForRowWithNonGradedQuestion">
                   Цвет фона для строк с внезачётными заданиями:
                 </td>
                 <td class="color-picker-cell">
-                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
-                    [color]="backgroundColorForRowWithNonGradedQuestion"
-                    (selected)="onBackgroundColorForNonGradedQuestionSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker>
+                  <input [(colorPicker)]="backgroundColorForRowWithNonGradedQuestion"
+                    [style.background]="backgroundColorForRowWithNonGradedQuestion" [cpPosition]="cpPositionMode"
+                    (colorPickerSelect)="onBackgroundColorForNonGradedQuestionSelected($event)" width="100%"
+                    [cpAlphaChannel]="cpAlphaChannelMode" />
                 </td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="spacer-table-row">
-                <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr class="spacer-table-row">
-                <td colspan="2">Чтобы выбрать цвет, нажмите на кружок в соответствующей ячейке справа вверху, выберите
-                  цвет, и нажмите на этот-же кружок ещё раз. Выбранный будет сохранён в настройках автоматически. Чтобы
-                  сбросить настройки цвета в значения по-умолчанию, нажмите на соответствующую кнопку, расположенную
-                  ниже.</td>
-              </tr>
-              <tr class="spacer-table-row">
-                <td colspan="2">&nbsp;</td>
+                <td colspan="2">
+                  &nbsp;
+                </td>
               </tr>
               <tr class="spacer-table-row">
                 <td colspan="2">
@@ -58,6 +51,21 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                     class="reset-button-style">
                     Сбросить настройки цвета в значения по-умолчанию
                   </button>
+                </td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">
+                  &nbsp;
+                </td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">
+                  &nbsp;
+                </td>
+              </tr>
+              <tr class="spacer-table-row">
+                <td colspan="2">
+                  &nbsp;
                 </td>
               </tr>
             </tfoot>
@@ -76,10 +84,10 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                   Цвет фона строк для ответов без оценки:
                 </td>
                 <td class="color-picker-cell">
-                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
                     [color]="notGradedAnswerBackgroundColor"
                     (selected)="onBackgroundColorForNotGradedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker>
+                  </rcp-radial-color-picker> -->
                 </td>
               </tr>
               <tr>
@@ -87,10 +95,10 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                   Цвет фона строк для зачтённых (принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
-                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
                     [color]="acceptedAnswerBackgroundColor"
                     (selected)="onBackgroundColorForAcceptedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker>
+                  </rcp-radial-color-picker> -->
                 </td>
               </tr>
               <tr>
@@ -98,10 +106,10 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
                   Цвет фона строк для не зачтённых (не принятых) ответов:
                 </td>
                 <td class="color-picker-cell">
-                  <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
+                  <!-- <rcp-radial-color-picker [size]="128" [collapsed]="isColorPickerOpenedInitially"
                     [color]="notAcceptedAnswerBackgroundColor"
                     (selected)="onBackgroundColorForNotAcceptedAnswerSelected($event)" class="color-picker-control">
-                  </rcp-radial-color-picker>
+                  </rcp-radial-color-picker> -->
                 </td>
               </tr>
             </tbody>
