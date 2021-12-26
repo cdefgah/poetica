@@ -30,6 +30,8 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
   cpPositionMode = 'left';
   cpAlphaChannelMode = 'disabled';
 
+  dbResetSpellWord: string;
+
   ngOnInit() {
     this.loadBackgroundColorsForQuestionsTable();
     this.loadBackgroundColorsForAnswersTable();
@@ -132,5 +134,27 @@ export class ToolsComponent extends AbstractInteractiveComponentModel implements
    };
 
     this.confirmationDialog(confirmationMessage, dialogAcceptedAction);    
+  }
+
+  resetDatabase() {
+    const correctSpellWord = 'Удалить все ответы и письма';
+
+    if (correctSpellWord !== this.dbResetSpellWord) {
+      this.displayMessage('Пожалуйста впишите требуемый текст с соблюдением регистра букв, без лишних пробелов, без кавычек и попробуйте снова.', 'Внимание');
+      return;
+    }
+
+    const confirmationMessage = `Все загруженные письма и ответы будут безвозвратно удалены из базы. Продолжать?`;
+
+    const dialogAcceptedAction = () => {
+     // если диалог был принят (accepted)
+     const url = '/configuration/reset-database-state';
+     this.httpClient.post(url, null).subscribe(() => {
+      this.displayMessage('Операция выполнена успешно', 'Сброс состояния базы');
+     },
+     (error) => this.reportServerError(error));
+   };
+
+    this.confirmationDialog(confirmationMessage, dialogAcceptedAction);
   }
 }

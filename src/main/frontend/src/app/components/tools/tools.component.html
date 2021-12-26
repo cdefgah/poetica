@@ -140,6 +140,41 @@ Copyright (c) 2020 - 2022 by Rafael Osipov <rafael.osipov@outlook.com> -->
       </mat-tab-group>
     </mat-tab>
     <mat-tab label="Управление">
+      <table class="db-reset-table">
+        <tr>
+          <td class="db-reset-table-heading-row">Сброс состояния базы для следующего тура</td>
+        </tr>
+        <tr>
+          <td>
+            <p>Сброс состояния подразумевает безвозвратное удаление из&nbsp;базы всех импортированных писем
+              и&nbsp;ответов. В&nbsp;базе остаётся лишь информация о&nbsp;заданиях и&nbsp;командах.</p>
+
+            <p>Перед сбросом рекомендуется <a
+                href="https://github.com/cdefgah/poetica/wiki/%D0%A7%D0%B0%D1%81%D1%82%D0%BE-%D0%B7%D0%B0%D0%B4%D0%B0%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D0%B5-%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%8B"
+                target="_blank">завершить работу приложения</a> и&nbsp;скопировать файл poetica.sqlite в&nbsp;безопасное
+              место.
+              После чего стартовать приложение заново и&nbsp;вернуться на&nbsp;эту страницу.</p>
+
+            <p>В&nbsp;поле, расположенное ниже, с&nbsp;соблюдением регистра букв, без кавычек и&nbsp;лишних пробелов,
+              введите текст:
+              &laquo;Удалить все ответы и&nbsp;письма&raquo; и&nbsp;нажимте кнопку &laquo;Сбросить состояние базы&raquo;
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input matInput required ngClass="spell-word-field" placeholder="Текст писать сюда..."
+              [(ngModel)]="dbResetSpellWord" appBlockCopyPaste />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button mat-raised-button color="accent" (click)="resetDatabase()" class="reset-button-style">
+              Сбросить состояние базы
+            </button>
+          </td>
+        </tr>
+      </table>
     </mat-tab>
   </mat-tab-group>
 </div>

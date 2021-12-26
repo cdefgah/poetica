@@ -125,7 +125,7 @@ public class ConfigurationController extends AbstractController {
         updateConfigRecord(Configuration.CONFIG_KEY_NON_GRADED_QUESTION_BACKGROUND_COLOR,
                                                                     defaultNonGradedQuestionBackgroundColor.getValue());
 
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -157,7 +157,7 @@ public class ConfigurationController extends AbstractController {
 
         updateConfigRecord(Configuration.CONFIG_KEY_BACKGROUND_COLOR_FOR_NOT_GRADED_ANSWER,
                                                                    defaultBackgroundColorForNotGradedAnswer.getValue());
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -172,7 +172,7 @@ public class ConfigurationController extends AbstractController {
         answersDeletionQuery.executeUpdate();
         emailsDeletionQuery.executeUpdate();
 
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     /**

@@ -51,6 +51,7 @@ import { DatePipe } from '@angular/common';
 import { DisplayRoundPipe } from './components/answers/support/display-round-pipe/display-round.pipe';
 import { TeamsListImporterComponent } from './components/teams/teams-list-importer/teams-list-importer.component';
 import { ToolsComponent } from './components/tools/tools.component';
+import { BlockCopyPasteDirective } from './utils/directives/BlockCopyPasteDirective';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { ToolsComponent } from './components/tools/tools.component';
     DisplayRoundPipe,
     TeamsListImporterComponent,
     ToolsComponent,
+    BlockCopyPasteDirective
   ],
   imports: [
     FormsModule,
