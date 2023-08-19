@@ -1,7 +1,5 @@
 # Poetica Project
 
-[![Build Status](https://github.com/cdefgah/poetica/workflows/build/badge.svg)](https://github.com/cdefgah/poetica/actions)
-
 #### Актуальная версия [0.94.7 от 26 декабря 2021 года](https://github.com/cdefgah/poetica/releases/tag/v0.94.7).
 
 [Информация о сборке](https://github.com/cdefgah/poetica/blob/master/src/main/resources/other/whatsnew.txt)
